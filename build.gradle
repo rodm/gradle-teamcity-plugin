@@ -27,13 +27,13 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.1'
+version = '0.1.1'
 group = 'com.github.rodm'
 
 pluginBundle {
-    website = 'http://github.com/rodm'
-    vcsUrl = 'https://github.com/rodm'
-    description = 'Plugin to help develop TeamCity plugins'
+    website = 'https://github.com/rodm/gradle-teamcity-plugin'
+    vcsUrl = 'https://github.com/rodm/gradle-teamcity-plugin'
+    description = 'Gradle plugin to support the development of TeamCity plugins'
     tags = ['teamcity']
 
     plugins {
@@ -41,5 +41,10 @@ pluginBundle {
             id = 'com.github.rodm.teamcity'
             displayName = 'Gradle TeamCity plugin'
         }
+    }
+
+    mavenCoordinates {
+        groupId = project.group
+        artifactId = project.name
     }
 }
