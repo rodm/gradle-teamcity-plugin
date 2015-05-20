@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -40,18 +39,11 @@ class TeamCityPlugin implements Plugin<Project> {
         def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
         jar.exclude "**/teamcity-plugin.xml"
 
-        def packagePlugin = project.tasks.create('packagePlugin', Zip.class)
-        packagePlugin.description = 'Package TeamCity plugin'
-        packagePlugin.group = 'TeamCity'
+        def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin) {
+            conventionMapping.map("descriptor") { extension.descriptor }
+        }
         packagePlugin.dependsOn jar
-
-        packagePlugin.from(jar.outputs.files) {
-            into 'server'
-        }
-        def buildDir = project.getBuildDir()
-        packagePlugin.from("$buildDir/resources/main") {
-            include 'teamcity-plugin.xml'
-        }
+        packagePlugin.serverComponents = jar.outputs.files
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
