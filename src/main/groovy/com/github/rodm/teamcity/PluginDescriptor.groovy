@@ -37,12 +37,15 @@ class PluginDescriptor {
 
     String vendorLogo
 
+    boolean useSeparateClassloader
+
     def writeTo(Writer writer) {
         Node root = new Node(null, "teamcity-plugin", [
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:noNamespaceSchemaLocation": "urn:schemas-jetbrains-com:teamcity-plugin-v1-xml"
         ])
         buildInfoNode(root)
+        buildDeploymentNode(root)
         XmlUtil.serialize(root, writer)
     }
 
@@ -67,5 +70,9 @@ class PluginDescriptor {
             new Node(vendor, "url", getVendorUrl())
         if (getVendorLogo())
             new Node(vendor, "logo", getVendorLogo())
+    }
+
+    private void buildDeploymentNode(Node root) {
+        Node deployment = new Node(root, "deployment", ['use-separate-classloader': useSeparateClassloader])
     }
 }

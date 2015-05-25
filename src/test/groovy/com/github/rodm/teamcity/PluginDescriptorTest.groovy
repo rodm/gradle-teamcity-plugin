@@ -124,4 +124,19 @@ public class PluginDescriptorTest {
         assertXpathNotExists("//info/vendor/url", writer.toString());
         assertXpathNotExists("//info/vendor/logo", writer.toString());
     }
+
+    @Test
+    public void writeOptionalSeparateClassloader() {
+        project.teamcity {
+            descriptor {
+                useSeparateClassloader = 'true'
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        StringWriter writer = new StringWriter();
+
+        descriptor.writeTo(writer)
+
+        assertXpathEvaluatesTo("true", "//deployment/@use-separate-classloader", writer.toString());
+    }
 }
