@@ -19,11 +19,15 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
 public class TeamCityPluginTest {
@@ -60,9 +64,26 @@ public class TeamCityPluginTest {
     }
 
     @Test
-    public void defaultDescriptorPath() {
-        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+    public void buildScriptPluginDescriptor() {
+        project.teamcity {
+            descriptor {
+                name = 'test plugin'
+            }
+        }
 
-        assertThat(extension.descriptor.getPath(), endsWith("src/main/resources/teamcity-plugin.xml"))
+        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        assertThat(extension.descriptor, isA(PluginDescriptor))
+        assertThat(extension.descriptor.getName(), equalTo('test plugin'))
+    }
+
+    @Test
+    public void filePluginDescriptor() {
+        project.teamcity {
+            descriptor = project.file('test-teamcity-plugin.xml')
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        assertThat(extension.descriptor, isA(File))
+        assertThat(extension.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
 }

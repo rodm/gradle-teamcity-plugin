@@ -34,14 +34,11 @@ class TeamCityPlugin implements Plugin<Project> {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByName(TEAMCITY_EXTENSION_NAME)
-        extension.descriptor = project.file("src/main/resources/teamcity-plugin.xml")
 
         def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
         jar.exclude "**/teamcity-plugin.xml"
 
-        def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin) {
-            conventionMapping.map("descriptor") { extension.descriptor }
-        }
+        def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
         packagePlugin.dependsOn jar
         packagePlugin.serverComponents = jar.outputs.files
 
@@ -51,6 +48,16 @@ class TeamCityPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 compile "org.jetbrains.teamcity:server-api:${extension.version}"
+            }
+
+            if (extension.descriptor instanceof File) {
+                def processDescriptor = project.tasks.create('processDescriptor', ProcessPluginDescriptor) {
+                    conventionMapping.map("descriptor") { extension.descriptor }
+                }
+                packagePlugin.dependsOn processDescriptor
+            } else {
+                def generateDescriptor = project.tasks.create('generateDescriptor', GeneratePluginDescriptor)
+                packagePlugin.dependsOn generateDescriptor
             }
         }
     }

@@ -57,6 +57,9 @@ class PackagePlugin extends Zip {
 
     @InputFile
     public File getDescriptor() {
+        if (descriptor == null) {
+            descriptor = new File(project.getBuildDir(), "/descriptor/teamcity-plugin.xml")
+        }
         return descriptor
     }
 
