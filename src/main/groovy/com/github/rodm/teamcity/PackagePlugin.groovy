@@ -41,7 +41,7 @@ class PackagePlugin extends Zip {
                 getDescriptor()
             }
             rename {
-                'teamcity-plugin.xml'
+                TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
             }
         }
     }
@@ -58,7 +58,7 @@ class PackagePlugin extends Zip {
     @InputFile
     public File getDescriptor() {
         if (descriptor == null) {
-            descriptor = new File(project.getBuildDir(), "/descriptor/teamcity-plugin.xml")
+            descriptor = new File(project.getBuildDir(), TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR + "/" + TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME)
         }
         return descriptor
     }

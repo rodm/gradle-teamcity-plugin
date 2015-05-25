@@ -22,8 +22,6 @@ import org.gradle.api.tasks.TaskAction
 
 class GeneratePluginDescriptor extends DefaultTask {
 
-    public static final String FILENAME = 'teamcity-plugin.xml'
-
     private File destination
 
     GeneratePluginDescriptor() {
@@ -33,7 +31,7 @@ class GeneratePluginDescriptor extends DefaultTask {
     @OutputFile
     File getDestination() {
         if (destination == null) {
-            destination = new File(project.getBuildDir(), "/descriptor/" + FILENAME)
+            destination = new File(project.getBuildDir(), TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR + "/" + TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME)
         }
         return destination
     }

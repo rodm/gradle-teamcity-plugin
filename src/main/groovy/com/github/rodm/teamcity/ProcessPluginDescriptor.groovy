@@ -23,12 +23,12 @@ class ProcessPluginDescriptor extends Copy {
     private File descriptor
 
     ProcessPluginDescriptor() {
-        setDestinationDir(new File(project.getBuildDir(), "/descriptor"))
+        setDestinationDir(new File(project.getBuildDir(), TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR))
         from {
             getDescriptor()
         }
         rename {
-            'teamcity-plugin.xml'
+            TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
         }
     }
 

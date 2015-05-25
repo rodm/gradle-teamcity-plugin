@@ -21,6 +21,10 @@ import org.gradle.api.plugins.JavaPlugin
 
 class TeamCityPlugin implements Plugin<Project> {
 
+    static final String PLUGIN_DESCRIPTOR_FILENAME = 'teamcity-plugin.xml'
+
+    static final String PLUGIN_DESCRIPTOR_DIR = 'descriptor'
+
     static final String TEAMCITY_EXTENSION_NAME = 'teamcity'
 
     static final String JETBRAINS_MAVEN_REPOSITORY = 'http://repository.jetbrains.com/all'
@@ -36,7 +40,7 @@ class TeamCityPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.getByName(TEAMCITY_EXTENSION_NAME)
 
         def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-        jar.exclude "**/teamcity-plugin.xml"
+        jar.exclude "**/" + PLUGIN_DESCRIPTOR_FILENAME
 
         def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
         packagePlugin.dependsOn jar
