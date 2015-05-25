@@ -22,6 +22,8 @@ dependencies {
     compile localGroovy()
 
     testCompile "junit:junit:4.12"
+    testCompile "xmlunit:xmlunit:1.6"
+
 }
 
 sourceCompatibility = 1.6

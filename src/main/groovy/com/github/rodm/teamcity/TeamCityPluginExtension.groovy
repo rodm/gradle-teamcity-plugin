@@ -15,9 +15,16 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.util.ConfigureUtil
+
 class TeamCityPluginExtension {
 
     String version = '9.0'
 
-    File descriptor
+    def descriptor
+
+    def descriptor(Closure closure) {
+        this.descriptor = new PluginDescriptor()
+        ConfigureUtil.configure(closure, this.descriptor)
+    }
 }
