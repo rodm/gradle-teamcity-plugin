@@ -52,6 +52,8 @@ class TeamCityPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 compile "org.jetbrains.teamcity:server-api:${extension.version}"
+
+                testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
             }
 
             if (extension.descriptor instanceof File) {

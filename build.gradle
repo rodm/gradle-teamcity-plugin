@@ -29,7 +29,7 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.2'
+version = '0.3'
 group = 'com.github.rodm'
 
 pluginBundle {
