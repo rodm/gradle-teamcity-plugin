@@ -145,4 +145,19 @@ public class PluginDescriptorGeneratorTest {
 
         assertXpathEvaluatesTo("true", "//deployment/@use-separate-classloader", writer.toString());
     }
+
+    @Test
+    public void writeOptionalSeparateClassloaderOnlyIfSpecified() {
+        project.teamcity {
+            descriptor {
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathNotExists("//deployment", writer.toString());
+    }
 }
