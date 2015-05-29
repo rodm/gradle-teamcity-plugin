@@ -24,7 +24,7 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists
 
-public class PluginDescriptorTest {
+public class PluginDescriptorGeneratorTest {
 
     private Project project;
 
@@ -40,8 +40,9 @@ public class PluginDescriptorTest {
     public void writesTeamCityPluginRootNode() {
         StringWriter writer = new StringWriter();
         PluginDescriptor descriptor = new PluginDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
 
-        descriptor.writeTo(writer);
+        generator.writeTo(writer);
 
         assertXpathExists("/teamcity-plugin", writer.toString());
     }
@@ -57,9 +58,10 @@ public class PluginDescriptorTest {
             }
         }
         PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
-        descriptor.writeTo(writer);
+        generator.writeTo(writer);
 
         assertXpathEvaluatesTo("plugin name", "//info/name", writer.toString());
         assertXpathEvaluatesTo("display name", "//info/display-name", writer.toString());
@@ -74,9 +76,10 @@ public class PluginDescriptorTest {
             }
         }
         PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
-        descriptor.writeTo(writer)
+        generator.writeTo(writer)
 
         assertXpathExists("//info/name", writer.toString());
         assertXpathExists("//info/display-name", writer.toString());
@@ -96,9 +99,10 @@ public class PluginDescriptorTest {
             }
         }
         PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
-        descriptor.writeTo(writer)
+        generator.writeTo(writer)
 
         assertXpathEvaluatesTo("plugin description", "//info/description", writer.toString());
         assertXpathEvaluatesTo("download url", "//info/download-url", writer.toString());
@@ -114,9 +118,10 @@ public class PluginDescriptorTest {
             }
         }
         PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
-        descriptor.writeTo(writer)
+        generator.writeTo(writer)
 
         assertXpathNotExists("//info/description", writer.toString());
         assertXpathNotExists("//info/download-url", writer.toString());
@@ -133,9 +138,10 @@ public class PluginDescriptorTest {
             }
         }
         PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
-        descriptor.writeTo(writer)
+        generator.writeTo(writer)
 
         assertXpathEvaluatesTo("true", "//deployment/@use-separate-classloader", writer.toString());
     }

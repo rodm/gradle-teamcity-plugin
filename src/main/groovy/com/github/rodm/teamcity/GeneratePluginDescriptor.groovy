@@ -43,6 +43,7 @@ class GeneratePluginDescriptor extends DefaultTask {
         if (descriptor == null) {
             descriptor = new PluginDescriptor()
         }
-        getDestination().withPrintWriter { writer -> descriptor.writeTo(writer) }
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 }
