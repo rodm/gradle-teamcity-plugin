@@ -32,6 +32,7 @@ class PluginDescriptorGenerator {
         ])
         buildInfoNode(root)
         buildDeploymentNode(root)
+        buildParametersNode(root)
         XmlUtil.serialize(root, writer)
     }
 
@@ -61,5 +62,14 @@ class PluginDescriptorGenerator {
     private void buildDeploymentNode(Node root) {
         if (descriptor.getUseSeparateClassloader())
             new Node(root, "deployment", ['use-separate-classloader': descriptor.getUseSeparateClassloader()])
+    }
+
+    private void buildParametersNode(Node root) {
+        if (descriptor.getParameters().parameters.size() > 0) {
+            Node parameters = new Node(root, "parameters")
+            descriptor.getParameters().parameters.each { name, value ->
+                new Node(parameters, "parameter", ['name': name], value)
+            }
+        }
     }
 }

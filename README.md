@@ -47,6 +47,11 @@ teamcity {
         vendorUrl = 'vendor url'
         vendorLogo = 'vendor logo'
         useSeparateClassloader = 'true'
+
+        parameters {
+            parameter 'name1', 'value1'
+            parameter 'name2', 'value2'
+        }
     }
 }
 ```

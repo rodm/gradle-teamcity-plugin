@@ -15,33 +15,14 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.util.ConfigureUtil
+class Parameters {
+    Map<String, Object> parameters = [:]
 
-class PluginDescriptor {
+    void parameter(String key, Object value) {
+        parameters[key] = value
+    }
 
-    String name
-
-    String displayName
-
-    String version
-
-    String description
-
-    String downloadUrl
-
-    String email
-
-    String vendorName
-
-    String vendorUrl
-
-    String vendorLogo
-
-    boolean useSeparateClassloader
-
-    Parameters parameters = new Parameters()
-
-    def parameters(Closure closure) {
-        ConfigureUtil.configure(closure, parameters)
+    void parameters(Map<String, ?> parameters) {
+        this.parameters.putAll(parameters)
     }
 }

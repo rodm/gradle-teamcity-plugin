@@ -147,7 +147,7 @@ public class PluginDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeOptionalSeparateClassloaderOnlyIfSpecified() {
+    public void writeOptionalSettingsOnlyIfSpecified() {
         project.teamcity {
             descriptor {
             }
@@ -159,5 +159,26 @@ public class PluginDescriptorGeneratorTest {
         generator.writeTo(writer)
 
         assertXpathNotExists("//deployment", writer.toString());
+        assertXpathNotExists("//parameters", writer.toString());
+    }
+
+    @Test
+    public void writeParameters() {
+        project.teamcity {
+            descriptor {
+                parameters {
+                    parameter 'name1', 'value1'
+                    parameter 'name2', 'value2'
+                }
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("value1", "//parameters/parameter[@name='name1']", writer.toString());
+        assertXpathEvaluatesTo("value2", "//parameters/parameter[@name='name2']", writer.toString());
     }
 }
