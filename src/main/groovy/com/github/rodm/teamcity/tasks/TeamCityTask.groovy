@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity.tasks
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputDirectory
 
-class TeamCityPluginExtension {
+class TeamCityTask extends DefaultTask {
 
-    String version = '9.0'
-
-    def descriptor
-
+    @InputDirectory
     File homeDir
 
+    @InputDirectory
     File dataDir
 
+    @InputDirectory
     File javaHome
 
-    def descriptor(Closure closure) {
-        this.descriptor = new PluginDescriptor()
-        ConfigureUtil.configure(closure, this.descriptor)
+    TeamCityTask() {
+        group 'TeamCity'
     }
 }

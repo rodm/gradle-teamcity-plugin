@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity.tasks
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.tasks.TaskAction
 
-class TeamCityPluginExtension {
+class StopServer extends TeamCityTask {
 
-    String version = '9.0'
+    StopServer() {
+        description = 'Stops the TeamCity Server'
+    }
 
-    def descriptor
-
-    File homeDir
-
-    File dataDir
-
-    File javaHome
-
-    def descriptor(Closure closure) {
-        this.descriptor = new PluginDescriptor()
-        ConfigureUtil.configure(closure, this.descriptor)
+    @TaskAction
+    public void stop() {
+        project.exec {
+            executable "${homeDir}/bin/teamcity-server.sh"
+            environment JAVA_HOME: "$javaHome"
+            environment TEAMCITY_DATA_PATH: "$dataDir"
+            args 'stop'
+        }
     }
 }

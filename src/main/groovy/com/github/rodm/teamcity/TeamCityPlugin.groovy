@@ -15,6 +15,9 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.StartServer
+import com.github.rodm.teamcity.tasks.StopServer
+import com.github.rodm.teamcity.tasks.TeamCityTask
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.plugins.JavaPlugin
@@ -66,5 +69,18 @@ class TeamCityPlugin implements Plugin<Project> {
                 packagePlugin.dependsOn generateDescriptor
             }
         }
+
+        configureTeamCityTasks(project, extension)
+    }
+
+    private void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
+        project.tasks.withType(TeamCityTask) {
+            conventionMapping.map('homeDir') { extension.homeDir }
+            conventionMapping.map('dataDir') { extension.dataDir }
+            conventionMapping.map('javaHome') { extension.javaHome }
+        }
+
+        project.tasks.create('startServer', StartServer)
+        project.tasks.create('stopServer', StopServer)
     }
 }
