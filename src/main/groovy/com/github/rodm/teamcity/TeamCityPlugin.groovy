@@ -15,7 +15,9 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
+import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.TeamCityTask
 import org.gradle.api.Project
@@ -82,5 +84,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
         project.tasks.create('startServer', StartServer)
         project.tasks.create('stopServer', StopServer)
+        project.tasks.create('startAgent', StartAgent)
+        project.tasks.create('stopAgent', StopAgent)
     }
 }
