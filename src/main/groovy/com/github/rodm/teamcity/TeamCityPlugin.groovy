@@ -15,11 +15,13 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.TeamCityTask
+import com.github.rodm.teamcity.tasks.UndeployPlugin
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.plugins.JavaPlugin
@@ -86,5 +88,11 @@ class TeamCityPlugin implements Plugin<Project> {
         project.tasks.create('stopServer', StopServer)
         project.tasks.create('startAgent', StartAgent)
         project.tasks.create('stopAgent', StopAgent)
+
+        def deployPlugin = project.tasks.create('deployPlugin', DeployPlugin)
+        deployPlugin.file = project.tasks['packagePlugin'].archivePath
+
+        def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin)
+        undeployPlugin.file = project.tasks['packagePlugin'].archiveName
     }
 }
