@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity.tasks
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.DefaultTask
 
-class TeamCityPluginExtension {
+class InstallTeamCity extends DefaultTask {
 
-    String version = '9.0'
-
-    def descriptor
-
-    File homeDir
-
-    File dataDir
-
-    File javaHome
-
-    String downloadBaseUrl = 'http://download.jetbrains.com/teamcity'
-
-    def descriptor(Closure closure) {
-        this.descriptor = new PluginDescriptor()
-        ConfigureUtil.configure(closure, this.descriptor)
+    InstallTeamCity() {
+        group = 'TeamCity'
     }
 }

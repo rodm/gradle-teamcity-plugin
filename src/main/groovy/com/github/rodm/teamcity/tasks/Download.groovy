@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity.tasks
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
-class TeamCityPluginExtension {
+class Download extends DefaultTask {
 
-    String version = '9.0'
+    @Input
+    String source
 
-    def descriptor
+    @OutputFile
+    File target
 
-    File homeDir
-
-    File dataDir
-
-    File javaHome
-
-    String downloadBaseUrl = 'http://download.jetbrains.com/teamcity'
-
-    def descriptor(Closure closure) {
-        this.descriptor = new PluginDescriptor()
-        ConfigureUtil.configure(closure, this.descriptor)
+    @TaskAction
+    void download() {
+        logger.info("Downloading TeamCity installer from {} to {}", getSource(), getTarget())
+        new URL(getSource()).withInputStream { is -> getTarget().withOutputStream { os -> os << is }}
     }
 }

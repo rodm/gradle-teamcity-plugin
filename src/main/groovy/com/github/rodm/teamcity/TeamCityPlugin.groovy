@@ -16,7 +16,9 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.DeployPlugin
+import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GeneratePluginDescriptor
+import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.PackagePlugin
 import com.github.rodm.teamcity.tasks.ProcessPluginDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
@@ -25,6 +27,7 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.TeamCityTask
 import com.github.rodm.teamcity.tasks.UndeployPlugin
+import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.plugins.JavaPlugin
@@ -97,5 +100,18 @@ class TeamCityPlugin implements Plugin<Project> {
 
         def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin)
         undeployPlugin.file = project.tasks['packagePlugin'].archiveName
+
+        def download = project.tasks.create("downloadTeamCity", Download) {
+            conventionMapping.map('source') { extension.downloadBaseUrl + "/TeamCity-" + extension.version + ".tar.gz" }
+            conventionMapping.map('target') { project.file("TeamCity-${extension.version}.tar.gz") }
+        }
+        def unpack = project.tasks.create("unpackTeamCity", Unpack) {
+            conventionMapping.map('source') { project.file("TeamCity-${extension.version}.tar.gz") }
+            conventionMapping.map('target') { extension.homeDir }
+        }
+        unpack.dependsOn download
+
+        def install = project.tasks.create("installTeamCity", InstallTeamCity)
+        install.dependsOn unpack
     }
 }
