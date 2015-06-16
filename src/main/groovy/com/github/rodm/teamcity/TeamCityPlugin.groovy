@@ -95,11 +95,12 @@ class TeamCityPlugin implements Plugin<Project> {
         project.tasks.create('startAgent', StartAgent)
         project.tasks.create('stopAgent', StopAgent)
 
-        def deployPlugin = project.tasks.create('deployPlugin', DeployPlugin)
-        deployPlugin.file = project.tasks['packagePlugin'].archivePath
-
-        def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin)
-        undeployPlugin.file = project.tasks['packagePlugin'].archiveName
+        project.tasks.create('deployPlugin', DeployPlugin) {
+            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
+        }
+        project.tasks.create('undeployPlugin', UndeployPlugin) {
+            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
+        }
 
         def download = project.tasks.create("downloadTeamCity", Download) {
             conventionMapping.map('source') { extension.downloadBaseUrl + "/TeamCity-" + extension.version + ".tar.gz" }

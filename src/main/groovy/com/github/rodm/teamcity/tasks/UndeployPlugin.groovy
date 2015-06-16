@@ -29,6 +29,6 @@ class UndeployPlugin extends TeamCityTask {
 
     @TaskAction
     public void undeploy() {
-        project.delete("$dataDir/plugins/$file")
+        project.delete("$dataDir/plugins/${getFile()}")
     }
 }
