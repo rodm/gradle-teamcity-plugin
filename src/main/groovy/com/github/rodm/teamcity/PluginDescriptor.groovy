@@ -37,7 +37,7 @@ class PluginDescriptor {
 
     String vendorLogo
 
-    boolean useSeparateClassloader
+    Boolean useSeparateClassloader
 
     Parameters parameters = new Parameters()
 

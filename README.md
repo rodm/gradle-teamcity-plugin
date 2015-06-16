@@ -61,7 +61,7 @@ teamcity {
         email = 'me@example.com'
         vendorUrl = 'vendor url'
         vendorLogo = 'vendor logo'
-        useSeparateClassloader = 'true'
+        useSeparateClassloader = true
 
         parameters {
             parameter 'name1', 'value1'

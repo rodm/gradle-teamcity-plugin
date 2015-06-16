@@ -42,7 +42,7 @@ teamcity {
 
         downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
         email = 'rod.n.mackenzie@gmail.com'
-        useSeparateClassloader = 'false'
+        useSeparateClassloader = false
 
         parameters {
             parameter 'param', 'value'

@@ -60,7 +60,7 @@ class PluginDescriptorGenerator {
     }
 
     private void buildDeploymentNode(Node root) {
-        if (descriptor.getUseSeparateClassloader())
+        if (descriptor.getUseSeparateClassloader() != null)
             new Node(root, "deployment", ['use-separate-classloader': descriptor.getUseSeparateClassloader()])
     }
 
