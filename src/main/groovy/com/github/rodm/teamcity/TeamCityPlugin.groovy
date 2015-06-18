@@ -97,6 +97,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
         project.tasks.create('deployPlugin', DeployPlugin) {
             conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
+            conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
         }
         project.tasks.create('undeployPlugin', UndeployPlugin) {
             conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }

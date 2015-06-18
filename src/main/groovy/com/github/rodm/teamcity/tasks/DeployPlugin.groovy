@@ -16,12 +16,16 @@
 package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 class DeployPlugin extends TeamCityTask {
 
     @InputFile
     File file
+
+    @OutputDirectory
+    File target
 
     DeployPlugin() {
         description = 'Deploy plugin'
@@ -30,8 +34,8 @@ class DeployPlugin extends TeamCityTask {
     @TaskAction
     public void deploy() {
         project.copy {
-            from "$file"
-            into "$dataDir/plugins"
+            from getFile()
+            into getTarget()
         }
     }
 }
