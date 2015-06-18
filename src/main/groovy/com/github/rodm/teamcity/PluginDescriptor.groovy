@@ -37,6 +37,10 @@ class PluginDescriptor {
 
     String vendorLogo
 
+    String minimumBuild
+
+    String maximumBuild
+
     Boolean useSeparateClassloader
 
     Parameters parameters = new Parameters()

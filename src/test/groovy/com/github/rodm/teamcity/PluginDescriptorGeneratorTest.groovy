@@ -252,4 +252,72 @@ public class PluginDescriptorGeneratorTest {
 
         assertXpathNotExists("//dependencies", writer.toString());
     }
+
+    @Test
+    public void writeRequirements() {
+        project.teamcity {
+            descriptor {
+                minimumBuild = '1234'
+                maximumBuild = '2345'
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("1234", "//requirements/@min-build", writer.toString());
+        assertXpathEvaluatesTo("2345", "//requirements/@max-build", writer.toString());
+    }
+
+    @Test
+    public void writeRequirementsMinimumBuildOnly() {
+        project.teamcity {
+            descriptor {
+                minimumBuild = '1234'
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("1234", "//requirements/@min-build", writer.toString());
+        assertXpathNotExists("//requirements/@max-build", writer.toString());
+    }
+
+    @Test
+    public void writeRequirementsMaximumBuildOnly() {
+        project.teamcity {
+            descriptor {
+                maximumBuild = '1234'
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("1234", "//requirements/@max-build", writer.toString());
+        assertXpathNotExists("//requirements/@min-build", writer.toString());
+    }
+
+
+    @Test
+    public void writeRequirementsOnlyIfSpecified() {
+        project.teamcity {
+            descriptor {
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathNotExists("//requirements", writer.toString());
+    }
 }
