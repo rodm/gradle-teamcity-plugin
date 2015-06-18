@@ -15,39 +15,21 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.util.ConfigureUtil
+class Dependencies {
 
-class PluginDescriptor {
+    List<String> plugins = []
 
-    String name
-
-    String displayName
-
-    String version
-
-    String description
-
-    String downloadUrl
-
-    String email
-
-    String vendorName
-
-    String vendorUrl
-
-    String vendorLogo
-
-    Boolean useSeparateClassloader
-
-    Parameters parameters = new Parameters()
-
-    def parameters(Closure closure) {
-        ConfigureUtil.configure(closure, parameters)
+    void plugin(String name) {
+        plugins << name
     }
 
-    Dependencies dependencies = new Dependencies()
+    List<String> tools = []
 
-    def dependencies(Closure closure) {
-        ConfigureUtil.configure(closure, dependencies)
+    void tool(String name) {
+        tools << name
+    }
+
+    boolean hasDependencies() {
+        return plugins.size() > 0 || tools.size() > 0
     }
 }

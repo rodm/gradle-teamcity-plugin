@@ -199,4 +199,57 @@ public class PluginDescriptorGeneratorTest {
         assertXpathEvaluatesTo("value1", "//parameters/parameter[@name='name1']", writer.toString());
         assertXpathEvaluatesTo("value2", "//parameters/parameter[@name='name2']", writer.toString());
     }
+
+    @Test
+    public void writePluginDependency() {
+        project.teamcity {
+            descriptor {
+                dependencies {
+                    plugin 'plugin-name'
+                }
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("plugin-name", "//dependencies/plugin/@name", writer.toString());
+    }
+
+    @Test
+    public void writeToolDependency() {
+        project.teamcity {
+            descriptor {
+                dependencies {
+                    tool 'tool-name'
+                }
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("tool-name", "//dependencies/tool/@name", writer.toString());
+    }
+
+    @Test
+    public void writeDependenciesOnlyIfSpecified() {
+        project.teamcity {
+            descriptor {
+                dependencies {
+                }
+            }
+        }
+        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathNotExists("//dependencies", writer.toString());
+    }
 }
