@@ -56,8 +56,6 @@ class TeamCityPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.getByName(TEAMCITY_EXTENSION_NAME)
 
         def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-        jar.exclude "**/" + PLUGIN_DESCRIPTOR_FILENAME
-
         def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
         packagePlugin.dependsOn jar
         packagePlugin.serverComponents = jar.outputs.files
