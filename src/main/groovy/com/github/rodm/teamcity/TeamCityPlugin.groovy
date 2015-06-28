@@ -46,8 +46,11 @@ class TeamCityPlugin implements Plugin<Project> {
         project.plugins.apply(JavaPlugin)
         project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
 
-        project.repositories.maven {
-            url = JETBRAINS_MAVEN_REPOSITORY
+        project.repositories {
+            mavenCentral()
+            maven {
+                url = JETBRAINS_MAVEN_REPOSITORY
+            }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByName(TEAMCITY_EXTENSION_NAME)
