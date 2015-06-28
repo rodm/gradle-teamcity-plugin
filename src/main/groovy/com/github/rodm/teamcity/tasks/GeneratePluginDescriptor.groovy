@@ -42,12 +42,13 @@ class GeneratePluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
+        PluginDescriptor descriptor = extension.getDescriptor()
 
         if (descriptor == null) {
             descriptor = new PluginDescriptor()
         }
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 }

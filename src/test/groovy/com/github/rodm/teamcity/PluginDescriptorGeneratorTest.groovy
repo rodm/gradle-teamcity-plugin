@@ -254,6 +254,26 @@ public class PluginDescriptorGeneratorTest {
     }
 
     @Test
+    public void writeDependenciesOnlyForTeamCity9() {
+        project.teamcity {
+            version = '8.1'
+            descriptor {
+                dependencies {
+                    plugin 'plugin-name'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
+        PluginDescriptor descriptor = extension.getDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion())
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathNotExists("//dependencies", writer.toString());
+    }
+
+    @Test
     public void writeRequirements() {
         project.teamcity {
             descriptor {

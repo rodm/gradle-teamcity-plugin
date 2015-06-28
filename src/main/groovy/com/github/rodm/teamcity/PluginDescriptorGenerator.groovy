@@ -21,8 +21,15 @@ class PluginDescriptorGenerator {
 
     private PluginDescriptor descriptor
 
+    private String version
+
     PluginDescriptorGenerator(PluginDescriptor descriptor) {
+        this(descriptor, "9.0")
+    }
+
+    PluginDescriptorGenerator(PluginDescriptor descriptor, String version) {
         this.descriptor = descriptor
+        this.version = version
     }
 
     public void writeTo(Writer writer) {
@@ -86,13 +93,15 @@ class PluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (descriptor.getDependencies().hasDependencies()) {
-            Node dependencies = new Node(root, 'dependencies')
-            descriptor.getDependencies().plugins.each { name ->
-                new Node(dependencies, "plugin", ['name': name])
-            }
-            descriptor.getDependencies().tools.each { name ->
-                new Node(dependencies, "tool", ['name': name])
+        if (version.startsWith("9")) {
+            if (descriptor.getDependencies().hasDependencies()) {
+                Node dependencies = new Node(root, 'dependencies')
+                descriptor.getDependencies().plugins.each { name ->
+                    new Node(dependencies, "plugin", ['name': name])
+                }
+                descriptor.getDependencies().tools.each { name ->
+                    new Node(dependencies, "tool", ['name': name])
+                }
             }
         }
     }
