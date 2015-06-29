@@ -25,10 +25,10 @@ class StartAgent extends TeamCityTask {
 
     @TaskAction
     public void start() {
-        project.exec {
-            executable "$homeDir/buildAgent/bin/agent.sh"
-            environment JAVA_HOME: "$javaHome"
-            args = ['start']
+        def name = isWindows() ? 'agent.bat' : 'agent.sh'
+        project.ant.exec(executable: "$homeDir/buildAgent/bin/$name", spawn: true) {
+            env key: 'JAVA_HOME', path: getJavaHome()
+            arg value: 'start'
         }
     }
 }

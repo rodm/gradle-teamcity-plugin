@@ -25,11 +25,11 @@ class StartServer extends TeamCityTask {
 
     @TaskAction
     public void start() {
-        project.exec {
-            executable "$homeDir/bin/teamcity-server.sh"
-            environment JAVA_HOME: "$javaHome"
-            environment TEAMCITY_DATA_PATH: "$dataDir"
-            args 'start'
+        def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
+        project.ant.exec(executable: "$homeDir/bin/$name", spawn: true) {
+            env key: 'JAVA_HOME', path: getJavaHome()
+            env key: 'TEAMCITY_DATA_PATH', path: getDataDir()
+            arg value: 'start'
         }
     }
 }

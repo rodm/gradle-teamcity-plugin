@@ -25,10 +25,10 @@ class StopAgent extends TeamCityTask {
 
     @TaskAction
     public void stop() {
-        project.exec {
-            executable "$homeDir/buildAgent/bin/agent.sh"
-            environment JAVA_HOME: "$javaHome"
-            args = ['stop']
+        def name = isWindows() ? 'agent.bat' : 'agent.sh'
+        project.ant.exec(executable: "$homeDir/buildAgent/bin/$name", spawn: true) {
+            env key: 'JAVA_HOME', path: getJavaHome()
+            arg value: 'stop'
         }
     }
 }
