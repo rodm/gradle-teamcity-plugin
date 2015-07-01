@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.4'
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.5'
     }
 }
 
@@ -20,10 +20,6 @@ ext {
     teamcityDir = "$rootDir/servers/TeamCity-${teamcityVersion}"
     teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
     teamcityJavaHome = System.properties['java.home']
-}
-
-repositories {
-    mavenCentral()
 }
 
 test {
