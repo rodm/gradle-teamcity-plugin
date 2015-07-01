@@ -19,15 +19,13 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
-import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
 
 public class TeamCityPluginTest {
@@ -85,5 +83,36 @@ public class TeamCityPluginTest {
         TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
         assertThat(extension.descriptor, isA(File))
         assertThat(extension.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
+    public void defaultDownloadUrl() {
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.getDownloadUrl(), equalTo('http://download.jetbrains.com/teamcity/TeamCity-9.0.tar.gz'))
+    }
+
+    @Test
+    public void alternativeDownloadBaseUrl() {
+        project.teamcity {
+            downloadBaseUrl = 'http://repository:8080/teamcity'
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.getDownloadUrl(), equalTo('http://repository:8080/teamcity/TeamCity-9.0.tar.gz'))
+    }
+
+    @Test
+    public void defaultDownloadDir() {
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.getDownloadFile(), equalTo('downloads/TeamCity-9.0.tar.gz'))
+    }
+
+    @Test
+    public void alternativeDownloadDir() {
+        project.teamcity {
+            downloadDir = '/tmp'
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.getDownloadFile(), equalTo('/tmp/TeamCity-9.0.tar.gz'))
     }
 }

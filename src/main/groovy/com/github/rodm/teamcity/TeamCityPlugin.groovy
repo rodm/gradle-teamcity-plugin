@@ -105,11 +105,11 @@ class TeamCityPlugin implements Plugin<Project> {
         }
 
         def download = project.tasks.create("downloadTeamCity", Download) {
-            conventionMapping.map('source') { extension.downloadBaseUrl + "/TeamCity-" + extension.version + ".tar.gz" }
-            conventionMapping.map('target') { project.file("TeamCity-${extension.version}.tar.gz") }
+            conventionMapping.map('source') { extension.downloadUrl }
+            conventionMapping.map('target') { project.file(extension.downloadFile) }
         }
         def unpack = project.tasks.create("unpackTeamCity", Unpack) {
-            conventionMapping.map('source') { project.file("TeamCity-${extension.version}.tar.gz") }
+            conventionMapping.map('source') { project.file(extension.downloadFile) }
             conventionMapping.map('target') { extension.homeDir }
         }
         unpack.dependsOn download

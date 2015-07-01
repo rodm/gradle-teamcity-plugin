@@ -31,8 +31,28 @@ class TeamCityPluginExtension {
 
     String downloadBaseUrl = 'http://download.jetbrains.com/teamcity'
 
+    String downloadUrl
+
+    String downloadDir = 'downloads'
+
+    String downloadFile
+
     def descriptor(Closure closure) {
         this.descriptor = new PluginDescriptor()
         ConfigureUtil.configure(closure, this.descriptor)
+    }
+
+    def getDownloadUrl() {
+        if (!downloadUrl) {
+            downloadUrl = "${downloadBaseUrl}/TeamCity-${version}.tar.gz"
+        }
+        return downloadUrl
+    }
+
+    def getDownloadFile() {
+        if (!downloadFile) {
+            downloadFile = "${downloadDir}/TeamCity-${version}.tar.gz"
+        }
+        return downloadFile
     }
 }
