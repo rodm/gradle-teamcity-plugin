@@ -69,7 +69,7 @@ public class TeamCityPluginTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.descriptor, isA(PluginDescriptor))
         assertThat(extension.descriptor.getName(), equalTo('test plugin'))
     }
@@ -80,7 +80,7 @@ public class TeamCityPluginTest {
             descriptor = project.file('test-teamcity-plugin.xml')
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.descriptor, isA(File))
         assertThat(extension.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
