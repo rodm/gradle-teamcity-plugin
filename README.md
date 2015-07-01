@@ -25,6 +25,7 @@ descriptor can be specified as a path to a file or by a configuration block with
 * `dataDir` : The path to the TeamCity Data directory.
 * `javaHome` : The path to the version of Java used to run the server and build agent.
 * `downloadBaseUrl` : The base URL used to download the TeamCity installer. Default 'http://download.jetbrains.com/teamcity'.
+* `downloadDir` : The directory the TeamCity installer is downloaded into. Default 'downloads'.
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for [Packaging Plugins](https://confluence.jetbrains.com/display/TCD9/Plugins+Packaging#PluginsPackaging-PluginDescriptor)  
 
@@ -62,10 +63,20 @@ teamcity {
         vendorUrl = 'vendor url'
         vendorLogo = 'vendor logo'
         useSeparateClassloader = true
+        
+        minimumBuild = '10'
+        maximumBuild = '20'
 
         parameters {
             parameter 'name1', 'value1'
             parameter 'name2', 'value2'
+        }
+        
+        dependencies {
+            plugin 'plugin1-name'
+            plugin 'plugin2-name'
+            tool 'tool1-name'
+            tool 'tool2-name'
         }
     }
             
@@ -76,6 +87,9 @@ teamcity {
     
     // local web server for downloading TeamCity distributions 
     downloadBaseUrl = "http://repository/"
+    
+    // store the downloaded TeamCity distributions in /tmp
+    downloadDir = '/tmp'
 }
 ```
 
