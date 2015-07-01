@@ -77,7 +77,7 @@ class PluginDescriptorGenerator {
         if (descriptor.getMaximumBuild())
             attributes << ['max-build': descriptor.getMaximumBuild()]
         if (attributes.size() > 0)
-            Node requirements = new Node(root, "requirements", attributes)
+            new Node(root, "requirements", attributes)
     }
 
     private void buildDeploymentNode(Node root) {
