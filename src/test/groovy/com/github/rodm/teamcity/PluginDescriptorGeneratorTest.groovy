@@ -84,7 +84,7 @@ public class PluginDescriptorGeneratorTest {
     }
 
     @Test
-    public void wrtiesRequiredInfoPropertiesUsingDefaults() {
+    public void writesRequiredInfoPropertiesUsingDefaults() {
         def defaults = [:]
         defaults << ['name': 'test-plugin name']
         defaults << ['displayName': 'test-plugin display name']
