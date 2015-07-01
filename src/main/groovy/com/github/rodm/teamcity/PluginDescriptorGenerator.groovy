@@ -23,13 +23,12 @@ class PluginDescriptorGenerator {
 
     private String version
 
-    PluginDescriptorGenerator(PluginDescriptor descriptor) {
-        this(descriptor, "9.0")
-    }
+    private Map<String, String> defaults
 
-    PluginDescriptorGenerator(PluginDescriptor descriptor, String version) {
+    PluginDescriptorGenerator(PluginDescriptor descriptor, String version = "9.0", Map defaults = [:]) {
         this.descriptor = descriptor
         this.version = version
+        this.defaults = defaults
     }
 
     public void writeTo(Writer writer) {
@@ -47,9 +46,12 @@ class PluginDescriptorGenerator {
 
     private void buildInfoNode(Node root) {
         Node info = new Node(root, "info")
-        new Node(info, "name", descriptor.getName())
-        new Node(info, "display-name", descriptor.getDisplayName())
-        new Node(info, "version", descriptor.getVersion())
+        def name = descriptor.getName() ? descriptor.getName() : defaults.name
+        def displayName = descriptor.getDisplayName() ? descriptor.getDisplayName() : defaults.displayName
+        def version = descriptor.getVersion() ? descriptor.getVersion() : defaults.version
+        new Node(info, "name", name)
+        new Node(info, "display-name", displayName)
+        new Node(info, "version", version)
         if (descriptor.getDescription())
             new Node(info, "description", descriptor.getDescription())
         if (descriptor.getDownloadUrl())

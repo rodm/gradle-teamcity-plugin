@@ -71,11 +71,7 @@ public class PluginDescriptorGeneratorTest {
 
     @Test
     public void writesRequiredInfoPropertiesWhenNotSet() {
-        project.teamcity {
-            descriptor {
-            }
-        }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        PluginDescriptor descriptor = new PluginDescriptor()
         PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
@@ -85,6 +81,23 @@ public class PluginDescriptorGeneratorTest {
         assertXpathExists("//info/display-name", writer.toString());
         assertXpathExists("//info/version", writer.toString());
         assertXpathExists("//info/vendor/name", writer.toString());
+    }
+
+    @Test
+    public void wrtiesRequiredInfoPropertiesUsingDefaults() {
+        def defaults = [:]
+        defaults << ['name': 'test-plugin name']
+        defaults << ['displayName': 'test-plugin display name']
+        defaults << ['version': '1.2.3']
+        PluginDescriptor descriptor = new PluginDescriptor()
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, "9.0", defaults)
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertXpathEvaluatesTo("test-plugin name", "//info/name", writer.toString());
+        assertXpathEvaluatesTo("test-plugin display name", "//info/display-name", writer.toString());
+        assertXpathEvaluatesTo("1.2.3", "//info/version", writer.toString());
     }
 
     @Test

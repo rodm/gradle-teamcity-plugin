@@ -48,7 +48,14 @@ class GeneratePluginDescriptor extends DefaultTask {
         if (descriptor == null) {
             descriptor = new PluginDescriptor()
         }
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion())
+        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion(), defaults())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
+    }
+
+    private Map<String, String> defaults() {
+        Map<String, String> defaults = [:]
+        defaults << ['name': project.name]
+        defaults << ['displayName': project.name]
+        defaults << ['version': project.version]
     }
 }
