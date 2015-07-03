@@ -20,7 +20,9 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
+import static org.hamcrest.Matchers.hasSize
 import static org.junit.Assert.assertThat
 
 class AgentConfigurationTest {
@@ -44,5 +46,77 @@ class AgentConfigurationTest {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.descriptor, isA(AgentPluginDescriptor))
+    }
+
+    @Test
+    public void createDescriptorForPluginDeployment() {
+        project.teamcity {
+            type = 'agent-plugin'
+
+            descriptor {
+                pluginDeployment {
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.descriptor.deployment, isA(PluginDeployment))
+    }
+
+    @Test
+    public void createDescriptorForPluginDeploymentWithExecutableFiles() {
+        project.teamcity {
+            type = 'agent-plugin'
+
+            descriptor {
+                pluginDeployment {
+                    useSeparateClassloader = true
+                    executableFiles {
+                        include 'file1'
+                        include 'file2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        PluginDeployment deployment = extension.descriptor.deployment
+        assertThat(deployment.useSeparateClassloader, equalTo(Boolean.TRUE))
+        assertThat(deployment.executableFiles.includes, hasSize(2))
+    }
+
+    @Test
+    public void createDescriptorForToolDeployment() {
+        project.teamcity {
+            type = 'agent-plugin'
+
+            descriptor {
+                toolDeployment {
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.descriptor.deployment, isA(ToolDeployment))
+    }
+
+    @Test
+    public void createDescriptorForToolDeploymentWithExecutableFiles() {
+        project.teamcity {
+            type = 'agent-plugin'
+
+            descriptor {
+                toolDeployment {
+                    executableFiles {
+                        include 'file1'
+                        include 'file2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        ToolDeployment deployment = extension.descriptor.deployment
+        assertThat(deployment.executableFiles.includes, hasSize(2))
     }
 }

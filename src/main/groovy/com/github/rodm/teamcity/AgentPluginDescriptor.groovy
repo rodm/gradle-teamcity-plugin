@@ -21,6 +21,16 @@ class AgentPluginDescriptor {
 
     def deployment
 
+    def pluginDeployment(Closure closure) {
+        deployment = new PluginDeployment()
+        ConfigureUtil.configure(closure, deployment)
+    }
+
+    def toolDeployment(Closure closure) {
+        deployment = new ToolDeployment()
+        ConfigureUtil.configure(closure, deployment)
+    }
+
     Dependencies dependencies = new Dependencies()
 
     def dependencies(Closure closure) {
