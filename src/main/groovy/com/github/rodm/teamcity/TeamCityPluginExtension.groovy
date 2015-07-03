@@ -19,6 +19,8 @@ import org.gradle.util.ConfigureUtil
 
 class TeamCityPluginExtension {
 
+    String type
+
     String version = '9.0'
 
     def descriptor
@@ -38,7 +40,11 @@ class TeamCityPluginExtension {
     String downloadFile
 
     def descriptor(Closure closure) {
-        this.descriptor = new PluginDescriptor()
+        if (this.type == 'agent-plugin') {
+            this.descriptor = new AgentPluginDescriptor()
+        } else {
+            this.descriptor = new PluginDescriptor()
+        }
         ConfigureUtil.configure(closure, this.descriptor)
     }
 
