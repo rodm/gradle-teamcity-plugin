@@ -15,15 +15,11 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.util.ConfigureUtil
+class ExecutableFiles {
 
-class AgentPluginDescriptor {
+    List<String> includes = []
 
-    def deployment
-
-    Dependencies dependencies = new Dependencies()
-
-    def dependencies(Closure closure) {
-        ConfigureUtil.configure(closure, dependencies)
+    void include(String name) {
+        includes << name
     }
 }

@@ -17,13 +17,13 @@ package com.github.rodm.teamcity
 
 import org.gradle.util.ConfigureUtil
 
-class AgentPluginDescriptor {
+class PluginDeployment {
 
-    def deployment
+    Boolean useSeparateClassloader
 
-    Dependencies dependencies = new Dependencies()
+    ExecutableFiles executableFiles = new ExecutableFiles()
 
-    def dependencies(Closure closure) {
-        ConfigureUtil.configure(closure, dependencies)
+    def executableFiles(Closure closure) {
+        ConfigureUtil.configure(closure, executableFiles)
     }
 }
