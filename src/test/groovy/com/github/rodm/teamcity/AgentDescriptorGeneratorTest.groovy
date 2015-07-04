@@ -73,6 +73,16 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
+    public void writeOptionalUseSeparateClassloaderWhenFalse() {
+        descriptor.deployment = new PluginDeployment()
+        descriptor.deployment.useSeparateClassloader = false
+
+        generator.writeTo(writer);
+
+        assertXpathEvaluatesTo('false', "//plugin-deployment/@use-separate-classloader", writer.toString())
+    }
+
+    @Test
     public void writePluginDeploymentExecutableFiles() {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.executableFiles {

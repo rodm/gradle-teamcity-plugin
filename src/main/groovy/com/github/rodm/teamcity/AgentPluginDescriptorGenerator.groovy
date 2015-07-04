@@ -44,8 +44,8 @@ class AgentPluginDescriptorGenerator {
 
     private void buildPluginDeploymentNode(Node root) {
         Map<String, Object> attributes = [:]
-        if (descriptor.deployment.useSeparateClassloader)
-            attributes << ['use-separate-classloader': descriptor.deployment.getUseSeparateClassloader()]
+        if (descriptor.deployment.useSeparateClassloader != null)
+            attributes << ['use-separate-classloader': descriptor.deployment.useSeparateClassloader]
         Node deployment = root.appendNode('plugin-deployment', attributes)
         buildLayoutNode(deployment)
     }
