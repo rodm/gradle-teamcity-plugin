@@ -44,31 +44,37 @@ class TeamCityPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
-        project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
+        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
 
+        configureRepositories(project)
+        configureServerPluginTasks(project, extension)
+        configureTeamCityTasks(project, extension)
+    }
+
+    private configureRepositories(Project project) {
         project.repositories {
             mavenCentral()
             maven {
                 url = JETBRAINS_MAVEN_REPOSITORY
             }
         }
+    }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-        def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
-        packagePlugin.dependsOn jar
-        packagePlugin.serverComponents = jar.outputs.files
-
-        def assemble = project.tasks['assemble']
-        assemble.dependsOn packagePlugin
-
+    private void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             project.dependencies {
                 compile "org.jetbrains.teamcity:server-api:${extension.version}"
 
                 testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
             }
+
+            def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+            def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
+            packagePlugin.dependsOn jar
+            packagePlugin.serverComponents = jar.outputs.files
+
+            def assemble = project.tasks['assemble']
+            assemble.dependsOn packagePlugin
 
             if (extension.descriptor instanceof File) {
                 def processDescriptor = project.tasks.create('processDescriptor', ProcessPluginDescriptor) {
@@ -80,8 +86,6 @@ class TeamCityPlugin implements Plugin<Project> {
                 packagePlugin.dependsOn generateDescriptor
             }
         }
-
-        configureTeamCityTasks(project, extension)
     }
 
     private void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
