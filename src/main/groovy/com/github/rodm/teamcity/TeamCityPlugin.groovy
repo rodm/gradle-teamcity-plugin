@@ -17,8 +17,10 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.Download
+import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.GeneratePluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
+import com.github.rodm.teamcity.tasks.PackageAgentPlugin
 import com.github.rodm.teamcity.tasks.PackagePlugin
 import com.github.rodm.teamcity.tasks.ProcessPluginDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
@@ -49,6 +51,10 @@ class TeamCityPlugin implements Plugin<Project> {
         configureRepositories(project)
         configureServerPluginTasks(project, extension)
         configureTeamCityTasks(project, extension)
+
+        project.afterEvaluate {
+            configureAgentPluginTasks(project, extension)
+        }
     }
 
     private configureRepositories(Project project) {
@@ -56,6 +62,32 @@ class TeamCityPlugin implements Plugin<Project> {
             mavenCentral()
             maven {
                 url = JETBRAINS_MAVEN_REPOSITORY
+            }
+        }
+    }
+
+    void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
+        if ("agent-plugin" == extension.type) {
+            project.dependencies {
+                compile "org.jetbrains.teamcity:agent-api:${extension.version}"
+            }
+
+            def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+            def packagePlugin = project.tasks.create('packageAgentPlugin', PackageAgentPlugin)
+            packagePlugin.dependsOn jar
+            packagePlugin.agentComponents = jar.outputs.files
+
+            def assemble = project.tasks['assemble']
+            assemble.dependsOn packagePlugin
+
+            if (extension.descriptor instanceof File) {
+                def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessPluginDescriptor) {
+                    conventionMapping.map("descriptor") { extension.descriptor }
+                }
+                packagePlugin.dependsOn processDescriptor
+            } else {
+                def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
+                packagePlugin.dependsOn generateDescriptor
             }
         }
     }
