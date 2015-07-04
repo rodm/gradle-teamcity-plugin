@@ -22,4 +22,8 @@ class ExecutableFiles {
     void include(String name) {
         includes << name
     }
+
+    boolean hasFiles() {
+        return includes.size() > 0;
+    }
 }

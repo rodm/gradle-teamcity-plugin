@@ -56,10 +56,12 @@ class AgentPluginDescriptorGenerator {
     }
 
     private void buildLayoutNode(Node deployment) {
-        Node layout = deployment.appendNode('layout')
-        Node executableFiles = layout.appendNode('executable-files')
-        descriptor.deployment.getExecutableFiles().includes.each { name ->
-            executableFiles.appendNode('include', ['name': name])
+        if (descriptor.deployment.getExecutableFiles().hasFiles()) {
+            Node layout = deployment.appendNode('layout')
+            Node executableFiles = layout.appendNode('executable-files')
+            descriptor.deployment.getExecutableFiles().includes.each { name ->
+                executableFiles.appendNode('include', ['name': name])
+            }
         }
     }
 

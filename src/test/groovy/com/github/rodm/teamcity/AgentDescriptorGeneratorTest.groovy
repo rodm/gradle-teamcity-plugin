@@ -98,6 +98,16 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
+    public void writePluginDeploymentExecutableFilesOnlyIfSpecified() {
+        descriptor.deployment = new PluginDeployment()
+
+        generator.writeTo(writer);
+
+        assertXpathNotExists("//plugin-deployment/layout", writer.toString())
+        assertXpathNotExists("//plugin-deployment/layout/executable-files", writer.toString())
+    }
+
+    @Test
     public void writesToolDeployment() {
         descriptor.deployment = new ToolDeployment()
 
@@ -119,6 +129,16 @@ public class AgentDescriptorGeneratorTest {
         assertXpathExists("//tool-deployment/layout/executable-files", writer.toString())
         assertXpathEvaluatesTo('file1', "//executable-files/include[1]/@name", writer.toString())
         assertXpathEvaluatesTo('file2', "//executable-files/include[2]/@name", writer.toString())
+    }
+
+    @Test
+    public void writeToolDeploymentExecutableFilesOnlyIfSpecified() {
+        descriptor.deployment = new PluginDeployment()
+
+        generator.writeTo(writer);
+
+        assertXpathNotExists("//plugin-deployment/layout", writer.toString())
+        assertXpathNotExists("//plugin-deployment/layout/executable-files", writer.toString())
     }
 
     @Test
