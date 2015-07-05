@@ -15,8 +15,8 @@
  */
 package com.github.rodm.teamcity.tasks
 
-import com.github.rodm.teamcity.PluginDescriptor
-import com.github.rodm.teamcity.PluginDescriptorGenerator
+import com.github.rodm.teamcity.ServerPluginDescriptor
+import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
 import org.gradle.api.DefaultTask
@@ -24,11 +24,11 @@ import org.gradle.api.specs.Specs
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-class GeneratePluginDescriptor extends DefaultTask {
+class GenerateServerPluginDescriptor extends DefaultTask {
 
     private File destination
 
-    GeneratePluginDescriptor() {
+    GenerateServerPluginDescriptor() {
         getOutputs().upToDateWhen(Specs.satisfyNone())
     }
 
@@ -43,12 +43,12 @@ class GeneratePluginDescriptor extends DefaultTask {
     @TaskAction
     void generateDescriptor() {
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-        PluginDescriptor descriptor = extension.getDescriptor()
+        ServerPluginDescriptor descriptor = extension.getDescriptor()
 
         if (descriptor == null) {
-            descriptor = new PluginDescriptor()
+            descriptor = new ServerPluginDescriptor()
         }
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion(), defaults())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion(), defaults())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 

@@ -43,7 +43,7 @@ class TeamCityPluginExtension {
         if (this.type == 'agent-plugin') {
             this.descriptor = new AgentPluginDescriptor()
         } else {
-            this.descriptor = new PluginDescriptor()
+            this.descriptor = new ServerPluginDescriptor()
         }
         ConfigureUtil.configure(closure, this.descriptor)
     }

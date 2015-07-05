@@ -70,7 +70,7 @@ public class TeamCityPluginTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(PluginDescriptor))
+        assertThat(extension.descriptor, isA(ServerPluginDescriptor))
         assertThat(extension.descriptor.getName(), equalTo('test plugin'))
     }
 

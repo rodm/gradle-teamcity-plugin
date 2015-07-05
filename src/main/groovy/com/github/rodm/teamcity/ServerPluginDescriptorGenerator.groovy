@@ -17,15 +17,15 @@ package com.github.rodm.teamcity
 
 import groovy.xml.XmlUtil
 
-class PluginDescriptorGenerator {
+class ServerPluginDescriptorGenerator {
 
-    private PluginDescriptor descriptor
+    private ServerPluginDescriptor descriptor
 
     private String version
 
     private Map<String, String> defaults
 
-    PluginDescriptorGenerator(PluginDescriptor descriptor, String version = "9.0", Map defaults = [:]) {
+    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version = "9.0", Map defaults = [:]) {
         this.descriptor = descriptor
         this.version = version
         this.defaults = defaults

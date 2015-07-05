@@ -17,7 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.util.ConfigureUtil
 
-class PluginDescriptor {
+class ServerPluginDescriptor {
 
     String name
 

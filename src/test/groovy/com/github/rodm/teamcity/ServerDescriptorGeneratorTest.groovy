@@ -24,7 +24,7 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists
 
-public class PluginDescriptorGeneratorTest {
+public class ServerDescriptorGeneratorTest {
 
     private Project project;
 
@@ -39,8 +39,8 @@ public class PluginDescriptorGeneratorTest {
     @Test
     public void writesTeamCityPluginRootNode() {
         StringWriter writer = new StringWriter();
-        PluginDescriptor descriptor = new PluginDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer);
 
@@ -57,8 +57,8 @@ public class PluginDescriptorGeneratorTest {
                 vendorName = 'vendor name'
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer);
@@ -71,8 +71,8 @@ public class PluginDescriptorGeneratorTest {
 
     @Test
     public void writesRequiredInfoPropertiesWhenNotSet() {
-        PluginDescriptor descriptor = new PluginDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -89,8 +89,8 @@ public class PluginDescriptorGeneratorTest {
         defaults << ['name': 'test-plugin name']
         defaults << ['displayName': 'test-plugin display name']
         defaults << ['version': '1.2.3']
-        PluginDescriptor descriptor = new PluginDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, "9.0", defaults)
+        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, "9.0", defaults)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -111,8 +111,8 @@ public class PluginDescriptorGeneratorTest {
                 vendorLogo = 'vendor logo'
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -130,8 +130,8 @@ public class PluginDescriptorGeneratorTest {
             descriptor {
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -150,8 +150,8 @@ public class PluginDescriptorGeneratorTest {
                 useSeparateClassloader = true
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -168,8 +168,8 @@ public class PluginDescriptorGeneratorTest {
             }
         }
 
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -183,8 +183,8 @@ public class PluginDescriptorGeneratorTest {
             descriptor {
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -203,8 +203,8 @@ public class PluginDescriptorGeneratorTest {
                 }
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -222,8 +222,8 @@ public class PluginDescriptorGeneratorTest {
                 }
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -240,8 +240,8 @@ public class PluginDescriptorGeneratorTest {
                 }
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -257,8 +257,8 @@ public class PluginDescriptorGeneratorTest {
                 }
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -277,8 +277,8 @@ public class PluginDescriptorGeneratorTest {
             }
         }
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-        PluginDescriptor descriptor = extension.getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor, extension.getVersion())
+        ServerPluginDescriptor descriptor = extension.getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -294,8 +294,8 @@ public class PluginDescriptorGeneratorTest {
                 maximumBuild = '2345'
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -311,8 +311,8 @@ public class PluginDescriptorGeneratorTest {
                 minimumBuild = '1234'
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -328,8 +328,8 @@ public class PluginDescriptorGeneratorTest {
                 maximumBuild = '1234'
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)
@@ -345,8 +345,8 @@ public class PluginDescriptorGeneratorTest {
             descriptor {
             }
         }
-        PluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
-        PluginDescriptorGenerator generator = new PluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptor descriptor = project.getExtensions().getByType(TeamCityPluginExtension).getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
         StringWriter writer = new StringWriter();
 
         generator.writeTo(writer)

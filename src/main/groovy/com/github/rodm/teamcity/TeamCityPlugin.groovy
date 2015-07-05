@@ -18,7 +18,7 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
-import com.github.rodm.teamcity.tasks.GeneratePluginDescriptor
+import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.PackageAgentPlugin
 import com.github.rodm.teamcity.tasks.PackagePlugin
@@ -114,7 +114,7 @@ class TeamCityPlugin implements Plugin<Project> {
                 }
                 packagePlugin.dependsOn processDescriptor
             } else {
-                def generateDescriptor = project.tasks.create('generateDescriptor', GeneratePluginDescriptor)
+                def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
                 packagePlugin.dependsOn generateDescriptor
             }
         }
