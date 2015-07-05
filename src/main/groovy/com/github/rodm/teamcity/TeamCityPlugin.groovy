@@ -49,11 +49,11 @@ class TeamCityPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
 
         configureRepositories(project)
-        configureServerPluginTasks(project, extension)
-        configureTeamCityTasks(project, extension)
 
         project.afterEvaluate {
             configureAgentPluginTasks(project, extension)
+            configureServerPluginTasks(project, extension)
+            configureTeamCityTasks(project, extension)
         }
     }
 
@@ -92,8 +92,8 @@ class TeamCityPlugin implements Plugin<Project> {
         }
     }
 
-    private void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate {
+    void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
+        if ("server-plugin" == extension.type) {
             project.dependencies {
                 compile "org.jetbrains.teamcity:server-api:${extension.version}"
 
@@ -121,36 +121,38 @@ class TeamCityPlugin implements Plugin<Project> {
     }
 
     private void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
-        project.tasks.withType(TeamCityTask) {
-            conventionMapping.map('homeDir') { extension.homeDir }
-            conventionMapping.map('dataDir') { extension.dataDir }
-            conventionMapping.map('javaHome') { extension.javaHome }
-        }
+        if ("server-plugin" == extension.type) {
+            project.tasks.withType(TeamCityTask) {
+                conventionMapping.map('homeDir') { extension.homeDir }
+                conventionMapping.map('dataDir') { extension.dataDir }
+                conventionMapping.map('javaHome') { extension.javaHome }
+            }
 
-        project.tasks.create('startServer', StartServer)
-        project.tasks.create('stopServer', StopServer)
-        project.tasks.create('startAgent', StartAgent)
-        project.tasks.create('stopAgent', StopAgent)
+            project.tasks.create('startServer', StartServer)
+            project.tasks.create('stopServer', StopServer)
+            project.tasks.create('startAgent', StartAgent)
+            project.tasks.create('stopAgent', StopAgent)
 
-        project.tasks.create('deployPlugin', DeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
-            conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
-        }
-        project.tasks.create('undeployPlugin', UndeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
-        }
+            project.tasks.create('deployPlugin', DeployPlugin) {
+                conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
+                conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
+            }
+            project.tasks.create('undeployPlugin', UndeployPlugin) {
+                conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
+            }
 
-        def download = project.tasks.create("downloadTeamCity", Download) {
-            conventionMapping.map('source') { extension.downloadUrl }
-            conventionMapping.map('target') { project.file(extension.downloadFile) }
-        }
-        def unpack = project.tasks.create("unpackTeamCity", Unpack) {
-            conventionMapping.map('source') { project.file(extension.downloadFile) }
-            conventionMapping.map('target') { extension.homeDir }
-        }
-        unpack.dependsOn download
+            def download = project.tasks.create("downloadTeamCity", Download) {
+                conventionMapping.map('source') { extension.downloadUrl }
+                conventionMapping.map('target') { project.file(extension.downloadFile) }
+            }
+            def unpack = project.tasks.create("unpackTeamCity", Unpack) {
+                conventionMapping.map('source') { project.file(extension.downloadFile) }
+                conventionMapping.map('target') { extension.homeDir }
+            }
+            unpack.dependsOn download
 
-        def install = project.tasks.create("installTeamCity", InstallTeamCity)
-        install.dependsOn unpack
+            def install = project.tasks.create("installTeamCity", InstallTeamCity)
+            install.dependsOn unpack
+        }
     }
 }

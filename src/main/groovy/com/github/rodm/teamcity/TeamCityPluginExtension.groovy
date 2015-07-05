@@ -19,7 +19,7 @@ import org.gradle.util.ConfigureUtil
 
 class TeamCityPluginExtension {
 
-    String type
+    String type = 'server-plugin'
 
     String version = '9.0'
 
