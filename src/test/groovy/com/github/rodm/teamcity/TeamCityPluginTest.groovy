@@ -22,8 +22,6 @@ import org.junit.Before
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.equalTo
-import static org.hamcrest.CoreMatchers.isA
-import static org.hamcrest.CoreMatchers.endsWith
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
@@ -59,30 +57,6 @@ public class TeamCityPluginTest {
             version = '8.1.5'
         }
         assertEquals('8.1.5', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    public void buildScriptPluginDescriptor() {
-        project.teamcity {
-            descriptor {
-                name = 'test plugin'
-            }
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(ServerPluginDescriptor))
-        assertThat(extension.descriptor.getName(), equalTo('test plugin'))
-    }
-
-    @Test
-    public void filePluginDescriptor() {
-        project.teamcity {
-            descriptor = project.file('test-teamcity-plugin.xml')
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(File))
-        assertThat(extension.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
 
     @Test

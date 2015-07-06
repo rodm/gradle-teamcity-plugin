@@ -120,7 +120,7 @@ class TeamCityPlugin implements Plugin<Project> {
         }
     }
 
-    private void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
+    void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
         if ("server-plugin" == extension.type) {
             project.tasks.withType(TeamCityTask) {
                 conventionMapping.map('homeDir') { extension.homeDir }
