@@ -20,9 +20,11 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
-import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
+import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasSize
+import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
 
 class AgentConfigurationTest {
@@ -118,5 +120,59 @@ class AgentConfigurationTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         ToolDeployment deployment = extension.descriptor.deployment
         assertThat(deployment.executableFiles.includes, hasSize(2))
+    }
+
+    @Test
+    public void agentPluginTasks() {
+        project.teamcity {
+            type = 'agent-plugin'
+            descriptor {}
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        plugin.configureAgentPluginTasks(project, extension)
+
+        assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('packageAgentPlugin'))
+        assertNull(project.tasks.findByName('processAgentDescriptor'))
+    }
+
+    @Test
+    public void agentPluginTasksWithFileDescriptor() {
+        project.teamcity {
+            type = 'agent-plugin'
+            descriptor = project.file('test-teamcity-plugin')
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        plugin.configureAgentPluginTasks(project, extension)
+
+        assertNull(project.tasks.findByName('generateAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('packageAgentPlugin'))
+        assertNotNull(project.tasks.findByName('processAgentDescriptor'))
+    }
+
+    @Test
+    public void noServerPluginTasks() {
+        project.teamcity {
+            type = 'agent-plugin'
+            descriptor {}
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        plugin.configureServerPluginTasks(project, extension)
+
+        assertNull(project.tasks.findByName('processDescriptor'))
+        assertNull(project.tasks.findByName('packagePlugin'))
+        assertNull(project.tasks.findByName('generateDescriptor'))
+        assertNull(project.tasks.findByName('deployPlugin'))
+        assertNull(project.tasks.findByName('undeployPlugin'))
+        assertNull(project.tasks.findByName('startAgent'))
+        assertNull(project.tasks.findByName('stopAgent'))
+        assertNull(project.tasks.findByName('startServer'))
+        assertNull(project.tasks.findByName('stopServer'))
     }
 }
