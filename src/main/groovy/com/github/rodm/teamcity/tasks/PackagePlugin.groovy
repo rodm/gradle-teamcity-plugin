@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity.tasks
 
 import com.github.rodm.teamcity.TeamCityPlugin
+import org.gradle.api.file.CopySpec
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -27,9 +28,13 @@ class PackagePlugin extends Zip {
 
     private FileCollection serverComponents
 
+    private CopySpec agent
+
     PackagePlugin() {
         description = 'Package TeamCity plugin'
         group = 'TeamCity'
+
+        agent = rootSpec.addFirst().into { 'agent' }
 
         into('server') {
             from {
@@ -45,6 +50,14 @@ class PackagePlugin extends Zip {
                 TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
             }
         }
+    }
+
+    CopySpec getAgent() {
+        return agent
+    }
+
+    void setAgent(CopySpec agentSpec) {
+        agent.with(agentSpec)
     }
 
     @InputFiles

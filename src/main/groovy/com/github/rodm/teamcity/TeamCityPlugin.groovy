@@ -30,9 +30,14 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.TeamCityTask
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPlugin
+
+import java.util.concurrent.Callable
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -49,6 +54,7 @@ class TeamCityPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
 
         configureRepositories(project)
+        configureConfigurations(project)
 
         project.afterEvaluate {
             configureAgentPluginTasks(project, extension)
@@ -64,6 +70,14 @@ class TeamCityPlugin implements Plugin<Project> {
                 url = JETBRAINS_MAVEN_REPOSITORY
             }
         }
+    }
+
+    void configureConfigurations(final Project project) {
+        ConfigurationContainer configurations = project.getConfigurations();
+        configurations.create('agent')
+                .setVisible(false)
+                .setTransitive(false)
+                .setDescription("Configuration for agent plugin.");
     }
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
@@ -101,9 +115,20 @@ class TeamCityPlugin implements Plugin<Project> {
             }
 
             def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-            def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin)
+            def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin) {
+                conventionMapping.map('serverComponents') { jar.outputs.files }
+            }
             packagePlugin.dependsOn jar
-            packagePlugin.serverComponents = jar.outputs.files
+
+            project.getTasks().withType(PackagePlugin.class, new Action<PackagePlugin>() {
+                public void execute(PackagePlugin task) {
+                    task.getAgent().from(new Callable<FileCollection>() {
+                        public FileCollection call() throws Exception {
+                            return project.getConfigurations().getByName('agent')
+                        }
+                    })
+                }
+            })
 
             def assemble = project.tasks['assemble']
             assemble.dependsOn packagePlugin
