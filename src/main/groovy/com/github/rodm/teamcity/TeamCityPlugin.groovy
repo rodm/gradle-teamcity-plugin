@@ -35,6 +35,7 @@ import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCollection
+import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
 
 import java.util.concurrent.Callable
@@ -78,6 +79,10 @@ class TeamCityPlugin implements Plugin<Project> {
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription("Configuration for agent plugin.");
+        configurations.create('plugin')
+                .setVisible(false)
+                .setTransitive(false)
+                .setDescription('Configuration for plugin artfact.')
     }
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
@@ -103,6 +108,9 @@ class TeamCityPlugin implements Plugin<Project> {
                 def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
                 packagePlugin.dependsOn generateDescriptor
             }
+
+            ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
+            project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
         }
     }
 
