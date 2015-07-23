@@ -1,0 +1,15 @@
+
+apply plugin: 'com.github.rodm.teamcity'
+
+teamcity {
+    type = 'agent-plugin'
+    version = teamcityVersion
+
+    descriptor {
+        pluginDeployment {
+            useSeparateClassloader = false
+        }
+    }
+    // Alternative way to specify the agent plugin descriptor
+    // descriptor = project.file('src/main/descriptor/teamcity-plugin.xml')
+}
