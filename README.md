@@ -4,9 +4,10 @@ Gradle plugin to support the development of TeamCity plugins
 
 [![Build Status](https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master)](https://travis-ci.org/rodm/gradle-teamcity-plugin)
 
-The plugin applies the Java Plugin, adds the JetBrains Maven repository, adds the TeamCity server-api dependency
-to the compile configuration, adds the tests-support dependency to the testCompile configuration and adds a number of
-tasks to package the plugin into a zip, deploy the plugin and start and stop both the server and build agent.
+The plugin applies the Java Plugin, adds the JetBrains Maven repository, adds the TeamCity server-api and tests-supprt
+dependencies to the compile and testCompile configurations for a server side plugin, adds the agent-api dependency to
+the compile configuration for an agent side plugin. Adds a number of tasks to package the plugin into a zip, deploy the
+plugin and start and stop both the server and build agent.
 
 ## Usage
 
@@ -20,7 +21,10 @@ the TeamCity server-api added to the `compile` configuration and the version dow
 descriptor can be specified as a path to a file or by a configuration block within the build script.
 
 * `version` : The version of the TeamCity API to build against. Defaults to '9.0'.
-* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.  
+* `type` : The project type defines the project as an agent side plugin or a server side plugin, values are 'agent-plugin'
+ and 'server-plugin'. Default is 'server-plugin'. 
+* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
+ The type property affects the type of descriptor generated.   
 * `homeDir` : The path to a TeamCity install.
 * `dataDir` : The path to the TeamCity Data directory.
 * `javaHome` : The path to the version of Java used to run the server and build agent.
@@ -31,7 +35,8 @@ The plugin descriptor properties are shown in the examples below and described i
 
 ### Tasks
 
-* `packagePlugin` : Builds and packages a TeamCity plugin
+* `packagePlugin` : Builds and packages a TeamCity plugin.
+* `packageAgentPlugin` : Builds and packages the agent side of a TeamCity plugin.
 * `deployPlugin` : Deploys the plugin archive to a local TeamCity server, requires the `dataDir` property to be defined.
 * `undeployPlugin` : Undeploys the plugin archive from a local TeamCity server, requires the `dataDir` property to be defined.
 * `startSever` : Starts the TeamCity Server, requires the `homeDir` and `dataDir` properties to be defined.
@@ -100,5 +105,47 @@ teamcity {
     version = '8.1.5'
     // Locate the plugin descriptor in the project root
     descriptor = file('teamcity-plugin.xml')
+}
+```
+
+Agent side plugin descriptor 
+```
+teamcity {
+    type = 'agent-plugin'
+    version = teamcityVersion
+
+    descriptor {
+        pluginDeployment {
+            useSeparateClassloader = false
+            executableFiles {
+                include 'file1'
+                include 'file2'
+            }
+        }
+        dependencies {
+            plugin 'plugin-name'
+            tool 'tool-name'
+        }
+    }
+}
+```
+
+Agent tool descriptor
+```
+teamcity {
+    type = 'agent-plugin'
+
+    descriptor {
+        toolDeployment {
+            executableFiles {
+                include 'file1'
+                include 'file2'
+            }
+        }
+        dependencies {
+            plugin 'plugin-name'
+            tool 'tool-name'
+        }
+    }
 }
 ```
