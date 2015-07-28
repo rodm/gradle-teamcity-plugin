@@ -20,7 +20,6 @@ import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
-import com.github.rodm.teamcity.tasks.PackageAgentPlugin
 import com.github.rodm.teamcity.tasks.PackagePlugin
 import com.github.rodm.teamcity.tasks.ProcessPluginDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
@@ -37,6 +36,7 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Zip
 
 import java.util.concurrent.Callable
 
@@ -92,9 +92,23 @@ class TeamCityPlugin implements Plugin<Project> {
             }
 
             def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-            def packagePlugin = project.tasks.create('packageAgentPlugin', PackageAgentPlugin)
-            packagePlugin.dependsOn jar
-            packagePlugin.agentComponents = jar.outputs.files
+            def packagePlugin = project.tasks.create('packageAgentPlugin', Zip)
+            packagePlugin.description = 'Package TeamCity Agent plugin'
+            packagePlugin.group = 'TeamCity'
+            packagePlugin.with {
+                into("lib") {
+                    from(jar)
+                    from(project.configurations.agent)
+                }
+                into('') {
+                    from {
+                        new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                    }
+                    rename {
+                        PLUGIN_DESCRIPTOR_FILENAME
+                    }
+                }
+            }
 
             def assemble = project.tasks['assemble']
             assemble.dependsOn packagePlugin
