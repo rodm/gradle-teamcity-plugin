@@ -20,7 +20,6 @@ import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
-import com.github.rodm.teamcity.tasks.ProcessPluginDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
@@ -33,6 +32,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityPlugin implements Plugin<Project> {
@@ -109,8 +109,10 @@ class TeamCityPlugin implements Plugin<Project> {
             assemble.dependsOn packagePlugin
 
             if (extension.descriptor instanceof File) {
-                def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessPluginDescriptor) {
-                    conventionMapping.map("descriptor") { extension.descriptor }
+                def processDescriptor = project.tasks.create('processDescriptor', Copy)
+                processDescriptor.with {
+                    from(extension.descriptor)
+                    into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
                 }
                 packagePlugin.dependsOn processDescriptor
             } else {
@@ -156,8 +158,10 @@ class TeamCityPlugin implements Plugin<Project> {
             assemble.dependsOn packagePlugin
 
             if (extension.descriptor instanceof File) {
-                def processDescriptor = project.tasks.create('processDescriptor', ProcessPluginDescriptor) {
-                    conventionMapping.map("descriptor") { extension.descriptor }
+                def processDescriptor = project.tasks.create('processDescriptor', Copy)
+                processDescriptor.with {
+                    from(extension.descriptor)
+                    into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
                 }
                 packagePlugin.dependsOn processDescriptor
             } else {
