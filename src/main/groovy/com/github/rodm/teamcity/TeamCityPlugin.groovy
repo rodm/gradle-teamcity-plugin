@@ -20,7 +20,6 @@ import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
-import com.github.rodm.teamcity.tasks.PackagePlugin
 import com.github.rodm.teamcity.tasks.ProcessPluginDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
@@ -29,16 +28,12 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.TeamCityTask
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
-import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
-
-import java.util.concurrent.Callable
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -137,20 +132,25 @@ class TeamCityPlugin implements Plugin<Project> {
             }
 
             def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-            def packagePlugin = project.tasks.create('packagePlugin', PackagePlugin) {
-                conventionMapping.map('serverComponents') { jar.outputs.files }
-            }
-            packagePlugin.dependsOn jar
-
-            project.getTasks().withType(PackagePlugin.class, new Action<PackagePlugin>() {
-                public void execute(PackagePlugin task) {
-                    task.getAgent().from(new Callable<FileCollection>() {
-                        public FileCollection call() throws Exception {
-                            return project.getConfigurations().getByName('agent')
-                        }
-                    })
+            def packagePlugin = project.tasks.create('packagePlugin', Zip)
+            packagePlugin.description = 'Package TeamCity plugin'
+            packagePlugin.group = 'TeamCity'
+            packagePlugin.with {
+                into('server') {
+                    from(jar)
                 }
-            })
+                into('agent') {
+                    from(project.configurations.agent)
+                }
+                into('') {
+                    from {
+                        new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                    }
+                    rename {
+                        PLUGIN_DESCRIPTOR_FILENAME
+                    }
+                }
+            }
 
             def assemble = project.tasks['assemble']
             assemble.dependsOn packagePlugin
