@@ -109,7 +109,7 @@ class TeamCityPlugin implements Plugin<Project> {
             assemble.dependsOn packagePlugin
 
             if (extension.descriptor instanceof File) {
-                def processDescriptor = project.tasks.create('processDescriptor', Copy)
+                def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
                 processDescriptor.with {
                     from(extension.descriptor)
                     into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
