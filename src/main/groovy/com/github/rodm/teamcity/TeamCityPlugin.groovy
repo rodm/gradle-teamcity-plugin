@@ -29,6 +29,7 @@ import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
@@ -78,12 +79,16 @@ class TeamCityPlugin implements Plugin<Project> {
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription('Configuration for plugin artfact.')
+        Configuration providedCompileConfiguration = configurations.create('providedCompile')
+                .setVisible(false)
+                .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
+        configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedCompileConfiguration)
     }
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
         if ("agent-plugin" == extension.type) {
             project.dependencies {
-                compile "org.jetbrains.teamcity:agent-api:${extension.version}"
+                providedCompile "org.jetbrains.teamcity:agent-api:${extension.version}"
             }
 
             def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
@@ -94,6 +99,7 @@ class TeamCityPlugin implements Plugin<Project> {
                 into("lib") {
                     from(jar)
                     from(project.configurations.agent)
+                    from(project.configurations.runtime - project.configurations.providedCompile)
                 }
                 into('') {
                     from {
@@ -128,7 +134,7 @@ class TeamCityPlugin implements Plugin<Project> {
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         if ("server-plugin" == extension.type) {
             project.dependencies {
-                compile "org.jetbrains.teamcity:server-api:${extension.version}"
+                providedCompile "org.jetbrains.teamcity:server-api:${extension.version}"
 
                 testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
             }
@@ -140,6 +146,7 @@ class TeamCityPlugin implements Plugin<Project> {
             packagePlugin.with {
                 into('server') {
                     from(jar)
+                    from(project.configurations.runtime - project.configurations.providedCompile)
                 }
                 into('agent') {
                     from(project.configurations.agent)
