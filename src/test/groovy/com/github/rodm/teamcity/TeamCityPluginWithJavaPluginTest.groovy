@@ -39,6 +39,9 @@ public class TeamCityPluginWithJavaPluginTest {
         def configuration = project.configurations.getByName('agent')
         assertThat(configuration, notNullValue())
 
+        configuration = project.configurations.getByName('server')
+        assertThat(configuration, notNullValue())
+
         configuration = project.configurations.getByName('plugin')
         assertThat(configuration, notNullValue())
 

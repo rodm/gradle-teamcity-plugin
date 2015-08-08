@@ -40,6 +40,11 @@ public class TeamCityPluginWithoutJavaPluginTest {
         assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(false))
 
+        configuration = project.configurations.getByName('server')
+        assertThat(configuration, notNullValue())
+        assertThat(configuration.visible, is(false))
+        assertThat(configuration.transitive, is(false))
+
         configuration = project.configurations.getByName('plugin')
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))

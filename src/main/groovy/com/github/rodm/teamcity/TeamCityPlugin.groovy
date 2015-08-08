@@ -78,10 +78,14 @@ class TeamCityPlugin implements Plugin<Project> {
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription("Configuration for agent plugin.");
+        configurations.create('server')
+                .setVisible(false)
+                .setTransitive(false)
+                .setDescription("Configuration for server plugin.");
         configurations.create('plugin')
                 .setVisible(false)
                 .setTransitive(false)
-                .setDescription('Configuration for plugin artfact.')
+                .setDescription('Configuration for plugin artifact.')
         if (project.plugins.hasPlugin(JavaPlugin)) {
             Configuration providedCompileConfiguration = configurations.create('providedCompile')
                     .setVisible(false)
@@ -160,6 +164,7 @@ class TeamCityPlugin implements Plugin<Project> {
                         from(jar)
                         from(project.configurations.runtime - project.configurations.providedCompile)
                     }
+                    from(project.configurations.server)
                 }
                 into('agent') {
                     from(project.configurations.agent)
