@@ -32,6 +32,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
@@ -47,7 +48,7 @@ class TeamCityPlugin implements Plugin<Project> {
     static final String JETBRAINS_MAVEN_REPOSITORY = 'http://repository.jetbrains.com/all'
 
     void apply(Project project) {
-        project.plugins.apply(JavaPlugin)
+        project.plugins.apply(BasePlugin)
         TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
 
         configureRepositories(project)
@@ -61,10 +62,12 @@ class TeamCityPlugin implements Plugin<Project> {
     }
 
     private configureRepositories(Project project) {
-        project.repositories {
-            mavenCentral()
-            maven {
-                url = JETBRAINS_MAVEN_REPOSITORY
+        if (project.plugins.hasPlugin(JavaPlugin)) {
+            project.repositories {
+                mavenCentral()
+                maven {
+                    url = JETBRAINS_MAVEN_REPOSITORY
+                }
             }
         }
     }
@@ -79,27 +82,33 @@ class TeamCityPlugin implements Plugin<Project> {
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription('Configuration for plugin artfact.')
-        Configuration providedCompileConfiguration = configurations.create('providedCompile')
-                .setVisible(false)
-                .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
-        configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedCompileConfiguration)
+        if (project.plugins.hasPlugin(JavaPlugin)) {
+            Configuration providedCompileConfiguration = configurations.create('providedCompile')
+                    .setVisible(false)
+                    .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
+            configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedCompileConfiguration)
+        }
     }
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
         if ("agent-plugin" == extension.type) {
-            project.dependencies {
-                providedCompile "org.jetbrains.teamcity:agent-api:${extension.version}"
+            if (project.plugins.hasPlugin(JavaPlugin)) {
+                project.dependencies {
+                    providedCompile "org.jetbrains.teamcity:agent-api:${extension.version}"
+                }
             }
 
-            def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
             def packagePlugin = project.tasks.create('packageAgentPlugin', Zip)
             packagePlugin.description = 'Package TeamCity Agent plugin'
             packagePlugin.group = 'TeamCity'
             packagePlugin.with {
                 into("lib") {
-                    from(jar)
+                    if (project.plugins.hasPlugin(JavaPlugin)) {
+                        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+                        from(jar)
+                        from(project.configurations.runtime - project.configurations.providedCompile)
+                    }
                     from(project.configurations.agent)
-                    from(project.configurations.runtime - project.configurations.providedCompile)
                 }
                 into('') {
                     from {
@@ -133,20 +142,24 @@ class TeamCityPlugin implements Plugin<Project> {
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         if ("server-plugin" == extension.type) {
-            project.dependencies {
-                providedCompile "org.jetbrains.teamcity:server-api:${extension.version}"
+            if (project.plugins.hasPlugin(JavaPlugin)) {
+                project.dependencies {
+                    providedCompile "org.jetbrains.teamcity:server-api:${extension.version}"
 
-                testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                    testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                }
             }
 
-            def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
             def packagePlugin = project.tasks.create('packagePlugin', Zip)
             packagePlugin.description = 'Package TeamCity plugin'
             packagePlugin.group = 'TeamCity'
             packagePlugin.with {
                 into('server') {
-                    from(jar)
-                    from(project.configurations.runtime - project.configurations.providedCompile)
+                    if (project.plugins.hasPlugin(JavaPlugin)) {
+                        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+                        from(jar)
+                        from(project.configurations.runtime - project.configurations.providedCompile)
+                    }
                 }
                 into('agent') {
                     from(project.configurations.agent)

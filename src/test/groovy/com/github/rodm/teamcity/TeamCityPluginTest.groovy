@@ -16,14 +16,12 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
-import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.equalTo
-import static org.hamcrest.CoreMatchers.notNullValue
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
@@ -39,8 +37,8 @@ public class TeamCityPluginTest {
     }
 
     @Test
-    public void applyJavaPlugin() {
-        assertTrue(project.plugins.hasPlugin(JavaPlugin))
+    public void applyBasePlugin() {
+        assertTrue(project.plugins.hasPlugin(BasePlugin))
     }
 
     @Test
@@ -90,23 +88,5 @@ public class TeamCityPluginTest {
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.getDownloadFile(), equalTo('/tmp/TeamCity-9.0.tar.gz'))
-    }
-
-    @Test
-    public void createsConfigurations() {
-        def configuration = project.configurations.getByName('agent')
-        assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
-        assertThat(configuration.transitive, is(false))
-
-        configuration = project.configurations.getByName('plugin')
-        assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
-        assertThat(configuration.transitive, is(false))
-
-        configuration = project.configurations.getByName('providedCompile')
-        assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
-        assertThat(configuration.transitive, is(true))
     }
 }
