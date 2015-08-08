@@ -123,6 +123,7 @@ class TeamCityPlugin implements Plugin<Project> {
                     }
                 }
             }
+            packagePlugin.onlyIf { extension.descriptor != null }
 
             def assemble = project.tasks['assemble']
             assemble.dependsOn packagePlugin
@@ -133,9 +134,11 @@ class TeamCityPlugin implements Plugin<Project> {
                     from(extension.descriptor)
                     into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
                 }
+                processDescriptor.onlyIf { extension.descriptor != null }
                 packagePlugin.dependsOn processDescriptor
             } else {
                 def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
+                generateDescriptor.onlyIf { extension.descriptor != null }
                 packagePlugin.dependsOn generateDescriptor
             }
 
@@ -178,6 +181,7 @@ class TeamCityPlugin implements Plugin<Project> {
                     }
                 }
             }
+            packagePlugin.onlyIf { extension.descriptor != null }
 
             def assemble = project.tasks['assemble']
             assemble.dependsOn packagePlugin
@@ -188,9 +192,11 @@ class TeamCityPlugin implements Plugin<Project> {
                     from(extension.descriptor)
                     into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
                 }
+                processDescriptor.onlyIf { extension.descriptor != null }
                 packagePlugin.dependsOn processDescriptor
             } else {
                 def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
+                generateDescriptor.onlyIf { extension.descriptor != null }
                 packagePlugin.dependsOn generateDescriptor
             }
         }
