@@ -38,7 +38,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
-        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
+        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
 
         configureRepositories(project)
         configureConfigurations(project)
@@ -82,55 +82,53 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     }
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
-        if ("agent-plugin" == extension.type) {
-            if (project.plugins.hasPlugin(JavaPlugin)) {
-                project.dependencies {
-                    providedCompile "org.jetbrains.teamcity:agent-api:${extension.version}"
-                }
+        if (project.plugins.hasPlugin(JavaPlugin)) {
+            project.dependencies {
+                providedCompile "org.jetbrains.teamcity:agent-api:${extension.version}"
             }
-
-            def packagePlugin = project.tasks.create('packageAgentPlugin', Zip)
-            packagePlugin.description = 'Package TeamCity Agent plugin'
-            packagePlugin.group = 'TeamCity'
-            packagePlugin.with {
-                into("lib") {
-                    if (project.plugins.hasPlugin(JavaPlugin)) {
-                        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-                        from(jar)
-                        from(project.configurations.runtime - project.configurations.providedCompile)
-                    }
-                    from(project.configurations.agent)
-                }
-                into('') {
-                    from {
-                        new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
-                    }
-                    rename {
-                        PLUGIN_DESCRIPTOR_FILENAME
-                    }
-                }
-            }
-            packagePlugin.onlyIf { extension.descriptor != null }
-
-            def assemble = project.tasks['assemble']
-            assemble.dependsOn packagePlugin
-
-            if (extension.descriptor instanceof File) {
-                def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
-                processDescriptor.with {
-                    from(extension.descriptor)
-                    into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
-                }
-                processDescriptor.onlyIf { extension.descriptor != null }
-                packagePlugin.dependsOn processDescriptor
-            } else {
-                def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
-                generateDescriptor.onlyIf { extension.descriptor != null }
-                packagePlugin.dependsOn generateDescriptor
-            }
-
-            ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
-            project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
         }
+
+        def packagePlugin = project.tasks.create('packageAgentPlugin', Zip)
+        packagePlugin.description = 'Package TeamCity Agent plugin'
+        packagePlugin.group = 'TeamCity'
+        packagePlugin.with {
+            into("lib") {
+                if (project.plugins.hasPlugin(JavaPlugin)) {
+                    def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+                    from(jar)
+                    from(project.configurations.runtime - project.configurations.providedCompile)
+                }
+                from(project.configurations.agent)
+            }
+            into('') {
+                from {
+                    new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                }
+                rename {
+                    PLUGIN_DESCRIPTOR_FILENAME
+                }
+            }
+        }
+        packagePlugin.onlyIf { extension.descriptor != null }
+
+        def assemble = project.tasks['assemble']
+        assemble.dependsOn packagePlugin
+
+        if (extension.descriptor instanceof File) {
+            def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
+            processDescriptor.with {
+                from(extension.descriptor)
+                into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
+            }
+            processDescriptor.onlyIf { extension.descriptor != null }
+            packagePlugin.dependsOn processDescriptor
+        } else {
+            def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
+            generateDescriptor.onlyIf { extension.descriptor != null }
+            packagePlugin.dependsOn generateDescriptor
+        }
+
+        ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
+        project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
     }
 }

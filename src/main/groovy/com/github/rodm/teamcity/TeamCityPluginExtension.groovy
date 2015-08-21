@@ -15,11 +15,10 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
 class TeamCityPluginExtension {
-
-    String type = 'server-plugin'
 
     String version = '9.0'
 
@@ -39,8 +38,14 @@ class TeamCityPluginExtension {
 
     String downloadFile
 
+    private Project project
+
+    TeamCityPluginExtension(Project project) {
+        this.project = project
+    }
+
     def descriptor(Closure closure) {
-        if (this.type == 'agent-plugin') {
+        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             this.descriptor = new AgentPluginDescriptor()
         } else {
             this.descriptor = new ServerPluginDescriptor()

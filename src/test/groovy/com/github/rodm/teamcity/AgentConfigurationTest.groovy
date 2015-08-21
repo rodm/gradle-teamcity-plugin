@@ -40,8 +40,6 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForAgentProjectType() {
         project.teamcity {
-            type = 'agent-plugin'
-
             descriptor {
             }
         }
@@ -53,8 +51,6 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForPluginDeployment() {
         project.teamcity {
-            type = 'agent-plugin'
-
             descriptor {
                 pluginDeployment {
                 }
@@ -68,8 +64,6 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForPluginDeploymentWithExecutableFiles() {
         project.teamcity {
-            type = 'agent-plugin'
-
             descriptor {
                 pluginDeployment {
                     useSeparateClassloader = true
@@ -90,8 +84,6 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForToolDeployment() {
         project.teamcity {
-            type = 'agent-plugin'
-
             descriptor {
                 toolDeployment {
                 }
@@ -105,8 +97,6 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForToolDeploymentWithExecutableFiles() {
         project.teamcity {
-            type = 'agent-plugin'
-
             descriptor {
                 toolDeployment {
                     executableFiles {
@@ -125,7 +115,6 @@ class AgentConfigurationTest {
     @Test
     public void agentPluginTasks() {
         project.teamcity {
-            type = 'agent-plugin'
             descriptor {}
         }
 
@@ -141,7 +130,6 @@ class AgentConfigurationTest {
     @Test
     public void agentPluginTasksWithFileDescriptor() {
         project.teamcity {
-            type = 'agent-plugin'
             descriptor = project.file('test-teamcity-plugin')
         }
 

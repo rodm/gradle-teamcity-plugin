@@ -47,7 +47,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
-        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension)
+        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
 
         configureRepositories(project)
         configureConfigurations(project)
@@ -92,93 +92,89 @@ class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
-        if ("server-plugin" == extension.type) {
-            if (project.plugins.hasPlugin(JavaPlugin)) {
-                project.dependencies {
-                    providedCompile "org.jetbrains.teamcity:server-api:${extension.version}"
+        if (project.plugins.hasPlugin(JavaPlugin)) {
+            project.dependencies {
+                providedCompile "org.jetbrains.teamcity:server-api:${extension.version}"
 
-                    testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+            }
+        }
+
+        def packagePlugin = project.tasks.create('packagePlugin', Zip)
+        packagePlugin.description = 'Package TeamCity plugin'
+        packagePlugin.group = 'TeamCity'
+        packagePlugin.with {
+            into('server') {
+                if (project.plugins.hasPlugin(JavaPlugin)) {
+                    def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+                    from(jar)
+                    from(project.configurations.runtime - project.configurations.providedCompile)
+                }
+                from(project.configurations.server)
+            }
+            into('agent') {
+                from(project.configurations.agent)
+            }
+            into('') {
+                from {
+                    new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                }
+                rename {
+                    PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
+        }
+        packagePlugin.onlyIf { extension.descriptor != null }
 
-            def packagePlugin = project.tasks.create('packagePlugin', Zip)
-            packagePlugin.description = 'Package TeamCity plugin'
-            packagePlugin.group = 'TeamCity'
-            packagePlugin.with {
-                into('server') {
-                    if (project.plugins.hasPlugin(JavaPlugin)) {
-                        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-                        from(jar)
-                        from(project.configurations.runtime - project.configurations.providedCompile)
-                    }
-                    from(project.configurations.server)
-                }
-                into('agent') {
-                    from(project.configurations.agent)
-                }
-                into('') {
-                    from {
-                        new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
-                    }
-                    rename {
-                        PLUGIN_DESCRIPTOR_FILENAME
-                    }
-                }
+        def assemble = project.tasks['assemble']
+        assemble.dependsOn packagePlugin
+
+        if (extension.descriptor instanceof File) {
+            def processDescriptor = project.tasks.create('processDescriptor', Copy)
+            processDescriptor.with {
+                from(extension.descriptor)
+                into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
             }
-            packagePlugin.onlyIf { extension.descriptor != null }
-
-            def assemble = project.tasks['assemble']
-            assemble.dependsOn packagePlugin
-
-            if (extension.descriptor instanceof File) {
-                def processDescriptor = project.tasks.create('processDescriptor', Copy)
-                processDescriptor.with {
-                    from(extension.descriptor)
-                    into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
-                }
-                processDescriptor.onlyIf { extension.descriptor != null }
-                packagePlugin.dependsOn processDescriptor
-            } else {
-                def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
-                generateDescriptor.onlyIf { extension.descriptor != null }
-                packagePlugin.dependsOn generateDescriptor
-            }
+            processDescriptor.onlyIf { extension.descriptor != null }
+            packagePlugin.dependsOn processDescriptor
+        } else {
+            def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
+            generateDescriptor.onlyIf { extension.descriptor != null }
+            packagePlugin.dependsOn generateDescriptor
         }
     }
 
     void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
-        if ("server-plugin" == extension.type) {
-            project.tasks.withType(TeamCityTask) {
-                conventionMapping.map('homeDir') { extension.homeDir }
-                conventionMapping.map('dataDir') { extension.dataDir }
-                conventionMapping.map('javaHome') { extension.javaHome }
-            }
-
-            project.tasks.create('startServer', StartServer)
-            project.tasks.create('stopServer', StopServer)
-            project.tasks.create('startAgent', StartAgent)
-            project.tasks.create('stopAgent', StopAgent)
-
-            project.tasks.create('deployPlugin', DeployPlugin) {
-                conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
-                conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
-            }
-            project.tasks.create('undeployPlugin', UndeployPlugin) {
-                conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
-            }
-
-            def download = project.tasks.create("downloadTeamCity", Download) {
-                conventionMapping.map('source') { extension.downloadUrl }
-                conventionMapping.map('target') { project.file(extension.downloadFile) }
-            }
-            def unpack = project.tasks.create("unpackTeamCity", Unpack) {
-                conventionMapping.map('source') { project.file(extension.downloadFile) }
-                conventionMapping.map('target') { extension.homeDir }
-            }
-            unpack.dependsOn download
-
-            def install = project.tasks.create("installTeamCity", InstallTeamCity)
-            install.dependsOn unpack
+        project.tasks.withType(TeamCityTask) {
+            conventionMapping.map('homeDir') { extension.homeDir }
+            conventionMapping.map('dataDir') { extension.dataDir }
+            conventionMapping.map('javaHome') { extension.javaHome }
         }
+
+        project.tasks.create('startServer', StartServer)
+        project.tasks.create('stopServer', StopServer)
+        project.tasks.create('startAgent', StartAgent)
+        project.tasks.create('stopAgent', StopAgent)
+
+        project.tasks.create('deployPlugin', DeployPlugin) {
+            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
+            conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
+        }
+        project.tasks.create('undeployPlugin', UndeployPlugin) {
+            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
+        }
+
+        def download = project.tasks.create("downloadTeamCity", Download) {
+            conventionMapping.map('source') { extension.downloadUrl }
+            conventionMapping.map('target') { project.file(extension.downloadFile) }
+        }
+        def unpack = project.tasks.create("unpackTeamCity", Unpack) {
+            conventionMapping.map('source') { project.file(extension.downloadFile) }
+            conventionMapping.map('target') { extension.homeDir }
+        }
+        unpack.dependsOn download
+
+        def install = project.tasks.create("installTeamCity", InstallTeamCity)
+        install.dependsOn unpack
     }
 }
