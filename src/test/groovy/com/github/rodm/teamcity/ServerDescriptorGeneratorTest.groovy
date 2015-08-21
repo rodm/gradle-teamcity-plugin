@@ -33,7 +33,7 @@ public class ServerDescriptorGeneratorTest {
         project = ProjectBuilder.builder()
                 .withName('test-plugin')
                 .build()
-        project.apply plugin: 'com.github.rodm.teamcity'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
     }
 
     @Test

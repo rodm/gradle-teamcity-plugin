@@ -34,7 +34,7 @@ class AgentConfigurationTest {
     @Before
     public void setup() {
         project = ProjectBuilder.builder().build()
-        project.apply plugin: 'com.github.rodm.teamcity'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
     }
 
     @Test
@@ -130,7 +130,7 @@ class AgentConfigurationTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityAgentPlugin plugin = project.plugins.getPlugin(TeamCityAgentPlugin)
         plugin.configureAgentPluginTasks(project, extension)
 
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
@@ -146,33 +146,11 @@ class AgentConfigurationTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityAgentPlugin plugin = project.plugins.getPlugin(TeamCityAgentPlugin)
         plugin.configureAgentPluginTasks(project, extension)
 
         assertNull(project.tasks.findByName('generateAgentDescriptor'))
         assertNotNull(project.tasks.findByName('packageAgentPlugin'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
-    }
-
-    @Test
-    public void noServerPluginTasks() {
-        project.teamcity {
-            type = 'agent-plugin'
-            descriptor {}
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
-        plugin.configureServerPluginTasks(project, extension)
-
-        assertNull(project.tasks.findByName('processDescriptor'))
-        assertNull(project.tasks.findByName('packagePlugin'))
-        assertNull(project.tasks.findByName('generateDescriptor'))
-        assertNull(project.tasks.findByName('deployPlugin'))
-        assertNull(project.tasks.findByName('undeployPlugin'))
-        assertNull(project.tasks.findByName('startAgent'))
-        assertNull(project.tasks.findByName('stopAgent'))
-        assertNull(project.tasks.findByName('startServer'))
-        assertNull(project.tasks.findByName('stopServer'))
     }
 }

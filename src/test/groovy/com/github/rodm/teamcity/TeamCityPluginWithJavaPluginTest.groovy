@@ -31,7 +31,7 @@ public class TeamCityPluginWithJavaPluginTest {
     public void setup() {
         project = ProjectBuilder.builder().build()
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
     }
 
     @Test

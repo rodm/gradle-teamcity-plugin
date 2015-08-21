@@ -30,7 +30,7 @@ public class TeamCityPluginWithoutJavaPluginTest {
     @Before
     public void setup() {
         project = ProjectBuilder.builder().build()
-        project.apply plugin: 'com.github.rodm.teamcity'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
     }
 
     @Test

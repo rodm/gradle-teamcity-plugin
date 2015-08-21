@@ -34,7 +34,7 @@ class ServerConfigurationTest {
     @Before
     public void setup() {
         project = ProjectBuilder.builder().build()
-        project.apply plugin: 'com.github.rodm.teamcity'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
     }
 
     @Test
@@ -68,7 +68,7 @@ class ServerConfigurationTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
         plugin.configureServerPluginTasks(project, extension)
 
         assertNotNull(project.tasks.findByName('generateDescriptor'))
@@ -83,7 +83,7 @@ class ServerConfigurationTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
         plugin.configureServerPluginTasks(project, extension)
 
         assertNotNull(project.tasks.findByName('processDescriptor'))
@@ -94,7 +94,7 @@ class ServerConfigurationTest {
     @Test
     public void teamcityDeployTasks() {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
         plugin.configureTeamCityTasks(project, extension)
 
         assertNotNull(project.tasks.findByName('deployPlugin'))
@@ -104,23 +104,12 @@ class ServerConfigurationTest {
     @Test
     public void startStopTasks() {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
+        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
         plugin.configureTeamCityTasks(project, extension)
 
         assertNotNull(project.tasks.findByName('startAgent'))
         assertNotNull(project.tasks.findByName('stopAgent'))
         assertNotNull(project.tasks.findByName('startServer'))
         assertNotNull(project.tasks.findByName('stopServer'))
-    }
-
-    @Test
-    public void noAgentPluginTasks() {
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityPlugin plugin = project.plugins.getPlugin(TeamCityPlugin)
-        plugin.configureAgentPluginTasks(project, extension)
-
-        assertNull(project.tasks.findByName('generateAgentDescriptor'))
-        assertNull(project.tasks.findByName('processAgentDescriptor'))
-        assertNull(project.tasks.findByName('packageAgentPlugin'))
     }
 }
