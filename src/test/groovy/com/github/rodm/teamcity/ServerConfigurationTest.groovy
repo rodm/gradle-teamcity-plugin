@@ -67,13 +67,9 @@ class ServerConfigurationTest {
             descriptor {}
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
-        plugin.configureServerPluginTasks(project, extension)
-
+        assertNotNull(project.tasks.findByName('processDescriptor'))
         assertNotNull(project.tasks.findByName('generateDescriptor'))
         assertNotNull(project.tasks.findByName('packagePlugin'))
-        assertNull(project.tasks.findByName('processDescriptor'))
     }
 
     @Test
@@ -82,31 +78,19 @@ class ServerConfigurationTest {
             descriptor = project.file('test-teamcity-plugin')
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
-        plugin.configureServerPluginTasks(project, extension)
-
         assertNotNull(project.tasks.findByName('processDescriptor'))
+        assertNotNull(project.tasks.findByName('generateDescriptor'))
         assertNotNull(project.tasks.findByName('packagePlugin'))
-        assertNull(project.tasks.findByName('generateDescriptor'))
     }
 
     @Test
     public void teamcityDeployTasks() {
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
-        plugin.configureTeamCityTasks(project, extension)
-
         assertNotNull(project.tasks.findByName('deployPlugin'))
         assertNotNull(project.tasks.findByName('undeployPlugin'))
     }
 
     @Test
     public void startStopTasks() {
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityServerPlugin plugin = project.plugins.getPlugin(TeamCityServerPlugin)
-        plugin.configureTeamCityTasks(project, extension)
-
         assertNotNull(project.tasks.findByName('startAgent'))
         assertNotNull(project.tasks.findByName('stopAgent'))
         assertNotNull(project.tasks.findByName('startServer'))

@@ -118,13 +118,9 @@ class AgentConfigurationTest {
             descriptor {}
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityAgentPlugin plugin = project.plugins.getPlugin(TeamCityAgentPlugin)
-        plugin.configureAgentPluginTasks(project, extension)
-
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
         assertNotNull(project.tasks.findByName('packageAgentPlugin'))
-        assertNull(project.tasks.findByName('processAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('processAgentDescriptor'))
     }
 
     @Test
@@ -133,11 +129,7 @@ class AgentConfigurationTest {
             descriptor = project.file('test-teamcity-plugin')
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        TeamCityAgentPlugin plugin = project.plugins.getPlugin(TeamCityAgentPlugin)
-        plugin.configureAgentPluginTasks(project, extension)
-
-        assertNull(project.tasks.findByName('generateAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
         assertNotNull(project.tasks.findByName('packageAgentPlugin'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
     }

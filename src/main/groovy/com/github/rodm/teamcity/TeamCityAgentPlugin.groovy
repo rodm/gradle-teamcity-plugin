@@ -42,10 +42,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         configureRepositories(project)
         configureConfigurations(project)
-
-        project.afterEvaluate {
-            configureAgentPluginTasks(project, extension)
-        }
+        configureAgentPluginTasks(project, extension)
     }
 
     private configureRepositories(Project project) {
@@ -83,8 +80,10 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
     void configureAgentPluginTasks(Project project, TeamCityPluginExtension extension) {
         if (project.plugins.hasPlugin(JavaPlugin)) {
-            project.dependencies {
-                teamcity "org.jetbrains.teamcity:agent-api:${extension.version}"
+            project.afterEvaluate {
+                project.dependencies {
+                    teamcity "org.jetbrains.teamcity:agent-api:${extension.version}"
+                }
             }
         }
 
@@ -114,19 +113,17 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        if (extension.descriptor instanceof File) {
-            def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
-            processDescriptor.with {
-                from(extension.descriptor)
-                into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
-            }
-            processDescriptor.onlyIf { extension.descriptor != null }
-            packagePlugin.dependsOn processDescriptor
-        } else {
-            def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
-            generateDescriptor.onlyIf { extension.descriptor != null }
-            packagePlugin.dependsOn generateDescriptor
+        def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
+        processDescriptor.with {
+            from { extension.descriptor }
+            into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
         }
+        processDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof File}
+        packagePlugin.dependsOn processDescriptor
+
+        def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor)
+        generateDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof AgentPluginDescriptor }
+        packagePlugin.dependsOn generateDescriptor
 
         ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
         project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)

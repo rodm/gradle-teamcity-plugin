@@ -51,11 +51,8 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         configureRepositories(project)
         configureConfigurations(project)
-
-        project.afterEvaluate {
-            configureServerPluginTasks(project, extension)
-            configureTeamCityTasks(project, extension)
-        }
+        configureServerPluginTasks(project, extension)
+        configureTeamCityTasks(project, extension)
     }
 
     private configureRepositories(Project project) {
@@ -93,10 +90,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         if (project.plugins.hasPlugin(JavaPlugin)) {
-            project.dependencies {
-                teamcity "org.jetbrains.teamcity:server-api:${extension.version}"
+            project.afterEvaluate {
+                project.dependencies {
+                    teamcity "org.jetbrains.teamcity:server-api:${extension.version}"
 
-                testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                    testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                }
             }
         }
 
@@ -129,19 +128,17 @@ class TeamCityServerPlugin implements Plugin<Project> {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        if (extension.descriptor instanceof File) {
-            def processDescriptor = project.tasks.create('processDescriptor', Copy)
-            processDescriptor.with {
-                from(extension.descriptor)
-                into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
-            }
-            processDescriptor.onlyIf { extension.descriptor != null }
-            packagePlugin.dependsOn processDescriptor
-        } else {
-            def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
-            generateDescriptor.onlyIf { extension.descriptor != null }
-            packagePlugin.dependsOn generateDescriptor
+        def processDescriptor = project.tasks.create('processDescriptor', Copy)
+        processDescriptor.with {
+            from { extension.descriptor }
+            into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
         }
+        processDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof File }
+        packagePlugin.dependsOn processDescriptor
+
+        def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
+        generateDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof ServerPluginDescriptor }
+        packagePlugin.dependsOn generateDescriptor
     }
 
     void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
