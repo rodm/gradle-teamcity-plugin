@@ -27,65 +27,16 @@ import com.github.rodm.teamcity.tasks.TeamCityTask
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
-import org.gradle.api.Plugin
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
-class TeamCityServerPlugin implements Plugin<Project> {
+class TeamCityServerPlugin extends TeamCityPlugin {
 
-    static final String PLUGIN_DESCRIPTOR_FILENAME = 'teamcity-plugin.xml'
-
-    static final String PLUGIN_DESCRIPTOR_DIR = 'descriptor'
-
-    static final String TEAMCITY_EXTENSION_NAME = 'teamcity'
-
-    static final String JETBRAINS_MAVEN_REPOSITORY = 'http://repository.jetbrains.com/all'
-
-    void apply(Project project) {
-        project.plugins.apply(BasePlugin)
-        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
-
-        configureRepositories(project)
-        configureConfigurations(project)
+    @Override
+    void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureServerPluginTasks(project, extension)
         configureTeamCityTasks(project, extension)
-    }
-
-    private configureRepositories(Project project) {
-        if (project.plugins.hasPlugin(JavaPlugin)) {
-            project.repositories {
-                mavenCentral()
-                maven {
-                    url = JETBRAINS_MAVEN_REPOSITORY
-                }
-            }
-        }
-    }
-
-    void configureConfigurations(final Project project) {
-        ConfigurationContainer configurations = project.getConfigurations();
-        configurations.create('agent')
-                .setVisible(false)
-                .setTransitive(false)
-                .setDescription("Configuration for agent plugin.");
-        configurations.create('server')
-                .setVisible(false)
-                .setTransitive(false)
-                .setDescription("Configuration for server plugin.");
-        configurations.create('plugin')
-                .setVisible(false)
-                .setTransitive(false)
-                .setDescription('Configuration for plugin artifact.')
-        if (project.plugins.hasPlugin(JavaPlugin)) {
-            Configuration teamcityConfiguration = configurations.create('teamcity')
-                    .setVisible(false)
-                    .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
-            configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(teamcityConfiguration)
-        }
     }
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
