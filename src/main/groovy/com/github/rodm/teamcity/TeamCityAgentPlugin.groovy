@@ -66,6 +66,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         processDescriptor.with {
             from { extension.descriptor }
             into("$project.buildDir/$AGENT_PLUGIN_DESCRIPTOR_DIR")
+            rename { PLUGIN_DESCRIPTOR_FILENAME }
         }
         processDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof File}
         packagePlugin.dependsOn processDescriptor
