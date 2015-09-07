@@ -119,8 +119,8 @@ class AgentConfigurationTest {
         }
 
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('packageAgentPlugin'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('agentPlugin'))
     }
 
     @Test
@@ -130,7 +130,7 @@ class AgentConfigurationTest {
         }
 
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('packageAgentPlugin'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
+        assertNotNull(project.tasks.findByName('agentPlugin'))
     }
 }

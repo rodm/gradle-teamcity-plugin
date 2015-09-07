@@ -34,7 +34,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
             }
         }
 
-        def packagePlugin = project.tasks.create('packageAgentPlugin', Zip)
+        def packagePlugin = project.tasks.create('agentPlugin', Zip)
         packagePlugin.description = 'Package TeamCity Agent plugin'
         packagePlugin.group = 'TeamCity'
         packagePlugin.with {

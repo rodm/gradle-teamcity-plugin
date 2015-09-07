@@ -69,7 +69,7 @@ class ServerConfigurationTest {
 
         assertNotNull(project.tasks.findByName('processDescriptor'))
         assertNotNull(project.tasks.findByName('generateDescriptor'))
-        assertNotNull(project.tasks.findByName('packagePlugin'))
+        assertNotNull(project.tasks.findByName('serverPlugin'))
     }
 
     @Test
@@ -80,7 +80,7 @@ class ServerConfigurationTest {
 
         assertNotNull(project.tasks.findByName('processDescriptor'))
         assertNotNull(project.tasks.findByName('generateDescriptor'))
-        assertNotNull(project.tasks.findByName('packagePlugin'))
+        assertNotNull(project.tasks.findByName('serverPlugin'))
     }
 
     @Test

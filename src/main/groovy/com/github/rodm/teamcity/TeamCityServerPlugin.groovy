@@ -50,7 +50,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             }
         }
 
-        def packagePlugin = project.tasks.create('packagePlugin', Zip)
+        def packagePlugin = project.tasks.create('serverPlugin', Zip)
         packagePlugin.description = 'Package TeamCity plugin'
         packagePlugin.group = 'TeamCity'
         packagePlugin.with {
@@ -105,11 +105,11 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         project.tasks.create('stopAgent', StopAgent)
 
         project.tasks.create('deployPlugin', DeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archivePath }
+            conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
             conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
         }
         project.tasks.create('undeployPlugin', UndeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('packagePlugin').archiveName }
+            conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archiveName }
         }
 
         def download = project.tasks.create("downloadTeamCity", Download) {
