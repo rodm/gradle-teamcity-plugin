@@ -17,7 +17,8 @@ package com.github.rodm.teamcity.tasks
 
 import com.github.rodm.teamcity.AgentPluginDescriptor
 import com.github.rodm.teamcity.AgentPluginDescriptorGenerator
-import com.github.rodm.teamcity.TeamCityServerPlugin
+import com.github.rodm.teamcity.TeamCityAgentPlugin
+import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.specs.Specs
@@ -35,7 +36,7 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     @OutputFile
     File getDestination() {
         if (destination == null) {
-            destination = new File(project.getBuildDir(), TeamCityServerPlugin.PLUGIN_DESCRIPTOR_DIR + "/" + TeamCityServerPlugin.PLUGIN_DESCRIPTOR_FILENAME)
+            destination = new File(project.getBuildDir(), TeamCityAgentPlugin.AGENT_PLUGIN_DESCRIPTOR_DIR + "/" + TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME)
         }
         return destination
     }

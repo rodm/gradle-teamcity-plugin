@@ -33,6 +33,8 @@ import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityServerPlugin extends TeamCityPlugin {
 
+    public static final String SERVER_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/server'
+
     @Override
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureServerPluginTasks(project, extension)
@@ -67,7 +69,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             }
             into('') {
                 from {
-                    new File(project.getBuildDir(), PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                    new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
                 }
                 rename {
                     PLUGIN_DESCRIPTOR_FILENAME
@@ -82,7 +84,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         def processDescriptor = project.tasks.create('processDescriptor', Copy)
         processDescriptor.with {
             from { extension.descriptor }
-            into("$project.buildDir/$PLUGIN_DESCRIPTOR_DIR")
+            into("$project.buildDir/$SERVER_PLUGIN_DESCRIPTOR_DIR")
         }
         processDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof File }
         packagePlugin.dependsOn processDescriptor
