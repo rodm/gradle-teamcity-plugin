@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -35,7 +36,17 @@ abstract class TeamCityPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
 
-        TeamCityPluginExtension extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
+        if (project.plugins.hasPlugin(JavaPlugin) &&
+                (project.plugins.hasPlugin(TeamCityAgentPlugin) || project.plugins.hasPlugin(TeamCityServerPlugin))) {
+            throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
+        }
+
+        TeamCityPluginExtension extension
+        if (project.extensions.findByType(TeamCityPluginExtension)) {
+            extension = project.extensions.getByType(TeamCityPluginExtension)
+        } else {
+            extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
+        }
         configureRepositories(project)
         configureConfigurations(project)
         configureTasks(project, extension)
@@ -54,6 +65,9 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     void configureConfigurations(final Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
+        if (configurations.names.contains('agent'))
+            return
+
         configurations.create('agent')
                 .setVisible(false)
                 .setTransitive(false)
