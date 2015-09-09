@@ -22,8 +22,6 @@ class TeamCityPluginExtension {
 
     String version = '9.0'
 
-    def descriptor
-
     File homeDir
 
     File dataDir
@@ -38,19 +36,54 @@ class TeamCityPluginExtension {
 
     String downloadFile
 
+    private AgentPluginConfiguration agent = new AgentPluginConfiguration()
+
+    private ServerPluginConfiguration server = new ServerPluginConfiguration()
+
     private Project project
 
     TeamCityPluginExtension(Project project) {
         this.project = project
     }
 
+    def getAgent() {
+        return agent
+    }
+
+    def agent(Closure closure) {
+        ConfigureUtil.configure(closure, agent)
+    }
+
+    def getServer() {
+        return server
+    }
+
+    def server(Closure closure) {
+        ConfigureUtil.configure(closure, server)
+    }
+
+    def setDescriptor(Object descriptor) {
+        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+            agent.descriptor = descriptor
+        } else {
+            server.descriptor = descriptor
+        }
+    }
+
+    def getDescriptor() {
+        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+            return agent.descriptor
+        } else {
+            return server.descriptor
+        }
+    }
+
     def descriptor(Closure closure) {
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
-            this.descriptor = new AgentPluginDescriptor()
+            agent.descriptor(closure)
         } else {
-            this.descriptor = new ServerPluginDescriptor()
+            server.descriptor(closure)
         }
-        ConfigureUtil.configure(closure, this.descriptor)
     }
 
     def getDownloadUrl() {

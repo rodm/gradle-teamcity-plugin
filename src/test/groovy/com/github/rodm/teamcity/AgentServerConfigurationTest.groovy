@@ -23,6 +23,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
+import static org.hamcrest.CoreMatchers.isA
+import static org.junit.Assert.assertThat
+
 class AgentServerConfigurationTest {
 
     @Rule
@@ -59,5 +62,24 @@ class AgentServerConfigurationTest {
     public void applyBothPlugins() {
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         project.apply plugin: 'com.github.rodm.teamcity-server'
+    }
+
+    @Test
+    public void applyAndConfigureBothPlugins() {
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+            server {
+                descriptor {}
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
+        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
     }
 }
