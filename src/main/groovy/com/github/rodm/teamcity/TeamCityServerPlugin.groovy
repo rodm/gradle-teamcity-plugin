@@ -76,22 +76,22 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 }
             }
         }
-        packagePlugin.onlyIf { extension.descriptor != null }
+        packagePlugin.onlyIf { extension.server.descriptor != null }
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
         def processDescriptor = project.tasks.create('processDescriptor', Copy)
         processDescriptor.with {
-            from { extension.descriptor }
+            from { extension.server.descriptor }
             into("$project.buildDir/$SERVER_PLUGIN_DESCRIPTOR_DIR")
             rename { PLUGIN_DESCRIPTOR_FILENAME }
         }
-        processDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof File }
+        processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }
         packagePlugin.dependsOn processDescriptor
 
         def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
-        generateDescriptor.onlyIf { extension.descriptor != null && extension.descriptor instanceof ServerPluginDescriptor }
+        generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
     }
 
