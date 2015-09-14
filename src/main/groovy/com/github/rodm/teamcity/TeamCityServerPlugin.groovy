@@ -65,7 +65,12 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 from(project.configurations.server)
             }
             into('agent') {
-                from(project.configurations.agent)
+                if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+                    def agentPlugin = project.tasks['agentPlugin']
+                    from(agentPlugin)
+                } else {
+                    from(project.configurations.agent)
+                }
             }
             into('') {
                 from {
