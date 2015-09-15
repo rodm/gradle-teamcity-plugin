@@ -57,6 +57,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
                 }
             }
         }
+        packagePlugin.with(extension.agent.files)
         packagePlugin.onlyIf { extension.agent.descriptor != null }
 
         def assemble = project.tasks['assemble']

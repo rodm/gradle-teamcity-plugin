@@ -36,14 +36,16 @@ class TeamCityPluginExtension {
 
     String downloadFile
 
-    private AgentPluginConfiguration agent = new AgentPluginConfiguration()
+    private AgentPluginConfiguration agent
 
-    private ServerPluginConfiguration server = new ServerPluginConfiguration()
+    private ServerPluginConfiguration server
 
     private Project project
 
     TeamCityPluginExtension(Project project) {
         this.project = project
+        this.agent = new AgentPluginConfiguration(project.copySpec {})
+        this.server = new ServerPluginConfiguration()
     }
 
     def getAgent() {
