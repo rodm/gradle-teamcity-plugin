@@ -107,18 +107,19 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             conventionMapping.map('javaHome') { extension.javaHome }
         }
 
-        project.tasks.create('startServer', StartServer)
-        project.tasks.create('stopServer', StopServer)
-        project.tasks.create('startAgent', StartAgent)
-        project.tasks.create('stopAgent', StopAgent)
-
-        project.tasks.create('deployPlugin', DeployPlugin) {
+        def deployPlugin = project.tasks.create('deployPlugin', DeployPlugin) {
             conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
             conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
         }
         project.tasks.create('undeployPlugin', UndeployPlugin) {
             conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archiveName }
         }
+
+        def startServer = project.tasks.create('startServer', StartServer)
+        startServer.dependsOn deployPlugin
+        project.tasks.create('stopServer', StopServer)
+        project.tasks.create('startAgent', StartAgent)
+        project.tasks.create('stopAgent', StopAgent)
 
         def download = project.tasks.create("downloadTeamCity", Download) {
             conventionMapping.map('source') { extension.downloadUrl }
