@@ -15,14 +15,29 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
 class ServerPluginConfiguration {
 
     def descriptor
 
+    private CopySpec files
+
+    ServerPluginConfiguration(CopySpec copySpec) {
+        this.files = copySpec
+    }
+
     def descriptor(Closure closure) {
         descriptor = new ServerPluginDescriptor()
         ConfigureUtil.configure(closure, descriptor)
+    }
+
+    def files(Closure closure) {
+        ConfigureUtil.configure(closure, files.addChild())
+    }
+
+    CopySpec getFiles() {
+        return files
     }
 }

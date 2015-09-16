@@ -23,8 +23,8 @@ import org.junit.Test
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
+import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
 
 class ServerConfigurationTest {
@@ -81,6 +81,19 @@ class ServerConfigurationTest {
         assertNotNull(project.tasks.findByName('processDescriptor'))
         assertNotNull(project.tasks.findByName('generateDescriptor'))
         assertNotNull(project.tasks.findByName('serverPlugin'))
+    }
+
+    @Test
+    public void serverPluginWithAdditionalFiles() {
+        project.teamcity {
+            server {
+                files {
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.files.childSpecs.size, is(1))
     }
 
     @Test

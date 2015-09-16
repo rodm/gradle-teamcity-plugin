@@ -81,6 +81,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 }
             }
         }
+        packagePlugin.with(extension.server.files)
         packagePlugin.onlyIf { extension.server.descriptor != null }
 
         def assemble = project.tasks['assemble']
