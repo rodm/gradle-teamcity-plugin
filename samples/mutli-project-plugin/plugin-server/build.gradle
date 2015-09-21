@@ -1,0 +1,22 @@
+
+apply plugin: 'com.github.rodm.teamcity-server'
+
+dependencies {
+    agent project(path: ':plugin-agent', configuration: 'plugin')
+    server project(':common')
+    server project(':server')
+}
+
+teamcity {
+    version = teamcityVersion
+
+    descriptor {
+        name = 'Example TeamCity Plugin'
+        displayName = 'Example TeamCity Plugin'
+        version = project.version
+        vendorName = 'rodm'
+        description = 'Example multi-project TeamCity plugin'
+        email = 'rod.n.mackenzie@gmail.com'
+        useSeparateClassloader = true
+    }
+}

@@ -1,0 +1,11 @@
+
+apply plugin: 'java'
+apply plugin: 'com.github.rodm.teamcity-server'
+
+dependencies {
+    compile project(':common')
+}
+
+teamcity {
+    version = teamcityVersion
+}
