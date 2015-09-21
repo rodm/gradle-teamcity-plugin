@@ -1,8 +1,8 @@
 
-apply plugin: 'com.github.rodm.teamcity'
+apply plugin: 'java'
+apply plugin: 'com.github.rodm.teamcity-agent'
 
 teamcity {
-    type = 'agent-plugin'
     version = teamcityVersion
 
     descriptor {
