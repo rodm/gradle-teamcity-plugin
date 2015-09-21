@@ -29,7 +29,7 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.6'
+version = '0.7'
 group = 'com.github.rodm'
 
 pluginBundle {
@@ -39,9 +39,13 @@ pluginBundle {
     tags = ['teamcity']
 
     plugins {
-        teamcityPlugin {
-            id = 'com.github.rodm.teamcity'
-            displayName = 'Gradle TeamCity plugin'
+        teamcityServerPlugin {
+            id = 'com.github.rodm.teamcity-server'
+            displayName = 'Gradle TeamCity Server plugin'
+        }
+        teamcityAgentPlugin {
+            id = 'com.github.rodm.teamcity-agent'
+            displayName = 'Gradle TeamCity Agent plugin'
         }
     }
 
