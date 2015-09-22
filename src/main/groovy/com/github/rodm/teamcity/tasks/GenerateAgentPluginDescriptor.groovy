@@ -44,7 +44,7 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     @TaskAction
     void generateDescriptor() {
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-        AgentPluginDescriptor descriptor = extension.getDescriptor()
+        AgentPluginDescriptor descriptor = extension.agent.descriptor
 
         if (descriptor == null) {
             descriptor = new AgentPluginDescriptor()
