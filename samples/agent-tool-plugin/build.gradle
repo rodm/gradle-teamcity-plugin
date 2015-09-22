@@ -1,0 +1,86 @@
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8'
+    }
+}
+
+apply plugin: 'com.github.rodm.teamcity-agent'
+apply plugin: 'com.github.rodm.teamcity-server'
+
+
+group = 'com.github.rodm.teamcity'
+version = '1.0-SNAPSHOT'
+
+ext {
+    teamcityVersion = '8.1.5'
+    teamcityDir = "$rootDir/servers/TeamCity-${teamcityVersion}"
+    teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
+    teamcityJavaHome = System.properties['java.home']
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    maven
+}
+
+dependencies {
+    maven group: 'org.apache.maven', name: 'apache-maven', version: '3.3.3', classifier: 'bin', ext: 'zip'
+}
+
+agentPlugin {
+    baseName = 'maven3_3'
+    version = ''
+}
+
+serverPlugin {
+    baseName = 'maven3_3-tool'
+    version = ''
+}
+
+teamcity {
+    version = teamcityVersion
+
+    agent {
+        descriptor {
+            toolDeployment {
+                executableFiles {
+                    include 'bin/mvn'
+                }
+            }
+        }
+
+        files {
+            from(zipTree(configurations.maven.singleFile)) {
+                includeEmptyDirs = false
+                eachFile { file ->
+                    file.relativePath = new RelativePath(file.relativePath.endsWithFile, file.relativePath.segments[1..-1] as String[])
+                }
+            }
+        }
+    }
+
+    server {
+        descriptor {
+            name = 'maven3_3-tool'
+            displayName = 'Repacked Maven 3.3'
+            version = project.version
+            vendorName = 'rodm'
+            description = 'TeamCity Example Tool Plugin - Repacked Maven 3.3'
+            downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
+            email = 'rod.n.mackenzie@gmail.com'
+        }
+    }
+
+    homeDir = file(teamcityDir)
+    dataDir = file(teamcityDataDir)
+    javaHome = file(teamcityJavaHome)
+}
