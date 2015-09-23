@@ -88,7 +88,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        def processDescriptor = project.tasks.create('processDescriptor', Copy)
+        def processDescriptor = project.tasks.create('processServerDescriptor', Copy)
         processDescriptor.with {
             from { extension.server.descriptor }
             into("$project.buildDir/$SERVER_PLUGIN_DESCRIPTOR_DIR")
@@ -97,7 +97,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }
         packagePlugin.dependsOn processDescriptor
 
-        def generateDescriptor = project.tasks.create('generateDescriptor', GenerateServerPluginDescriptor)
+        def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor)
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
     }

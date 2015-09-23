@@ -67,8 +67,8 @@ class ServerConfigurationTest {
             descriptor {}
         }
 
-        assertNotNull(project.tasks.findByName('processDescriptor'))
-        assertNotNull(project.tasks.findByName('generateDescriptor'))
+        assertNotNull(project.tasks.findByName('processServerDescriptor'))
+        assertNotNull(project.tasks.findByName('generateServerDescriptor'))
         assertNotNull(project.tasks.findByName('serverPlugin'))
     }
 
@@ -78,8 +78,8 @@ class ServerConfigurationTest {
             descriptor = project.file('test-teamcity-plugin')
         }
 
-        assertNotNull(project.tasks.findByName('processDescriptor'))
-        assertNotNull(project.tasks.findByName('generateDescriptor'))
+        assertNotNull(project.tasks.findByName('processServerDescriptor'))
+        assertNotNull(project.tasks.findByName('generateServerDescriptor'))
         assertNotNull(project.tasks.findByName('serverPlugin'))
     }
 
