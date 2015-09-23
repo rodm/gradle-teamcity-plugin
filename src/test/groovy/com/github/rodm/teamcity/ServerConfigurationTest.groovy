@@ -97,6 +97,17 @@ class ServerConfigurationTest {
     }
 
     @Test
+    public void serverPluginWithAdditionalFilesAlternative() {
+        project.teamcity {
+            files {
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.files.childSpecs.size, is(1))
+    }
+
+    @Test
     public void teamcityDeployTasks() {
         assertNotNull(project.tasks.findByName('deployPlugin'))
         assertNotNull(project.tasks.findByName('undeployPlugin'))

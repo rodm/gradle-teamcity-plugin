@@ -146,4 +146,15 @@ class AgentConfigurationTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.files.childSpecs.size, is(1))
     }
+
+    @Test
+    public void agentPluginWithAdditionalFilesAlternative() {
+        project.teamcity {
+            files {
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.agent.files.childSpecs.size, is(1))
+    }
 }

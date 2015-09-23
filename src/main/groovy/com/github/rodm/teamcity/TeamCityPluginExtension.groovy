@@ -88,6 +88,14 @@ class TeamCityPluginExtension {
         }
     }
 
+    def files(Closure closure) {
+        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+            agent.files(closure)
+        } else {
+            server.files(closure)
+        }
+    }
+
     def getDownloadUrl() {
         if (!downloadUrl) {
             downloadUrl = "${downloadBaseUrl}/TeamCity-${version}.tar.gz"
