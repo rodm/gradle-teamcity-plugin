@@ -19,6 +19,7 @@ import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
+import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
@@ -28,7 +29,6 @@ import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityServerPlugin extends TeamCityPlugin {
@@ -88,12 +88,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        def processDescriptor = project.tasks.create('processServerDescriptor', Copy)
-        processDescriptor.with {
-            from { extension.server.descriptor }
-            into("$project.buildDir/$SERVER_PLUGIN_DESCRIPTOR_DIR")
-            rename { PLUGIN_DESCRIPTOR_FILENAME }
+        def processDescriptor = project.tasks.create('processServerDescriptor', ProcessDescriptor) {
+            conventionMapping.descriptor = { extension.server.descriptor instanceof File ? extension.server.descriptor : null }
         }
+        processDescriptor.destinationDir = new File(project.buildDir, SERVER_PLUGIN_DESCRIPTOR_DIR)
         processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }
         packagePlugin.dependsOn processDescriptor
 

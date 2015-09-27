@@ -16,10 +16,10 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
+import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityAgentPlugin extends TeamCityPlugin {
@@ -64,12 +64,10 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        def processDescriptor = project.tasks.create('processAgentDescriptor', Copy)
-        processDescriptor.with {
-            from { extension.agent.descriptor }
-            into("$project.buildDir/$AGENT_PLUGIN_DESCRIPTOR_DIR")
-            rename { PLUGIN_DESCRIPTOR_FILENAME }
+        def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessDescriptor) {
+            conventionMapping.descriptor = { extension.agent.descriptor instanceof File ? extension.agent.descriptor : null }
         }
+        processDescriptor.destinationDir = new File(project.buildDir, AGENT_PLUGIN_DESCRIPTOR_DIR)
         processDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof File}
         packagePlugin.dependsOn processDescriptor
 
