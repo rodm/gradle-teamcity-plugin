@@ -24,6 +24,8 @@ class AgentPluginConfiguration {
 
     private CopySpec files
 
+    Map<String, Object> tokens = [:]
+
     AgentPluginConfiguration(CopySpec copySpec) {
         this.files = copySpec
     }

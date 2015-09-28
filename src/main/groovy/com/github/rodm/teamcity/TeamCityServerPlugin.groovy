@@ -90,6 +90,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
         def processDescriptor = project.tasks.create('processServerDescriptor', ProcessDescriptor) {
             conventionMapping.descriptor = { extension.server.descriptor instanceof File ? extension.server.descriptor : null }
+            conventionMapping.tokens = { extension.server.tokens }
         }
         processDescriptor.destinationDir = new File(project.buildDir, SERVER_PLUGIN_DESCRIPTOR_DIR)
         processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }

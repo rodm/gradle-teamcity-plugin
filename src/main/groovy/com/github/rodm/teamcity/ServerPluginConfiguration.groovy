@@ -24,6 +24,8 @@ class ServerPluginConfiguration {
 
     private CopySpec files
 
+    Map<String, Object> tokens = [:]
+
     ServerPluginConfiguration(CopySpec copySpec) {
         this.files = copySpec
     }

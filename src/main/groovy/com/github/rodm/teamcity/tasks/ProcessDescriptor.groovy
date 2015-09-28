@@ -16,7 +16,9 @@
 package com.github.rodm.teamcity.tasks
 
 import com.github.rodm.teamcity.TeamCityPlugin
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -26,6 +28,8 @@ class ProcessDescriptor extends DefaultTask {
     private File descriptor
 
     private File destinationDir
+
+    private Map<String, Object> tokens = [:]
 
     @InputFile
     File getDescriptor() {
@@ -41,12 +45,20 @@ class ProcessDescriptor extends DefaultTask {
         destinationDir = dir
     }
 
+    @Input
+    Map<String, Object> getTokens() {
+        return tokens
+    }
+
     @TaskAction
     public void process() {
         project.copy {
             into getDestinationDir()
             from getDescriptor()
             rename { TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME }
+            if (!tokens.empty) {
+                filter(ReplaceTokens, tokens: tokens)
+            }
         }
     }
 }

@@ -66,6 +66,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
 
         def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessDescriptor) {
             conventionMapping.descriptor = { extension.agent.descriptor instanceof File ? extension.agent.descriptor : null }
+            conventionMapping.tokens = { extension.agent.tokens }
         }
         processDescriptor.destinationDir = new File(project.buildDir, AGENT_PLUGIN_DESCRIPTOR_DIR)
         processDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof File}

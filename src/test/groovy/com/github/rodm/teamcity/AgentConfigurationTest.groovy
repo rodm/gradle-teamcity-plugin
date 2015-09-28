@@ -23,6 +23,7 @@ import org.junit.Test
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertNotNull
@@ -132,6 +133,18 @@ class AgentConfigurationTest {
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
         assertNotNull(project.tasks.findByName('agentPlugin'))
+    }
+
+    @Test
+    public void agentPluginDescriptorReplacementTokens() {
+        project.teamcity {
+            descriptor = project.file('test-teamcity-plugin')
+            tokens = [VERSION: '1.2.3', VENDOR: 'rodm']
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.agent.tokens, hasEntry('VERSION', '1.2.3'))
+        assertThat(extension.agent.tokens, hasEntry('VENDOR', 'rodm'))
     }
 
     @Test
