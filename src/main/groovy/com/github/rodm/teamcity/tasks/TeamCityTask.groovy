@@ -16,21 +16,38 @@
 package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.InvalidUserDataException
+import org.gradle.api.tasks.Input
 
 class TeamCityTask extends DefaultTask {
 
-    @InputDirectory
+    @Input
     File homeDir
 
-    @InputDirectory
+    @Input
     File dataDir
 
-    @InputDirectory
+    @Input
     File javaHome
 
     TeamCityTask() {
         group 'TeamCity'
+    }
+
+    void validate() {
+        validDirectory('homeDir', getHomeDir())
+        validDirectory('dataDir', getDataDir())
+        validDirectory('javaHome', getJavaHome())
+    }
+
+    private void validDirectory(String propertyName, File value) {
+        if (value == null) {
+            throw new InvalidUserDataException(String.format("Property '%s' not set.", propertyName));
+        } else if (!value.exists()) {
+            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' does not exist.", value, propertyName));
+        } else if (!value.isDirectory()) {
+            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' is not a directory.", value, propertyName));
+        }
     }
 
     boolean isWindows() {
