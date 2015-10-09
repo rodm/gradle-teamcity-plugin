@@ -28,6 +28,8 @@ class TeamCityPluginExtension {
 
     File javaHome
 
+    String serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+
     String downloadBaseUrl = 'http://download.jetbrains.com/teamcity'
 
     String downloadUrl

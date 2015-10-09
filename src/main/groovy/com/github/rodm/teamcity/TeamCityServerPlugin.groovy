@@ -116,7 +116,9 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archiveName }
         }
 
-        def startServer = project.tasks.create('startServer', StartServer)
+        def startServer = project.tasks.create('startServer', StartServer) {
+            conventionMapping.map('serverOptions') { extension.serverOptions }
+        }
         startServer.dependsOn deployPlugin
         project.tasks.create('stopServer', StopServer)
         project.tasks.create('startAgent', StartAgent)
