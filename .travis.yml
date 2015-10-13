@@ -4,4 +4,4 @@ jdk:
   - openjdk6
 
 script:
-  - ./gradlew clean build
+  - ./gradlew clean build functionalTest
