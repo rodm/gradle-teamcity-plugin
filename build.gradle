@@ -21,6 +21,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
+    testCompile gradleTestKit()
     testCompile "junit:junit:4.12"
     testCompile "xmlunit:xmlunit:1.6"
     testCompile 'org.hamcrest:hamcrest-library:1.3'
@@ -31,6 +32,37 @@ targetCompatibility = 1.6
 
 version = '0.8'
 group = 'com.github.rodm'
+
+task pluginClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+dependencies {
+    testRuntime files(pluginClasspathManifest)
+}
+
+sourceSets {
+    functionalTest {
+        compileClasspath += main.output + configurations.testRuntime
+        runtimeClasspath += main.output + configurations.testRuntime
+        groovy {
+            srcDir 'src/functional/groovy'
+        }
+    }
+}
+
+task functionalTest(type: Test) {
+    testClassesDir = sourceSets.functionalTest.output.classesDir
+    classpath = sourceSets.functionalTest.runtimeClasspath
+}
 
 pluginBundle {
     website = 'https://github.com/rodm/gradle-teamcity-plugin'
