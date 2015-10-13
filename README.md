@@ -43,6 +43,8 @@ descriptor can be specified as a path to a file or by a configuration block with
 * `homeDir` : The path to a TeamCity install.
 * `dataDir` : The path to the TeamCity Data directory.
 * `javaHome` : The path to the version of Java used to run the server and build agent.
+* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+ these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.  
 * `downloadBaseUrl` : The base URL used to download the TeamCity installer. Default 'http://download.jetbrains.com/teamcity'.
 * `downloadDir` : The directory the TeamCity installer is downloaded into. Default 'downloads'.
 
@@ -133,7 +135,8 @@ Plugin descriptor defined in the build script.
         downloadDir = '/tmp'
     }
 
-Plugin descriptor defined in an external file at the root of the project.
+Plugin descriptor defined in an external file at the root of the project. A map of tokens to be replaced in the
+descriptor file can be provided using the `tokens` property.
 
     teamcity {
         // Use TeamCity 8.1 API 
@@ -142,6 +145,7 @@ Plugin descriptor defined in an external file at the root of the project.
         server {
             // Locate the plugin descriptor in the root directory of the project
             descriptor = file('teamcity-plugin.xml')
+            tokens = [VERSION: project.version, VENDOR_NAME: 'vendor name']
         }
     }
 
