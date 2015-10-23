@@ -4,12 +4,12 @@
     <info>
         <name>server-plugin</name>
         <display-name>server-plugin</display-name>
-        <version>1.0-SNAPSHOT</version>
+        <version>@VERSION@</version>
         <description>TeamCity Example Server Plugin</description>
         <download-url>https://github.com/rodm/gradle-teamcity-plugin/</download-url>
         <email>rod.n.mackenzie@gmail.com</email>
         <vendor>
-            <name>vendor name</name>
+            <name>@VENDOR_NAME@</name>
         </vendor>
     </info>
     <deployment use-separate-classloader="false"/>

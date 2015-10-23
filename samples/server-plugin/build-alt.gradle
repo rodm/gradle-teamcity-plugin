@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.7'
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8'
     }
 }
 
@@ -15,6 +15,8 @@ apply plugin: 'com.github.rodm.teamcity-server'
 
 group = 'com.github.rodm.teamcity'
 version = '1.0-SNAPSHOT'
+
+def vendorName = 'rodm'
 
 ext {
     teamcityVersion = '8.1.5'
@@ -31,6 +33,7 @@ teamcity {
     version = teamcityVersion
 
     descriptor = file("$rootDir/src/main/descriptor/teamcity-plugin.xml")
+    tokens = [VERSION: project.version, VENDOR_NAME: vendorName]
 
     homeDir = file(teamcityDir)
     dataDir = file(teamcityDataDir)
