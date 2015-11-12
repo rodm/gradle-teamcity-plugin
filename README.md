@@ -31,6 +31,20 @@ The jar contains two plugins:
 TeamCity server, and tasks to start and stop the server and default agent.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent side of a TeamCity plugin.
 
+### Configurations
+
+The two plugins add the following configurations.
+
+* `teamcity` : The `teamcity` configuration is used to define dependencies required at compile time but not to be
+included in the plugin. By default the plugins add the `agent-api` and `server-api` depenencies when the `java` plugin
+is also applied.
+* `agent` : The `agent` configuration is used to define additional dependencies to be included in the agent plugin
+lib directory when used with the agent plugin. When used with the server plugin the dependencies are added to the
+ agent directory of the plugin archive.
+* `server` : The `server` configuration is used to define additional dependencies to be include in the server plugin
+lib directory when used with the server plugin.
+* `plugin` : The `plugin` configuration is used by the agent plugin when publishing the agent plugin archive.
+
 ### Extension Properties
 
 The following properties are defined in the `teamcity` configuration block. The version property controls the version of
