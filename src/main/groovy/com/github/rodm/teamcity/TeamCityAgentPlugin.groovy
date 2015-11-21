@@ -28,7 +28,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
 
     @Override
     void configureTasks(Project project, TeamCityPluginExtension extension) {
-        if (project.plugins.hasPlugin(JavaPlugin)) {
+        project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
                     teamcity "org.jetbrains.teamcity:agent-api:${extension.version}"
@@ -42,7 +42,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         packagePlugin.with {
             baseName = "${project.rootProject.name}-agent"
             into("lib") {
-                if (project.plugins.hasPlugin(JavaPlugin)) {
+                project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
                     from(jar)
                     from(project.configurations.runtime - project.configurations.teamcity)

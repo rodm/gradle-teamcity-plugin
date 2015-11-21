@@ -53,7 +53,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
     }
 
     private configureRepositories(Project project) {
-        if (project.plugins.hasPlugin(JavaPlugin)) {
+        project.plugins.withType(JavaPlugin) {
             project.repositories {
                 mavenCentral()
                 maven {
@@ -80,7 +80,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription('Configuration for plugin artifact.')
-        if (project.plugins.hasPlugin(JavaPlugin)) {
+        project.plugins.withType(JavaPlugin) {
             Configuration teamcityConfiguration = configurations.create('teamcity')
                     .setVisible(false)
                     .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')

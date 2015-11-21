@@ -42,7 +42,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     }
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
-        if (project.plugins.hasPlugin(JavaPlugin)) {
+        project.tasks.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
                     teamcity "org.jetbrains.teamcity:server-api:${extension.version}"
@@ -58,7 +58,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         packagePlugin.with {
             baseName = "${project.rootProject.name}"
             into('server') {
-                if (project.plugins.hasPlugin(JavaPlugin)) {
+                project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
                     from(jar)
                     from(project.configurations.runtime - project.configurations.teamcity)
