@@ -65,23 +65,20 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     void configureConfigurations(final Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
-        if (configurations.names.contains('agent'))
-            return
-
-        configurations.create('agent')
+        configurations.maybeCreate('agent')
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription("Configuration for agent plugin.");
-        configurations.create('server')
+        configurations.maybeCreate('server')
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription("Configuration for server plugin.");
-        configurations.create('plugin')
+        configurations.maybeCreate('plugin')
                 .setVisible(false)
                 .setTransitive(false)
                 .setDescription('Configuration for plugin artifact.')
         project.plugins.withType(JavaPlugin) {
-            Configuration teamcityConfiguration = configurations.create('teamcity')
+            Configuration teamcityConfiguration = configurations.maybeCreate('teamcity')
                     .setVisible(false)
                     .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
             configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(teamcityConfiguration)
