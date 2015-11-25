@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         maven {
@@ -33,7 +32,7 @@ teamcity {
     version = teamcityVersion
 
     descriptor = file("$rootDir/src/main/descriptor/teamcity-plugin.xml")
-    tokens = [VERSION: project.version, VENDOR_NAME: vendorName]
+    tokens VERSION: project.version, VENDOR_NAME: vendorName
 
     homeDir = file(teamcityDir)
     dataDir = file(teamcityDataDir)

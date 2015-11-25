@@ -106,6 +106,14 @@ class TeamCityPluginExtension {
         }
     }
 
+    def tokens(Map<String, Object> tokens) {
+        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+            agent.tokens tokens
+        } else {
+            server.tokens tokens
+        }
+    }
+
     def getDownloadUrl() {
         if (!downloadUrl) {
             downloadUrl = "${downloadBaseUrl}/TeamCity-${version}.tar.gz"

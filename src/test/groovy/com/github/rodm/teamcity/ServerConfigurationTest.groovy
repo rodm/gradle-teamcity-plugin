@@ -88,12 +88,30 @@ class ServerConfigurationTest {
     public void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             descriptor = project.file('test-teamcity-plugin')
-            tokens = [VERSION: '1.2.3', VENDOR: 'rodm']
+            tokens VERSION: '1.2.3', VENDOR: 'rodm'
+            tokens BUILD_NUMBER: '123'
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.server.tokens, hasEntry('VERSION', '1.2.3'))
         assertThat(extension.server.tokens, hasEntry('VENDOR', 'rodm'))
+        assertThat(extension.server.tokens, hasEntry('BUILD_NUMBER', '123'))
+    }
+
+    @Test
+    public void serverPluginDescriptorReplacementTokensAlternative() {
+        project.teamcity {
+            server {
+                descriptor = project.file('test-teamcity-plugin')
+                tokens VERSION: '1.2.3', VENDOR: 'rodm'
+                tokens BUILD_NUMBER: '123'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.tokens, hasEntry('VERSION', '1.2.3'))
+        assertThat(extension.server.tokens, hasEntry('VENDOR', 'rodm'))
+        assertThat(extension.server.tokens, hasEntry('BUILD_NUMBER', '123'))
     }
 
     @Test
