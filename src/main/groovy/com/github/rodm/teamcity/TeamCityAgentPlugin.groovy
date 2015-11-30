@@ -31,7 +31,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
-                    teamcity "org.jetbrains.teamcity:agent-api:${extension.version}"
+                    provided "org.jetbrains.teamcity:agent-api:${extension.version}"
                 }
             }
         }
@@ -45,7 +45,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
                     from(jar)
-                    from(project.configurations.runtime - project.configurations.teamcity)
+                    from(project.configurations.runtime - project.configurations.provided)
                 }
                 from(project.configurations.agent)
             }

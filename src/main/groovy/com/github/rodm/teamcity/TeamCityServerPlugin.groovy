@@ -45,7 +45,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         project.tasks.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
-                    teamcity "org.jetbrains.teamcity:server-api:${extension.version}"
+                    provided "org.jetbrains.teamcity:server-api:${extension.version}"
 
                     testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
                 }
@@ -61,7 +61,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
                     from(jar)
-                    from(project.configurations.runtime - project.configurations.teamcity)
+                    from(project.configurations.runtime - project.configurations.provided)
                 }
                 from(project.configurations.server)
             }

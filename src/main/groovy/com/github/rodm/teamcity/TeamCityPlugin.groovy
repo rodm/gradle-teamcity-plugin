@@ -78,10 +78,10 @@ abstract class TeamCityPlugin implements Plugin<Project> {
                 .setTransitive(false)
                 .setDescription('Configuration for plugin artifact.')
         project.plugins.withType(JavaPlugin) {
-            Configuration teamcityConfiguration = configurations.maybeCreate('teamcity')
+            Configuration providedConfiguration = configurations.maybeCreate('provided')
                     .setVisible(false)
                     .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
-            configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(teamcityConfiguration)
+            configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
         }
     }
 
