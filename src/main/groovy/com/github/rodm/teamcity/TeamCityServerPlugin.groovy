@@ -112,17 +112,27 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
             conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
         }
-        project.tasks.create('undeployPlugin', UndeployPlugin) {
+        deployPlugin.onlyIf { extension.dataDir != null }
+
+        def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin) {
             conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archiveName }
         }
+        undeployPlugin.onlyIf { extension.dataDir != null }
 
         def startServer = project.tasks.create('startServer', StartServer) {
             conventionMapping.map('serverOptions') { extension.serverOptions }
         }
         startServer.dependsOn deployPlugin
-        project.tasks.create('stopServer', StopServer)
-        project.tasks.create('startAgent', StartAgent)
-        project.tasks.create('stopAgent', StopAgent)
+        startServer.onlyIf { extension.homeDir != null && extension.dataDir != null }
+
+        def stopServer = project.tasks.create('stopServer', StopServer)
+        stopServer.onlyIf { extension.homeDir != null && extension.dataDir != null }
+
+        def startAgent = project.tasks.create('startAgent', StartAgent)
+        startAgent.onlyIf { extension.homeDir != null }
+
+        def stopAgent = project.tasks.create('stopAgent', StopAgent)
+        stopAgent.onlyIf { extension.homeDir != null }
 
         def download = project.tasks.create("downloadTeamCity", Download) {
             conventionMapping.map('source') { extension.downloadUrl }
