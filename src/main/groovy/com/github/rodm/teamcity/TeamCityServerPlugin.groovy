@@ -42,7 +42,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     }
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
-        project.tasks.withType(JavaPlugin) {
+        project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:server-api:${extension.version}"
