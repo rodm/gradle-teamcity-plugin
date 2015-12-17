@@ -1,6 +1,6 @@
 # Gradle TeamCity plugin
 
-The plugin provides support to develop TeamCity plugins, creating agent and server side archives, downloading and 
+The plugin provides support to [develop TeamCity plugins](https://confluence.jetbrains.com/display/TCD9/Extending+TeamCity), creating agent and server side archives, downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 [![Build Status](https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master)](https://travis-ci.org/rodm/gradle-teamcity-plugin)
@@ -19,7 +19,7 @@ The following code adds the plugin to your build script.
         }
       }
       dependencies {
-        classpath "com.github.rodm:gradle-teamcity-plugin:0.7"
+        classpath "com.github.rodm:gradle-teamcity-plugin:0.8.1"
       }
     }
 

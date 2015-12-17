@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8'
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.1'
     }
 }
 
