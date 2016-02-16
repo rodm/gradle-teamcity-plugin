@@ -133,6 +133,6 @@ public class AgentPluginFunctionalTest {
                 .buildAndFail()
 
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))
-        assertThat(result.getStandardError(), containsString("specified for property 'descriptor' does not exist."))
+        assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
     }
 }

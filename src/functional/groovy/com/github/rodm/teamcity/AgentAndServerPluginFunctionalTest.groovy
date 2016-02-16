@@ -202,6 +202,6 @@ public class AgentAndServerPluginFunctionalTest {
                 .withArguments("assemble")
                 .buildAndFail()
 
-        assertThat(result.getStandardError(), containsString("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin"))
+        assertThat(result.getOutput(), containsString("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin"))
     }
 }

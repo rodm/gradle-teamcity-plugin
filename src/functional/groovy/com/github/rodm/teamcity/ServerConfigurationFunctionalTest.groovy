@@ -139,7 +139,7 @@ public class ServerConfigurationFunctionalTest {
                 .buildAndFail()
 
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(FAILED))
-        assertThat(result.getStandardError(), containsString("specified for property 'descriptor' does not exist."))
+        assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
     }
 
     @Test
