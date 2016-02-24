@@ -30,7 +30,7 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.8.1'
+version = '0.8.2'
 group = 'com.github.rodm'
 
 task pluginClasspathManifest {
@@ -78,6 +78,10 @@ pluginBundle {
         teamcityAgentPlugin {
             id = 'com.github.rodm.teamcity-agent'
             displayName = 'Gradle TeamCity Agent plugin'
+        }
+        teamcityCommonPlugin {
+            id = 'com.github.rodm.teamcity-common'
+            displayName = 'Gradle TeamCity Common API plugin'
         }
     }
 

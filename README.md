@@ -19,21 +19,22 @@ The following code adds the plugin to your build script.
         }
       }
       dependencies {
-        classpath "com.github.rodm:gradle-teamcity-plugin:0.8.1"
+        classpath "com.github.rodm:gradle-teamcity-plugin:0.8.2"
       }
     }
 
 ### Plugins
 
-The jar contains two plugins:
+The jar contains three plugins:
 
 * `com.github.rodm.teamcity-server` - Provides tasks to package a TeamCity plugin, deploy and undeploy the plugin to a
 TeamCity server, and tasks to start and stop the server and default agent.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent side of a TeamCity plugin.
+* `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project.
 
 ### Configurations
 
-The two plugins add the following configurations.
+The plugins add the following configurations.
 
 * `provided` : The `provided` configuration is used to define dependencies required at compile time but not to be
 included in the plugin. By default the plugins add the `agent-api` and `server-api` depenencies when the `java` plugin
