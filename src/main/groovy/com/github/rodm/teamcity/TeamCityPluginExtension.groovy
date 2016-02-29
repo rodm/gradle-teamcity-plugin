@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
@@ -44,8 +45,11 @@ class TeamCityPluginExtension {
 
     private Project project
 
-    TeamCityPluginExtension(Project project) {
+    final NamedDomainObjectContainer<TeamCityEnvironment> environments
+
+    TeamCityPluginExtension(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
         this.project = project
+        this.environments = environments
         this.agent = new AgentPluginConfiguration(project.copySpec {})
         this.server = new ServerPluginConfiguration(project.copySpec {})
     }
@@ -126,5 +130,9 @@ class TeamCityPluginExtension {
             downloadFile = "${downloadDir}/TeamCity-${version}.tar.gz"
         }
         return downloadFile
+    }
+
+    void environments(Closure config) {
+        environments.configure(config)
     }
 }
