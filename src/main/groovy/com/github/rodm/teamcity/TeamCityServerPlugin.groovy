@@ -39,6 +39,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureServerPluginTasks(project, extension)
         configureTeamCityTasks(project, extension)
+        configureEnvironmentTasks(project, extension)
     }
 
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
@@ -146,5 +147,28 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
         def install = project.tasks.create("installTeamCity", InstallTeamCity)
         install.dependsOn unpack
+    }
+
+    private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
+        project.afterEvaluate {
+            if (extension.environments.isEmpty()) {
+                extension.environments << new TeamCityEnvironment()
+            }
+
+            extension.environments.each { environment ->
+                String name = environment.name.capitalize()
+                def download = project.tasks.create(String.format("download%s", name), Download) {
+                    conventionMapping.map('source') { environment.downloadUrl }
+                    conventionMapping.map('target') { project.file(environment.downloadFile) }
+                }
+                def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
+                    conventionMapping.map('source') { project.file(environment.downloadFile) }
+                    conventionMapping.map('target') { environment.homeDir }
+                }
+                unpack.dependsOn download
+                def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
+                install.dependsOn unpack
+            }
+        }
     }
 }
