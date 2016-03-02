@@ -185,6 +185,36 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                     }
                 }
                 undeployPlugin.onlyIf { environment.dataDir != null }
+
+                def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('dataDir') { environment.dataDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('serverOptions') { environment.serverOptions }
+                }
+                startServer.dependsOn deployPlugin
+                startServer.onlyIf { environment.homeDir != null && environment.dataDir != null }
+
+                def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('dataDir') { environment.dataDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
+                }
+                stopServer.onlyIf { environment.homeDir != null && environment.dataDir != null }
+
+                def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('dataDir') { environment.dataDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
+                }
+                startAgent.onlyIf { environment.homeDir != null }
+
+                def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('dataDir') { environment.dataDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
+                }
+                stopAgent.onlyIf { environment.homeDir != null }
             }
         }
     }
