@@ -15,11 +15,12 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-class DeployPlugin extends TeamCityTask {
+class DeployPlugin extends DefaultTask {
 
     @InputFile
     File file

@@ -116,7 +116,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         deployPlugin.onlyIf { extension.dataDir != null }
 
         def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archiveName }
+            conventionMapping.map('file') {
+                def archiveName = project.tasks.getByName('serverPlugin').archiveName
+                project.file("${extension.dataDir}/plugins/${archiveName}")
+            }
         }
         undeployPlugin.onlyIf { extension.dataDir != null }
 
@@ -168,6 +171,20 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 unpack.dependsOn download
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
                 install.dependsOn unpack
+
+                def deployPlugin = project.tasks.create(String.format('deployPluginTo%s', name), DeployPlugin) {
+                    conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
+                    conventionMapping.map('target') { project.file("${environment.dataDir}/plugins") }
+                }
+                deployPlugin.onlyIf { environment.dataDir != null }
+
+                def undeployPlugin = project.tasks.create(String.format('undeployPluginFrom%s', name), UndeployPlugin) {
+                    conventionMapping.map('file') {
+                        def archiveName = project.tasks.getByName('serverPlugin').archiveName
+                        project.file("${environment.dataDir}/plugins/${archiveName}")
+                    }
+                }
+                undeployPlugin.onlyIf { environment.dataDir != null }
             }
         }
     }

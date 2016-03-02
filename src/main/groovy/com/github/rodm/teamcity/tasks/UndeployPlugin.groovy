@@ -15,13 +15,14 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
-class UndeployPlugin extends TeamCityTask {
+class UndeployPlugin extends DefaultTask {
 
     @Input
-    String file
+    File file
 
     UndeployPlugin() {
         description = 'Undeploy plugin'
@@ -29,6 +30,6 @@ class UndeployPlugin extends TeamCityTask {
 
     @TaskAction
     public void undeploy() {
-        project.delete("$dataDir/plugins/${getFile()}")
+        project.delete(getFile())
     }
 }
