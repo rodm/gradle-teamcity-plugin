@@ -25,9 +25,6 @@ class TeamCityTask extends DefaultTask {
     File homeDir
 
     @Input
-    File dataDir
-
-    @Input
     File javaHome
 
     TeamCityTask() {
@@ -36,11 +33,10 @@ class TeamCityTask extends DefaultTask {
 
     void validate() {
         validDirectory('homeDir', getHomeDir())
-        validDirectory('dataDir', getDataDir())
         validDirectory('javaHome', getJavaHome())
     }
 
-    private void validDirectory(String propertyName, File value) {
+    void validDirectory(String propertyName, File value) {
         if (value == null) {
             throw new InvalidUserDataException(String.format("Property '%s' not set.", propertyName));
         } else if (!value.exists()) {

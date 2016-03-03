@@ -21,6 +21,9 @@ import org.gradle.api.tasks.TaskAction
 class StartServer extends TeamCityTask {
 
     @Input
+    File dataDir
+
+    @Input
     String serverOptions
 
     StartServer() {
@@ -30,6 +33,8 @@ class StartServer extends TeamCityTask {
     @TaskAction
     public void start() {
         validate()
+        validDirectory('dataDir', getDataDir())
+
         def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
         project.ant.exec(executable: "$homeDir/bin/$name", spawn: true) {
             env key: 'JAVA_HOME', path: getJavaHome()

@@ -105,7 +105,6 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
         project.tasks.withType(TeamCityTask) {
             conventionMapping.map('homeDir') { extension.homeDir }
-            conventionMapping.map('dataDir') { extension.dataDir }
             conventionMapping.map('javaHome') { extension.javaHome }
         }
 
@@ -124,6 +123,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         undeployPlugin.onlyIf { extension.dataDir != null }
 
         def startServer = project.tasks.create('startServer', StartServer) {
+            conventionMapping.map('dataDir') { extension.dataDir }
             conventionMapping.map('serverOptions') { extension.serverOptions }
         }
         startServer.dependsOn deployPlugin
@@ -197,21 +197,18 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
                 def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
                     conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('dataDir') { environment.dataDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                 }
                 stopServer.onlyIf { environment.homeDir != null && environment.dataDir != null }
 
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('dataDir') { environment.dataDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                 }
                 startAgent.onlyIf { environment.homeDir != null }
 
                 def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('dataDir') { environment.dataDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                 }
                 stopAgent.onlyIf { environment.homeDir != null }
