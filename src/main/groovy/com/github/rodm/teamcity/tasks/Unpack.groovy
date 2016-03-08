@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RelativePath
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -31,11 +32,17 @@ class Unpack extends DefaultTask {
     @TaskAction
     public void unpack() {
         logger.info("Unpacking TeamCity installer from {} into {}", getSource(), getTarget())
+        String targetName = getTarget().name
         project.copy {
-            from project.tarTree(getSource())
+            from(project.tarTree(getSource())) {
+                includeEmptyDirs = false
+                eachFile { file ->
+                    String[] segments = file.relativePath.segments[0..-1] as String[]
+                    segments[0] = targetName
+                    file.relativePath = new RelativePath(file.relativePath.endsWithFile, segments)
+                }
+            }
             into getTarget().getParentFile()
         }
-        File unpackedDir = new File(getTarget().getParentFile(), 'TeamCity')
-        unpackedDir.renameTo(getTarget())
     }
 }
