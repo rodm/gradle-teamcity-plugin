@@ -30,7 +30,7 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.8.2'
+version = '0.8.3'
 group = 'com.github.rodm'
 
 task pluginClasspathManifest {
