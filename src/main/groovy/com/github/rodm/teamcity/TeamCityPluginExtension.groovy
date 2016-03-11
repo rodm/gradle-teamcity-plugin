@@ -45,13 +45,10 @@ class TeamCityPluginExtension {
 
     private Project project
 
-    final NamedDomainObjectContainer<TeamCityEnvironment> environments
-
     TeamCityPluginExtension(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
         this.project = project
-        this.environments = environments
         this.agent = new AgentPluginConfiguration(project.copySpec {})
-        this.server = new ServerPluginConfiguration(project.copySpec {})
+        this.server = new ServerPluginConfiguration(project.copySpec {}, environments)
     }
 
     def getAgent() {
@@ -133,6 +130,6 @@ class TeamCityPluginExtension {
     }
 
     void environments(Closure config) {
-        environments.configure(config)
+        server.environments config
     }
 }

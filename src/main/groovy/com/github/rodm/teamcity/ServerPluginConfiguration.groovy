@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
@@ -26,8 +27,11 @@ class ServerPluginConfiguration {
 
     private Map<String, Object> tokens = [:]
 
-    ServerPluginConfiguration(CopySpec copySpec) {
+    final NamedDomainObjectContainer<TeamCityEnvironment> environments
+
+    ServerPluginConfiguration(CopySpec copySpec, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
         this.files = copySpec
+        this.environments = environments
     }
 
     def descriptor(Closure closure) {
@@ -53,5 +57,9 @@ class ServerPluginConfiguration {
 
     def tokens(Map<String, Object> tokens) {
         this.tokens += tokens
+    }
+
+    void environments(Closure config) {
+        environments.configure(config)
     }
 }

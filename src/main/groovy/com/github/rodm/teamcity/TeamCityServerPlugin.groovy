@@ -154,11 +154,11 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
-            if (extension.environments.isEmpty()) {
-                extension.environments << new TeamCityEnvironment()
+            if (extension.server.environments.isEmpty()) {
+                extension.server.environments << new TeamCityEnvironment()
             }
 
-            extension.environments.each { environment ->
+            extension.server.environments.each { environment ->
                 defaultMissingProperties(project, extension, environment)
 
                 String name = environment.name.capitalize()
