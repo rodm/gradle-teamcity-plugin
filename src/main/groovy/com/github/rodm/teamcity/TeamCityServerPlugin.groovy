@@ -164,10 +164,14 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 String name = environment.name.capitalize()
                 def download = project.tasks.create(String.format("download%s", name), Download) {
                     conventionMapping.map('source') { environment.downloadUrl }
-                    conventionMapping.map('target') { project.file(environment.downloadFile) }
+                    conventionMapping.map('target') {
+                        project.file("${extension.downloadDir}/${toFilename(environment.downloadUrl)}")
+                    }
                 }
                 def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
-                    conventionMapping.map('source') { project.file(environment.downloadFile) }
+                    conventionMapping.map('source') {
+                        project.file("${extension.downloadDir}/${toFilename(environment.downloadUrl)}")
+                    }
                     conventionMapping.map('target') { environment.homeDir }
                 }
                 unpack.dependsOn download
@@ -221,10 +225,13 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     private void defaultMissingProperties(Project project, TeamCityPluginExtension extension, TeamCityEnvironment environment) {
         environment.with {
             downloadUrl = downloadUrl ?: "${extension.downloadBaseUrl}/TeamCity-${version}.tar.gz"
-            downloadFile = downloadFile ?: "${extension.downloadDir}/TeamCity-${version}.tar.gz"
             homeDir = homeDir ?: project.file("${project.rootDir}/servers/TeamCity-${version}")
             dataDir = dataDir ?: project.file("${project.rootDir}/data/" + (version =~ (/(\d+\.\d+).*/))[0][1])
             javaHome = javaHome ?: project.file(System.properties['java.home'])
         }
+    }
+
+    private String toFilename(String url) {
+        return url[(url.lastIndexOf('/') + 1)..-1]
     }
 }

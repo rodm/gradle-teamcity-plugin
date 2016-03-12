@@ -23,8 +23,6 @@ class TeamCityEnvironment {
 
     String downloadUrl
 
-    String downloadFile
-
     File homeDir
 
     File dataDir
