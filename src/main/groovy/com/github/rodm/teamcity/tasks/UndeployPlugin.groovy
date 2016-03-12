@@ -25,6 +25,7 @@ class UndeployPlugin extends DefaultTask {
     File file
 
     UndeployPlugin() {
+        group = 'TeamCity'
         description = 'Undeploy plugin'
     }
 

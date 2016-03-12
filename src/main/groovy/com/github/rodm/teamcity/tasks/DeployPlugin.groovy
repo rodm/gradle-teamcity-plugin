@@ -29,6 +29,7 @@ class DeployPlugin extends DefaultTask {
     File target
 
     DeployPlugin() {
+        group = 'TeamCity'
         description = 'Deploy plugin'
     }
 
