@@ -27,6 +27,14 @@ class ServerPluginConfiguration {
 
     private Map<String, Object> tokens = [:]
 
+    String downloadsDir = 'downloads'
+
+    String baseDownloadUrl = 'http://download.jetbrains.com/teamcity'
+
+    String baseDataDir = 'data'
+
+    String baseHomeDir = 'servers'
+
     final NamedDomainObjectContainer<TeamCityEnvironment> environments
 
     ServerPluginConfiguration(CopySpec copySpec, NamedDomainObjectContainer<TeamCityEnvironment> environments) {

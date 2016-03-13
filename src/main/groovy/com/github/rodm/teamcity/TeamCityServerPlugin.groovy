@@ -154,23 +154,24 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
-            if (extension.server.environments.isEmpty()) {
-                extension.server.environments << new TeamCityEnvironment()
+            ServerPluginConfiguration server = extension.server
+            if (server.environments.isEmpty()) {
+                server.environments << new TeamCityEnvironment()
             }
 
-            extension.server.environments.each { environment ->
-                defaultMissingProperties(project, extension, environment)
+            server.environments.each { environment ->
+                defaultMissingProperties(project, server, environment)
 
                 String name = environment.name.capitalize()
                 def download = project.tasks.create(String.format("download%s", name), Download) {
                     conventionMapping.map('source') { environment.downloadUrl }
                     conventionMapping.map('target') {
-                        project.file("${extension.downloadDir}/${toFilename(environment.downloadUrl)}")
+                        project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
                     }
                 }
                 def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
                     conventionMapping.map('source') {
-                        project.file("${extension.downloadDir}/${toFilename(environment.downloadUrl)}")
+                        project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
                     }
                     conventionMapping.map('target') { environment.homeDir }
                 }
@@ -222,11 +223,11 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         }
     }
 
-    private void defaultMissingProperties(Project project, TeamCityPluginExtension extension, TeamCityEnvironment environment) {
+    private void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
         environment.with {
-            downloadUrl = downloadUrl ?: "${extension.downloadBaseUrl}/TeamCity-${version}.tar.gz"
-            homeDir = homeDir ?: project.file("${project.rootDir}/servers/TeamCity-${version}")
-            dataDir = dataDir ?: project.file("${project.rootDir}/data/" + (version =~ (/(\d+\.\d+).*/))[0][1])
+            downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
+            homeDir = homeDir ?: project.file("${project.rootDir}/${server.baseHomeDir}/TeamCity-${version}")
+            dataDir = dataDir ?: project.file("${project.rootDir}/${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
             javaHome = javaHome ?: project.file(System.properties['java.home'])
         }
     }
