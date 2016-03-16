@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.3'
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.4'
     }
 }
 
@@ -17,7 +17,9 @@ group = 'com.github.rodm.teamcity'
 version = '1.0-SNAPSHOT'
 
 ext {
+    vendorName = 'rodm'
     teamcityVersion = '8.1.5'
+
     downloadsDir = project.hasProperty('downloads.dir') ? property('downloads.dir') : "$rootDir/downloads"
     serversDir = project.hasProperty('servers.dir') ? property('servers.dir') : "$rootDir/servers"
     java7Home = project.hasProperty('java7.home') ? property('java7.home') : '/opt/jdk1.7.0_80'
@@ -31,45 +33,45 @@ test {
 teamcity {
     version = teamcityVersion
 
-    descriptor {
-        name = project.name
-        displayName = project.name
-        version = project.version
-        vendorName = 'vendor name'
-        description = 'TeamCity Example Server Plugin'
+    server {
+        descriptor {
+            name = project.name
+            displayName = project.name
+            version = project.version
+            vendorName = project.vendorName
+            description = 'TeamCity Example Server Plugin'
 
-        downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
-        email = 'rod.n.mackenzie@gmail.com'
-        useSeparateClassloader = false
+            downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
+            email = 'rod.n.mackenzie@gmail.com'
+            useSeparateClassloader = false
 
-        parameters {
-            parameter 'param', 'value'
-        }
-    }
-
-    downloadsDir = project.downloadsDir
-
-    environments {
-        teamcity81 {
-            version = '8.1.5'
-            homeDir = file("$serversDir/TeamCity-${version}")
-            dataDir = file("$rootDir/data/8.1")
-            javaHome = file(java7Home)
+            parameters {
+                parameter 'param', 'value'
+            }
         }
 
-        teamcity91 {
-            version = '9.1.6'
-            homeDir = file("$serversDir/TeamCity-${version}")
-            dataDir = file("$rootDir/data/9.1")
-            javaHome = file(java7Home)
-        }
+        downloadsDir = project.downloadsDir
+        baseHomeDir = project.serversDir
+        baseDataDir = 'data'
 
-        teamcity10 {
-            version = '10.0-EAP'
-            downloadUrl = "https://download.jetbrains.com/teamcity/eap/TeamCity-40941.tar.gz"
-            homeDir = file("$serversDir/TeamCity-${version}")
-            dataDir = file("$rootDir/data/10.0")
-            javaHome = file(java8Home)
+        environments {
+            teamcity81 {
+                version = '8.1.5'
+                javaHome = file(java7Home)
+            }
+
+            teamcity91 {
+                version = '9.1.6'
+                javaHome = file(java7Home)
+            }
+
+            teamcity10 {
+                version = '10.0-EAP'
+                downloadUrl = "https://download.jetbrains.com/teamcity/eap/TeamCity-40941.tar.gz"
+                homeDir = file("$serversDir/TeamCity-${version}")
+                dataDir = file("$rootDir/data/10.0")
+                javaHome = file(java8Home)
+            }
         }
     }
 }

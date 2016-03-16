@@ -1,6 +1,12 @@
 
 apply plugin: 'com.github.rodm.teamcity-server'
 
+ext {
+    teamcityDir = "$rootDir/servers/TeamCity-${teamcityVersion}"
+    teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
+    teamcityJavaHome = System.properties['java.home']
+}
+
 dependencies {
     agent project(path: ':plugin-agent', configuration: 'plugin')
     server project(':common')
@@ -10,13 +16,24 @@ dependencies {
 teamcity {
     version = teamcityVersion
 
-    descriptor {
-        name = 'Example TeamCity Plugin'
-        displayName = 'Example TeamCity Plugin'
-        version = project.version
-        vendorName = 'rodm'
-        description = 'Example multi-project TeamCity plugin'
-        email = 'rod.n.mackenzie@gmail.com'
-        useSeparateClassloader = true
+    server {
+        descriptor {
+            name = 'Example TeamCity Plugin'
+            displayName = 'Example TeamCity Plugin'
+            version = project.version
+            vendorName = 'rodm'
+            description = 'Example multi-project TeamCity plugin'
+            email = 'rod.n.mackenzie@gmail.com'
+            useSeparateClassloader = true
+        }
+
+        environments {
+            teamcity {
+                version = teamcityVersion
+                homeDir = file(teamcityDir)
+                dataDir = file(teamcityDataDir)
+                javaHome = file(teamcityJavaHome)
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.3'
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.4'
     }
 }
 
@@ -30,18 +30,25 @@ dependencies {
 teamcity {
     version = teamcityVersion
 
-    descriptor {
-        name = project.name
-        displayName = project.name
-        version = project.version
-        vendorName = 'vendor name'
-        description = 'TeamCity Example Build Feature Plugin'
-        downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
-        email = 'rod.n.mackenzie@gmail.com'
-        useSeparateClassloader = false
-    }
+    server {
+        descriptor {
+            name = project.name
+            displayName = project.name
+            version = project.version
+            vendorName = 'vendor name'
+            description = 'TeamCity Example Build Feature Plugin'
+            downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
+            email = 'rod.n.mackenzie@gmail.com'
+            useSeparateClassloader = false
+        }
 
-    homeDir = file(teamcityDir)
-    dataDir = file(teamcityDataDir)
-    javaHome = file(teamcityJavaHome)
+        environments {
+            teamcity {
+                version = teamcityVersion
+                homeDir = file(teamcityDir)
+                dataDir = file(teamcityDataDir)
+                javaHome = file(teamcityJavaHome)
+            }
+        }
+    }
 }
