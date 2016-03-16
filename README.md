@@ -58,24 +58,6 @@ descriptor can be specified as a path to a file or by a configuration block with
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for [Packaging Plugins](https://confluence.jetbrains.com/display/TCD9/Plugins+Packaging#PluginsPackaging-PluginDescriptor)
 
-* `homeDir` : The path to a TeamCity install.
-* `dataDir` : The path to the TeamCity Data directory.
-* `javaHome` : The path to the version of Java used to run the server and build agent.
-* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
- these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.  
-* `downloadBaseUrl` : The base URL used to download the TeamCity installer. Default 'http://download.jetbrains.com/teamcity'.
-* `downloadDir` : The directory the TeamCity installer is downloaded into. Default 'downloads'.
-
-Multiple TeamCity environments can be defined in an environments configuration block, each environment supports the following properties
-
-* `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
-* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${downloadBaseUrl/TeamCity-${version}.tar.gz`.
-* `homeDir` : The path to a TeamCity install. Defaults to `${rootDir}/servers/TeamCity-{version}`
-* `dataDir` : The path to the TeamCity Data directory. Defaults to `${rootDir}/data/${version}`, version exludes the bug fix digit.
-* `javaHome` : The path to the version of Java used to run the server and build agent.
-* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
- these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.
-
 ### TeamCity Server Plugin
 
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity server-api and
@@ -83,6 +65,25 @@ tests-supprt dependencies to the compile and testCompile configurations. If the 
 provides only the tasks to package the server side plugin archive if a plugin descriptor is defined. 
 
 The server plugin can be combined with the agent plugin but not with the Java Plugin. 
+
+### TeamCity Server Plugin Configuration
+
+The following properties can be defined in the `server` configuration block.
+
+* `downloadsDir` : The directory the TeamCity installers are downlowded to. Defaults to `downloads`
+* `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `http://download.jetbrains.com/teamcity`.
+* `baseHomeDir` : The base directory for a TeamCity install. Defaults to `servers`.
+* `baseDataDir` : The base directory for a TeamCity Data directory. Defaults to `data`.
+
+An `environments` configuration block allows multiple TeamCity environments to be defined, each environment supports the following properties
+
+* `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
+* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl/TeamCity-${version}.tar.gz`.
+* `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-{version}`
+* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir/${version}`, version exludes the bug fix digit.
+* `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
+* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+ these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.
 
 ### TeamCity Server Plugin Tasks
 
@@ -158,17 +159,6 @@ Plugin descriptor defined in the build script.
                 }
             }
         }
-                
-        // local TeamCity instance properties        
-        homeDir = file("/opt/TeamCity")
-        dataDir = file("$rootDir/data")
-        javaHome = file("/opt/jdk1.7.0_80")
-        
-        // local web server for downloading TeamCity distributions 
-        downloadBaseUrl = "http://repository/"
-        
-        // store the downloaded TeamCity distributions in /tmp
-        downloadDir = '/tmp'
     }
 
 Plugin descriptor defined in an external file at the root of the project. A map of tokens to be replaced in the
@@ -201,27 +191,39 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
         // Use TeamCity 8.1 API
         version = '8.1'
 
-        // Locate the plugin descriptor in the root directory of the project
-        descriptor = file('teamcity-plugin.xml')
+        server {
+            // Locate the plugin descriptor in the root directory of the project
+            descriptor = file('teamcity-plugin.xml')
 
-        environments {
-            teamcity81 {
-                version = '8.1.5'
-                javaHome = file('/opt/jdk1.7.0_80')
-            }
+            // use a local web server for downloading TeamCity distributions
+            baseDownloadUrl = "http://repository/"
 
-            teamcity90 {
-                version = '9.0.5'
-                javaHome = file('/opt/jdk1.8.0_60')
-            }
+            // store the downloaded TeamCity distributions in /tmp
+            downloadsDir = '/tmp'
 
-            teamcity91 {
-                version = '9.1.6'
-                downloadUrl = 'http://repository/teamcity/TeamCity-9.1.6.tar.gz'
-                homeDir = file("$rootDir/teamcity/servers/TeamCity-9.1.6")
-                dataDir = file("$rootDir/teamcity/data/9.1")
-                javaHome = file('/opt/jdk1.8.0_60')
-                serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+            // base properties for TeamCity servers and data directories
+            baseHomeDir = 'teamcity/servers'
+            baseDataDir = 'teamcity/data'
+
+            environments {
+                teamcity81 {
+                    version = '8.1.5'
+                    javaHome = file('/opt/jdk1.7.0_80')
+                }
+
+                teamcity90 {
+                    version = '9.0.5'
+                    javaHome = file('/opt/jdk1.7.0_80')
+                }
+
+                teamcity91 {
+                    version = '9.1.6'
+                    downloadUrl = 'http://repository/teamcity/TeamCity-9.1.6.tar.gz'
+                    homeDir = file("$rootDir/teamcity/servers/TeamCity-9.1.6")
+                    dataDir = file("$rootDir/teamcity/data/9.1")
+                    javaHome = file('/opt/jdk1.8.0_60')
+                    serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+                }
             }
         }
     }
