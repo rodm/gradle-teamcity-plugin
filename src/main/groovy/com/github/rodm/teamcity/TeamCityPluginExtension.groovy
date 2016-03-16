@@ -128,8 +128,4 @@ class TeamCityPluginExtension {
         }
         return downloadFile
     }
-
-    void environments(Closure config) {
-        server.environments config
-    }
 }
