@@ -226,8 +226,8 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     private void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
         environment.with {
             downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
-            homeDir = homeDir ?: project.file("${project.rootDir}/${server.baseHomeDir}/TeamCity-${version}")
-            dataDir = dataDir ?: project.file("${project.rootDir}/${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
+            homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
+            dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
             javaHome = javaHome ?: project.file(System.properties['java.home'])
         }
     }

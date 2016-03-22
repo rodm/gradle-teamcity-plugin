@@ -188,4 +188,227 @@ public class ServerConfigurationFunctionalTest {
         assertThat(result.task(":deployPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.task(":startServer").getOutcome(), is(SUCCESS))
     }
+
+    @Test
+    public void defaultTasksForMultipleEnvironmentSupport() {
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                    }
+                    environments {
+                    }
+                }
+            }
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("tasks")
+                .build()
+
+        assertThat(result.output, containsString('deployPluginToDefault'))
+        assertThat(result.output, containsString('undeployPluginFromDefault'))
+        assertThat(result.output, containsString('startDefaultServer'))
+        assertThat(result.output, containsString('stopDefaultServer'))
+        assertThat(result.output, containsString('startDefaultAgent'))
+        assertThat(result.output, containsString('stopDefaultAgent'))
+    }
+
+    @Test
+    public void startDefaultServer() {
+        createFakeTeamCityInstall('servers', '9.0')
+
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                    }
+                    environments {
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments('build', 'startDefaultServer')
+                .build()
+
+        File pluginFile = new File(testProjectDir.root, 'data/9.0/plugins/test-plugin.zip')
+        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertThat(result.task(":startDefaultServer").getOutcome(), is(SUCCESS))
+    }
+
+    @Test
+    public void startDefaultServerInAlternativeBaseDirectory() {
+        createFakeTeamCityInstall('teamcity', '9.0')
+
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                    }
+                    baseHomeDir = 'teamcity'
+                    baseDataDir = 'teamcity/data'
+                    environments {
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments('build', 'startDefaultServer')
+                .build()
+
+        File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.0/plugins/test-plugin.zip')
+        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertThat(result.task(":startDefaultServer").getOutcome(), is(SUCCESS))
+    }
+
+    @Test
+    public void startNamedEnvironmentServer() {
+        createFakeTeamCityInstall('teamcity', '9.1.6')
+
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                    }
+                    baseHomeDir = 'teamcity'
+                    baseDataDir = 'teamcity/data'
+                    environments {
+                        teamcity8 {
+                            version = '8.1.5'
+                        }
+                        teamcity9 {
+                            version = '9.1.6'
+                        }
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments('build', 'startTeamcity9Server')
+                .build()
+
+        File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
+        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
+    }
+
+    @Rule
+    public final TemporaryFolder serversDir = new TemporaryFolder()
+
+    @Test
+    public void startNamedEnvironmentServerInAlternativeDirectory() {
+        createFakeTeamCityInstall(serversDir, 'teamcity', '9.1.6')
+
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                    }
+                    baseHomeDir = file('${serversDir.root.canonicalPath}/teamcity')
+                    baseDataDir = file('${serversDir.root.canonicalPath}/data')
+                    environments {
+                        teamcity8 {
+                            version = '8.1.5'
+                        }
+                        teamcity9 {
+                            version = '9.1.6'
+                        }
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments('build', 'startTeamcity9Server')
+                .build()
+
+        File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
+        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
+    }
+
+    private void createFakeTeamCityInstall(String baseDir, String version) {
+        createFakeTeamCityInstall(testProjectDir, baseDir, version)
+    }
+
+    private void createFakeTeamCityInstall(TemporaryFolder folder, String baseDir, String version) {
+        File homeDir = folder.newFolder(baseDir, "TeamCity-${version}")
+        File binDir = folder.newFolder(baseDir, "TeamCity-${version}", 'bin')
+
+        File teamcityServerShellFile = new File(binDir, 'teamcity-server.sh')
+        teamcityServerShellFile << """
+            #!/bin/bash
+            echo "Fake TeamCity startup script"
+        """
+        teamcityServerShellFile.executable = true
+    }
 }
