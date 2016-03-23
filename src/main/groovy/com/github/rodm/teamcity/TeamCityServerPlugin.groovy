@@ -208,6 +208,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                 }
+                stopServer.finalizedBy undeployPlugin
                 stopServer.onlyIf { environment.homeDir != null && environment.dataDir != null }
 
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
