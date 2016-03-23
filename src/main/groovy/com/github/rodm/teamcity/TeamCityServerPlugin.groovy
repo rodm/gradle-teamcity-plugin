@@ -159,6 +159,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 server.environments << new TeamCityEnvironment()
             }
 
+            def build = project.tasks.getByName('build')
             server.environments.each { environment ->
                 defaultMissingProperties(project, server, environment)
 
@@ -183,6 +184,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                     conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
                     conventionMapping.map('target') { project.file("${environment.dataDir}/plugins") }
                 }
+                deployPlugin.dependsOn build
                 deployPlugin.onlyIf { environment.dataDir != null }
 
                 def undeployPlugin = project.tasks.create(String.format('undeployPluginFrom%s', name), UndeployPlugin) {
