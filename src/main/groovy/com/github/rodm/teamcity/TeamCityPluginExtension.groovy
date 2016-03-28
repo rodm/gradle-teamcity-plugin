@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
@@ -56,6 +57,8 @@ class TeamCityPluginExtension {
     }
 
     def agent(Closure closure) {
+        if (!project.plugins.hasPlugin(TeamCityAgentPlugin))
+            throw new InvalidUserDataException('Agent plugin configuration is invalid for a project without the teamcity-agent plugin')
         ConfigureUtil.configure(closure, agent)
     }
 
@@ -64,6 +67,8 @@ class TeamCityPluginExtension {
     }
 
     def server(Closure closure) {
+        if (!project.plugins.hasPlugin(TeamCityServerPlugin))
+            throw new InvalidUserDataException('Server plugin configuration is invalid for a project without the teamcity-server plugin')
         ConfigureUtil.configure(closure, server)
     }
 

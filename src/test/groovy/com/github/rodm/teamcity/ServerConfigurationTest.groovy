@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
@@ -25,8 +26,10 @@ import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
+import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertThat
+import static org.junit.Assert.fail
 
 class ServerConfigurationTest {
 
@@ -150,5 +153,19 @@ class ServerConfigurationTest {
         assertNotNull(project.tasks.findByName('stopAgent'))
         assertNotNull(project.tasks.findByName('startServer'))
         assertNotNull(project.tasks.findByName('stopServer'))
+    }
+
+
+    @Test
+    public void configuringAgentWithOnlyServerPluginFails() {
+        try {
+            project.teamcity {
+                agent {}
+            }
+            fail("Configuring agent block should fail when the agent plugin is not applied")
+        }
+        catch (InvalidUserDataException expected) {
+            assertEquals('Agent plugin configuration is invalid for a project without the teamcity-agent plugin', expected.message)
+        }
     }
 }
