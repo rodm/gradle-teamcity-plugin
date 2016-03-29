@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'com.gradle.plugin-publish'
 apply plugin: 'groovy'
+apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
@@ -30,7 +31,7 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-version = '0.8.5'
+version = '0.9-SNAPSHOT'
 group = 'com.github.rodm'
 
 task pluginClasspathManifest {
@@ -62,6 +63,18 @@ sourceSets {
 task functionalTest(type: Test) {
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 pluginBundle {
