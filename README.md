@@ -53,8 +53,11 @@ the TeamCity server-api added to the `compile` configuration and the version dow
 descriptor can be specified as a path to a file or by a configuration block within the build script.
 
 * `version` : The version of the TeamCity API to build against. Defaults to '9.0'.
+* `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
+and the TeamCity repository, http://repository.jetbrains.com/all, are configured for resolving dependencies. Setting this
+ flag to false allows a local repository to be used for resolving dependencies.
 * `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
- The type property affects the type of descriptor generated.   
+ The type property affects the type of descriptor generated.
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for [Packaging Plugins](https://confluence.jetbrains.com/display/TCD9/Plugins+Packaging#PluginsPackaging-PluginDescriptor)
 

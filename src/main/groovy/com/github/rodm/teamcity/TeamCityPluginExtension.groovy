@@ -24,6 +24,8 @@ class TeamCityPluginExtension {
 
     String version = '9.0'
 
+    boolean defaultRepositories = true
+
     File homeDir
 
     File dataDir

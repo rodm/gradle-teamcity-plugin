@@ -55,10 +55,14 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     private configureRepositories(Project project) {
         project.plugins.withType(JavaPlugin) {
-            project.repositories {
-                mavenCentral()
-                maven {
-                    url = JETBRAINS_MAVEN_REPOSITORY
+            project.afterEvaluate {
+                if (project.teamcity.defaultRepositories) {
+                    project.repositories {
+                        mavenCentral()
+                        maven {
+                            url = JETBRAINS_MAVEN_REPOSITORY
+                        }
+                    }
                 }
             }
         }
