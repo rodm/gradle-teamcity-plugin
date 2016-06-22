@@ -38,4 +38,12 @@ class TeamCityEnvironment {
     TeamCityEnvironment(String name) {
         this.name = name
     }
+
+    def setServerOptions(String options) {
+        this.serverOptions = options
+    }
+
+    def serverOptions(String options) {
+        this.serverOptions += ' ' + options
+    }
 }
