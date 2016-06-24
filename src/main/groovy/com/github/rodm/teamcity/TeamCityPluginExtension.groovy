@@ -26,22 +26,6 @@ class TeamCityPluginExtension {
 
     boolean defaultRepositories = true
 
-    File homeDir
-
-    File dataDir
-
-    File javaHome
-
-    String serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
-
-    String downloadBaseUrl = 'http://download.jetbrains.com/teamcity'
-
-    String downloadUrl
-
-    String downloadDir = 'downloads'
-
-    String downloadFile
-
     private AgentPluginConfiguration agent
 
     private ServerPluginConfiguration server
@@ -120,19 +104,5 @@ class TeamCityPluginExtension {
         } else {
             server.tokens tokens
         }
-    }
-
-    def getDownloadUrl() {
-        if (!downloadUrl) {
-            downloadUrl = "${downloadBaseUrl}/TeamCity-${version}.tar.gz"
-        }
-        return downloadUrl
-    }
-
-    def getDownloadFile() {
-        if (!downloadFile) {
-            downloadFile = "${downloadDir}/TeamCity-${version}.tar.gz"
-        }
-        return downloadFile
     }
 }

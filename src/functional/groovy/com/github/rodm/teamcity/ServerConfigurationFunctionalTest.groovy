@@ -165,11 +165,17 @@ public class ServerConfigurationFunctionalTest {
             apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
-                descriptor {
+                server {
+                    descriptor {
+                    }
+                    environments {
+                        teamcity {
+                            homeDir = file('${homeDir.canonicalPath}')
+                            dataDir = file('${dataDir.canonicalPath}')
+                            javaHome = file('${dataDir.canonicalPath}')
+                        }
+                    }
                 }
-                homeDir = file('${homeDir.canonicalPath}')
-                dataDir = file('${dataDir.canonicalPath}')
-                javaHome = file('${dataDir.canonicalPath}')
             }
         """
 
@@ -180,13 +186,13 @@ public class ServerConfigurationFunctionalTest {
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
-                .withArguments("build", "startServer")
+                .withArguments("build", "startTeamcityServer")
                 .build()
 
         File pluginFile = new File(dataDir, 'plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
-        assertThat(result.task(":deployPlugin").getOutcome(), is(SUCCESS))
-        assertThat(result.task(":startServer").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":deployPluginToTeamcity").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
     }
 
     @Test

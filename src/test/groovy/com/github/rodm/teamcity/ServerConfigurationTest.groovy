@@ -142,21 +142,6 @@ class ServerConfigurationTest {
     }
 
     @Test
-    public void teamcityDeployTasks() {
-        assertNotNull(project.tasks.findByName('deployPlugin'))
-        assertNotNull(project.tasks.findByName('undeployPlugin'))
-    }
-
-    @Test
-    public void startStopTasks() {
-        assertNotNull(project.tasks.findByName('startAgent'))
-        assertNotNull(project.tasks.findByName('stopAgent'))
-        assertNotNull(project.tasks.findByName('startServer'))
-        assertNotNull(project.tasks.findByName('stopServer'))
-    }
-
-
-    @Test
     public void configuringAgentWithOnlyServerPluginFails() {
         try {
             project.teamcity {
@@ -167,5 +152,67 @@ class ServerConfigurationTest {
         catch (InvalidUserDataException expected) {
             assertEquals('Agent plugin configuration is invalid for a project without the teamcity-agent plugin', expected.message)
         }
+    }
+
+    @Test
+    public void defaultProperties() {
+        project.teamcity {
+            server {
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.getDownloadsDir(), equalTo('downloads'))
+        assertThat(extension.server.getBaseDownloadUrl(), equalTo('http://download.jetbrains.com/teamcity'))
+        assertThat(extension.server.getBaseDataDir(), equalTo('data'))
+        assertThat(extension.server.getBaseHomeDir(), equalTo('servers'))
+    }
+
+    @Test
+    public void alternativeDownloadsDir() {
+        project.teamcity {
+            server {
+                downloadsDir = '/tmp/downloads'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.getDownloadsDir(), equalTo('/tmp/downloads'))
+    }
+
+    @Test
+    public void alternativeDownloadBaseUrl() {
+        project.teamcity {
+            server {
+                baseDownloadUrl = 'http://local-repository'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.getBaseDownloadUrl(), equalTo('http://local-repository'))
+    }
+
+    @Test
+    public void alternativeBaseDataDir() {
+        project.teamcity {
+            server {
+                baseDataDir = '/tmp/data'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.getBaseDataDir(), equalTo('/tmp/data'))
+    }
+
+    @Test
+    public void alternativeBaseHomeDir() {
+        project.teamcity {
+            server {
+                baseHomeDir = '/tmp/servers'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.server.getBaseHomeDir(), equalTo('/tmp/servers'))
     }
 }

@@ -24,7 +24,6 @@ import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.TeamCityTask
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
@@ -38,7 +37,6 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     @Override
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureServerPluginTasks(project, extension)
-        configureTeamCityTasks(project, extension)
         configureEnvironmentTasks(project, extension)
     }
 
@@ -100,56 +98,6 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor)
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
-    }
-
-    void configureTeamCityTasks(Project project, TeamCityPluginExtension extension) {
-        project.tasks.withType(TeamCityTask) {
-            conventionMapping.map('homeDir') { extension.homeDir }
-            conventionMapping.map('javaHome') { extension.javaHome }
-        }
-
-        def deployPlugin = project.tasks.create('deployPlugin', DeployPlugin) {
-            conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
-            conventionMapping.map('target') { project.file("${extension.dataDir}/plugins") }
-        }
-        deployPlugin.onlyIf { extension.dataDir != null }
-
-        def undeployPlugin = project.tasks.create('undeployPlugin', UndeployPlugin) {
-            conventionMapping.map('file') {
-                def archiveName = project.tasks.getByName('serverPlugin').archiveName
-                project.file("${extension.dataDir}/plugins/${archiveName}")
-            }
-        }
-        undeployPlugin.onlyIf { extension.dataDir != null }
-
-        def startServer = project.tasks.create('startServer', StartServer) {
-            conventionMapping.map('dataDir') { extension.dataDir }
-            conventionMapping.map('serverOptions') { extension.serverOptions }
-        }
-        startServer.dependsOn deployPlugin
-        startServer.onlyIf { extension.homeDir != null && extension.dataDir != null }
-
-        def stopServer = project.tasks.create('stopServer', StopServer)
-        stopServer.onlyIf { extension.homeDir != null && extension.dataDir != null }
-
-        def startAgent = project.tasks.create('startAgent', StartAgent)
-        startAgent.onlyIf { extension.homeDir != null }
-
-        def stopAgent = project.tasks.create('stopAgent', StopAgent)
-        stopAgent.onlyIf { extension.homeDir != null }
-
-        def download = project.tasks.create("downloadTeamCity", Download) {
-            conventionMapping.map('source') { extension.downloadUrl }
-            conventionMapping.map('target') { project.file(extension.downloadFile) }
-        }
-        def unpack = project.tasks.create("unpackTeamCity", Unpack) {
-            conventionMapping.map('source') { project.file(extension.downloadFile) }
-            conventionMapping.map('target') { extension.homeDir }
-        }
-        unpack.dependsOn download
-
-        def install = project.tasks.create("installTeamCity", InstallTeamCity)
-        install.dependsOn unpack
     }
 
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {

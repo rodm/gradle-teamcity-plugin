@@ -21,9 +21,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
-import static org.hamcrest.CoreMatchers.equalTo
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
 
 public class TeamCityPluginTest {
@@ -57,36 +55,5 @@ public class TeamCityPluginTest {
             version = '8.1.5'
         }
         assertEquals('8.1.5', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    public void defaultDownloadUrl() {
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.getDownloadUrl(), equalTo('http://download.jetbrains.com/teamcity/TeamCity-9.0.tar.gz'))
-    }
-
-    @Test
-    public void alternativeDownloadBaseUrl() {
-        project.teamcity {
-            downloadBaseUrl = 'http://repository:8080/teamcity'
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.getDownloadUrl(), equalTo('http://repository:8080/teamcity/TeamCity-9.0.tar.gz'))
-    }
-
-    @Test
-    public void defaultDownloadDir() {
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.getDownloadFile(), equalTo('downloads/TeamCity-9.0.tar.gz'))
-    }
-
-    @Test
-    public void alternativeDownloadDir() {
-        project.teamcity {
-            downloadDir = '/tmp'
-        }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.getDownloadFile(), equalTo('/tmp/TeamCity-9.0.tar.gz'))
     }
 }
