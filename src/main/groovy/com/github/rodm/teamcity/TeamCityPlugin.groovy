@@ -31,7 +31,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     static final String TEAMCITY_EXTENSION_NAME = 'teamcity'
 
-    static final String JETBRAINS_MAVEN_REPOSITORY = 'http://repository.jetbrains.com/all'
+    static final String JETBRAINS_MAVEN_REPOSITORY = 'http://download.jetbrains.com/teamcity-repository'
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
