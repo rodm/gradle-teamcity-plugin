@@ -21,10 +21,10 @@ ext {
     vendorName = 'rodm'
     teamcityVersion = '8.1.5'
 
-    downloadsDir = project.hasProperty('downloads.dir') ? property('downloads.dir') : "$rootDir/downloads"
-    serversDir = project.hasProperty('servers.dir') ? property('servers.dir') : "$rootDir/servers"
-    java7Home = project.hasProperty('java7.home') ? property('java7.home') : '/opt/jdk1.7.0_80'
-    java8Home = project.hasProperty('java8.home') ? property('java8.home') : '/opt/jdk1.8.0_74'
+    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
+    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
+    java7Home = project.findProperty('java7.home') ?: '/opt/jdk1.7.0_80'
+    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
 }
 
 test {
