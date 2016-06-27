@@ -217,6 +217,9 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
                 teamcity90 {
                     version = '9.0.5'
                     javaHome = file('/opt/jdk1.7.0_80')
+                    // Add to the default server options
+                    serverOptions '-Xdebug'
+                    serverOptions '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
                 }
 
                 teamcity91 {
@@ -225,7 +228,8 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
                     homeDir = file("$rootDir/teamcity/servers/TeamCity-9.1.6")
                     dataDir = file("$rootDir/teamcity/data/9.1")
                     javaHome = file('/opt/jdk1.8.0_60')
-                    serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+                    // Replace the default server options
+                    serverOptions = '-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
                 }
             }
         }
