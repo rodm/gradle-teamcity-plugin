@@ -321,3 +321,21 @@ If the Gradle project only has the TeamCity Agent Plugin applied the agent confi
             }
         }
     }
+
+## Samples
+
+The samples directory contains some simple examples of using the plugin.
+
+* `server-plugin` : A simple server-side only plugin.
+* `agent-server-plugin` : A simple plugin with an agent-side and server-side components.
+* `multi-project-plugin` : A plugin with agent-side and server-side built from multiple Gradle Builds and packages a TeamCity plugin.
+* `agent-tool-plugin` : A simple tool plugin that repackages Maven.
+
+The following projects use the plugin.
+
+* [AWS CodeDeploy](https://github.com/JetBrains/teamcity-aws-codedeploy-plugin) plugin
+* [AWS CodePipeline](https://github.com/JetBrains/teamcity-aws-codepipeline-plugin) plugin
+* [Rust and Cargo Support](https://github.com/JetBrains/teamcity-rust-plugin) plugin
+* [Framework for process output parsers](https://github.com/JetBrains/process-output-parsers) plugin
+* [TeamCity oAuth authentication](https://github.com/pwielgolaski/teamcity-oauth) plugin
+* [Docker Deploy](https://github.com/codeamatic/teamcity-docker-runner) plugin
