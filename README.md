@@ -54,7 +54,7 @@ descriptor can be specified as a path to a file or by a configuration block with
 
 * `version` : The version of the TeamCity API to build against. Defaults to '9.0'.
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
-and the TeamCity repository, http://repository.jetbrains.com/all, are configured for resolving dependencies. Setting this
+and the TeamCity repository, http://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
  flag to false allows a local repository to be used for resolving dependencies.
 * `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
  The type property affects the type of descriptor generated.
