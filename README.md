@@ -19,7 +19,7 @@ The following code adds the plugin to your build script.
         }
       }
       dependencies {
-        classpath "com.github.rodm:gradle-teamcity-plugin:0.9"
+        classpath "com.github.rodm:gradle-teamcity-plugin:0.9.1"
       }
     }
 
