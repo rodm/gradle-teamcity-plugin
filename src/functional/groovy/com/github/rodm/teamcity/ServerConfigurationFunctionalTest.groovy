@@ -143,6 +143,50 @@ public class ServerConfigurationFunctionalTest {
     }
 
     @Test
+    public void simulateBuildingPluginInTeamCity() {
+        buildFile << """
+            buildscript {
+                dependencies {
+                    classpath files(${pluginClasspath})
+                }
+            }
+            apply plugin: 'java'
+            apply plugin: 'com.github.rodm.teamcity-server'
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+            }
+        """
+
+        // Provides similar functionality to the init.gradle script used by the TeamCity Gradle Runner plugin
+        File initFile = testProjectDir.newFile('init.gradle')
+        initFile << """
+            public class DummyTeamcityPropertiesListener implements ProjectEvaluationListener {
+                public void beforeEvaluate(Project project) {
+                    def props = [:]
+                    if (project.hasProperty("ext")) {
+                        project.ext.teamcity = props
+                    } else {
+                        project.setProperty("teamcity", props)
+                    }
+                }
+                public void afterEvaluate(Project project, ProjectState projectState) {
+                }
+            }
+            gradle.addListener(new DummyTeamcityPropertiesListener())
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("--init-script", "init.gradle", "--refresh-dependencies", "serverPlugin")
+                .withDebug(true)
+                .build()
+
+        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+    }
+
+    @Test
     public void startServerAfterDeployingPlugin() {
         File homeDir = testProjectDir.newFolder('teamcity')
         File binDir = testProjectDir.newFolder('teamcity', 'bin')

@@ -48,15 +48,15 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             def environments = project.container(TeamCityEnvironment)
             extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project, environments)
         }
-        configureRepositories(project)
+        configureRepositories(project, extension)
         configureConfigurations(project)
         configureTasks(project, extension)
     }
 
-    private configureRepositories(Project project) {
+    private configureRepositories(Project project, TeamCityPluginExtension extension) {
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
-                if (project.teamcity.defaultRepositories) {
+                if (extension.defaultRepositories) {
                     project.repositories {
                         mavenCentral()
                         maven {
