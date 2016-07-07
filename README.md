@@ -339,3 +339,6 @@ The following projects use the plugin.
 * [Framework for process output parsers](https://github.com/JetBrains/process-output-parsers) plugin
 * [TeamCity oAuth authentication](https://github.com/pwielgolaski/teamcity-oauth) plugin
 * [Docker Deploy](https://github.com/codeamatic/teamcity-docker-runner) plugin
+* [Teamcity web parameters](https://github.com/grundic/teamcity-web-parameters) plugin
+* [JMX Plugin](https://github.com/rodm/teamcity-jmx-plugin) plugin
+* [JVM Monitor Plugin](https://github.com/rodm/teamcity-jvm-monitor-plugin) plugin
