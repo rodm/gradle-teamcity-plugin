@@ -81,9 +81,9 @@ The following properties can be defined in the `server` configuration block.
 An `environments` configuration block allows multiple TeamCity environments to be defined, each environment supports the following properties
 
 * `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
-* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl/TeamCity-${version}.tar.gz`.
-* `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-{version}`
-* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir/${version}`, version exludes the bug fix digit.
+* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl}/TeamCity-${version}.tar.gz`.
+* `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-${version}`
+* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
 * `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
 * `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
  these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.
