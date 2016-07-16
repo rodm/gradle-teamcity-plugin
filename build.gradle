@@ -14,6 +14,7 @@ buildscript {
 apply plugin: 'com.gradle.plugin-publish'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
+apply plugin: 'org.gradle.jacoco'
 apply plugin: 'org.sonarqube'
 
 repositories {
