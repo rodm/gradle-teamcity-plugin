@@ -14,15 +14,16 @@ buildscript {
 apply plugin: 'com.github.rodm.teamcity-agent'
 apply plugin: 'com.github.rodm.teamcity-server'
 
-
 group = 'com.github.rodm.teamcity'
 version = '1.0-SNAPSHOT'
 
 ext {
     teamcityVersion = '8.1.5'
-    teamcityDir = "$rootDir/servers/TeamCity-${teamcityVersion}"
-    teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
-    teamcityJavaHome = System.properties['java.home']
+
+    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
+    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
+    java7Home = project.findProperty('java7.home') ?: '/opt/jdk1.7.0_80'
+    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
 }
 
 repositories {
@@ -80,12 +81,24 @@ teamcity {
             email = 'rod.n.mackenzie@gmail.com'
         }
 
+        downloadsDir = project.downloadsDir
+        baseHomeDir = project.serversDir
+        baseDataDir = 'data'
+
         environments {
-            teamcity {
-                version = teamcityVersion
-                homeDir = file(teamcityDir)
-                dataDir = file(teamcityDataDir)
-                javaHome = file(teamcityJavaHome)
+            teamcity81 {
+                version = '8.1.5'
+                javaHome = file(java7Home)
+            }
+
+            teamcity91 {
+                version = '9.1.6'
+                javaHome = file(java7Home)
+            }
+
+            teamcity10 {
+                version = '10.0'
+                javaHome = file(java8Home)
             }
         }
     }
