@@ -240,7 +240,7 @@ public class ServerConfigurationFunctionalTest {
     }
 
     @Test
-    public void defaultTasksForMultipleEnvironmentSupport() {
+    public void tasksForMultipleEnvironmentSupport() {
         buildFile << """
             buildscript {
                 dependencies {
@@ -255,6 +255,8 @@ public class ServerConfigurationFunctionalTest {
                     descriptor {
                     }
                     environments {
+                        teamcity {
+                        }
                     }
                 }
             }
@@ -265,90 +267,12 @@ public class ServerConfigurationFunctionalTest {
                 .withArguments("tasks")
                 .build()
 
-        assertThat(result.output, containsString('deployPluginToDefault'))
-        assertThat(result.output, containsString('undeployPluginFromDefault'))
-        assertThat(result.output, containsString('startDefaultServer'))
-        assertThat(result.output, containsString('stopDefaultServer'))
-        assertThat(result.output, containsString('startDefaultAgent'))
-        assertThat(result.output, containsString('stopDefaultAgent'))
-    }
-
-    @Test
-    public void startDefaultServer() {
-        createFakeTeamCityInstall('servers', '9.0')
-
-        buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
-            }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
-            teamcity {
-                version = '8.1.5'
-                server {
-                    descriptor {
-                    }
-                    environments {
-                    }
-                }
-            }
-        """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
-
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments('build', 'startDefaultServer')
-                .build()
-
-        File pluginFile = new File(testProjectDir.root, 'data/9.0/plugins/test-plugin.zip')
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
-        assertThat(result.task(":startDefaultServer").getOutcome(), is(SUCCESS))
-    }
-
-    @Test
-    public void startDefaultServerInAlternativeBaseDirectory() {
-        createFakeTeamCityInstall('teamcity', '9.0')
-
-        buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
-            }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
-            teamcity {
-                version = '8.1.5'
-                server {
-                    descriptor {
-                    }
-                    baseHomeDir = 'teamcity'
-                    baseDataDir = 'teamcity/data'
-                    environments {
-                    }
-                }
-            }
-        """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
-
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments('build', 'startDefaultServer')
-                .build()
-
-        File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.0/plugins/test-plugin.zip')
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
-        assertThat(result.task(":startDefaultServer").getOutcome(), is(SUCCESS))
+        assertThat(result.output, containsString('deployPluginToTeamcity'))
+        assertThat(result.output, containsString('undeployPluginFromTeamcity'))
+        assertThat(result.output, containsString('startTeamcityServer'))
+        assertThat(result.output, containsString('stopTeamcityServer'))
+        assertThat(result.output, containsString('startTeamcityAgent'))
+        assertThat(result.output, containsString('stopTeamcityAgent'))
     }
 
     @Test

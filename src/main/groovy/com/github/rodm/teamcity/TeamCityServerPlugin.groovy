@@ -103,10 +103,6 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             ServerPluginConfiguration server = extension.server
-            if (server.environments.isEmpty()) {
-                server.environments << new TeamCityEnvironment()
-            }
-
             def build = project.tasks.getByName('build')
             server.environments.each { environment ->
                 defaultMissingProperties(project, server, environment)
