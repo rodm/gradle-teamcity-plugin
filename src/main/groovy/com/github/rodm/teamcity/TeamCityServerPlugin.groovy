@@ -158,6 +158,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
                 startAgent.onlyIf { environment.homeDir != null }
 

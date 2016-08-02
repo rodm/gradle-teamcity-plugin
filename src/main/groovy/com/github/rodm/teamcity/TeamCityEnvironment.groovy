@@ -31,6 +31,8 @@ class TeamCityEnvironment {
 
     String serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
 
+    String agentOptions = ''
+
     TeamCityEnvironment() {
         this('default')
     }
@@ -45,5 +47,13 @@ class TeamCityEnvironment {
 
     def serverOptions(String options) {
         this.serverOptions += ' ' + options
+    }
+
+    def setAgentOptions(String options) {
+        this.agentOptions = options
+    }
+
+    def agentOptions(String options) {
+        this.agentOptions += ' ' + options
     }
 }

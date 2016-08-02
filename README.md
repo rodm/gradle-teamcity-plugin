@@ -87,6 +87,7 @@ An `environments` configuration block allows multiple TeamCity environments to b
 * `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
 * `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
  these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.
+* `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
 
 ### TeamCity Server Plugin Tasks
 
