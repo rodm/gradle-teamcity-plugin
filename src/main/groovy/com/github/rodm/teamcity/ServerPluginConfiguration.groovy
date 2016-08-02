@@ -16,10 +16,21 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
 class ServerPluginConfiguration {
+
+    public static final String DOWNLOADS_DIR_PROPERTY = 'com.github.rodm.teamcity.downloadsDir'
+    public static final String BASE_DOWNLOAD_URL_PROPERTY = 'com.github.rodm.teamcity.baseDownloadUrl'
+    public static final String BASE_DATA_DIR_PROPERTY = 'com.github.rodm.teamcity.baseDataDir'
+    public static final String BASE_HOME_DIR_PROPERTY = 'com.github.rodm.teamcity.baseHomeDir'
+
+    public static final String DEFAULT_DOWNLOADS_DIR = 'downloads'
+    public static final String DEFAULT_BASE_DOWNLOAD_URL = 'http://download.jetbrains.com/teamcity'
+    public static final String DEFAULT_BASE_DATA_DIR = 'data'
+    public static final String DEFAULT_BASE_HOME_DIR = 'servers'
 
     def descriptor
 
@@ -27,19 +38,22 @@ class ServerPluginConfiguration {
 
     private Map<String, Object> tokens = [:]
 
-    String downloadsDir = 'downloads'
+    private String downloadsDir
 
-    String baseDownloadUrl = 'http://download.jetbrains.com/teamcity'
+    private String baseDownloadUrl
 
-    String baseDataDir = 'data'
+    private String baseDataDir
 
-    String baseHomeDir = 'servers'
+    private String baseHomeDir
 
     final NamedDomainObjectContainer<TeamCityEnvironment> environments
 
-    ServerPluginConfiguration(CopySpec copySpec, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
-        this.files = copySpec
+    private Project project
+
+    ServerPluginConfiguration(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
+        this.project = project
         this.environments = environments
+        this.files = project.copySpec {}
     }
 
     def descriptor(Closure closure) {
@@ -67,7 +81,30 @@ class ServerPluginConfiguration {
         this.tokens += tokens
     }
 
+    String getDownloadsDir() {
+        downloadsDir ? downloadsDir : property(DOWNLOADS_DIR_PROPERTY, DEFAULT_DOWNLOADS_DIR)
+    }
+
+    String getBaseDownloadUrl() {
+        baseDownloadUrl ? baseDownloadUrl : property(BASE_DOWNLOAD_URL_PROPERTY, DEFAULT_BASE_DOWNLOAD_URL)
+    }
+
+    String getBaseDataDir() {
+        baseDataDir ? baseDataDir : property(BASE_DATA_DIR_PROPERTY, DEFAULT_BASE_DATA_DIR)
+    }
+
+    String getBaseHomeDir() {
+        baseHomeDir ? baseHomeDir : property(BASE_HOME_DIR_PROPERTY, DEFAULT_BASE_HOME_DIR)
+    }
+
     void environments(Closure config) {
         environments.configure(config)
+    }
+
+    private String property(String name, String defaultValue) {
+        if (project.hasProperty(name)) {
+            return project.property(name)
+        }
+        return defaultValue
     }
 }

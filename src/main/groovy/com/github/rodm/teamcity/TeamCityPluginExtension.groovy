@@ -35,7 +35,7 @@ class TeamCityPluginExtension {
     TeamCityPluginExtension(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
         this.project = project
         this.agent = new AgentPluginConfiguration(project.copySpec {})
-        this.server = new ServerPluginConfiguration(project.copySpec {}, environments)
+        this.server = new ServerPluginConfiguration(project, environments)
     }
 
     def getAgent() {
