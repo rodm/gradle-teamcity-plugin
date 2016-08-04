@@ -27,7 +27,8 @@ dependencies {
 
     testCompile gradleTestKit()
     testCompile "junit:junit:4.12"
-    testCompile "xmlunit:xmlunit:1.6"
+    testCompile 'org.xmlunit:xmlunit-core:2.2.1'
+    testCompile 'org.xmlunit:xmlunit-legacy:2.2.1'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
 }
 
