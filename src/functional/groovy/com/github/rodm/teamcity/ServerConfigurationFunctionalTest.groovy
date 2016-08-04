@@ -188,16 +188,8 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void startServerAfterDeployingPlugin() {
-        File homeDir = testProjectDir.newFolder('teamcity')
-        File binDir = testProjectDir.newFolder('teamcity', 'bin')
+        File homeDir = createFakeTeamCityInstall('teamcity', '9.1.6')
         File dataDir = testProjectDir.newFolder('data')
-
-        File teamcityServerShellFile = new File(binDir, 'teamcity-server.sh')
-        teamcityServerShellFile << """
-            #!/bin/bash
-            echo "Fake TeamCity startup script"
-        """
-        teamcityServerShellFile.executable = true
 
         buildFile << """
             buildscript {
@@ -370,11 +362,11 @@ public class ServerConfigurationFunctionalTest {
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
     }
 
-    private void createFakeTeamCityInstall(String baseDir, String version) {
+    private File createFakeTeamCityInstall(String baseDir, String version) {
         createFakeTeamCityInstall(testProjectDir, baseDir, version)
     }
 
-    private void createFakeTeamCityInstall(TemporaryFolder folder, String baseDir, String version) {
+    private File createFakeTeamCityInstall(TemporaryFolder folder, String baseDir, String version) {
         File homeDir = folder.newFolder(baseDir, "TeamCity-${version}")
         File binDir = folder.newFolder(baseDir, "TeamCity-${version}", 'bin')
 
@@ -384,5 +376,6 @@ public class ServerConfigurationFunctionalTest {
             echo "Fake TeamCity startup script"
         """
         teamcityServerShellFile.executable = true
+        return homeDir
     }
 }
