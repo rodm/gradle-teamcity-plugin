@@ -206,9 +206,9 @@ public class ServerConfigurationFunctionalTest {
                     }
                     environments {
                         teamcity {
-                            homeDir = file('${homeDir.canonicalPath}')
-                            dataDir = file('${dataDir.canonicalPath}')
-                            javaHome = file('${dataDir.canonicalPath}')
+                            homeDir = file('${windowsCompatiblePath(homeDir)}')
+                            dataDir = file('${windowsCompatiblePath(dataDir)}')
+                            javaHome = file('${windowsCompatiblePath(dataDir)}')
                         }
                     }
                 }
@@ -333,8 +333,8 @@ public class ServerConfigurationFunctionalTest {
                 server {
                     descriptor {
                     }
-                    baseHomeDir = file('${serversDir.root.canonicalPath}/teamcity')
-                    baseDataDir = file('${serversDir.root.canonicalPath}/data')
+                    baseHomeDir = file('${windowsCompatiblePath(serversDir.root)}/teamcity')
+                    baseDataDir = file('${windowsCompatiblePath(serversDir.root)}/data')
                     environments {
                         teamcity8 {
                             version = '8.1.5'
@@ -376,6 +376,16 @@ public class ServerConfigurationFunctionalTest {
             echo "Fake TeamCity startup script"
         """
         teamcityServerShellFile.executable = true
+
+        File teamcityServerBatchFile = new File(binDir, 'teamcity-server.bat')
+        teamcityServerBatchFile << """
+            @echo off
+            echo "Fake TeamCity startup script"
+        """
         return homeDir
+    }
+
+    private String windowsCompatiblePath(File path) {
+        path.canonicalPath.replace('\\', '\\\\')
     }
 }
