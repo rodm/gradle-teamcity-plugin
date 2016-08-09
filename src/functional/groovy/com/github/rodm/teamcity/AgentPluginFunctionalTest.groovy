@@ -22,33 +22,18 @@ public class AgentPluginFunctionalTest {
 
     private File buildFile
 
-    private String pluginClasspath
-
     @Before
     public void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
-
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-
-        pluginClasspath = pluginClasspathResource.readLines()
-                .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-                .collect { "'$it'" }
-                .join(", ")
     }
 
     @Test
     public void agentPluginBuildAndPackage() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-agent'
             teamcity {
                 version = '8.1.5'
                 descriptor {
@@ -64,6 +49,7 @@ public class AgentPluginFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("agentPlugin")
+                .withPluginClasspath()
                 .build();
 
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SUCCESS)
@@ -79,13 +65,10 @@ public class AgentPluginFunctionalTest {
     @Test
     public void agentPluginWithDescriptorFile() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-agent'
             teamcity {
                 version = '8.1.5'
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
@@ -104,6 +87,7 @@ public class AgentPluginFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("agentPlugin")
+                .withPluginClasspath()
                 .build();
 
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SKIPPED)
@@ -114,13 +98,10 @@ public class AgentPluginFunctionalTest {
     @Test
     public void agentPluginFailsWithMissingDescriptorFile() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-agent'
             teamcity {
                 version = '8.1.5'
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
@@ -130,6 +111,7 @@ public class AgentPluginFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("agentPlugin")
+                .withPluginClasspath()
                 .buildAndFail()
 
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))

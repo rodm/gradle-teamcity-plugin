@@ -26,33 +26,18 @@ public class ServerConfigurationFunctionalTest {
 
     private File buildFile
 
-    private String pluginClasspath
-
     @Before
     public void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
-
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-
-        pluginClasspath = pluginClasspathResource.readLines()
-                .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-                .collect { "'$it'" }
-                .join(", ")
     }
 
     @Test
     public void serverPluginBuildAndPackage() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 descriptor {
@@ -68,6 +53,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("serverPlugin")
+                .withPluginClasspath()
                 .build();
 
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SUCCESS)
@@ -83,13 +69,10 @@ public class ServerConfigurationFunctionalTest {
     @Test
     public void serverPluginWithDescriptorFile() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
@@ -110,6 +93,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("serverPlugin")
+                .withPluginClasspath()
                 .build();
 
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SKIPPED)
@@ -120,13 +104,10 @@ public class ServerConfigurationFunctionalTest {
     @Test
     public void serverPluginFailsWithMissingDescriptorFile() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
@@ -136,6 +117,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("serverPlugin")
+                .withPluginClasspath()
                 .buildAndFail()
 
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(FAILED))
@@ -145,13 +127,10 @@ public class ServerConfigurationFunctionalTest {
     @Test
     public void simulateBuildingPluginInTeamCity() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 descriptor {
@@ -180,6 +159,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("--init-script", "init.gradle", "--refresh-dependencies", "serverPlugin")
+                .withPluginClasspath()
                 .withDebug(true)
                 .build()
 
@@ -192,13 +172,10 @@ public class ServerConfigurationFunctionalTest {
         File dataDir = testProjectDir.newFolder('data')
 
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 server {
@@ -223,6 +200,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("build", "startTeamcityServer")
+                .withPluginClasspath()
                 .build()
 
         File pluginFile = new File(dataDir, 'plugins/test-plugin.zip')
@@ -234,13 +212,10 @@ public class ServerConfigurationFunctionalTest {
     @Test
     public void tasksForMultipleEnvironmentSupport() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 server {
@@ -257,6 +232,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("tasks")
+                .withPluginClasspath()
                 .build()
 
         assertThat(result.output, containsString('deployPluginToTeamcity'))
@@ -272,13 +248,10 @@ public class ServerConfigurationFunctionalTest {
         createFakeTeamCityInstall('teamcity', '9.1.6')
 
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 server {
@@ -306,6 +279,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments('build', 'startTeamcity9Server')
+                .withPluginClasspath()
                 .build()
 
         File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
@@ -321,13 +295,10 @@ public class ServerConfigurationFunctionalTest {
         createFakeTeamCityInstall(serversDir, 'teamcity', '9.1.6')
 
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files(${pluginClasspath})
-                }
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
             }
-            apply plugin: 'java'
-            apply plugin: 'com.github.rodm.teamcity-server'
             teamcity {
                 version = '8.1.5'
                 server {
@@ -355,6 +326,7 @@ public class ServerConfigurationFunctionalTest {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments('build', 'startTeamcity9Server')
+                .withPluginClasspath()
                 .build()
 
         File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')

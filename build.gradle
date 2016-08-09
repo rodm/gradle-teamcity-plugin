@@ -12,6 +12,7 @@ buildscript {
 }
 
 apply plugin: 'com.gradle.plugin-publish'
+apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'org.gradle.jacoco'
@@ -22,10 +23,6 @@ repositories {
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
-
-    testCompile gradleTestKit()
     testCompile "junit:junit:4.12"
     testCompile 'org.xmlunit:xmlunit-core:2.2.1'
     testCompile 'org.xmlunit:xmlunit-legacy:2.2.1'
@@ -38,22 +35,6 @@ targetCompatibility = 1.7
 version = '0.10-SNAPSHOT'
 group = 'com.github.rodm'
 
-task pluginClasspathManifest {
-    def outputDir = file("$buildDir/$name")
-
-    inputs.files sourceSets.main.runtimeClasspath
-    outputs.dir outputDir
-
-    doLast {
-        outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-    }
-}
-
-dependencies {
-    testRuntime files(pluginClasspathManifest)
-}
-
 sourceSets {
     functionalTest {
         compileClasspath += main.output + configurations.testRuntime
@@ -62,6 +43,10 @@ sourceSets {
             srcDir 'src/functional/groovy'
         }
     }
+}
+
+gradlePlugin {
+    testSourceSets sourceSets.functionalTest
 }
 
 task functionalTest(type: Test) {
