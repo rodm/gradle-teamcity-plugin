@@ -20,7 +20,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
-class ServerPluginConfiguration {
+class ServerPluginConfiguration extends PluginConfiguration {
 
     public static final String DOWNLOADS_DIR_PROPERTY = 'com.github.rodm.teamcity.downloadsDir'
     public static final String BASE_DOWNLOAD_URL_PROPERTY = 'com.github.rodm.teamcity.baseDownloadUrl'
@@ -31,12 +31,6 @@ class ServerPluginConfiguration {
     public static final String DEFAULT_BASE_DOWNLOAD_URL = 'http://download.jetbrains.com/teamcity'
     public static final String DEFAULT_BASE_DATA_DIR = 'data'
     public static final String DEFAULT_BASE_HOME_DIR = 'servers'
-
-    def descriptor
-
-    private CopySpec files
-
-    private Map<String, Object> tokens = [:]
 
     private String downloadsDir
 
@@ -51,34 +45,14 @@ class ServerPluginConfiguration {
     private Project project
 
     ServerPluginConfiguration(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
+        super(project.copySpec {})
         this.project = project
         this.environments = environments
-        this.files = project.copySpec {}
     }
 
     def descriptor(Closure closure) {
         descriptor = new ServerPluginDescriptor()
         ConfigureUtil.configure(closure, descriptor)
-    }
-
-    def files(Closure closure) {
-        ConfigureUtil.configure(closure, files.addChild())
-    }
-
-    CopySpec getFiles() {
-        return files
-    }
-
-    Map<String, Object> getTokens() {
-        return tokens
-    }
-
-    def setTokens(Map<String, Object> tokens) {
-        this.tokens = tokens
-    }
-
-    def tokens(Map<String, Object> tokens) {
-        this.tokens += tokens
     }
 
     String getDownloadsDir() {

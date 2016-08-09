@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rod MacKenzie
+ * Copyright 2016 Rod MacKenzie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,37 @@ package com.github.rodm.teamcity
 import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
-class AgentPluginConfiguration extends PluginConfiguration {
+abstract class PluginConfiguration {
 
-    AgentPluginConfiguration(CopySpec copySpec) {
-        super(copySpec)
+    def descriptor
+
+    private CopySpec files
+
+    private Map<String, Object> tokens = [:]
+
+    PluginConfiguration(CopySpec copySpec) {
+        this.files = copySpec
     }
 
-    def descriptor(Closure closure) {
-        descriptor = new AgentPluginDescriptor()
-        ConfigureUtil.configure(closure, descriptor)
+    abstract descriptor(Closure closure);
+
+    def files(Closure closure) {
+        ConfigureUtil.configure(closure, files.addChild())
+    }
+
+    CopySpec getFiles() {
+        return files
+    }
+
+    Map<String, Object> getTokens() {
+        return tokens
+    }
+
+    def setTokens(Map<String, Object> tokens) {
+        this.tokens = tokens
+    }
+
+    def tokens(Map<String, Object> tokens) {
+        this.tokens += tokens
     }
 }
