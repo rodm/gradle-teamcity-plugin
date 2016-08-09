@@ -199,7 +199,7 @@ public class ServerDescriptorGeneratorTest {
             descriptor {
                 parameters {
                     parameter 'name1', 'value1'
-                    parameter 'name2', 'value2'
+                    parameters name2: 'value2', name3: 'value3'
                 }
             }
         }
@@ -211,6 +211,7 @@ public class ServerDescriptorGeneratorTest {
 
         assertXpathEvaluatesTo("value1", "//parameters/parameter[@name='name1']", writer.toString());
         assertXpathEvaluatesTo("value2", "//parameters/parameter[@name='name2']", writer.toString());
+        assertXpathEvaluatesTo("value3", "//parameters/parameter[@name='name3']", writer.toString());
     }
 
     @Test
