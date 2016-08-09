@@ -17,7 +17,6 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.file.CopySpec
 import org.gradle.util.ConfigureUtil
 
 class ServerPluginConfiguration extends PluginConfiguration {
