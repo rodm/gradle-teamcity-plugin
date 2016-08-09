@@ -35,7 +35,7 @@ class EnvironmentsTest {
     }
 
     @Test
-    public void defaultServerOptions() {
+    public void defaultOptions() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
@@ -51,6 +51,7 @@ class EnvironmentsTest {
 
         def environment = extension.server.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions))
+        assertThat(environment.agentOptions, equalTo(''))
     }
 
     @Test
@@ -91,5 +92,48 @@ class EnvironmentsTest {
 
         def environment = extension.server.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption=test'))
+    }
+
+    @Test
+    public void replaceDefaultAgentOptions() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        agentOptions = '-DnewOption1=value1'
+                        agentOptions = '-DnewOption2=value2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
+    }
+
+    @Test
+    public void addToDefaultAgentOptions() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        agentOptions '-DadditionalOption1=value1'
+                        agentOptions '-DadditionalOption2=value2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
+        assertThat(environment.agentOptions.trim(), equalTo(expectedOptions))
     }
 }
