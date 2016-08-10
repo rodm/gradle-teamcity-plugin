@@ -15,10 +15,12 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
+@CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
     public static final String DOWNLOADS_DIR_PROPERTY = 'com.github.rodm.teamcity.downloadsDir'
