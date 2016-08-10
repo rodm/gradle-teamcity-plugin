@@ -15,8 +15,10 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.util.ConfigureUtil
 
+@CompileStatic
 class PluginDeployment {
 
     Boolean useSeparateClassloader

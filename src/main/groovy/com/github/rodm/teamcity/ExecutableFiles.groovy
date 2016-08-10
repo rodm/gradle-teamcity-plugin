@@ -15,6 +15,9 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class ExecutableFiles {
 
     List<String> includes = []
