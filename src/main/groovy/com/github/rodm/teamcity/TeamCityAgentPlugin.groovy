@@ -19,10 +19,19 @@ import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import org.gradle.api.Project
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityAgentPlugin extends TeamCityPlugin {
+
+    private static final Logger LOGGER = Logging.getLogger(TeamCityAgentPlugin.class);
+
+    public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
+
+    public static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
 
     public static final String AGENT_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/agent'
 
@@ -32,6 +41,19 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
             project.afterEvaluate {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:agent-api:${extension.version}"
+                }
+            }
+        }
+
+        Jar jarTask = project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
+        if (jarTask) {
+            List<String> definitionFiles = []
+            jarTask.filesMatching PLUGIN_DEFINITION_PATTERN, { details ->
+                definitionFiles << details.file.toString()
+            }
+            jarTask.doLast { task ->
+                if (definitionFiles.isEmpty()) {
+                    LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
                 }
             }
         }

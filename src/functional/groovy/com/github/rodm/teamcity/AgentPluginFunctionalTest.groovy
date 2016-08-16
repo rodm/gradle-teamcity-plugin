@@ -17,6 +17,8 @@ import static org.junit.Assert.assertTrue
 
 public class AgentPluginFunctionalTest {
 
+    static final String NO_DEFINITION_WARNING = TeamCityAgentPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
 
@@ -93,6 +95,58 @@ public class AgentPluginFunctionalTest {
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processAgentDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
+    }
+
+
+    @Test
+    public void agentPluginNoWarningsWithDefinitionFile() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-agent-plugin-example.xml')
+        definitionFile.createNewFile()
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+    }
+
+
+    @Test
+    public void agentPluginWarnsAboutMissingDefinitionFile() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+            }
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
     }
 
     @Test
