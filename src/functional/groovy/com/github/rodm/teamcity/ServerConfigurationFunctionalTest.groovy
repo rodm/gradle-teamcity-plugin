@@ -22,6 +22,29 @@ import static org.junit.Assert.assertTrue
 
 public class ServerConfigurationFunctionalTest {
 
+    static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
+        plugins {
+            id 'java'
+            id 'com.github.rodm.teamcity-server'
+        }
+        teamcity {
+            version = '8.1.5'
+            descriptor {
+            }
+        }
+    """
+
+    static final String BUILD_SCRIPT_WITH_FILE_DESCRIPTOR = """
+        plugins {
+            id 'java'
+            id 'com.github.rodm.teamcity-server'
+        }
+        teamcity {
+            version = '8.1.5'
+            descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+        }
+    """
+
     static final String NO_DEFINITION_WARNING = TeamCityServerPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     @Rule
@@ -36,17 +59,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void serverPluginBuildAndPackage() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         File settingsFile = testProjectDir.newFile('settings.gradle')
         settingsFile << """
@@ -71,16 +84,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void serverPluginWithDescriptorFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
         descriptorFile << """
@@ -106,17 +110,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void serverPluginNoWarningsWithDefinitionFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-example.xml')
@@ -133,17 +127,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void serverPluginWarnsAboutMissingDefinitionFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
@@ -156,16 +140,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void serverPluginFailsWithMissingDescriptorFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
@@ -179,17 +154,7 @@ public class ServerConfigurationFunctionalTest {
 
     @Test
     public void simulateBuildingPluginInTeamCity() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         // Provides similar functionality to the init.gradle script used by the TeamCity Gradle Runner plugin
         File initFile = testProjectDir.newFile('init.gradle')
