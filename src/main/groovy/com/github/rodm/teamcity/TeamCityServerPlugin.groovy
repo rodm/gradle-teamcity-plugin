@@ -27,10 +27,19 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityServerPlugin extends TeamCityPlugin {
+
+    private static final Logger LOGGER = Logging.getLogger(TeamCityAgentPlugin.class);
+
+    public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-server-plugin*.xml"
+
+    public static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
 
     public static final String SERVER_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/server'
 
@@ -47,6 +56,19 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                     provided "org.jetbrains.teamcity:server-api:${extension.version}"
 
                     testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                }
+            }
+        }
+
+        Jar jarTask = project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
+        if (jarTask) {
+            List<String> definitionFiles = []
+            jarTask.filesMatching PLUGIN_DEFINITION_PATTERN, { details ->
+                definitionFiles << details.file.toString()
+            }
+            jarTask.doLast { task ->
+                if (definitionFiles.isEmpty()) {
+                    LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
                 }
             }
         }

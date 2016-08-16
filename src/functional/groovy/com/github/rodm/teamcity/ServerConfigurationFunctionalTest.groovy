@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
+import static org.hamcrest.CoreMatchers.not
 import static org.junit.Assert.assertEquals
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
@@ -20,6 +21,8 @@ import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.junit.Assert.assertTrue
 
 public class ServerConfigurationFunctionalTest {
+
+    static final String NO_DEFINITION_WARNING = TeamCityServerPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -99,6 +102,56 @@ public class ServerConfigurationFunctionalTest {
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processServerDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+    }
+
+    @Test
+    public void serverPluginNoWarningsWithDefinitionFile() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-server-plugin-example.xml')
+        definitionFile.createNewFile()
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+    }
+
+    @Test
+    public void serverPluginWarnsAboutMissingDefinitionFile() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+            }
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
     }
 
     @Test
