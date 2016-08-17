@@ -13,9 +13,31 @@ import static org.gradle.testkit.runner.TaskOutcome.*
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
 
 public class AgentPluginFunctionalTest {
+
+    static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
+        plugins {
+            id 'java'
+            id 'com.github.rodm.teamcity-agent'
+        }
+        teamcity {
+            version = '8.1.5'
+            descriptor {
+            }
+        }
+    """
+
+    static final String BUILD_SCRIPT_WITH_FILE_DESCRIPTOR = """
+        plugins {
+            id 'java'
+            id 'com.github.rodm.teamcity-agent'
+        }
+        teamcity {
+            version = '8.1.5'
+            descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+        }
+    """
 
     static final String NO_DEFINITION_WARNING = TeamCityAgentPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
@@ -31,17 +53,7 @@ public class AgentPluginFunctionalTest {
 
     @Test
     public void agentPluginBuildAndPackage() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         File settingsFile = testProjectDir.newFile('settings.gradle')
         settingsFile << """
@@ -66,16 +78,7 @@ public class AgentPluginFunctionalTest {
 
     @Test
     public void agentPluginWithDescriptorFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
         descriptorFile << """
@@ -100,17 +103,7 @@ public class AgentPluginFunctionalTest {
 
     @Test
     public void agentPluginNoWarningsWithDefinitionFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
         File definitionFile = new File(metaInfDir, 'build-agent-plugin-example.xml')
@@ -128,17 +121,7 @@ public class AgentPluginFunctionalTest {
 
     @Test
     public void agentPluginWarnsAboutMissingDefinitionFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor {
-                }
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
@@ -151,16 +134,7 @@ public class AgentPluginFunctionalTest {
 
     @Test
     public void agentPluginFailsWithMissingDescriptorFile() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
-            }
-        """
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
