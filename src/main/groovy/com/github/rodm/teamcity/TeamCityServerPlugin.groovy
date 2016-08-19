@@ -39,6 +39,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-server-plugin*.xml"
 
+    public static final String CLASSES_PATTERN = "**/*.class";
+
+    public static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean %s, but the implementation class %s was not found in the jar.";
+
     public static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
 
     public static final String SERVER_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/server'
@@ -62,13 +66,26 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
         Jar jarTask = project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
         if (jarTask) {
-            List<String> definitionFiles = []
-            jarTask.filesMatching PLUGIN_DEFINITION_PATTERN, { details ->
-                definitionFiles << details.file.toString()
+            List<PluginDefinition> definitionFiles = []
+            jarTask.filesMatching PLUGIN_DEFINITION_PATTERN, { fileCopyDetails ->
+                definitionFiles << new PluginDefinition(fileCopyDetails.file)
+            }
+            Set<String> classes = []
+            jarTask.filesMatching CLASSES_PATTERN, { fileCopyDetails ->
+                classes << fileCopyDetails.relativePath.toString()
             }
             jarTask.doLast { task ->
                 if (definitionFiles.isEmpty()) {
                     LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
+                } else {
+                    for (PluginDefinition definition : definitionFiles) {
+                        for (PluginBean bean : definition.getBeans()) {
+                            def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
+                            if (!classes.contains(fqcn)) {
+                                LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.id, bean.className));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -204,5 +221,32 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     private String toFilename(String url) {
         return url[(url.lastIndexOf('/') + 1)..-1]
+    }
+
+    static class PluginDefinition {
+
+        private File definitionFile
+
+        PluginDefinition(File file) {
+            this.definitionFile = file
+        }
+
+        String getName() {
+            return this.definitionFile.name
+        }
+
+        def getBeans() {
+            List<PluginBean> pluginBeans = []
+            def beans = new XmlParser().parse(definitionFile)
+            beans.bean.each { bean ->
+                pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
+            }
+            return pluginBeans
+        }
+    }
+
+    static class PluginBean {
+        String id
+        String className
     }
 }

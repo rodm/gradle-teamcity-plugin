@@ -45,7 +45,19 @@ public class ServerConfigurationFunctionalTest {
         }
     """
 
+    static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="http://www.springframework.org/schema/beans"
+               xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+               default-autowire="constructor">
+            <bean id="examplePlugin" class="example.ExampleServerPlugin"></bean>
+        </beans>
+    """
+
     static final String NO_DEFINITION_WARNING = TeamCityServerPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+
+    static final String NO_BEAN_CLASS_WARNING = TeamCityServerPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -114,7 +126,7 @@ public class ServerConfigurationFunctionalTest {
 
         File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-example.xml')
-        definitionFile.createNewFile()
+        definitionFile << '<beans></beans>'
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
@@ -136,6 +148,49 @@ public class ServerConfigurationFunctionalTest {
                 .build();
 
         assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
+    }
+
+    @Test
+    public void noWarningWithValidDefinitionFile() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File javaFile = new File(exampleJavaDir, 'ExampleServerPlugin.java')
+        javaFile << """
+            package example;
+            public class ExampleServerPlugin {
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
+        definitionFile << PLUGIN_DEFINITION_FILE
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
+    }
+
+    @Test
+    public void warningAboutMissingClass() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
+        definitionFile << PLUGIN_DEFINITION_FILE
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin-test.xml', 'examplePlugin', 'example.ExampleServerPlugin')
+        assertThat(result.getOutput(), containsString(expectedWarning))
     }
 
     @Test
