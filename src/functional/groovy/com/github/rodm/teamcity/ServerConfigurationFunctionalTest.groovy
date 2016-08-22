@@ -194,6 +194,36 @@ public class ServerConfigurationFunctionalTest {
     }
 
     @Test
+    public void supportOlderPluginDefinitionFile() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File javaFile = new File(exampleJavaDir, 'ExampleServerPlugin.java')
+        javaFile << """
+            package example;
+            public class ExampleServerPlugin {
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
+        definitionFile << """<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+            <beans default-autowire="constructor">
+                <bean id="examplePlugin" class="example.ExampleServerPlugin"/>
+            </beans>
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
+    }
+
+    @Test
     public void serverPluginFailsWithMissingDescriptorFile() {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 

@@ -237,7 +237,9 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
         def getBeans() {
             List<PluginBean> pluginBeans = []
-            def beans = new XmlParser().parse(definitionFile)
+            def parser = new XmlParser()
+            parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+            def beans = parser.parse(definitionFile)
             beans.bean.each { bean ->
                 pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
             }
