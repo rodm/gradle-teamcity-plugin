@@ -55,9 +55,9 @@ public class ServerConfigurationFunctionalTest {
         </beans>
     """
 
-    static final String NO_DEFINITION_WARNING = TeamCityServerPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+    static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
-    static final String NO_BEAN_CLASS_WARNING = TeamCityServerPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
+    static final String NO_BEAN_CLASS_WARNING = TeamCityPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -172,6 +172,7 @@ public class ServerConfigurationFunctionalTest {
                 .withPluginClasspath()
                 .build();
 
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
     }
 
@@ -189,6 +190,7 @@ public class ServerConfigurationFunctionalTest {
                 .withPluginClasspath()
                 .build();
 
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin-test.xml', 'examplePlugin', 'example.ExampleServerPlugin')
         assertThat(result.getOutput(), containsString(expectedWarning))
     }
@@ -220,6 +222,7 @@ public class ServerConfigurationFunctionalTest {
                 .withPluginClasspath()
                 .build();
 
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
     }
 

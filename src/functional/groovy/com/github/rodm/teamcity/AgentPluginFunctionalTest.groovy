@@ -39,7 +39,19 @@ public class AgentPluginFunctionalTest {
         }
     """
 
-    static final String NO_DEFINITION_WARNING = TeamCityAgentPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+    static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns="http://www.springframework.org/schema/beans"
+               xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+               default-autowire="constructor">
+            <bean id="exampleFeature" class="example.ExampleBuildFeature"></bean>
+        </beans>
+    """
+
+    static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+
+    static final String NO_BEAN_CLASS_WARNING = TeamCityPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -107,7 +119,7 @@ public class AgentPluginFunctionalTest {
 
         File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
         File definitionFile = new File(metaInfDir, 'build-agent-plugin-example.xml')
-        definitionFile.createNewFile()
+        definitionFile << '<beans></beans>'
 
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.getRoot())
@@ -144,5 +156,82 @@ public class AgentPluginFunctionalTest {
 
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))
         assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
+    }
+
+    @Test
+    public void noWarningWithValidDefinitionFile() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File javaFile = new File(exampleJavaDir, 'ExampleBuildFeature.java')
+        javaFile << """
+            package example;
+            public class ExampleBuildFeature {
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-agent-plugin-test.xml')
+        definitionFile << PLUGIN_DEFINITION_FILE
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+        assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleBuildFeature was not found in the jar')))
+    }
+
+
+    @Test
+    public void warningAboutMissingClass() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-agent-plugin-test.xml')
+        definitionFile << PLUGIN_DEFINITION_FILE
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-agent-plugin-test.xml', 'exampleFeature', 'example.ExampleBuildFeature')
+        assertThat(result.getOutput(), containsString(expectedWarning))
+    }
+
+    @Test
+    public void supportOlderPluginDefinitionFile() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File javaFile = new File(exampleJavaDir, 'ExampleBuildFeature.java')
+        javaFile << """
+            package example;
+            public class ExampleBuildFeature {
+            }
+        """
+
+        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File definitionFile = new File(metaInfDir, 'build-agent-plugin-test.xml')
+        definitionFile << """<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+            <beans default-autowire="constructor">
+                <bean id="exampleFeature" class="example.ExampleBuildFeature"/>
+            </beans>
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+        assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleBuildFeature was not found in the jar')))
     }
 }
