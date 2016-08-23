@@ -200,7 +200,7 @@ public class AgentPluginFunctionalTest {
                 .build();
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
-        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-agent-plugin-test.xml', 'exampleFeature', 'example.ExampleBuildFeature')
+        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-agent-plugin-test.xml', 'example.ExampleBuildFeature')
         assertThat(result.getOutput(), containsString(expectedWarning))
     }
 

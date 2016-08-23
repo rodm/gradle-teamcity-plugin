@@ -191,7 +191,7 @@ public class ServerConfigurationFunctionalTest {
                 .build();
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
-        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin-test.xml', 'examplePlugin', 'example.ExampleServerPlugin')
+        String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin-test.xml', 'example.ExampleServerPlugin')
         assertThat(result.getOutput(), containsString(expectedWarning))
     }
 

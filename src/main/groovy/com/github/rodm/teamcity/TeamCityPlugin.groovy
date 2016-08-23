@@ -40,7 +40,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     static final String CLASSES_PATTERN = "**/*.class";
 
-    static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean %s, but the implementation class %s was not found in the jar.";
+    static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar.";
 
     static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
 
@@ -122,7 +122,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
                         for (PluginBean bean : definition.getBeans()) {
                             def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
                             if (!classes.contains(fqcn)) {
-                                LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.id, bean.className));
+                                LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className));
                             }
                         }
                     }
