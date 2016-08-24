@@ -4,4 +4,4 @@ jdk:
   - oraclejdk7
 
 script:
-  - ./gradlew clean build functionalTest
+  - ./gradlew -S clean build functionalTest
