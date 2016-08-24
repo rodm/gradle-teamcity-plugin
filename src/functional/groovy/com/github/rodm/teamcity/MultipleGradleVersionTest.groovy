@@ -50,9 +50,22 @@ class MultipleGradleVersionTest {
                 id 'com.github.rodm.teamcity-server'
             }
 
+            project(':common') {
+                apply plugin: 'java'
+                apply plugin: 'com.github.rodm.teamcity-common'
+
+                teamcity {
+                    version = '8.1.5'
+                }
+            }
+
             project(':agent') {
                 apply plugin: 'java'
                 apply plugin: 'com.github.rodm.teamcity-agent'
+
+                dependencies {
+                    compile project(':common')
+                }
 
                 teamcity {
                     version = '8.1.5'
@@ -68,6 +81,7 @@ class MultipleGradleVersionTest {
             }
 
             dependencies {
+                compile project(':common')
                 agent project(path: ':agent', configuration: 'plugin')
             }
 
@@ -85,7 +99,20 @@ class MultipleGradleVersionTest {
         settingsFile << """
             rootProject.name = 'test-plugin'
 
+            include 'common'
             include 'agent'
+        """
+
+        File commonJavaDir = projectDir.newFolder('common', 'src', 'main', 'java', 'example', 'common')
+        File commonJavaFile = new File(commonJavaDir, 'ExampleBuildFeature.java')
+        commonJavaFile << """
+            package example.common;
+
+            import jetbrains.buildServer.util.StringUtil;
+
+            public class ExampleBuildFeature {
+                public static final String BUILD_FEATURE_NAME = "example";
+            }
         """
 
         File agentJavaDir = projectDir.newFolder('agent', 'src', 'main', 'java', 'example', 'agent')
@@ -96,6 +123,7 @@ class MultipleGradleVersionTest {
             import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 
             public class ExampleBuildFeature extends AgentLifeCycleAdapter {
+                String FEATURE_NAME = example.common.ExampleBuildFeature.BUILD_FEATURE_NAME;
             }
         """
 
@@ -116,9 +144,11 @@ class MultipleGradleVersionTest {
         serverJavaFile << """
             package example.server;
 
+            import example.common.ExampleBuildFeature;
             import jetbrains.buildServer.serverSide.BuildServerAdapter;
 
             public class ExampleServerPlugin extends BuildServerAdapter {
+                String FEATURE_NAME = ExampleBuildFeature.BUILD_FEATURE_NAME;
             }
         """
 
@@ -173,11 +203,13 @@ class MultipleGradleVersionTest {
         ZipFile agentPluginFile = new ZipFile(new File(projectDir.root, 'agent/build/distributions/test-plugin-agent.zip'))
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
+        assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
 
         ZipFile serverPluginFile = new ZipFile(new File(projectDir.root, 'build/distributions/test-plugin.zip'))
         List<String> serverEntries = serverPluginFile.entries().collect { it.name }
         assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
+        assertThat(serverEntries, hasItem('server/common.jar'))
         assertThat(serverEntries, hasItem('server/test-plugin.jar'))
         assertThat(serverEntries, hasItem('teamcity-plugin.xml'))
     }
