@@ -50,6 +50,8 @@ gradlePlugin {
 }
 
 task functionalTest(type: Test) {
+    description = 'Runs the functional tests.'
+    group = 'verification'
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
 }
