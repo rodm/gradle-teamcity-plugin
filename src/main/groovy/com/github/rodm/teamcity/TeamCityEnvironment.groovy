@@ -32,9 +32,9 @@ class TeamCityEnvironment {
 
     File javaHome
 
-    String serverOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+    private List<String> serverOptions = ['-Dteamcity.development.mode=true', '-Dteamcity.development.shadowCopyClasses=true']
 
-    String agentOptions = ''
+    private List<String> agentOptions = []
 
     TeamCityEnvironment() {
         this('default')
@@ -44,19 +44,29 @@ class TeamCityEnvironment {
         this.name = name
     }
 
+    def getServerOptions() {
+        return serverOptions.join(' ')
+    }
+
     def setServerOptions(String options) {
-        this.serverOptions = options
+        this.serverOptions.clear()
+        this.serverOptions.addAll(options)
     }
 
     def serverOptions(String options) {
-        this.serverOptions += ' ' + options
+        this.serverOptions.addAll(options)
+    }
+
+    def getAgentOptions() {
+        return agentOptions.join(' ')
     }
 
     def setAgentOptions(String options) {
-        this.agentOptions = options
+        this.agentOptions.clear()
+        this.agentOptions.add(options)
     }
 
     def agentOptions(String options) {
-        this.agentOptions += ' ' + options
+        this.agentOptions.add(options)
     }
 }
