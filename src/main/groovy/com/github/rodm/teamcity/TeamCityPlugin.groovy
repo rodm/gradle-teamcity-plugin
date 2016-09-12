@@ -147,6 +147,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             List<PluginBean> pluginBeans = []
             def parser = new XmlParser()
             parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+            parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalDTD", "file,http");
             def beans = parser.parse(definitionFile)
             beans.bean.each { bean ->
                 pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
