@@ -54,6 +54,11 @@ task functionalTest(type: Test) {
     group = 'verification'
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
+
+    reports {
+        html.destination = project.file("$html.destination/functional")
+        junitXml.destination = project.file("$junitXml.destination/functional")
+    }
 }
 
 publishing {
