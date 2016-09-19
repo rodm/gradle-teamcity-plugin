@@ -183,6 +183,12 @@ class MultipleGradleVersionTest {
         checkBuild(result)
     }
 
+    @Test
+    public void buildPluginUsingGradle_3_1() {
+        BuildResult result = executeBuild('3.1')
+        checkBuild(result)
+    }
+
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.getRoot())
