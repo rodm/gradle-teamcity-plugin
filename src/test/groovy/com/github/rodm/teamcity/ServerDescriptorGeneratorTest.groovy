@@ -17,16 +17,27 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Test
+import org.xmlunit.matchers.EvaluateXPathMatcher
+import org.xmlunit.matchers.HasXPathMatcher
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.not
 
 public class ServerDescriptorGeneratorTest {
 
     private Project project;
+
+    private static HasXPathMatcher hasXPath(String xPath) {
+        return HasXPathMatcher.hasXPath(xPath)
+    }
+
+    private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
+        return EvaluateXPathMatcher.hasXPath(xPath, valueMatcher)
+    }
 
     @Before
     public void setup() {
@@ -44,7 +55,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathExists("/teamcity-plugin", writer.toString());
+        assertThat(writer.toString(), hasXPath("/teamcity-plugin"))
     }
 
     @Test
@@ -63,10 +74,10 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathEvaluatesTo("plugin name", "//info/name", writer.toString());
-        assertXpathEvaluatesTo("display name", "//info/display-name", writer.toString());
-        assertXpathEvaluatesTo("1.2.3", "//info/version", writer.toString());
-        assertXpathEvaluatesTo("vendor name", "//info/vendor/name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//info/name', equalTo('plugin name')))
+        assertThat(writer.toString(), hasXPath('//info/display-name', equalTo('display name')))
+        assertThat(writer.toString(), hasXPath('//info/version', equalTo('1.2.3')))
+        assertThat(writer.toString(), hasXPath('//info/vendor/name', equalTo('vendor name')))
     }
 
     @Test
@@ -77,10 +88,10 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathExists("//info/name", writer.toString());
-        assertXpathExists("//info/display-name", writer.toString());
-        assertXpathExists("//info/version", writer.toString());
-        assertXpathExists("//info/vendor/name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//info/name'))
+        assertThat(writer.toString(), hasXPath('//info/display-name'))
+        assertThat(writer.toString(), hasXPath('//info/version'))
+        assertThat(writer.toString(), hasXPath('//info/vendor/name'))
     }
 
     @Test
@@ -95,9 +106,9 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("test-plugin name", "//info/name", writer.toString());
-        assertXpathEvaluatesTo("test-plugin display name", "//info/display-name", writer.toString());
-        assertXpathEvaluatesTo("1.2.3", "//info/version", writer.toString());
+        assertThat(writer.toString(), hasXPath('//info/name', equalTo('test-plugin name')))
+        assertThat(writer.toString(), hasXPath('//info/display-name', equalTo('test-plugin display name')))
+        assertThat(writer.toString(), hasXPath('//info/version', equalTo('1.2.3')))
     }
 
     @Test
@@ -117,11 +128,11 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("plugin description", "//info/description", writer.toString());
-        assertXpathEvaluatesTo("download url", "//info/download-url", writer.toString());
-        assertXpathEvaluatesTo("email", "//info/email", writer.toString());
-        assertXpathEvaluatesTo("vendor url", "//info/vendor/url", writer.toString());
-        assertXpathEvaluatesTo("vendor logo", "//info/vendor/logo", writer.toString());
+        assertThat(writer.toString(), hasXPath('//info/description', equalTo('plugin description')))
+        assertThat(writer.toString(), hasXPath('//info/download-url', equalTo('download url')))
+        assertThat(writer.toString(), hasXPath('//info/email', equalTo('email')))
+        assertThat(writer.toString(), hasXPath('//info/vendor/url', equalTo('vendor url')))
+        assertThat(writer.toString(), hasXPath('//info/vendor/logo', equalTo('vendor logo')))
     }
 
     @Test
@@ -136,11 +147,11 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathNotExists("//info/description", writer.toString());
-        assertXpathNotExists("//info/download-url", writer.toString());
-        assertXpathNotExists("//info/email", writer.toString());
-        assertXpathNotExists("//info/vendor/url", writer.toString());
-        assertXpathNotExists("//info/vendor/logo", writer.toString());
+        assertThat(writer.toString(), not(hasXPath('//info/description')))
+        assertThat(writer.toString(), not(hasXPath('//info/download-url')))
+        assertThat(writer.toString(), not(hasXPath('//info/email')))
+        assertThat(writer.toString(), not(hasXPath('//info/vendor/url')))
+        assertThat(writer.toString(), not(hasXPath('//info/vendor/logo')))
     }
 
     @Test
@@ -156,9 +167,8 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("true", "//deployment/@use-separate-classloader", writer.toString());
+        assertThat(writer.toString(), hasXPath('//deployment/@use-separate-classloader', equalTo('true')))
     }
-
 
     @Test
     public void writeOptionalSeparateClassloaderWhenFalse() {
@@ -174,7 +184,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("false", "//deployment/@use-separate-classloader", writer.toString());
+        assertThat(writer.toString(), hasXPath('//deployment/@use-separate-classloader', equalTo('false')))
     }
 
     @Test
@@ -189,8 +199,8 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathNotExists("//deployment", writer.toString());
-        assertXpathNotExists("//parameters", writer.toString());
+        assertThat(writer.toString(), not(hasXPath('//deployment')))
+        assertThat(writer.toString(), not(hasXPath('//parameters')))
     }
 
     @Test
@@ -209,9 +219,9 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("value1", "//parameters/parameter[@name='name1']", writer.toString());
-        assertXpathEvaluatesTo("value2", "//parameters/parameter[@name='name2']", writer.toString());
-        assertXpathEvaluatesTo("value3", "//parameters/parameter[@name='name3']", writer.toString());
+        assertThat(writer.toString(), hasXPath("//parameters/parameter[@name='name1']", equalTo('value1')))
+        assertThat(writer.toString(), hasXPath("//parameters/parameter[@name='name2']", equalTo('value2')))
+        assertThat(writer.toString(), hasXPath("//parameters/parameter[@name='name3']", equalTo('value3')))
     }
 
     @Test
@@ -229,7 +239,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("plugin-name", "//dependencies/plugin/@name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//dependencies/plugin/@name', equalTo('plugin-name')))
     }
 
     @Test
@@ -247,7 +257,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("tool-name", "//dependencies/tool/@name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//dependencies/tool/@name', equalTo('tool-name')))
     }
 
     @Test
@@ -264,7 +274,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathNotExists("//dependencies", writer.toString());
+        assertThat(writer.toString(), not(hasXPath('//dependencies')))
     }
 
     @Test
@@ -284,7 +294,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathNotExists("//dependencies", writer.toString());
+        assertThat(writer.toString(), not(hasXPath('//dependencies')))
     }
 
     @Test
@@ -301,8 +311,8 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("1234", "//requirements/@min-build", writer.toString());
-        assertXpathEvaluatesTo("2345", "//requirements/@max-build", writer.toString());
+        assertThat(writer.toString(), hasXPath('//requirements/@min-build', equalTo('1234')))
+        assertThat(writer.toString(), hasXPath('//requirements/@max-build', equalTo('2345')))
     }
 
     @Test
@@ -318,8 +328,8 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("1234", "//requirements/@min-build", writer.toString());
-        assertXpathNotExists("//requirements/@max-build", writer.toString());
+        assertThat(writer.toString(), hasXPath('//requirements/@min-build', equalTo('1234')))
+        assertThat(writer.toString(), not(hasXPath('//requirements/@max-build')))
     }
 
     @Test
@@ -335,10 +345,9 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("1234", "//requirements/@max-build", writer.toString());
-        assertXpathNotExists("//requirements/@min-build", writer.toString());
+        assertThat(writer.toString(), hasXPath('//requirements/@max-build', equalTo('1234')))
+        assertThat(writer.toString(), not(hasXPath('//requirements/@min-build')))
     }
-
 
     @Test
     public void writeRequirementsOnlyIfSpecified() {
@@ -352,6 +361,6 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathNotExists("//requirements", writer.toString());
+        assertThat(writer.toString(), not(hasXPath('//requirements')))
     }
 }

@@ -17,12 +17,15 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Test
+import org.xmlunit.matchers.EvaluateXPathMatcher
+import org.xmlunit.matchers.HasXPathMatcher
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathExists
-import static org.custommonkey.xmlunit.XMLAssert.assertXpathNotExists
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.equalTo
+import static org.hamcrest.Matchers.not
 
 public class AgentDescriptorGeneratorTest {
 
@@ -33,6 +36,14 @@ public class AgentDescriptorGeneratorTest {
     private AgentPluginDescriptor descriptor
 
     private AgentPluginDescriptorGenerator generator
+
+    private static HasXPathMatcher hasXPath(String xPath) {
+        return HasXPathMatcher.hasXPath(xPath)
+    }
+
+    private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
+        return EvaluateXPathMatcher.hasXPath(xPath, valueMatcher)
+    }
 
     @Before
     public void setup() {
@@ -49,7 +60,7 @@ public class AgentDescriptorGeneratorTest {
     public void writesRootNode() {
         generator.writeTo(writer)
 
-        assertXpathExists("/teamcity-agent-plugin", writer.toString())
+        assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin'))
     }
 
     @Test
@@ -58,8 +69,8 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathExists("/teamcity-agent-plugin/plugin-deployment", writer.toString())
-        assertXpathNotExists("/teamcity-agent-plugin/plugin-deployment/@use-separate-classloader", writer.toString())
+        assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin/plugin-deployment'))
+        assertThat(writer.toString(), not(hasXPath('/teamcity-agent-plugin/plugin-deployment/@use-separate-classloader')))
     }
 
     @Test
@@ -69,7 +80,7 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathEvaluatesTo('true', "//plugin-deployment/@use-separate-classloader", writer.toString())
+        assertThat(writer.toString(), hasXPath('//plugin-deployment/@use-separate-classloader', equalTo('true')))
     }
 
     @Test
@@ -79,7 +90,7 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathEvaluatesTo('false', "//plugin-deployment/@use-separate-classloader", writer.toString())
+        assertThat(writer.toString(), hasXPath('//plugin-deployment/@use-separate-classloader', equalTo('false')))
     }
 
     @Test
@@ -92,9 +103,9 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathExists("//plugin-deployment/layout/executable-files", writer.toString())
-        assertXpathEvaluatesTo('file1', "//executable-files/include[1]/@name", writer.toString())
-        assertXpathEvaluatesTo('file2', "//executable-files/include[2]/@name", writer.toString())
+        assertThat(writer.toString(), hasXPath('//plugin-deployment/layout/executable-files'))
+        assertThat(writer.toString(), hasXPath('//executable-files/include[1]/@name', equalTo('file1')))
+        assertThat(writer.toString(), hasXPath('//executable-files/include[2]/@name', equalTo('file2')))
     }
 
     @Test
@@ -103,8 +114,8 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathNotExists("//plugin-deployment/layout", writer.toString())
-        assertXpathNotExists("//plugin-deployment/layout/executable-files", writer.toString())
+        assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout')))
+        assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout/executable-files')))
     }
 
     @Test
@@ -113,7 +124,7 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathExists("/teamcity-agent-plugin/tool-deployment", writer.toString())
+        assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin/tool-deployment'))
     }
 
     @Test
@@ -126,9 +137,9 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathExists("//tool-deployment/layout/executable-files", writer.toString())
-        assertXpathEvaluatesTo('file1', "//executable-files/include[1]/@name", writer.toString())
-        assertXpathEvaluatesTo('file2', "//executable-files/include[2]/@name", writer.toString())
+        assertThat(writer.toString(), hasXPath('//tool-deployment/layout/executable-files'))
+        assertThat(writer.toString(), hasXPath('//executable-files/include[1]/@name', equalTo('file1')))
+        assertThat(writer.toString(), hasXPath('//executable-files/include[2]/@name', equalTo('file2')))
     }
 
     @Test
@@ -137,8 +148,8 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer);
 
-        assertXpathNotExists("//plugin-deployment/layout", writer.toString())
-        assertXpathNotExists("//plugin-deployment/layout/executable-files", writer.toString())
+        assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout')))
+        assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout/executable-files')))
     }
 
     @Test
@@ -149,7 +160,7 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("plugin-name", "//dependencies/plugin/@name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//dependencies/plugin/@name', equalTo('plugin-name')))
     }
 
     @Test
@@ -160,6 +171,6 @@ public class AgentDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertXpathEvaluatesTo("tool-name", "//dependencies/tool/@name", writer.toString());
+        assertThat(writer.toString(), hasXPath('//dependencies/tool/@name', equalTo('tool-name')))
     }
 }
