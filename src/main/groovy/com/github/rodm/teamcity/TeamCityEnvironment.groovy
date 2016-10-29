@@ -53,7 +53,12 @@ class TeamCityEnvironment {
         this.serverOptions.addAll(options)
     }
 
-    def serverOptions(String options) {
+    def setServerOptions(List<String> options) {
+        this.serverOptions.clear()
+        this.serverOptions.addAll(options)
+    }
+
+    def serverOptions(String... options) {
         this.serverOptions.addAll(options)
     }
 
@@ -66,7 +71,12 @@ class TeamCityEnvironment {
         this.agentOptions.add(options)
     }
 
-    def agentOptions(String options) {
-        this.agentOptions.add(options)
+    def setAgentOptions(List<String> options) {
+        this.agentOptions.clear()
+        this.agentOptions.addAll(options)
+    }
+
+    def agentOptions(String... options) {
+        this.agentOptions.addAll(options)
     }
 }

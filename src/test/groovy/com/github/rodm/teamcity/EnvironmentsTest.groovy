@@ -75,6 +75,26 @@ class EnvironmentsTest {
     }
 
     @Test
+    public void replaceDefaultServerOptionsWithMultipleValues() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        serverOptions = ['-Doption1=value1', '-Doption2=value2']
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        assertThat(environment.serverOptions, equalTo('-Doption1=value1 -Doption2=value2'))
+    }
+
+    @Test
     public void addToDefaultServerOptions() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
@@ -92,6 +112,26 @@ class EnvironmentsTest {
 
         def environment = extension.server.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption=test'))
+    }
+
+    @Test
+    public void addMultipleValuesToDefaultServerOptions() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        serverOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'))
     }
 
     @Test
@@ -114,6 +154,25 @@ class EnvironmentsTest {
         def environment = extension.server.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
     }
+    @Test
+    public void replaceDefaultAdentOptionsWithMultipleValues() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        agentOptions = ['-Doption1=value1', '-Doption2=value2']
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        assertThat(environment.agentOptions, equalTo('-Doption1=value1 -Doption2=value2'))
+    }
 
     @Test
     public void addToDefaultAgentOptions() {
@@ -135,5 +194,25 @@ class EnvironmentsTest {
         def environment = extension.server.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
         assertThat(environment.agentOptions.trim(), equalTo(expectedOptions))
+    }
+
+    @Test
+    public void addMultipleValuesToDefaultAgentOptions() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            server {
+                environments {
+                    test {
+                        agentOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
+                    }
+                }
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        def environment = extension.server.environments.getByName('test')
+        assertThat(environment.agentOptions, equalTo('-DadditionalOption1=value1 -DadditionalOption2=value2'))
     }
 }
