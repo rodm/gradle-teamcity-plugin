@@ -1,17 +1,26 @@
-# Gradle TeamCity plugin
+= Gradle TeamCity plugin
+:uri-teamcity-documentation: https://confluence.jetbrains.com/display/TCD9
+:uri-teamcity-environment: {uri-teamcity-documentation}/Development+Environment
+:uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
+:uri-teamcity-packaging: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
+:uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
+:plugin-version: 0.9.1
 
-The plugin provides support to [develop TeamCity plugins](https://confluence.jetbrains.com/display/TCD9/Extending+TeamCity), creating agent and server side archives, downloading and
+The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins], creating agent and server side archives, downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
-[![Build Status](https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master)](https://travis-ci.org/rodm/gradle-teamcity-plugin)
+image:https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/rodm/gradle-teamcity-plugin"]
 
 ## Using the plugin
 
 ### Apply the plugin to the build
 
-The plugin is published on the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server).
-The following code adds the plugin to your build script. 
+The plugin is published on the {uri-gradle-plugin-portal}[Gradle Plugin Portal].
+The following code adds the plugin to your build script.
 
+[source,groovy]
+[subs="attributes"]
+----
     buildscript {
       repositories {
         maven {
@@ -19,9 +28,10 @@ The following code adds the plugin to your build script.
         }
       }
       dependencies {
-        classpath "com.github.rodm:gradle-teamcity-plugin:0.9.1"
+        classpath "com.github.rodm:gradle-teamcity-plugin:{plugin-version}"
       }
     }
+----
 
 ### Plugins
 
@@ -59,15 +69,16 @@ and the TeamCity repository, http://download.jetbrains.com/teamcity-repository, 
 * `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
  The type property affects the type of descriptor generated.
 
-The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for [Packaging Plugins](https://confluence.jetbrains.com/display/TCD9/Plugins+Packaging#PluginsPackaging-PluginDescriptor)
+The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
+{uri-teamcity-packaging}[Packaging Plugins]
 
 ### TeamCity Server Plugin
 
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity server-api and
 tests-supprt dependencies to the compile and testCompile configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package the server side plugin archive if a plugin descriptor is defined. 
+provides only the tasks to package the server side plugin archive if a plugin descriptor is defined.
 
-The server plugin can be combined with the agent plugin but not with the Java Plugin. 
+The server plugin can be combined with the agent plugin but not with the Java Plugin.
 
 ### TeamCity Server Plugin Configuration
 
@@ -86,14 +97,14 @@ An `environments` configuration block allows multiple TeamCity environments to b
 * `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
 * `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
 * `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
- these plguin development settings are described on the [Development Environment](https://confluence.jetbrains.com/display/TCD9/Development+Environment) page.
+ these plguin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
 * `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
 
 ### TeamCity Server Plugin Tasks
 
 * `serverPlugin` : Builds and packages a TeamCity plugin.
 * `generateDescriptor` : If the descriptor is defined in the build script this task is enabled and will
-output the descriptor to the build directory. 
+output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
 the file to the build directory. ('build/descriptor/server')
 
@@ -119,19 +130,22 @@ For each environment the following tasks are created based on the environment na
 
 Plugin descriptor defined in the build script.
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
-        // Use TeamCity 8.1 API 
+        // Use TeamCity 8.1 API
         version = '8.1.5'
-    
+
         // Plugin descriptor
         server {
             descriptor {
                 // required properties
                 name = project.name
-                displayName = 'TeamCity Plugin'        
+                displayName = 'TeamCity Plugin'
                 version = project.version
                 vendorName = 'vendor name'
-                
+
                 // optional properties
                 description = 'Example TeamCity plugin'
                 downloadUrl = 'download url'
@@ -139,15 +153,15 @@ Plugin descriptor defined in the build script.
                 vendorUrl = 'vendor url'
                 vendorLogo = 'vendor logo'
                 useSeparateClassloader = true
-                
+
                 minimumBuild = '10'
                 maximumBuild = '20'
-        
+
                 parameters {
                     parameter 'name1', 'value1'
                     parameter 'name2', 'value2'
                 }
-                
+
                 dependencies {
                     plugin 'plugin1-name'
                     plugin 'plugin2-name'
@@ -164,33 +178,45 @@ Plugin descriptor defined in the build script.
             }
         }
     }
+----
 
 Plugin descriptor defined in an external file at the root of the project. A map of tokens to be replaced in the
 descriptor file can be provided using the `tokens` property.
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
-        // Use TeamCity 8.1 API 
-        version = '8.1.5'    
-        
+        // Use TeamCity 8.1 API
+        version = '8.1.5'
+
         server {
             // Locate the plugin descriptor in the root directory of the project
             descriptor = file('teamcity-plugin.xml')
             tokens = [VERSION: project.version, VENDOR_NAME: 'vendor name']
         }
     }
+----
 
 If the Gradle project only has the TeamCity Server Plugin applied the server configuration block can be omitted.
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
-        // Use TeamCity 8.1 API 
-        version = '8.1.5'   
-         
+        // Use TeamCity 8.1 API
+        version = '8.1.5'
+
         // Locate the plugin descriptor in the root directory of the project
         descriptor = file('teamcity-plugin.xml')
     }
+----
 
 Environments allow a plugin to be tested against multiple versions for TeamCity.
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
         // Use TeamCity 8.1 API
         version = '8.1'
@@ -235,26 +261,30 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
             }
         }
     }
+----
 
 ### TeamCity Agent Plugin
 
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity agent-api and
 tests-supprt dependencies to the compile and testCompile configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined. 
+provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
 
 ### TeamCity Agent Plugin Tasks
 
 * `agentPlugin` : Builds and packages the agent side of a TeamCity plugin. The artifacts defined on the 'agent'
- configuration are added to the lib directory of the agent plugin archive. 
+ configuration are added to the lib directory of the agent plugin archive.
 * `generateAgentDescriptor` : If the descriptor is defined in the build script this task is enabled and will
-output the descriptor to the build directory. 
+output the descriptor to the build directory.
 * `processAgentDescriptor` : If the descriptor is defined as an external file this task will copy the file to the build
 directory. ('build/descriptor/agent')
 
 ### Examples
 
-Agent side plugin descriptor 
+Agent side plugin descriptor
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
         version = teamcityVersion
 
@@ -274,9 +304,13 @@ Agent side plugin descriptor
             }
         }
     }
+----
 
 Agent tool descriptor
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
         version = teamcityVersion
 
@@ -302,9 +336,13 @@ Agent tool descriptor
             }
         }
     }
+----
 
 If the Gradle project only has the TeamCity Agent Plugin applied the agent configuration block can be omitted.
 
+[source,groovy]
+[subs="attributes"]
+----
     teamcity {
         version = teamcityVersion
 
@@ -322,6 +360,7 @@ If the Gradle project only has the TeamCity Agent Plugin applied the agent confi
             }
         }
     }
+----
 
 ## Samples
 
@@ -334,12 +373,12 @@ The samples directory contains some simple examples of using the plugin.
 
 The following projects use the plugin.
 
-* [AWS CodeDeploy](https://github.com/JetBrains/teamcity-aws-codedeploy-plugin) plugin
-* [AWS CodePipeline](https://github.com/JetBrains/teamcity-aws-codepipeline-plugin) plugin
-* [Rust and Cargo Support](https://github.com/JetBrains/teamcity-rust-plugin) plugin
-* [Framework for process output parsers](https://github.com/JetBrains/process-output-parsers) plugin
-* [TeamCity oAuth authentication](https://github.com/pwielgolaski/teamcity-oauth) plugin
-* [Docker Deploy](https://github.com/codeamatic/teamcity-docker-runner) plugin
-* [Teamcity web parameters](https://github.com/grundic/teamcity-web-parameters) plugin
-* [JMX Plugin](https://github.com/rodm/teamcity-jmx-plugin) plugin
-* [JVM Monitor Plugin](https://github.com/rodm/teamcity-jvm-monitor-plugin) plugin
+* https://github.com/JetBrains/teamcity-aws-codedeploy-plugin[AWS CodeDeploy] plugin
+* https://github.com/JetBrains/teamcity-aws-codepipeline-plugin[AWS CodePipeline] plugin
+* https://github.com/JetBrains/teamcity-rust-plugin[Rust and Cargo Support] plugin
+* https://github.com/JetBrains/process-output-parsers[Framework for process output parsers] plugin
+* https://github.com/pwielgolaski/teamcity-oauth[TeamCity oAuth authentication] plugin
+* https://github.com/codeamatic/teamcity-docker-runner[Docker Deploy] plugin
+* https://github.com/grundic/teamcity-web-parameters[Teamcity web parameters] plugin
+* https://github.com/rodm/teamcity-jmx-plugin[JMX Plugin] plugin
+* https://github.com/rodm/teamcity-jvm-monitor-plugin[JVM Monitor Plugin] plugin
