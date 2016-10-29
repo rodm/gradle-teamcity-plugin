@@ -5,6 +5,8 @@
 :uri-teamcity-packaging: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
 :uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
 :plugin-version: 0.9.1
+:default-api-version: 9.0
+:example-api-version: 8.1
 
 The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins], creating agent and server side archives, downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
@@ -62,7 +64,7 @@ The following properties are defined in the `teamcity` configuration block. The 
 the TeamCity server-api added to the `compile` configuration and the version downloaded and installed. The plugin
 descriptor can be specified as a path to a file or by a configuration block within the build script.
 
-* `version` : The version of the TeamCity API to build against. Defaults to '9.0'.
+* `version` : The version of the TeamCity API to build against. Defaults to '{default-api-version}'.
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
 and the TeamCity repository, http://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
  flag to false allows a local repository to be used for resolving dependencies.
@@ -134,8 +136,8 @@ Plugin descriptor defined in the build script.
 [subs="attributes"]
 ----
     teamcity {
-        // Use TeamCity 8.1 API
-        version = '8.1.5'
+        // Use TeamCity {example-api-version} API
+        version = '{example-api-version}'
 
         // Plugin descriptor
         server {
@@ -187,8 +189,8 @@ descriptor file can be provided using the `tokens` property.
 [subs="attributes"]
 ----
     teamcity {
-        // Use TeamCity 8.1 API
-        version = '8.1.5'
+        // Use TeamCity {example-api-version} API
+        version = '{example-api-version}'
 
         server {
             // Locate the plugin descriptor in the root directory of the project
@@ -204,8 +206,8 @@ If the Gradle project only has the TeamCity Server Plugin applied the server con
 [subs="attributes"]
 ----
     teamcity {
-        // Use TeamCity 8.1 API
-        version = '8.1.5'
+        // Use TeamCity {example-api-version} API
+        version = '{example-api-version}'
 
         // Locate the plugin descriptor in the root directory of the project
         descriptor = file('teamcity-plugin.xml')
@@ -218,8 +220,8 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
 [subs="attributes"]
 ----
     teamcity {
-        // Use TeamCity 8.1 API
-        version = '8.1'
+        // Use TeamCity {example-api-version} API
+        version = '{example-api-version}'
 
         server {
             // Locate the plugin descriptor in the root directory of the project
