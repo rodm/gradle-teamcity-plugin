@@ -17,12 +17,10 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Test
-import org.xmlunit.matchers.EvaluateXPathMatcher
-import org.xmlunit.matchers.HasXPathMatcher
 
+import static XPathMatcher.hasXPath
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.not
@@ -36,14 +34,6 @@ public class AgentDescriptorGeneratorTest {
     private AgentPluginDescriptor descriptor
 
     private AgentPluginDescriptorGenerator generator
-
-    private static HasXPathMatcher hasXPath(String xPath) {
-        return HasXPathMatcher.hasXPath(xPath)
-    }
-
-    private static EvaluateXPathMatcher hasXPath(String xPath, Matcher<String> valueMatcher) {
-        return EvaluateXPathMatcher.hasXPath(xPath, valueMatcher)
-    }
 
     @Before
     public void setup() {
