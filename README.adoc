@@ -4,7 +4,7 @@
 :uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
 :uri-teamcity-packaging: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
 :uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
-:plugin-version: 0.9.1
+:plugin-version: 0.10
 :default-api-version: 9.0
 :example-api-version: 8.1
 
