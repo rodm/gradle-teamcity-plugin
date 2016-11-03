@@ -62,12 +62,12 @@ teamcity {
             }
 
             teamcity91 {
-                version = '9.1.6'
+                version = '9.1.7'
                 javaHome = file(java7Home)
             }
 
             teamcity10 {
-                version = '10.0'
+                version = '10.0.2'
                 javaHome = file(java8Home)
             }
         }
