@@ -45,29 +45,29 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildInfoNode(Node root) {
-        Node info = new Node(root, "info")
+        Node info = root.appendNode('info')
         def name = descriptor.getName() ? descriptor.getName() : defaults.name
         def displayName = descriptor.getDisplayName() ? descriptor.getDisplayName() : defaults.displayName
         def version = descriptor.getVersion() ? descriptor.getVersion() : defaults.version
-        new Node(info, "name", name)
-        new Node(info, "display-name", displayName)
-        new Node(info, "version", version)
+        info.appendNode('name', name)
+        info.appendNode('display-name', displayName)
+        info.appendNode('version', version)
         if (descriptor.getDescription())
-            new Node(info, "description", descriptor.getDescription())
+            info.appendNode('description', descriptor.getDescription())
         if (descriptor.getDownloadUrl())
-            new Node(info, "download-url", descriptor.getDownloadUrl())
+            info.appendNode('download-url', descriptor.getDownloadUrl())
         if (descriptor.getEmail())
-            new Node(info, "email", descriptor.getEmail())
+            info.appendNode('email', descriptor.getEmail())
         buildVendorNode(info)
     }
 
     private void buildVendorNode(Node info) {
-        Node vendor = new Node(info, "vendor")
-        new Node(vendor, "name", descriptor.getVendorName());
+        Node vendor = info.appendNode('vendor')
+        vendor.appendNode('name', descriptor.getVendorName())
         if (descriptor.getVendorUrl())
-            new Node(vendor, "url", descriptor.getVendorUrl())
+            vendor.appendNode('url', descriptor.getVendorUrl())
         if (descriptor.getVendorLogo())
-            new Node(vendor, "logo", descriptor.getVendorLogo())
+            vendor.appendNode('logo', descriptor.getVendorLogo())
     }
 
     private void buildRequirementsNode(Node root) {
@@ -77,19 +77,19 @@ class ServerPluginDescriptorGenerator {
         if (descriptor.getMaximumBuild())
             attributes << ['max-build': descriptor.getMaximumBuild()]
         if (attributes.size() > 0)
-            new Node(root, "requirements", attributes)
+            root.appendNode('requirements', attributes)
     }
 
     private void buildDeploymentNode(Node root) {
         if (descriptor.getUseSeparateClassloader() != null)
-            new Node(root, "deployment", ['use-separate-classloader': descriptor.getUseSeparateClassloader()])
+            root.appendNode('deployment', ['use-separate-classloader': descriptor.getUseSeparateClassloader()])
     }
 
     private void buildParametersNode(Node root) {
         if (descriptor.getParameters().parameters.size() > 0) {
-            Node parameters = new Node(root, "parameters")
+            Node parameters = root.appendNode('parameters')
             descriptor.getParameters().parameters.each { name, value ->
-                new Node(parameters, "parameter", ['name': name], value)
+                parameters.appendNode('parameter', ['name': name], value)
             }
         }
     }
@@ -97,18 +97,18 @@ class ServerPluginDescriptorGenerator {
     private void buildDependenciesNode(Node root) {
         if (getMajorVersion(version) >= 9) {
             if (descriptor.getDependencies().hasDependencies()) {
-                Node dependencies = new Node(root, 'dependencies')
+                Node dependencies = root.appendNode('dependencies')
                 descriptor.getDependencies().plugins.each { name ->
-                    new Node(dependencies, "plugin", ['name': name])
+                    dependencies.appendNode('plugin', ['name': name])
                 }
                 descriptor.getDependencies().tools.each { name ->
-                    new Node(dependencies, "tool", ['name': name])
+                    dependencies.appendNode('tool', ['name': name])
                 }
             }
         }
     }
 
-    private int getMajorVersion(String version) {
+    private static int getMajorVersion(String version) {
         String[] parts = version.split('\\.')
         return parts[0] as int
     }

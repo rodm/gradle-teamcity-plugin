@@ -264,7 +264,7 @@ public class ServerDescriptorGeneratorTest {
 
         generator.writeTo(writer)
 
-        assertThat(writer.toString(), not(XPathMatcher.hasXPath('//dependencies')))
+        assertThat(writer.toString(), not(hasXPath('//dependencies')))
     }
 
     @Test
