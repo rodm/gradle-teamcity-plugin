@@ -288,6 +288,26 @@ public class ServerDescriptorGeneratorTest {
     }
 
     @Test
+    public void writeDependenciesForTeamCity10() {
+        project.teamcity {
+            version = '10.0'
+            descriptor {
+                dependencies {
+                    plugin 'plugin-name'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
+        ServerPluginDescriptor descriptor = extension.getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        StringWriter writer = new StringWriter();
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//dependencies'))
+    }
+
+    @Test
     public void writeRequirements() {
         project.teamcity {
             descriptor {

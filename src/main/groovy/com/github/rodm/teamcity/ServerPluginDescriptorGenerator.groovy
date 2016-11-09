@@ -95,7 +95,7 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (version.startsWith("9")) {
+        if (getMajorVersion(version) >= 9) {
             if (descriptor.getDependencies().hasDependencies()) {
                 Node dependencies = new Node(root, 'dependencies')
                 descriptor.getDependencies().plugins.each { name ->
@@ -106,5 +106,10 @@ class ServerPluginDescriptorGenerator {
                 }
             }
         }
+    }
+
+    private int getMajorVersion(String version) {
+        String[] parts = version.split('\\.')
+        return parts[0] as int
     }
 }
