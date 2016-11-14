@@ -110,14 +110,6 @@ output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
 the file to the build directory. ('build/descriptor/server')
 
-* `deployPlugin` : Deploys the plugin archive to a local TeamCity server, requires the `dataDir` property to be defined.
-* `undeployPlugin` : Undeploys the plugin archive from a local TeamCity server, requires the `dataDir` property to be defined.
-* `startSever` : Starts the TeamCity Server, requires the `homeDir` and `dataDir` properties to be defined.
-* `stopServer` : Stops the TeamCity Server, requires the `homeDir` property to be defined.
-* `startAgent` : Starts the default TeamCity Build Agent, requires the `homeDir` property to be defined.
-* `stopAgent` : Stops the default TeamCity Build Agent, requires the `homeDir` property to be defined.
-* `installTeamCity` : Downloads and installs TeamCity, this tasks uses the `downloadBaseUrl` and the `homeDir` properties.
-
 For each environment the following tasks are created based on the environment name:
 
 * `deployPluginTo<envionment>` : Deploys the plugin archive to the TeamCity server for the environment, requires the environment `dataDir` property.
