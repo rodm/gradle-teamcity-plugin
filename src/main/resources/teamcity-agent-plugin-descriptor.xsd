@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+  <xs:element name="teamcity-agent-plugin">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="1">
+          <xs:element name="plugin-deployment" minOccurs="1" maxOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="layout" type="TFileAttributes" minOccurs="0" maxOccurs="1"/>
+              </xs:sequence>
+              <xs:attribute name="use-separate-classloader" type="xs:boolean" default="false" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="tool-deployment" minOccurs="1" maxOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="layout" type="TFileAttributes" minOccurs="0" maxOccurs="1"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+
+        <xs:element name="dependencies" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="plugin" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="tool" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:complexType name="TFileAttributes">
+    <xs:sequence>
+      <xs:element name="executable-files" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="include" minOccurs="1" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

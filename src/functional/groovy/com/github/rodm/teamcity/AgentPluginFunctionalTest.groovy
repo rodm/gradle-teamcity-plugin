@@ -108,8 +108,7 @@ public class AgentPluginFunctionalTest {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
-        descriptorFile << """
-            <?xml version="1.0" encoding="UTF-8"?>
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
             <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                    xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
                 <plugin-deployment use-separate-classloader="true"/>
@@ -127,6 +126,39 @@ public class AgentPluginFunctionalTest {
         assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
     }
 
+    @Test
+    public void agentPluginFailsWithMissingDescriptorFile() {
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .buildAndFail()
+
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))
+        assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
+    }
+
+    @Test
+    public void invalidAgentPluginDescriptor() {
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
+            <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+            </teamcity-agent-plugin>
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("agentPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
+    }
 
     @Test
     public void agentPluginNoWarningsWithDefinitionFile() {
@@ -157,20 +189,6 @@ public class AgentPluginFunctionalTest {
                 .build();
 
         assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
-    }
-
-    @Test
-    public void agentPluginFailsWithMissingDescriptorFile() {
-        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
-
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .buildAndFail()
-
-        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))
-        assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
     }
 
     @Test

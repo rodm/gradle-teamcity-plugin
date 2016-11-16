@@ -22,6 +22,10 @@ import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
+import javax.xml.XMLConstants
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
+
 class TeamCityAgentPlugin extends TeamCityPlugin {
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
@@ -61,6 +65,16 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
+        }
+        packagePlugin.doLast { task ->
+            def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+            URL url = this.getClass().getResource('/teamcity-agent-plugin-descriptor.xsd')
+            def schema = factory.newSchema(url)
+            def descriptorFile = new File(project.getBuildDir(), AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
+            def validator = schema.newValidator()
+            def errorHandler = new PluginDescriptorErrorHandler(project, task.getPath())
+            validator.setErrorHandler(errorHandler)
+            validator.validate(new StreamSource(new FileReader(descriptorFile)))
         }
         packagePlugin.with(extension.agent.files)
         packagePlugin.onlyIf { extension.agent.descriptor != null }
