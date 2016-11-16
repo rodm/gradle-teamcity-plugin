@@ -114,8 +114,7 @@ public class ServerConfigurationFunctionalTest {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
-        descriptorFile << """
-            <?xml version="1.0" encoding="UTF-8"?>
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
             <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
                 <info>
@@ -253,6 +252,29 @@ public class ServerConfigurationFunctionalTest {
 
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(FAILED))
         assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
+    }
+
+    @Test
+    public void invalidServerPluginDescriptor() {
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml");
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
+            <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+                <info>
+                    <name>test-plugin</name>
+                </info>
+            </teamcity-plugin>
+        """
+
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments("serverPlugin")
+                .withPluginClasspath()
+                .build();
+
+        assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
     }
 
     @Test

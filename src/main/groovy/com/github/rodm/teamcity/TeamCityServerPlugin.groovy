@@ -29,6 +29,13 @@ import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
+import org.xml.sax.ErrorHandler
+import org.xml.sax.SAXException
+import org.xml.sax.SAXParseException
+
+import javax.xml.XMLConstants
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
 
 class TeamCityServerPlugin extends TeamCityPlugin {
 
@@ -84,6 +91,16 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
+        }
+        packagePlugin.doLast { task ->
+            def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+            URL url = this.getClass().getResource('/teamcity-server-plugin-descriptor.xsd')
+            def schema = factory.newSchema(url)
+            def descriptorFile = new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
+            def validator = schema.newValidator()
+            def errorHandler = new PluginDescriptorErrorHandler(project, task.getPath())
+            validator.setErrorHandler(errorHandler)
+            validator.validate(new StreamSource(new FileReader(descriptorFile)))
         }
         packagePlugin.with(extension.server.files)
         packagePlugin.onlyIf { extension.server.descriptor != null }
@@ -186,5 +203,36 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     private String toFilename(String url) {
         return url[(url.lastIndexOf('/') + 1)..-1]
+    }
+
+    static class PluginDescriptorErrorHandler implements ErrorHandler {
+
+        private Project project
+
+        private String task
+
+        PluginDescriptorErrorHandler(Project project, String task) {
+            this.project = project
+            this.task = task
+        }
+
+        @Override
+        void warning(SAXParseException exception) throws SAXException {
+            outputMessage(exception)
+        }
+
+        @Override
+        void error(SAXParseException exception) throws SAXException {
+            outputMessage(exception)
+        }
+
+        @Override
+        void fatalError(SAXParseException exception) throws SAXException {
+            outputMessage(exception)
+        }
+
+        private void outputMessage(SAXParseException exception) {
+            project.logger.warn(task + ': Plugin descriptor is invalid: ' + exception.message)
+        }
     }
 }
