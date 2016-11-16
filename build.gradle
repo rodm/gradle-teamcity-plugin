@@ -42,10 +42,14 @@ sourceSets {
             srcDir 'src/functional/groovy'
         }
     }
+    samples {
+        compileClasspath += main.output + configurations.testRuntime
+        runtimeClasspath += main.output + configurations.testRuntime
+    }
 }
 
 gradlePlugin {
-    testSourceSets sourceSets.functionalTest
+    testSourceSets sourceSets.functionalTest, sourceSets.samples
 }
 
 task functionalTest(type: Test) {
@@ -57,6 +61,18 @@ task functionalTest(type: Test) {
     reports {
         html.destination = project.file("$html.destination/functional")
         junitXml.destination = project.file("$junitXml.destination/functional")
+    }
+}
+
+task samplesTest(type: Test, dependsOn: 'publishToMavenLocal') {
+    description = 'Runs the sample builds.'
+    group = 'verification'
+    testClassesDir = sourceSets.samples.output.classesDir
+    classpath = sourceSets.samples.runtimeClasspath
+
+    reports {
+        html.destination = project.file("$html.destination/samples")
+        junitXml.destination = project.file("$junitXml.destination/samples")
     }
 }
 
