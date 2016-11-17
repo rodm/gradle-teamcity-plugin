@@ -78,6 +78,14 @@ public class AgentPluginFunctionalTest {
         buildFile = testProjectDir.newFile("build.gradle")
     }
 
+    private BuildResult executeBuild(String... args = ['agentPlugin']) {
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments(args)
+                .withPluginClasspath()
+                .build()
+    }
+
     @Test
     public void agentPluginBuildAndPackage() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
@@ -87,11 +95,7 @@ public class AgentPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":processAgentDescriptor").getOutcome(), SKIPPED)
@@ -115,11 +119,7 @@ public class AgentPluginFunctionalTest {
             </teamcity-agent-plugin>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processAgentDescriptor").getOutcome(), SUCCESS)
@@ -151,11 +151,7 @@ public class AgentPluginFunctionalTest {
             </teamcity-agent-plugin>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
     }
@@ -168,11 +164,7 @@ public class AgentPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-agent-plugin-example.xml')
         definitionFile << '<beans></beans>'
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
     }
@@ -182,11 +174,7 @@ public class AgentPluginFunctionalTest {
     public void agentPluginWarnsAboutMissingDefinitionFile() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
     }
@@ -207,11 +195,7 @@ public class AgentPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-agent-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleBuildFeature was not found in the jar')))
@@ -226,11 +210,7 @@ public class AgentPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-agent-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-agent-plugin-test.xml', 'example.ExampleBuildFeature')
@@ -258,11 +238,7 @@ public class AgentPluginFunctionalTest {
             </beans>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("agentPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleBuildFeature was not found in the jar')))

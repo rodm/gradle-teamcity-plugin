@@ -41,6 +41,14 @@ public class AgentAndServerPluginFunctionalTest {
         buildFile = testProjectDir.newFile("build.gradle")
     }
 
+    private BuildResult executeBuild(String... args = ['build']) {
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments(args)
+                .withPluginClasspath()
+                .build()
+    }
+
     @Test
     public void agentAndServerPluginPackage() {
         buildFile << """
@@ -74,11 +82,7 @@ public class AgentAndServerPluginFunctionalTest {
         testProjectDir.newFile('lib/agent-lib.jar')
         testProjectDir.newFile('lib/server-lib.jar')
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("build")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
         assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
@@ -94,7 +98,6 @@ public class AgentAndServerPluginFunctionalTest {
         assertThat(entries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(entries, hasItem('server/server-lib.jar'))
     }
-
 
     @Test
     public void multiProjectPlugin() {
@@ -154,11 +157,7 @@ public class AgentAndServerPluginFunctionalTest {
         testProjectDir.newFile('lib/agent-lib.jar')
         testProjectDir.newFile('lib/server-lib.jar')
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("build")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
         assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)

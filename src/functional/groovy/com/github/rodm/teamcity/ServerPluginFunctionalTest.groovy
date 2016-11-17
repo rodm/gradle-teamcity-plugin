@@ -84,6 +84,14 @@ public class ServerPluginFunctionalTest {
         buildFile = testProjectDir.newFile("build.gradle")
     }
 
+    private BuildResult executeBuild(String... args = ['serverPlugin']) {
+        GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot())
+                .withArguments(args)
+                .withPluginClasspath()
+                .build()
+    }
+
     @Test
     public void serverPluginBuildAndPackage() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
@@ -93,11 +101,7 @@ public class ServerPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":processServerDescriptor").getOutcome(), SKIPPED)
@@ -123,11 +127,7 @@ public class ServerPluginFunctionalTest {
             </teamcity-plugin>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processServerDescriptor").getOutcome(), SUCCESS)
@@ -142,11 +142,7 @@ public class ServerPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-server-plugin-example.xml')
         definitionFile << '<beans></beans>'
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
     }
@@ -155,11 +151,7 @@ public class ServerPluginFunctionalTest {
     public void serverPluginWarnsAboutMissingDefinitionFile() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), containsString(NO_DEFINITION_WARNING))
     }
@@ -180,11 +172,7 @@ public class ServerPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
@@ -198,11 +186,7 @@ public class ServerPluginFunctionalTest {
         File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         String expectedWarning = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin-test.xml', 'example.ExampleServerPlugin')
@@ -230,11 +214,7 @@ public class ServerPluginFunctionalTest {
             </beans>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleServerPlugin was not found in the jar')))
@@ -268,11 +248,7 @@ public class ServerPluginFunctionalTest {
             </teamcity-plugin>
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .build();
+        BuildResult result = executeBuild()
 
         assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
     }
@@ -299,12 +275,7 @@ public class ServerPluginFunctionalTest {
             gradle.addListener(new DummyTeamcityPropertiesListener())
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("--init-script", "init.gradle", "--refresh-dependencies", "serverPlugin")
-                .withPluginClasspath()
-                .withDebug(true)
-                .build()
+        BuildResult result = executeBuild('--init-script', 'init.gradle', '--refresh-dependencies', 'serverPlugin')
 
         assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
     }
@@ -340,11 +311,7 @@ public class ServerPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("build", "startTeamcityServer")
-                .withPluginClasspath()
-                .build()
+        BuildResult result = executeBuild('build', 'startTeamcityServer')
 
         File pluginFile = new File(dataDir, 'plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
@@ -372,11 +339,7 @@ public class ServerPluginFunctionalTest {
             }
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments("tasks")
-                .withPluginClasspath()
-                .build()
+        BuildResult result = executeBuild('tasks')
 
         assertThat(result.output, containsString('deployPluginToTeamcity'))
         assertThat(result.output, containsString('undeployPluginFromTeamcity'))
@@ -419,11 +382,7 @@ public class ServerPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments('build', 'startTeamcity9Server')
-                .withPluginClasspath()
-                .build()
+        BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
         File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
@@ -466,11 +425,7 @@ public class ServerPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments('build', 'startTeamcity9Server')
-                .withPluginClasspath()
-                .build()
+        BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
         File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
