@@ -123,6 +123,8 @@ public class ServerPluginFunctionalTest {
                              xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
                 <info>
                     <name>test-plugin</name>
+                    <display-name>test-plugin</display-name>
+                    <version>1.0</version>
                 </info>
             </teamcity-plugin>
         """
@@ -132,6 +134,7 @@ public class ServerPluginFunctionalTest {
         assertEquals(result.task(":generateServerDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processServerDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.getOutput(), not(containsString("Plugin descriptor is invalid")))
     }
 
     @Test

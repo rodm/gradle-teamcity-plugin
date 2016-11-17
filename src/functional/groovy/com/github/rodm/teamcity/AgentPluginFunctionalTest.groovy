@@ -124,6 +124,7 @@ public class AgentPluginFunctionalTest {
         assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SKIPPED)
         assertEquals(result.task(":processAgentDescriptor").getOutcome(), SUCCESS)
         assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
+        assertThat(result.getOutput(), not(containsString("Plugin descriptor is invalid")))
     }
 
     @Test
