@@ -35,7 +35,7 @@ import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.junit.Assert.assertTrue
 
-public class ServerConfigurationFunctionalTest {
+public class ServerPluginFunctionalTest {
 
     static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
         plugins {
