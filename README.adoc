@@ -192,20 +192,6 @@ descriptor file can be provided using the `tokens` property.
     }
 ----
 
-If the Gradle project only has the TeamCity Server Plugin applied the server configuration block can be omitted.
-
-[source,groovy]
-[subs="attributes"]
-----
-    teamcity {
-        // Use TeamCity {example-api-version} API
-        version = '{example-api-version}'
-
-        // Locate the plugin descriptor in the root directory of the project
-        descriptor = file('teamcity-plugin.xml')
-    }
-----
-
 Environments allow a plugin to be tested against multiple versions for TeamCity.
 
 [source,groovy]
@@ -327,30 +313,6 @@ Agent tool descriptor
                 into('tooldir') {
                     from('tooldir')
                 }
-            }
-        }
-    }
-----
-
-If the Gradle project only has the TeamCity Agent Plugin applied the agent configuration block can be omitted.
-
-[source,groovy]
-[subs="attributes"]
-----
-    teamcity {
-        version = teamcityVersion
-
-        descriptor {
-            pluginDeployment {
-                useSeparateClassloader = false
-                executableFiles {
-                    include 'file1'
-                    include 'file2'
-                }
-            }
-            dependencies {
-                plugin 'plugin-name'
-                tool 'tool-name'
             }
         }
     }

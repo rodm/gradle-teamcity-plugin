@@ -9,9 +9,11 @@ dependencies {
 teamcity {
     version = teamcityVersion
 
-    descriptor {
-        pluginDeployment {
-            useSeparateClassloader = true
+    agent {
+        descriptor {
+            pluginDeployment {
+                useSeparateClassloader = true
+            }
         }
     }
 }
