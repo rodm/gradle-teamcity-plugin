@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.rodm.teamcity-agent'
 
 teamcity {
-    version = teamcityVersion
+    // API version is inherited from the root project
 
     descriptor {
         pluginDeployment {

@@ -70,6 +70,21 @@ public class TeamCityServerPluginTest {
     }
 
     @Test
+    public void subprojectInheritsVersion() {
+        Project rootProject = project
+
+        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+        rootProject.teamcity {
+            version = '8.1.5'
+        }
+
+        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
+        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+        assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
+    }
+
+    @Test
     public void configurationsCreatedWithoutJavaPlugin() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
