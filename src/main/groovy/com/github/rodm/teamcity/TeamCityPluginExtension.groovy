@@ -29,12 +29,15 @@ class TeamCityPluginExtension {
 
     private ServerPluginConfiguration server
 
+    private TeamCityEnvironments environments
+
     private Project project
 
     TeamCityPluginExtension(Project project) {
         this.project = project
+        this.environments = new TeamCityEnvironments(project)
         this.agent = new AgentPluginConfiguration(project.copySpec {})
-        this.server = new ServerPluginConfiguration(project)
+        this.server = new ServerPluginConfiguration(project, environments)
     }
 
     def getAgent() {
@@ -103,5 +106,9 @@ class TeamCityPluginExtension {
         } else {
             server.tokens tokens
         }
+    }
+
+    void environments(Closure config) {
+        ConfigureUtil.configure(config, environments)
     }
 }

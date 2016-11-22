@@ -27,10 +27,10 @@ class ServerPluginConfiguration extends PluginConfiguration {
 
     private Project project
 
-    ServerPluginConfiguration(Project project) {
+    ServerPluginConfiguration(Project project, TeamCityEnvironments environments) {
         super(project.copySpec {})
         this.project = project
-        this.environments = new TeamCityEnvironments(project)
+        this.environments = environments
     }
 
     def descriptor(Closure closure) {
