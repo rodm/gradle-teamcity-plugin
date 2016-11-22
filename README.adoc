@@ -112,7 +112,7 @@ the file to the build directory. ('build/descriptor/server')
 
 For each environment the following tasks are created based on the environment name:
 
-* `deployPluginTo<envionment>` : Deploys the plugin archive to the TeamCity server for the environment, requires the environment `dataDir` property.
+* `deployPluginTo<environment>` : Deploys the plugin archive to the TeamCity server for the environment, requires the environment `dataDir` property.
 * `undeployPluginFrom<environment>` : Undeploys the plugin archive from the TeamCity server for the environment, requires the environment `dataDir` property.
 * `start<environment>Sever` : Starts the TeamCity Server for the environment, requires the environment `homeDir` and `dataDir` properties to be defined.
 * `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
