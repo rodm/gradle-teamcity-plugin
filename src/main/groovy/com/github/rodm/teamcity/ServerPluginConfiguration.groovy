@@ -22,7 +22,8 @@ import org.gradle.util.ConfigureUtil
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
-    TeamCityEnvironments environments
+    @Delegate
+    private TeamCityEnvironments environments
 
     private Project project
 
@@ -35,42 +36,6 @@ class ServerPluginConfiguration extends PluginConfiguration {
     def descriptor(Closure closure) {
         descriptor = new ServerPluginDescriptor()
         ConfigureUtil.configure(closure, descriptor)
-    }
-
-    String getDownloadsDir() {
-        environments.getDownloadsDir()
-    }
-
-    void setDownloadsDir(String downloadsDir) {
-        environments.setDownloadsDir(downloadsDir)
-    }
-
-    String getBaseDownloadUrl() {
-        environments.getBaseDownloadUrl()
-    }
-
-    void setBaseDownloadUrl(String baseDownloadUrl) {
-        environments.setBaseDownloadUrl(baseDownloadUrl)
-    }
-
-    String getBaseDataDir() {
-        environments.getBaseDataDir()
-    }
-
-    void setBaseDataDir(String baseDataDir) {
-        environments.setBaseDataDir(baseDataDir)
-    }
-
-    String getBaseHomeDir() {
-        environments.getBaseHomeDir()
-    }
-
-    void setBaseHomeDir(String baseHomeDir) {
-        environments.setBaseHomeDir(baseHomeDir)
-    }
-
-    def getEnvironments() {
-        environments.environments
     }
 
     void environments(Closure config) {
