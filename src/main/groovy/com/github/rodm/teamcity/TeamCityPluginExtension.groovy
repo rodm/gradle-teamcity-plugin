@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.InvalidUserDataException
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
@@ -32,10 +31,10 @@ class TeamCityPluginExtension {
 
     private Project project
 
-    TeamCityPluginExtension(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
+    TeamCityPluginExtension(Project project) {
         this.project = project
         this.agent = new AgentPluginConfiguration(project.copySpec {})
-        this.server = new ServerPluginConfiguration(project, environments)
+        this.server = new ServerPluginConfiguration(project)
     }
 
     def getAgent() {

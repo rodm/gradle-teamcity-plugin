@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
@@ -27,7 +26,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
 
     private Project project
 
-    ServerPluginConfiguration(Project project, NamedDomainObjectContainer<TeamCityEnvironment> environments) {
+    ServerPluginConfiguration(Project project) {
         super(project.copySpec {})
         this.project = project
         this.environments = new TeamCityEnvironments(project)

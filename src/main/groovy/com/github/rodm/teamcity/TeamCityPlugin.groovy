@@ -56,8 +56,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         if (project.extensions.findByType(TeamCityPluginExtension)) {
             extension = project.extensions.getByType(TeamCityPluginExtension)
         } else {
-            def environments = project.container(TeamCityEnvironment)
-            extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project, environments)
+            extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
             if (!isRootProject(project)) {
                 def rootExtension = project.rootProject.extensions.findByType(TeamCityPluginExtension)
                 if (rootExtension) {
