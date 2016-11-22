@@ -108,6 +108,10 @@ class TeamCityPluginExtension {
         }
     }
 
+    TeamCityEnvironments getEnvironments() {
+        return environments
+    }
+
     void environments(Closure config) {
         ConfigureUtil.configure(config, environments)
     }

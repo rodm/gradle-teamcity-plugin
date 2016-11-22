@@ -35,21 +35,86 @@ class EnvironmentsTest {
     }
 
     @Test
+    public void defaultProperties() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.environments.getDownloadsDir(), equalTo('downloads'))
+        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://download.jetbrains.com/teamcity'))
+        assertThat(extension.environments.getBaseDataDir(), equalTo('data'))
+        assertThat(extension.environments.getBaseHomeDir(), equalTo('servers'))
+    }
+
+    @Test
+    public void alternativeDownloadsDir() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            environments {
+                downloadsDir = '/tmp/downloads'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.environments.getDownloadsDir(), equalTo('/tmp/downloads'))
+    }
+
+    @Test
+    public void alternativeDownloadBaseUrl() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            environments {
+                baseDownloadUrl = 'http://local-repository'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://local-repository'))
+    }
+
+    @Test
+    public void alternativeBaseDataDir() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            environments {
+                baseDataDir = '/tmp/data'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.environments.getBaseDataDir(), equalTo('/tmp/data'))
+    }
+
+    @Test
+    public void alternativeBaseHomeDir() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            environments {
+                baseHomeDir = '/tmp/servers'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertThat(extension.environments.getBaseHomeDir(), equalTo('/tmp/servers'))
+    }
+
+    @Test
     public void defaultOptions() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                    }
+            environments {
+                test {
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions))
         assertThat(environment.agentOptions, equalTo(''))
     }
@@ -59,18 +124,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        serverOptions = '-DnewOption=test'
-                    }
+            environments {
+                test {
+                    serverOptions = '-DnewOption=test'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo('-DnewOption=test'))
     }
 
@@ -79,18 +142,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        serverOptions = ['-Doption1=value1', '-Doption2=value2']
-                    }
+            environments {
+                test {
+                    serverOptions = ['-Doption1=value1', '-Doption2=value2']
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
@@ -99,18 +160,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        serverOptions '-DadditionalOption=test'
-                    }
+            environments {
+                test {
+                    serverOptions '-DadditionalOption=test'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption=test'))
     }
 
@@ -119,18 +178,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        serverOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
-                    }
+            environments {
+                test {
+                    serverOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'))
     }
 
@@ -139,19 +196,17 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        agentOptions = '-DnewOption1=value1'
-                        agentOptions = '-DnewOption2=value2'
-                    }
+            environments {
+                test {
+                    agentOptions = '-DnewOption1=value1'
+                    agentOptions = '-DnewOption2=value2'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
     }
     @Test
@@ -159,18 +214,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        agentOptions = ['-Doption1=value1', '-Doption2=value2']
-                    }
+            environments {
+                test {
+                    agentOptions = ['-Doption1=value1', '-Doption2=value2']
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
@@ -179,19 +232,17 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        agentOptions '-DadditionalOption1=value1'
-                        agentOptions '-DadditionalOption2=value2'
-                    }
+            environments {
+                test {
+                    agentOptions '-DadditionalOption1=value1'
+                    agentOptions '-DadditionalOption2=value2'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
         assertThat(environment.agentOptions.trim(), equalTo(expectedOptions))
     }
@@ -201,18 +252,16 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
-            server {
-                environments {
-                    test {
-                        agentOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
-                    }
+            environments {
+                test {
+                    agentOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
                 }
             }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        def environment = extension.server.environments.getByName('test')
+        def environment = extension.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-DadditionalOption1=value1 -DadditionalOption2=value2'))
     }
 }
