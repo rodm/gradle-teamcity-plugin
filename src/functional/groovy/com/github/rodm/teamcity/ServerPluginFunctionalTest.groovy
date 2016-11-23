@@ -298,12 +298,12 @@ public class ServerPluginFunctionalTest {
                 server {
                     descriptor {
                     }
-                    environments {
-                        teamcity {
-                            homeDir = file('${windowsCompatiblePath(homeDir)}')
-                            dataDir = file('${windowsCompatiblePath(dataDir)}')
-                            javaHome = file('${windowsCompatiblePath(dataDir)}')
-                        }
+                }
+                environments {
+                    teamcity {
+                        homeDir = file('${windowsCompatiblePath(homeDir)}')
+                        dataDir = file('${windowsCompatiblePath(dataDir)}')
+                        javaHome = file('${windowsCompatiblePath(dataDir)}')
                     }
                 }
             }
@@ -320,6 +320,7 @@ public class ServerPluginFunctionalTest {
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":deployPluginToTeamcity").getOutcome(), is(SUCCESS))
         assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
+        assertThat(result.output, not(containsString('deprecated')))
     }
 
     @Test
@@ -334,9 +335,9 @@ public class ServerPluginFunctionalTest {
                 server {
                     descriptor {
                     }
-                    environments {
-                        teamcity {
-                        }
+                }
+                environments {
+                    teamcity {
                     }
                 }
             }
@@ -350,6 +351,7 @@ public class ServerPluginFunctionalTest {
         assertThat(result.output, containsString('stopTeamcityServer'))
         assertThat(result.output, containsString('startTeamcityAgent'))
         assertThat(result.output, containsString('stopTeamcityAgent'))
+        assertThat(result.output, not(containsString('deprecated')))
     }
 
     @Test
@@ -366,15 +368,15 @@ public class ServerPluginFunctionalTest {
                 server {
                     descriptor {
                     }
+                }
+                environments {
                     baseHomeDir = 'teamcity'
                     baseDataDir = 'teamcity/data'
-                    environments {
-                        teamcity8 {
-                            version = '8.1.5'
-                        }
-                        teamcity9 {
-                            version = '9.1.6'
-                        }
+                    teamcity8 {
+                        version = '8.1.5'
+                    }
+                    teamcity9 {
+                        version = '9.1.6'
                     }
                 }
             }
@@ -390,6 +392,7 @@ public class ServerPluginFunctionalTest {
         File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
+        assertThat(result.output, not(containsString('deprecated')))
     }
 
     @Rule
@@ -409,15 +412,16 @@ public class ServerPluginFunctionalTest {
                 server {
                     descriptor {
                     }
+                }
+                environments {
                     baseHomeDir = file('${windowsCompatiblePath(serversDir.root)}/teamcity')
                     baseDataDir = file('${windowsCompatiblePath(serversDir.root)}/data')
-                    environments {
-                        teamcity8 {
-                            version = '8.1.5'
-                        }
-                        teamcity9 {
-                            version = '9.1.6'
-                        }
+
+                    teamcity8 {
+                        version = '8.1.5'
+                    }
+                    teamcity9 {
+                        version = '9.1.6'
                     }
                 }
             }
@@ -433,6 +437,7 @@ public class ServerPluginFunctionalTest {
         File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
+        assertThat(result.output, not(containsString('deprecated')))
     }
 
     @Test
