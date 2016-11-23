@@ -435,6 +435,37 @@ public class ServerPluginFunctionalTest {
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
     }
 
+    @Test
+    public void deprecatedEnvironmentsConfiguration() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '8.1.5'
+                server {
+                    downloadsDir = '/tmp'
+                    baseDownloadUrl = 'http://repository/'
+                    baseDataDir = '/tmp/data'
+                    baseHomeDir = '/tmp/servers'
+                    environments {
+                        teamcity {
+                        }
+                    }
+                }
+            }
+        """
+
+        BuildResult result = executeBuild('tasks')
+
+        assertThat(result.output, containsString('downloadsDir property in server configuration is deprecated'))
+        assertThat(result.output, containsString('baseDownloadUrl property in server configuration is deprecated'))
+        assertThat(result.output, containsString('baseDataDir property in server configuration is deprecated'))
+        assertThat(result.output, containsString('baseHomeDir property in server configuration is deprecated'))
+        assertThat(result.output, containsString('environments configuration in server configuration is deprecated'))
+    }
+
     private File createFakeTeamCityInstall(String baseDir, String version) {
         createFakeTeamCityInstall(testProjectDir, baseDir, version)
     }

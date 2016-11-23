@@ -38,7 +38,28 @@ class ServerPluginConfiguration extends PluginConfiguration {
         ConfigureUtil.configure(closure, descriptor)
     }
 
+    void setDownloadsDir(String downloadsDir) {
+        project.logger.warn('downloadsDir property in server configuration is deprecated')
+        environments.setDownloadsDir(downloadsDir)
+    }
+
+    void setBaseDownloadUrl(String baseDownloadUrl) {
+        project.logger.warn('baseDownloadUrl property in server configuration is deprecated')
+        environments.setBaseDownloadUrl(baseDownloadUrl)
+    }
+
+    void setBaseDataDir(String baseDataDir) {
+        project.logger.warn('baseDataDir property in server configuration is deprecated')
+        environments.setBaseDataDir(baseDataDir)
+    }
+
+    void setBaseHomeDir(String baseHomeDir) {
+        project.logger.warn('baseHomeDir property in server configuration is deprecated')
+        environments.setBaseHomeDir(baseHomeDir)
+    }
+
     void environments(Closure config) {
+        project.logger.warn('environments configuration in server configuration is deprecated')
         ConfigureUtil.configure(config, environments)
     }
 }
