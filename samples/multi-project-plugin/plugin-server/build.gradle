@@ -27,26 +27,26 @@ teamcity {
             email = 'rod.n.mackenzie@gmail.com'
             useSeparateClassloader = true
         }
+    }
 
+    environments {
         downloadsDir = project.downloadsDir
         baseHomeDir = project.serversDir
         baseDataDir = 'data'
 
-        environments {
-            teamcity81 {
-                version = '8.1.5'
-                javaHome = file(java7Home)
-            }
+        teamcity81 {
+            version = '8.1.5'
+            javaHome = file(java7Home)
+        }
 
-            teamcity91 {
-                version = '9.1.7'
-                javaHome = file(java7Home)
-            }
+        teamcity91 {
+            version = '9.1.7'
+            javaHome = file(java7Home)
+        }
 
-            teamcity10 {
-                version = '10.0.2'
-                javaHome = file(java8Home)
-            }
+        teamcity10 {
+            version = '10.0.2'
+            javaHome = file(java8Home)
         }
     }
 }
