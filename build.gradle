@@ -64,7 +64,7 @@ task functionalTest(type: Test) {
     }
 }
 
-task samplesTest(type: Test, dependsOn: 'publishToMavenLocal') {
+task samplesTest(type: Test, dependsOn: 'publish') {
     description = 'Runs the sample builds.'
     group = 'verification'
     testClassesDir = sourceSets.samples.output.classesDir
