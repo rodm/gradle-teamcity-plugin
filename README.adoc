@@ -2,7 +2,8 @@
 :uri-teamcity-documentation: https://confluence.jetbrains.com/display/TCD9
 :uri-teamcity-environment: {uri-teamcity-documentation}/Development+Environment
 :uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
-:uri-teamcity-packaging: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
+:uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
+:uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
 :uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
 :plugin-version: 0.10
 :default-api-version: 9.0
@@ -83,9 +84,12 @@ The following properties can be defined in the `server` configuration block.
 
 * `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
  The type property affects the type of descriptor generated.
+* `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
+if the descriptor is referencing an external file.
+* `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
-{uri-teamcity-packaging}[Packaging Plugins]
+{uri-server-descriptor}[Server-Side Plugin Descriptor]
 
 ### TeamCity Server Plugin Tasks
 
@@ -255,6 +259,19 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity agent-api and
 tests-supprt dependencies to the compile and testCompile configurations. If the Java Plugin is not applied the plugin
 provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
+
+### TeamCity Agent Plugin Configuration
+
+The following properties can be defined in the `agent` configuration block.
+
+* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
+ The type property affects the type of descriptor generated.
+* `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
+if the descriptor is referencing an external file.
+* `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
+
+The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
+{uri-agent-descriptor}[Agent-Side Plugin Descriptor]
 
 ### TeamCity Agent Plugin Tasks
 
