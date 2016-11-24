@@ -61,6 +61,7 @@ class TeamCityPluginExtension {
     }
 
     def setDescriptor(Object descriptor) {
+        project.logger.warn('descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             agent.descriptor = descriptor
         } else {
@@ -77,6 +78,7 @@ class TeamCityPluginExtension {
     }
 
     def descriptor(Closure closure) {
+        project.logger.warn('descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             agent.descriptor(closure)
         } else {
@@ -85,6 +87,7 @@ class TeamCityPluginExtension {
     }
 
     def files(Closure closure) {
+        project.logger.warn('files property is deprecated. Please use the files property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             agent.files(closure)
         } else {
@@ -93,6 +96,7 @@ class TeamCityPluginExtension {
     }
 
     def setTokens(Map<String, Object> tokens) {
+        project.logger.warn('tokens property is deprecated. Please use the tokens property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             agent.tokens = tokens
         } else {
@@ -101,6 +105,7 @@ class TeamCityPluginExtension {
     }
 
     def tokens(Map<String, Object> tokens) {
+        project.logger.warn('tokens property is deprecated. Please use the tokens property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
             agent.tokens tokens
         } else {

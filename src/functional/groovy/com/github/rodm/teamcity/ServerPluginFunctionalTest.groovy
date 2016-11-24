@@ -471,6 +471,32 @@ public class ServerPluginFunctionalTest {
         assertThat(result.output, containsString('environments configuration in server configuration is deprecated'))
     }
 
+    @Test
+    public void deprecateOmittingServerConfiguration() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '8.1.5'
+                descriptor {
+                }
+                tokens = [TOKEN: 'value']
+                files {
+                    from('sourcedir')
+                    into('targetdir')
+                }
+            }
+        """
+
+        BuildResult result = executeBuild('tasks')
+
+        assertThat(result.output, containsString('descriptor property is deprecated'))
+        assertThat(result.output, containsString('tokens property is deprecated'))
+        assertThat(result.output, containsString('files property is deprecated'))
+    }
+
     private File createFakeTeamCityInstall(String baseDir, String version) {
         createFakeTeamCityInstall(testProjectDir, baseDir, version)
     }
