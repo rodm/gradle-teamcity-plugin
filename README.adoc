@@ -68,11 +68,6 @@ descriptor can be specified as a path to a file or by a configuration block with
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
 and the TeamCity repository, http://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
  flag to false allows a local repository to be used for resolving dependencies.
-* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
- The type property affects the type of descriptor generated.
-
-The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
-{uri-teamcity-packaging}[Packaging Plugins]
 
 ### TeamCity Server Plugin
 
@@ -86,21 +81,11 @@ The server plugin can be combined with the agent plugin but not with the Java Pl
 
 The following properties can be defined in the `server` configuration block.
 
-* `downloadsDir` : The directory the TeamCity installers are downlowded to. Defaults to `downloads`
-* `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `http://download.jetbrains.com/teamcity`.
-* `baseHomeDir` : The base directory for a TeamCity install. Defaults to `servers`.
-* `baseDataDir` : The base directory for a TeamCity Data directory. Defaults to `data`.
+* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
+ The type property affects the type of descriptor generated.
 
-An `environments` configuration block allows multiple TeamCity environments to be defined, each environment supports the following properties
-
-* `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
-* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl}/TeamCity-${version}.tar.gz`.
-* `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-${version}`
-* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
-* `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
-* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
- these plguin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
-* `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
+The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
+{uri-teamcity-packaging}[Packaging Plugins]
 
 ### TeamCity Server Plugin Tasks
 
@@ -109,16 +94,6 @@ An `environments` configuration block allows multiple TeamCity environments to b
 output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
 the file to the build directory. ('build/descriptor/server')
-
-For each environment the following tasks are created based on the environment name:
-
-* `deployPluginTo<environment>` : Deploys the plugin archive to the TeamCity server for the environment, requires the environment `dataDir` property.
-* `undeployPluginFrom<environment>` : Undeploys the plugin archive from the TeamCity server for the environment, requires the environment `dataDir` property.
-* `start<environment>Sever` : Starts the TeamCity Server for the environment, requires the environment `homeDir` and `dataDir` properties to be defined.
-* `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
-* `start<environment>Agent` : Starts the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
-* `stop<environment>Agent` : Stops the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
-* `install<environment>` : Downloads and installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
 
 ### Examples
 
@@ -192,6 +167,38 @@ descriptor file can be provided using the `tokens` property.
     }
 ----
 
+### TeamCity Environments Configuration
+
+The environments configuration is available by applying the `com.github.rodm.teamcity-server` plugin.
+
+The following properties can be defined in the `environments` configuration block.
+
+* `downloadsDir` : The directory the TeamCity installers are downlowded to. Defaults to `downloads`
+* `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `http://download.jetbrains.com/teamcity`.
+* `baseHomeDir` : The base directory for a TeamCity install. Defaults to `servers`.
+* `baseDataDir` : The base directory for a TeamCity Data directory. Defaults to `data`.
+
+Within the `environments` configuration block multiple TeamCity environments can be defined, each environment supports the following properties
+
+* `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
+* `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl}/TeamCity-${version}.tar.gz`.
+* `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-${version}`
+* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
+* `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
+* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+ these plguin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
+* `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
+
+For each environment the following tasks are created based on the environment name:
+
+* `deployPluginTo<environment>` : Deploys the plugin archive to the TeamCity server for the environment, requires the environment `dataDir` property.
+* `undeployPluginFrom<environment>` : Undeploys the plugin archive from the TeamCity server for the environment, requires the environment `dataDir` property.
+* `start<environment>Sever` : Starts the TeamCity Server for the environment, requires the environment `homeDir` and `dataDir` properties to be defined.
+* `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
+* `start<environment>Agent` : Starts the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
+* `stop<environment>Agent` : Stops the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
+* `install<environment>` : Downloads and installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
+
 Environments allow a plugin to be tested against multiple versions for TeamCity.
 
 [source,groovy]
@@ -204,7 +211,9 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
         server {
             // Locate the plugin descriptor in the root directory of the project
             descriptor = file('teamcity-plugin.xml')
+        }
 
+        environments {
             // use a local web server for downloading TeamCity distributions
             baseDownloadUrl = "http://repository/"
 
@@ -215,29 +224,27 @@ Environments allow a plugin to be tested against multiple versions for TeamCity.
             baseHomeDir = 'teamcity/servers'
             baseDataDir = 'teamcity/data'
 
-            environments {
-                teamcity81 {
-                    version = '8.1.5'
-                    javaHome = file('/opt/jdk1.7.0_80')
-                }
+            teamcity81 {
+                version = '8.1.5'
+                javaHome = file('/opt/jdk1.7.0_80')
+            }
 
-                teamcity90 {
-                    version = '9.0.5'
-                    javaHome = file('/opt/jdk1.7.0_80')
-                    // Add to the default server options
-                    serverOptions '-Xdebug'
-                    serverOptions '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
-                }
+            teamcity90 {
+                version = '9.0.5'
+                javaHome = file('/opt/jdk1.7.0_80')
+                // Add to the default server options
+                serverOptions '-Xdebug'
+                serverOptions '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
+            }
 
-                teamcity91 {
-                    version = '9.1.6'
-                    downloadUrl = 'http://repository/teamcity/TeamCity-9.1.6.tar.gz'
-                    homeDir = file("$rootDir/teamcity/servers/TeamCity-9.1.6")
-                    dataDir = file("$rootDir/teamcity/data/9.1")
-                    javaHome = file('/opt/jdk1.8.0_60')
-                    // Replace the default server options
-                    serverOptions = '-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
-                }
+            teamcity91 {
+                version = '9.1.6'
+                downloadUrl = 'http://repository/teamcity/TeamCity-9.1.6.tar.gz'
+                homeDir = file("$rootDir/teamcity/servers/TeamCity-9.1.6")
+                dataDir = file("$rootDir/teamcity/data/9.1")
+                javaHome = file('/opt/jdk1.8.0_60')
+                // Replace the default server options
+                serverOptions = '-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5500'
             }
         }
     }
