@@ -54,11 +54,13 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writesRequiredInfoProperties() {
         project.teamcity {
-            descriptor {
-                name = 'plugin name'
-                displayName = 'display name'
-                version = '1.2.3'
-                vendorName = 'vendor name'
+            server {
+                descriptor {
+                    name = 'plugin name'
+                    displayName = 'display name'
+                    version = '1.2.3'
+                    vendorName = 'vendor name'
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -107,12 +109,14 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writesOptionalInfoProperties() {
         project.teamcity {
-            descriptor {
-                description = 'plugin description'
-                downloadUrl = 'download url'
-                email = 'email'
-                vendorUrl = 'vendor url'
-                vendorLogo = 'vendor logo'
+            server {
+                descriptor {
+                    description = 'plugin description'
+                    downloadUrl = 'download url'
+                    email = 'email'
+                    vendorUrl = 'vendor url'
+                    vendorLogo = 'vendor logo'
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -131,7 +135,9 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void optionalInfoPropertiesNotWrittenWhenNotSet() {
         project.teamcity {
-            descriptor {
+            server {
+                descriptor {
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -150,8 +156,10 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeOptionalSeparateClassloader() {
         project.teamcity {
-            descriptor {
-                useSeparateClassloader = true
+            server {
+                descriptor {
+                    useSeparateClassloader = true
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -166,8 +174,10 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeOptionalSeparateClassloaderWhenFalse() {
         project.teamcity {
-            descriptor {
-                useSeparateClassloader = false
+            server {
+                descriptor {
+                    useSeparateClassloader = false
+                }
             }
         }
 
@@ -183,7 +193,9 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeOptionalSettingsOnlyIfSpecified() {
         project.teamcity {
-            descriptor {
+            server {
+                descriptor {
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -199,10 +211,12 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeParameters() {
         project.teamcity {
-            descriptor {
-                parameters {
-                    parameter 'name1', 'value1'
-                    parameters name2: 'value2', name3: 'value3'
+            server {
+                descriptor {
+                    parameters {
+                        parameter 'name1', 'value1'
+                        parameters name2: 'value2', name3: 'value3'
+                    }
                 }
             }
         }
@@ -220,9 +234,11 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writePluginDependency() {
         project.teamcity {
-            descriptor {
-                dependencies {
-                    plugin 'plugin-name'
+            server {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name'
+                    }
                 }
             }
         }
@@ -238,9 +254,11 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeToolDependency() {
         project.teamcity {
-            descriptor {
-                dependencies {
-                    tool 'tool-name'
+            server {
+                descriptor {
+                    dependencies {
+                        tool 'tool-name'
+                    }
                 }
             }
         }
@@ -256,8 +274,10 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeDependenciesOnlyIfSpecified() {
         project.teamcity {
-            descriptor {
-                dependencies {
+            server {
+                descriptor {
+                    dependencies {
+                    }
                 }
             }
         }
@@ -274,9 +294,11 @@ public class ServerDescriptorGeneratorTest {
     public void writeDependenciesOnlyForTeamCity9() {
         project.teamcity {
             version = '8.1'
-            descriptor {
-                dependencies {
-                    plugin 'plugin-name'
+            server {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name'
+                    }
                 }
             }
         }
@@ -293,9 +315,11 @@ public class ServerDescriptorGeneratorTest {
     public void writeDependenciesForTeamCity10() {
         project.teamcity {
             version = '10.0'
-            descriptor {
-                dependencies {
-                    plugin 'plugin-name'
+            server {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name'
+                    }
                 }
             }
         }
@@ -311,9 +335,11 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeRequirements() {
         project.teamcity {
-            descriptor {
-                minimumBuild = '1234'
-                maximumBuild = '2345'
+            server {
+                descriptor {
+                    minimumBuild = '1234'
+                    maximumBuild = '2345'
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -329,8 +355,10 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeRequirementsMinimumBuildOnly() {
         project.teamcity {
-            descriptor {
-                minimumBuild = '1234'
+            server {
+                descriptor {
+                    minimumBuild = '1234'
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -346,8 +374,10 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeRequirementsMaximumBuildOnly() {
         project.teamcity {
-            descriptor {
-                maximumBuild = '1234'
+            server {
+                descriptor {
+                    maximumBuild = '1234'
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
@@ -363,7 +393,9 @@ public class ServerDescriptorGeneratorTest {
     @Test
     public void writeRequirementsOnlyIfSpecified() {
         project.teamcity {
-            descriptor {
+            server {
+                descriptor {
+                }
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()

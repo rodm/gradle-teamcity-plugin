@@ -21,6 +21,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
@@ -45,20 +46,12 @@ class AgentConfigurationTest {
     }
 
     @Test
-    public void createDescriptorForAgentProjectType() {
-        project.teamcity {
-            descriptor {
-            }
-        }
-
-        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
-    }
-
-    @Test
     public void createDescriptorForPluginDeployment() {
         project.teamcity {
-            descriptor {
-                pluginDeployment {
+            agent {
+                descriptor {
+                    pluginDeployment {
+                    }
                 }
             }
         }
@@ -69,12 +62,14 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForPluginDeploymentWithExecutableFiles() {
         project.teamcity {
-            descriptor {
-                pluginDeployment {
-                    useSeparateClassloader = true
-                    executableFiles {
-                        include 'file1'
-                        include 'file2'
+            agent {
+                descriptor {
+                    pluginDeployment {
+                        useSeparateClassloader = true
+                        executableFiles {
+                            include 'file1'
+                            include 'file2'
+                        }
                     }
                 }
             }
@@ -88,8 +83,10 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForToolDeployment() {
         project.teamcity {
-            descriptor {
-                toolDeployment {
+            agent {
+                descriptor {
+                    toolDeployment {
+                    }
                 }
             }
         }
@@ -100,11 +97,13 @@ class AgentConfigurationTest {
     @Test
     public void createDescriptorForToolDeploymentWithExecutableFiles() {
         project.teamcity {
-            descriptor {
-                toolDeployment {
-                    executableFiles {
-                        include 'file1'
-                        include 'file2'
+            agent {
+                descriptor {
+                    toolDeployment {
+                        executableFiles {
+                            include 'file1'
+                            include 'file2'
+                        }
                     }
                 }
             }
@@ -115,9 +114,23 @@ class AgentConfigurationTest {
     }
 
     @Test
+    public void filePluginDescriptor() {
+        project.teamcity {
+            agent {
+                descriptor = project.file('test-teamcity-plugin.xml')
+            }
+        }
+
+        assertThat(extension.agent.descriptor, isA(File))
+        assertThat(extension.agent.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
     public void agentPluginTasks() {
         project.teamcity {
-            descriptor {}
+            agent {
+                descriptor {}
+            }
         }
 
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
@@ -128,7 +141,9 @@ class AgentConfigurationTest {
     @Test
     public void agentPluginTasksWithFileDescriptor() {
         project.teamcity {
-            descriptor = project.file('test-teamcity-plugin')
+            agent {
+                descriptor = project.file('test-teamcity-plugin')
+            }
         }
 
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
@@ -139,9 +154,11 @@ class AgentConfigurationTest {
     @Test
     public void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
-            descriptor = project.file('test-teamcity-plugin')
-            tokens VERSION: '1.2.3', VENDOR: 'rodm'
-            tokens BUILD_NUMBER: '123'
+            agent {
+                descriptor = project.file('test-teamcity-plugin')
+                tokens VERSION: '1.2.3', VENDOR: 'rodm'
+                tokens BUILD_NUMBER: '123'
+            }
         }
 
         assertThat(extension.agent.tokens, hasEntry('VERSION', '1.2.3'))
@@ -177,7 +194,17 @@ class AgentConfigurationTest {
     }
 
     @Test
-    public void agentPluginWithAdditionalFilesAlternative() {
+    public void deprecatedDescriptorCreationForAgentProjectType() {
+        project.teamcity {
+            descriptor {
+            }
+        }
+
+        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
+    }
+
+    @Test
+    public void deprecatedAdditionalFilesForAgentPlugin() {
         project.teamcity {
             files {
             }

@@ -47,19 +47,22 @@ class ServerConfigurationTest {
     @Test
     public void buildScriptPluginDescriptor() {
         project.teamcity {
-            descriptor {
-                name = 'test plugin'
+            server {
+                descriptor {
+                    name = 'test plugin'
+                }
             }
         }
 
-        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
         assertThat(extension.server.descriptor.getName(), equalTo('test plugin'))
     }
 
     @Test
     public void filePluginDescriptor() {
         project.teamcity {
-            descriptor = project.file('test-teamcity-plugin.xml')
+            server {
+                descriptor = project.file('test-teamcity-plugin.xml')
+            }
         }
 
         assertThat(extension.server.descriptor, isA(File))
@@ -69,7 +72,9 @@ class ServerConfigurationTest {
     @Test
     public void serverPluginTasks() {
         project.teamcity {
-            descriptor {}
+            server {
+                descriptor {}
+            }
         }
 
         assertNotNull(project.tasks.findByName('processServerDescriptor'))
@@ -80,7 +85,9 @@ class ServerConfigurationTest {
     @Test
     public void serverPluginTasksWithFileDescriptor() {
         project.teamcity {
-            descriptor = project.file('test-teamcity-plugin')
+            server {
+                descriptor = project.file('test-teamcity-plugin')
+            }
         }
 
         assertNotNull(project.tasks.findByName('processServerDescriptor'))
@@ -91,9 +98,11 @@ class ServerConfigurationTest {
     @Test
     public void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
-            descriptor = project.file('test-teamcity-plugin')
-            tokens VERSION: '1.2.3', VENDOR: 'rodm'
-            tokens BUILD_NUMBER: '123'
+            server {
+                descriptor = project.file('test-teamcity-plugin')
+                tokens VERSION: '1.2.3', VENDOR: 'rodm'
+                tokens BUILD_NUMBER: '123'
+            }
         }
 
         assertThat(extension.server.tokens, hasEntry('VERSION', '1.2.3'))
@@ -129,7 +138,17 @@ class ServerConfigurationTest {
     }
 
     @Test
-    public void serverPluginWithAdditionalFilesAlternative() {
+    public void deprecatedDescriptorCreationForServerProjectType() {
+        project.teamcity {
+            descriptor {
+            }
+        }
+
+        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
+    }
+
+    @Test
+    public void deprecatedAdditionalFilesForServerPlugin() {
         project.teamcity {
             files {
             }
