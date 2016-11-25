@@ -35,10 +35,13 @@ class ServerConfigurationTest {
 
     private Project project;
 
+    private TeamCityPluginExtension extension
+
     @Before
     public void setup() {
         project = ProjectBuilder.builder().build()
         project.apply plugin: 'com.github.rodm.teamcity-server'
+        extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }
 
     @Test
@@ -49,9 +52,8 @@ class ServerConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(ServerPluginDescriptor))
-        assertThat(extension.descriptor.getName(), equalTo('test plugin'))
+        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
+        assertThat(extension.server.descriptor.getName(), equalTo('test plugin'))
     }
 
     @Test
@@ -60,9 +62,8 @@ class ServerConfigurationTest {
             descriptor = project.file('test-teamcity-plugin.xml')
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(File))
-        assertThat(extension.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
+        assertThat(extension.server.descriptor, isA(File))
+        assertThat(extension.server.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
 
     @Test
@@ -95,7 +96,6 @@ class ServerConfigurationTest {
             tokens BUILD_NUMBER: '123'
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.server.tokens, hasEntry('VERSION', '1.2.3'))
         assertThat(extension.server.tokens, hasEntry('VENDOR', 'rodm'))
         assertThat(extension.server.tokens, hasEntry('BUILD_NUMBER', '123'))
@@ -111,7 +111,6 @@ class ServerConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.server.tokens, hasEntry('VERSION', '1.2.3'))
         assertThat(extension.server.tokens, hasEntry('VENDOR', 'rodm'))
         assertThat(extension.server.tokens, hasEntry('BUILD_NUMBER', '123'))
@@ -126,7 +125,6 @@ class ServerConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.server.files.childSpecs.size, is(1))
     }
 
@@ -137,7 +135,6 @@ class ServerConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.server.files.childSpecs.size, is(1))
     }
 

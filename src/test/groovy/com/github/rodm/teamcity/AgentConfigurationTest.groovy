@@ -35,10 +35,13 @@ class AgentConfigurationTest {
 
     private Project project;
 
+    private TeamCityPluginExtension extension
+
     @Before
     public void setup() {
         project = ProjectBuilder.builder().build()
         project.apply plugin: 'com.github.rodm.teamcity-agent'
+        extension = project.extensions.getByType(TeamCityPluginExtension)
     }
 
     @Test
@@ -48,8 +51,7 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor, isA(AgentPluginDescriptor))
+        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
     }
 
     @Test
@@ -61,8 +63,7 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor.deployment, isA(PluginDeployment))
+        assertThat(extension.agent.descriptor.deployment, isA(PluginDeployment))
     }
 
     @Test
@@ -79,8 +80,7 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        PluginDeployment deployment = extension.descriptor.deployment
+        PluginDeployment deployment = extension.agent.descriptor.deployment
         assertThat(deployment.useSeparateClassloader, equalTo(Boolean.TRUE))
         assertThat(deployment.executableFiles.includes, hasSize(2))
     }
@@ -94,8 +94,7 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.descriptor.deployment, isA(ToolDeployment))
+        assertThat(extension.agent.descriptor.deployment, isA(ToolDeployment))
     }
 
     @Test
@@ -111,8 +110,7 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        ToolDeployment deployment = extension.descriptor.deployment
+        ToolDeployment deployment = extension.agent.descriptor.deployment
         assertThat(deployment.executableFiles.includes, hasSize(2))
     }
 
@@ -146,7 +144,6 @@ class AgentConfigurationTest {
             tokens BUILD_NUMBER: '123'
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.tokens, hasEntry('VERSION', '1.2.3'))
         assertThat(extension.agent.tokens, hasEntry('VENDOR', 'rodm'))
         assertThat(extension.agent.tokens, hasEntry('BUILD_NUMBER', '123'))
@@ -162,7 +159,6 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.tokens, hasEntry('VERSION', '1.2.3'))
         assertThat(extension.agent.tokens, hasEntry('VENDOR', 'rodm'))
         assertThat(extension.agent.tokens, hasEntry('BUILD_NUMBER', '123'))
@@ -177,7 +173,6 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.files.childSpecs.size, is(1))
     }
 
@@ -188,7 +183,6 @@ class AgentConfigurationTest {
             }
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.files.childSpecs.size, is(1))
     }
 

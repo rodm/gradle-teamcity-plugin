@@ -69,14 +69,6 @@ class TeamCityPluginExtension {
         }
     }
 
-    def getDescriptor() {
-        if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
-            return agent.descriptor
-        } else {
-            return server.descriptor
-        }
-    }
-
     def descriptor(Closure closure) {
         project.logger.warn('descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.')
         if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
