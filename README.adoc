@@ -13,6 +13,7 @@ The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 image:https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/rodm/gradle-teamcity-plugin"]
+image:https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true["Build Status", link="https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin"]
 
 ## Using the plugin
 
