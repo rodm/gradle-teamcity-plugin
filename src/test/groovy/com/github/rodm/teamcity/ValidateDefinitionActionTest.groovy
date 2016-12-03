@@ -41,8 +41,15 @@ class ValidateDefinitionActionTest {
             </beans>
         """
 
+    public static final String EMPTY_BEAN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+            <beans default-autowire="constructor">
+            </beans>
+        """
+
     private static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
     private static final String NO_BEAN_CLASS_WARNING = TeamCityPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
+    private static final String NO_BEAN_CLASSES_WARNING = TeamCityPlugin.NO_BEAN_CLASSES_WARNING_MESSAGE.substring(4)
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
@@ -81,6 +88,21 @@ class ValidateDefinitionActionTest {
         pluginValidationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), not(containsString(NO_DEFINITION_WARNING)))
+    }
+
+    @Test
+    public void logWarningMessageForEmptyDefinitionFile() {
+        Project project = ProjectBuilder.builder().build()
+        File definitionFile = project.file('build-server-plugin.xml')
+        definitionFile << EMPTY_BEAN_DEFINITION_FILE
+        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        outputEventListener.reset()
+
+        pluginValidationAction.execute(stubTask)
+
+        String expectedMessage = String.format(NO_BEAN_CLASSES_WARNING, 'build-server-plugin.xml')
+        assertThat(outputEventListener.toString(), containsString(expectedMessage))
     }
 
     @Test

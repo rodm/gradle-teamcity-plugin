@@ -45,6 +45,8 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar.";
 
+    static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans.";
+
     static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
 
     void apply(Project project) {
@@ -152,10 +154,15 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         }
 
         private void validateDefinition(PluginDefinition definition, Task task) {
-            for (PluginBean bean : definition.getBeans()) {
-                def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
-                if (!classes.contains(fqcn)) {
-                    LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
+            List<PluginBean> beans = definition.getBeans()
+            if (beans.isEmpty()) {
+                LOGGER.warn(String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
+            } else {
+                for (PluginBean bean : beans) {
+                    def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
+                    if (!classes.contains(fqcn)) {
+                        LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
+                    }
                 }
             }
         }
