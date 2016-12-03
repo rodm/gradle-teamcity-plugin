@@ -15,9 +15,11 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.logging.Logger
@@ -123,18 +125,36 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             jarTask.filesMatching CLASSES_PATTERN, { fileCopyDetails ->
                 classes << fileCopyDetails.relativePath.toString()
             }
-            jarTask.doLast { task ->
-                if (pluginDefinitions.isEmpty()) {
-                    LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
-                } else {
-                    for (PluginDefinition definition : pluginDefinitions) {
-                        for (PluginBean bean : definition.getBeans()) {
-                            def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
-                            if (!classes.contains(fqcn)) {
-                                LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className));
-                            }
-                        }
-                    }
+            jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+        }
+    }
+
+    static class PluginDefinitionValidationAction implements Action<Task> {
+
+        private final List<PluginDefinition> definitions
+        private final Set<String> classes
+
+        PluginDefinitionValidationAction(List<PluginDefinition> definitions, Set<String> classes) {
+            this.definitions = definitions
+            this.classes = classes
+        }
+
+        @Override
+        void execute(Task task) {
+            if (definitions.isEmpty()) {
+                LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
+            } else {
+                for (PluginDefinition definition : definitions) {
+                    validateDefinition(definition, task)
+                }
+            }
+        }
+
+        private void validateDefinition(PluginDefinition definition, Task task) {
+            for (PluginBean bean : definition.getBeans()) {
+                def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
+                if (!classes.contains(fqcn)) {
+                    LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
                 }
             }
         }
