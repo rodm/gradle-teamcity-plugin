@@ -27,6 +27,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
+import org.xml.sax.SAXNotRecognizedException
 
 abstract class TeamCityPlugin implements Plugin<Project> {
 
@@ -176,12 +177,19 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             List<PluginBean> pluginBeans = []
             def parser = new XmlParser()
             parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-            parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalDTD", "file,http");
+            setParserProperty(parser, "http://javax.xml.XMLConstants/property/accessExternalDTD", "file,http")
             def beans = parser.parse(definitionFile)
             beans.bean.each { bean ->
                 pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
             }
             return pluginBeans
+        }
+
+        private void setParserProperty(XmlParser parser, String uri, Object value) {
+            try {
+                parser.setProperty(uri, value);
+            }
+            catch (SAXNotRecognizedException ignore) { }
         }
     }
 
