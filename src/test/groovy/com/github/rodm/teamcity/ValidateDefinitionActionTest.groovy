@@ -19,6 +19,9 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.internal.ConventionMapping
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.internal.logging.events.LogEvent
 import org.gradle.internal.logging.events.OutputEvent
 import org.gradle.internal.logging.events.OutputEventListener
@@ -30,7 +33,11 @@ import org.junit.Test
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
+import static org.mockito.Mockito.verify
 
 class ValidateDefinitionActionTest {
 
@@ -134,6 +141,38 @@ class ValidateDefinitionActionTest {
 
         String expectedMessage = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin.xml', 'example.Plugin')
         assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
+    }
+
+    @Test
+    public void 'apply configures filesMatching actions on jar spec'() {
+        Project project = ProjectBuilder.builder().build()
+        project.pluginManager.apply(JavaPlugin)
+        Jar mockJarTask = mockJar(project)
+
+        project.pluginManager.apply(TeamCityServerPlugin)
+
+        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml'), any(Action))
+        verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
+    }
+
+    @Test
+    public void 'apply configures doLast action on jar task'() {
+        Project project = ProjectBuilder.builder().build()
+        project.pluginManager.apply(JavaPlugin)
+        Jar mockJarTask = mockJar(project)
+
+        project.pluginManager.apply(TeamCityServerPlugin)
+
+        verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+    }
+
+    private Jar mockJar(Project project) {
+        Jar mockJar = mock(Jar)
+        when(mockJar.getName()).thenReturn(JavaPlugin.JAR_TASK_NAME)
+        when(mockJar.getConventionMapping()).thenReturn(mock(ConventionMapping))
+        project.tasks.remove(project.tasks.getByName(JavaPlugin.JAR_TASK_NAME))
+        project.tasks.add(mockJar)
+        return mockJar
     }
 
     static class ResettableOutputEventListener implements OutputEventListener {
