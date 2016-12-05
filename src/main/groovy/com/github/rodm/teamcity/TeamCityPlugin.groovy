@@ -30,6 +30,10 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.xml.sax.SAXNotRecognizedException
 
+import javax.xml.XMLConstants
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
+
 abstract class TeamCityPlugin implements Plugin<Project> {
 
     private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class);
@@ -227,5 +231,28 @@ abstract class TeamCityPlugin implements Plugin<Project> {
     static class PluginBean {
         String id
         String className
+    }
+
+    static class PluginDescriptorValidationAction implements Action<Task> {
+
+        private String schema
+        private File descriptor
+
+        PluginDescriptorValidationAction(String schema, File descriptor) {
+            this.schema = schema
+            this.descriptor = descriptor
+        }
+
+        @Override
+        void execute(Task task) {
+            Project project = task.getProject()
+            def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+            URL url = this.getClass().getResource('/' + schema)
+            def schema = factory.newSchema(url)
+            def validator = schema.newValidator()
+            def errorHandler = new PluginDescriptorErrorHandler(project, task.getPath())
+            validator.setErrorHandler(errorHandler)
+            validator.validate(new StreamSource(new FileReader(descriptor)))
+        }
     }
 }
