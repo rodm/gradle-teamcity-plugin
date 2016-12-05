@@ -122,11 +122,9 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
         if (jarTask) {
             List<PluginDefinition> pluginDefinitions = []
-            jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
             Set<String> classes = []
-            jarTask.filesMatching CLASSES_PATTERN, { fileCopyDetails ->
-                classes << fileCopyDetails.relativePath.toString()
-            }
+            jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
+            jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
             jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
         }
     }
@@ -141,6 +139,20 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         @Override
         void execute(FileCopyDetails fileCopyDetails) {
             pluginDefinitions << new PluginDefinition(fileCopyDetails.file)
+        }
+    }
+
+    static class ClassCollectorAction implements Action<FileCopyDetails> {
+
+        private Set<String> classes
+
+        ClassCollectorAction(Set<String> classes) {
+            this.classes = classes
+        }
+
+        @Override
+        void execute(FileCopyDetails fileCopyDetails) {
+            classes << fileCopyDetails.relativePath.toString()
         }
     }
 

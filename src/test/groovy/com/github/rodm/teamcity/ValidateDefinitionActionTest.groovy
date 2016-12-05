@@ -20,6 +20,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.ConventionMapping
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
@@ -33,6 +34,7 @@ import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.mockito.ArgumentMatchers.any
@@ -154,7 +156,7 @@ class ValidateDefinitionActionTest {
         project.pluginManager.apply(TeamCityServerPlugin)
 
         verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
+        verify(mockJarTask).filesMatching(eq('**/*.class'), any(TeamCityPlugin.ClassCollectorAction))
     }
 
     @Test
@@ -177,7 +179,7 @@ class ValidateDefinitionActionTest {
         project.pluginManager.apply(TeamCityAgentPlugin)
 
         verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
+        verify(mockJarTask).filesMatching(eq('**/*.class'), any(TeamCityPlugin.ClassCollectorAction))
     }
 
     @Test
@@ -204,6 +206,19 @@ class ValidateDefinitionActionTest {
 
         assertThat(definitions.size(), equalTo(1))
         assertThat(definitions.get(0).name, equalTo('build-server-plugin.xml'))
+    }
+
+    @Test
+    public void "ClassCollector collects classes"() {
+        Set<String> classList = new HashSet<String>()
+        Action<FileCopyDetails> classManifestCollector = new TeamCityPlugin.ClassCollectorAction(classList)
+        FileCopyDetails stubDetails = mock(FileCopyDetails)
+        when(stubDetails.getRelativePath()).thenReturn(new RelativePath(true, 'com', 'example', 'Plugin.class'))
+
+        classManifestCollector.execute(stubDetails)
+
+        assertThat(classList.size(), equalTo(1))
+        assertThat(classList, hasItem('com/example/Plugin.class'))
     }
 
     private Jar mockJar(Project project) {
