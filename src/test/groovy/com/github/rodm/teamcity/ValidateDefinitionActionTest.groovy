@@ -19,6 +19,7 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.internal.ConventionMapping
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
@@ -31,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.containsString
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.mockito.ArgumentMatchers.any
@@ -151,7 +153,7 @@ class ValidateDefinitionActionTest {
 
         project.pluginManager.apply(TeamCityServerPlugin)
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml'), any(Action))
+        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
         verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
     }
 
@@ -174,7 +176,7 @@ class ValidateDefinitionActionTest {
 
         project.pluginManager.apply(TeamCityAgentPlugin)
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml'), any(Action))
+        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
         verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
     }
 
@@ -187,6 +189,21 @@ class ValidateDefinitionActionTest {
         project.pluginManager.apply(TeamCityAgentPlugin)
 
         verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+    }
+
+    @Test
+    public void 'PluginDefinitionCollector collects plugin definition files'() {
+        Project project = ProjectBuilder.builder().build()
+        List<TeamCityPlugin.PluginDefinition> definitions = new ArrayList<TeamCityPlugin.PluginDefinition>()
+        Action<FileCopyDetails> collectorAction = new TeamCityPlugin.PluginDefinitionCollectorAction(definitions)
+        File definitionFile = project.file('build-server-plugin.xml')
+        FileCopyDetails stubDetails = mock(FileCopyDetails)
+        when(stubDetails.getFile()).thenReturn(definitionFile)
+
+        collectorAction.execute(stubDetails)
+
+        assertThat(definitions.size(), equalTo(1))
+        assertThat(definitions.get(0).name, equalTo('build-server-plugin.xml'))
     }
 
     private Jar mockJar(Project project) {

@@ -22,6 +22,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
@@ -121,14 +122,25 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
         if (jarTask) {
             List<PluginDefinition> pluginDefinitions = []
-            jarTask.filesMatching pattern, { fileCopyDetails ->
-                pluginDefinitions << new PluginDefinition(fileCopyDetails.file)
-            }
+            jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
             Set<String> classes = []
             jarTask.filesMatching CLASSES_PATTERN, { fileCopyDetails ->
                 classes << fileCopyDetails.relativePath.toString()
             }
             jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+        }
+    }
+
+    static class PluginDefinitionCollectorAction implements Action<FileCopyDetails> {
+
+        List<PluginDefinition> pluginDefinitions
+
+        PluginDefinitionCollectorAction(List<PluginDefinition> pluginDefinitions) {
+            this.pluginDefinitions = pluginDefinitions
+        }
+        @Override
+        void execute(FileCopyDetails fileCopyDetails) {
+            pluginDefinitions << new PluginDefinition(fileCopyDetails.file)
         }
     }
 
