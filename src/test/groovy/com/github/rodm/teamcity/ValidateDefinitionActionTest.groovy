@@ -144,7 +144,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'apply configures filesMatching actions on jar spec'() {
+    public void 'server plugin apply configures filesMatching actions on jar spec'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
@@ -156,12 +156,35 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'apply configures doLast action on jar task'() {
+    public void 'server plugin apply configures doLast action on jar task'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
 
         project.pluginManager.apply(TeamCityServerPlugin)
+
+        verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+    }
+
+    @Test
+    public void 'agent plugin apply configures filesMatching actions on jar spec'() {
+        Project project = ProjectBuilder.builder().build()
+        project.pluginManager.apply(JavaPlugin)
+        Jar mockJarTask = mockJar(project)
+
+        project.pluginManager.apply(TeamCityAgentPlugin)
+
+        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml'), any(Action))
+        verify(mockJarTask).filesMatching(eq('**/*.class'), any(Action))
+    }
+
+    @Test
+    public void 'agent plugin apply configures doLast action on jar task'() {
+        Project project = ProjectBuilder.builder().build()
+        project.pluginManager.apply(JavaPlugin)
+        Jar mockJarTask = mockJar(project)
+
+        project.pluginManager.apply(TeamCityAgentPlugin)
 
         verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
     }
