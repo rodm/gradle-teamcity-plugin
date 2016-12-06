@@ -24,9 +24,6 @@ import org.gradle.api.file.RelativePath
 import org.gradle.api.internal.ConventionMapping
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.internal.logging.events.LogEvent
-import org.gradle.internal.logging.events.OutputEvent
-import org.gradle.internal.logging.events.OutputEventListener
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -228,24 +225,5 @@ class ValidateDefinitionActionTest {
         project.tasks.remove(project.tasks.getByName(JavaPlugin.JAR_TASK_NAME))
         project.tasks.add(mockJar)
         return mockJar
-    }
-
-    static class ResettableOutputEventListener implements OutputEventListener {
-        final StringBuffer buffer = new StringBuffer()
-
-        void reset() {
-            buffer.delete(0, buffer.size())
-        }
-
-        @Override
-        String toString() {
-            return buffer.toString()
-        }
-
-        @Override
-        synchronized void onOutput(OutputEvent event) {
-            LogEvent logEvent = event as LogEvent
-            buffer.append(logEvent.message)
-        }
     }
 }
