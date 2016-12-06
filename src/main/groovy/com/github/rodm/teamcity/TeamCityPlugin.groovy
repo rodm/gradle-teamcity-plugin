@@ -84,18 +84,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
     }
 
     private configureRepositories(Project project, TeamCityPluginExtension extension) {
-        project.plugins.withType(JavaPlugin) {
-            project.afterEvaluate {
-                if (extension.defaultRepositories) {
-                    project.repositories {
-                        mavenCentral()
-                        maven {
-                            url = JETBRAINS_MAVEN_REPOSITORY
-                        }
-                    }
-                }
-            }
-        }
+        project.afterEvaluate new ConfigureRepositories(extension)
     }
 
     void configureConfigurations(final Project project) {
@@ -130,6 +119,29 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
             jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
             jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+        }
+    }
+
+    static class ConfigureRepositories implements Action<Project> {
+
+        private TeamCityPluginExtension extension
+
+        ConfigureRepositories(TeamCityPluginExtension extension) {
+            this.extension = extension
+        }
+
+        @Override
+        void execute(Project project) {
+            project.plugins.withType(JavaPlugin) {
+                if (extension.defaultRepositories) {
+                    project.repositories {
+                        mavenCentral()
+                        maven {
+                            url = JETBRAINS_MAVEN_REPOSITORY
+                        }
+                    }
+                }
+            }
         }
     }
 

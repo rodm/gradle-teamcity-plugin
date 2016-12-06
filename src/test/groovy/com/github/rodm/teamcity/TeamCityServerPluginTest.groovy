@@ -21,6 +21,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
@@ -130,5 +131,40 @@ public class TeamCityServerPluginTest {
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(true))
+    }
+
+    @Test
+    public void 'ConfigureRepositories adds MavenCentral and JetBrains repositories'() {
+        project.apply plugin: 'java'
+
+        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
+
+        configureRepositories.execute(project)
+
+        List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
+        assertThat(urls, hasItem('https://repo1.maven.org/maven2/'))
+        assertThat(urls, hasItem('http://download.jetbrains.com/teamcity-repository'))
+    }
+
+    @Test
+    public void 'ConfigureRepositories adds no repositories when Java plugin is not applied'() {
+        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
+
+        configureRepositories.execute(project)
+
+        assertThat(project.repositories.size(), equalTo(0))
+    }
+
+    @Test
+    public void 'ConfigureRepositories adds no repositories when defaultRepositories is false'() {
+        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
+        extension.defaultRepositories = false
+
+        configureRepositories.execute(project)
+
+        assertThat(project.repositories.size(), equalTo(0))
     }
 }
