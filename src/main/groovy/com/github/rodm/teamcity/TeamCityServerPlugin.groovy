@@ -26,6 +26,7 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
@@ -107,7 +108,19 @@ class TeamCityServerPlugin extends TeamCityPlugin {
     }
 
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate {
+        project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
+    }
+
+    static class ConfigureEnvironmentTasksAction implements Action<Project> {
+
+        private TeamCityPluginExtension extension
+
+        ConfigureEnvironmentTasksAction(TeamCityPluginExtension extension) {
+            this.extension = extension
+        }
+
+        @Override
+        void execute(Project project) {
             ServerPluginConfiguration server = extension.server
             def build = project.tasks.getByName('build')
             server.environments.each { environment ->
@@ -175,18 +188,18 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 stopAgent.onlyIf { environment.homeDir != null }
             }
         }
-    }
 
-    private void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
-        environment.with {
-            downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
-            homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
-            dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
-            javaHome = javaHome ?: project.file(System.properties['java.home'])
+        private void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
+            environment.with {
+                downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
+                homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
+                dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
+                javaHome = javaHome ?: project.file(System.properties['java.home'])
+            }
         }
-    }
 
-    private String toFilename(String url) {
-        return url[(url.lastIndexOf('/') + 1)..-1]
+        private String toFilename(String url) {
+            return url[(url.lastIndexOf('/') + 1)..-1]
+        }
     }
 }

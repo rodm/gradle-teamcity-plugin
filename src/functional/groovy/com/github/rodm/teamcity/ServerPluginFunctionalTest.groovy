@@ -324,37 +324,6 @@ public class ServerPluginFunctionalTest {
     }
 
     @Test
-    public void tasksForMultipleEnvironmentSupport() {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1.5'
-                server {
-                    descriptor {
-                    }
-                }
-                environments {
-                    teamcity {
-                    }
-                }
-            }
-        """
-
-        BuildResult result = executeBuild('tasks')
-
-        assertThat(result.output, containsString('deployPluginToTeamcity'))
-        assertThat(result.output, containsString('undeployPluginFromTeamcity'))
-        assertThat(result.output, containsString('startTeamcityServer'))
-        assertThat(result.output, containsString('stopTeamcityServer'))
-        assertThat(result.output, containsString('startTeamcityAgent'))
-        assertThat(result.output, containsString('stopTeamcityAgent'))
-        assertThat(result.output, not(containsString('deprecated')))
-    }
-
-    @Test
     public void startNamedEnvironmentServer() {
         createFakeTeamCityInstall('teamcity', '9.1.6')
 
