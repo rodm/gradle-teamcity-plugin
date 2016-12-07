@@ -19,8 +19,10 @@ import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
@@ -33,6 +35,11 @@ import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.fail
 
 class AgentConfigurationTest {
+
+    private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
+
+    @Rule
+    public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project;
 
@@ -186,6 +193,17 @@ class AgentConfigurationTest {
         }
 
         assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
+        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
+    }
+
+    @Test
+    public void deprecatedDescriptorAssignmentForAgentProjectType() {
+        project.teamcity {
+            descriptor = project.file('teamcity-plugin.xml')
+        }
+
+        assertThat(extension.agent.descriptor, isA(File))
+        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
     }
 
     @Test
@@ -196,6 +214,27 @@ class AgentConfigurationTest {
         }
 
         assertThat(extension.agent.files.childSpecs.size, is(1))
+        assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
+    }
+
+    @Test
+    public void deprecatedTokensForAgentPlugin() {
+        project.teamcity {
+            tokens VERSION: project.version
+        }
+
+        assertThat(extension.agent.tokens.size(), is(1))
+        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
+    }
+
+    @Test
+    public void deprecatedTokensAssignmentForAgentPlugin() {
+        project.teamcity {
+            tokens = [VERSION: project.version]
+        }
+
+        assertThat(extension.agent.tokens.size(), is(1))
+        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
     }
 
     @Test
