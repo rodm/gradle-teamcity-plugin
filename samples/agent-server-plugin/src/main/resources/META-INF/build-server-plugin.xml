@@ -3,4 +3,5 @@
 
 <beans default-autowire="constructor">
     <bean id="exampleBuildFeature" class="example.teamcity.server.ExampleBuildFeature"/>
+    <bean id="examplePage" class="example.teamcity.server.ExamplePage"/>
 </beans>
