@@ -42,7 +42,7 @@ teamcity {
             description = 'TeamCity Example Build Feature Plugin'
             downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
             email = 'rod.n.mackenzie@gmail.com'
-            useSeparateClassloader = false
+            useSeparateClassloader = true
         }
     }
 
@@ -64,6 +64,8 @@ teamcity {
         teamcity10 {
             version = '10.0.2'
             javaHome = file(java8Home)
+            serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+            agentOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
         }
     }
 }
