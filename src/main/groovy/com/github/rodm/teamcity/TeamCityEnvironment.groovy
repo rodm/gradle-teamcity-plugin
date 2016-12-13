@@ -46,6 +46,10 @@ class TeamCityEnvironment {
         this.name = name
     }
 
+    File getPluginsDir() {
+        return new File(dataDir, 'plugins')
+    }
+
     List<Object> getPlugins() {
         return plugins
     }

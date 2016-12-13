@@ -145,7 +145,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
                 def deployPlugin = project.tasks.create(String.format('deployPluginTo%s', name), DeployPlugin) {
                     conventionMapping.map('files') { project.files(environment.plugins) }
-                    conventionMapping.map('target') { project.file("${environment.dataDir}/plugins") }
+                    conventionMapping.map('target') { project.file(environment.pluginsDir) }
                 }
                 deployPlugin.dependsOn build
                 deployPlugin.onlyIf { environment.dataDir != null }
@@ -153,7 +153,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 def undeployPlugin = project.tasks.create(String.format('undeployPluginFrom%s', name), UndeployPlugin) {
                     conventionMapping.map('files') {
                         project.files(project.files(environment.plugins).collect { plugin ->
-                            "${environment.dataDir}/plugins/${plugin.name}"
+                            "${environment.pluginsDir}/${plugin.name}"
                         })
                     }
                 }
