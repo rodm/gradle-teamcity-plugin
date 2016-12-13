@@ -16,14 +16,15 @@
 package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 class DeployPlugin extends DefaultTask {
 
-    @InputFile
-    File file
+    @InputFiles
+    FileCollection files
 
     @OutputDirectory
     File target
@@ -36,7 +37,7 @@ class DeployPlugin extends DefaultTask {
     @TaskAction
     public void deploy() {
         project.copy {
-            from getFile()
+            from getFiles()
             into getTarget()
         }
     }

@@ -32,6 +32,8 @@ class TeamCityEnvironment {
 
     File javaHome
 
+    private List<Object> plugins = []
+
     private List<String> serverOptions = ['-Dteamcity.development.mode=true', '-Dteamcity.development.shadowCopyClasses=true']
 
     private List<String> agentOptions = []
@@ -42,6 +44,19 @@ class TeamCityEnvironment {
 
     TeamCityEnvironment(String name) {
         this.name = name
+    }
+
+    List<Object> getPlugins() {
+        return plugins
+    }
+
+    def setPlugins(Object plugins) {
+        this.plugins.clear()
+        this.plugins.addAll(plugins)
+    }
+
+    def plugins(Object plugin) {
+        this.plugins.add(plugin)
     }
 
     def getServerOptions() {

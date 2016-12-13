@@ -33,6 +33,7 @@ import static org.junit.Assert.assertEquals
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
 public class ServerPluginFunctionalTest {
@@ -407,6 +408,43 @@ public class ServerPluginFunctionalTest {
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('deprecated')))
+    }
+
+    @Test
+    public void 'deploy and undeploy multiple plugins to and from an environment'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '9.1'
+                environments {
+                    baseDataDir = 'teamcity/data'
+                    teamcity {
+                        version = '9.1.6'
+                        plugins 'plugin1.zip'
+                        plugins project.file('plugin2.zip')
+                    }
+                }
+            }
+        """
+
+        testProjectDir.newFile('plugin1.zip')
+        testProjectDir.newFile('plugin2.zip')
+
+        BuildResult result = executeBuild('-S', 'deployPluginToTeamcity')
+
+        File plugin1File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin1.zip')
+        File plugin2File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin2.zip')
+        assertThat(result.task(":deployPluginToTeamcity").getOutcome(), is(SUCCESS))
+        assertTrue('Plugin1 archive not deployed', plugin1File.exists())
+        assertTrue('Plugin2 archive not deployed', plugin2File.exists())
+
+        result = executeBuild('undeployPluginFromTeamcity')
+        assertThat(result.task(":undeployPluginFromTeamcity").getOutcome(), is(SUCCESS))
+        assertFalse('Plugin1 archive not undeployed', plugin1File.exists())
+        assertFalse('Plugin2 archive not undeployed', plugin2File.exists())
     }
 
     private File createFakeTeamCityInstall(String baseDir, String version) {

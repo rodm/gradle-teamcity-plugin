@@ -16,13 +16,14 @@
 package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 
 class UndeployPlugin extends DefaultTask {
 
-    @Input
-    File file
+    @InputFiles
+    FileCollection files
 
     UndeployPlugin() {
         group = 'TeamCity'
@@ -31,6 +32,6 @@ class UndeployPlugin extends DefaultTask {
 
     @TaskAction
     public void undeploy() {
-        project.delete(getFile())
+        project.delete(getFiles())
     }
 }

@@ -144,16 +144,17 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 install.dependsOn unpack
 
                 def deployPlugin = project.tasks.create(String.format('deployPluginTo%s', name), DeployPlugin) {
-                    conventionMapping.map('file') { project.tasks.getByName('serverPlugin').archivePath }
+                    conventionMapping.map('files') { project.files(environment.plugins) }
                     conventionMapping.map('target') { project.file("${environment.dataDir}/plugins") }
                 }
                 deployPlugin.dependsOn build
                 deployPlugin.onlyIf { environment.dataDir != null }
 
                 def undeployPlugin = project.tasks.create(String.format('undeployPluginFrom%s', name), UndeployPlugin) {
-                    conventionMapping.map('file') {
-                        def archiveName = project.tasks.getByName('serverPlugin').archiveName
-                        project.file("${environment.dataDir}/plugins/${archiveName}")
+                    conventionMapping.map('files') {
+                        project.files(project.files(environment.plugins).collect { plugin ->
+                            "${environment.dataDir}/plugins/${plugin.name}"
+                        })
                     }
                 }
                 undeployPlugin.onlyIf { environment.dataDir != null }
@@ -195,6 +196,13 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
                 dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
                 javaHome = javaHome ?: project.file(System.properties['java.home'])
+
+                if (plugins.isEmpty()) {
+                    def serverPlugin = project.tasks.getByName('serverPlugin')
+                    if (serverPlugin) {
+                        plugins serverPlugin.archivePath
+                    }
+                }
             }
         }
 

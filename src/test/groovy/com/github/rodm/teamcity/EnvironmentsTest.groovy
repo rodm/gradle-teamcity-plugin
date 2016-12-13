@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.DeployPlugin
+import com.github.rodm.teamcity.tasks.UndeployPlugin
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskContainer
@@ -26,6 +28,8 @@ import org.junit.Before
 import org.junit.Test
 
 import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.Matchers.hasItem
+import static org.hamcrest.Matchers.hasSize
 import static org.junit.Assert.assertThat
 
 class EnvironmentsTest {
@@ -318,6 +322,58 @@ class EnvironmentsTest {
 
         assertThat(project.tasks, hasTask('startTeamcity9Server'))
         assertThat(project.tasks, hasTask('startTeamcity10Server'))
+    }
+
+    @Test
+    public void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with project plugin'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                teamcity10 {
+                    version = '10.0.3'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10')
+        assertThat(deployPlugin.files.files, hasSize(1))
+        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
+
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10')
+        assertThat(undeployPlugin.files.files, hasSize(1))
+        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/test.zip')))
+    }
+
+    @Test
+    public void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with environment plugins'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                teamcity10 {
+                    version = '10.0.3'
+                    plugins 'plugin1.zip'
+                    plugins 'plugin2.zip'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10')
+        assertThat(deployPlugin.files.files, hasSize(2))
+        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin1.zip')))
+        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin2.zip')))
+
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10')
+        assertThat(undeployPlugin.files.files, hasSize(2))
+        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
+        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
     }
 
     private static Matcher<TaskContainer> hasTask(String name) {
