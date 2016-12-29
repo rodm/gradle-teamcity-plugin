@@ -440,8 +440,8 @@ public class ServerPluginFunctionalTest {
             rootProject.name = 'test-plugin'
         """
 
-        def baseHomeDir = "-Pcom.github.rodm.teamcity.baseHomeDir=${serversDir.root}/teamcity"
-        def baseDataDir = "-Pcom.github.rodm.teamcity.baseDataDir=${serversDir.root}/data"
+        def baseHomeDir = "-Pteamcity.environments.baseHomeDir=${serversDir.root}/teamcity"
+        def baseDataDir = "-Pteamcity.environments.baseDataDir=${serversDir.root}/data"
         BuildResult result = executeBuild(baseHomeDir, baseDataDir, 'build', 'startTeamcity9Server')
 
         File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')

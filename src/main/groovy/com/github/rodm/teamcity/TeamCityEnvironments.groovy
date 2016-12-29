@@ -20,10 +20,10 @@ import org.gradle.api.Project
 
 class TeamCityEnvironments {
 
-    public static final String DOWNLOADS_DIR_PROPERTY = 'com.github.rodm.teamcity.downloadsDir'
-    public static final String BASE_DOWNLOAD_URL_PROPERTY = 'com.github.rodm.teamcity.baseDownloadUrl'
-    public static final String BASE_DATA_DIR_PROPERTY = 'com.github.rodm.teamcity.baseDataDir'
-    public static final String BASE_HOME_DIR_PROPERTY = 'com.github.rodm.teamcity.baseHomeDir'
+    public static final String DOWNLOADS_DIR_PROPERTY = 'teamcity.environments.downloadsDir'
+    public static final String BASE_DOWNLOAD_URL_PROPERTY = 'teamcity.environments.baseDownloadUrl'
+    public static final String BASE_DATA_DIR_PROPERTY = 'teamcity.environments.baseDataDir'
+    public static final String BASE_HOME_DIR_PROPERTY = 'teamcity.environments.baseHomeDir'
 
     public static final String DEFAULT_DOWNLOADS_DIR = 'downloads'
     public static final String DEFAULT_BASE_DOWNLOAD_URL = 'http://download.jetbrains.com/teamcity'
