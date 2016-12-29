@@ -52,7 +52,7 @@ class TeamCityEnvironments {
     }
 
     String getDownloadsDir() {
-        downloadsDir ? downloadsDir : property(DOWNLOADS_DIR_PROPERTY, DEFAULT_DOWNLOADS_DIR)
+        return property(DOWNLOADS_DIR_PROPERTY, downloadsDir, DEFAULT_DOWNLOADS_DIR)
     }
 
     void setDownloadsDir(String downloadsDir) {
@@ -60,7 +60,7 @@ class TeamCityEnvironments {
     }
 
     String getBaseDownloadUrl() {
-        baseDownloadUrl ? baseDownloadUrl : property(BASE_DOWNLOAD_URL_PROPERTY, DEFAULT_BASE_DOWNLOAD_URL)
+        return property(BASE_DOWNLOAD_URL_PROPERTY, baseDownloadUrl, DEFAULT_BASE_DOWNLOAD_URL)
     }
 
     void setBaseDownloadUrl(String baseDownloadUrl) {
@@ -68,7 +68,7 @@ class TeamCityEnvironments {
     }
 
     String getBaseDataDir() {
-        baseDataDir ? baseDataDir : property(BASE_DATA_DIR_PROPERTY, DEFAULT_BASE_DATA_DIR)
+        return property(BASE_DATA_DIR_PROPERTY, baseDataDir, DEFAULT_BASE_DATA_DIR)
     }
 
     void setBaseDataDir(String baseDataDir) {
@@ -76,18 +76,18 @@ class TeamCityEnvironments {
     }
 
     String getBaseHomeDir() {
-        baseHomeDir ? baseHomeDir : property(BASE_HOME_DIR_PROPERTY, DEFAULT_BASE_HOME_DIR)
+        return property(BASE_HOME_DIR_PROPERTY, baseHomeDir, DEFAULT_BASE_HOME_DIR)
     }
 
     void setBaseHomeDir(String baseHomeDir) {
         this.baseHomeDir = baseHomeDir
     }
 
-    private String property(String name, String defaultValue) {
+    private String property(String name, String value, String defaultValue) {
         if (project.hasProperty(name)) {
             return project.property(name)
         }
-        return defaultValue
+        return value ? value : defaultValue
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
