@@ -183,6 +183,14 @@ The following properties can be defined in the `environments` configuration bloc
 * `baseHomeDir` : The base directory for a TeamCity install. Defaults to `servers`.
 * `baseDataDir` : The base directory for a TeamCity Data directory. Defaults to `data`.
 
+The following Gradle properties can be used to override the shared environment properties from the command line or
+by setting a value in a gradle.properties file.
+
+* `teamcity.environments.downloadsDir`
+* `teamcity.environments.baseDownloadUrl`
+* `teamcity.environments.baseDataDir`
+* `teamcity.environments.baseHomeDir`
+
 Within the `environments` configuration block multiple TeamCity environments can be defined, each environment supports the following properties
 
 * `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '9.0'.
