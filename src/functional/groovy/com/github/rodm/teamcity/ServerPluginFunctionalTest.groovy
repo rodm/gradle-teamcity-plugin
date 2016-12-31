@@ -411,46 +411,6 @@ public class ServerPluginFunctionalTest {
     }
 
     @Test
-    public void 'start server with shared properties overridden by command line'() {
-        createFakeTeamCityInstall(serversDir, 'teamcity', '9.1.6')
-
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'com.github.rodm.teamcity-server'
-            }
-            teamcity {
-                version = '8.1'
-                server {
-                    descriptor {
-                    }
-                }
-                environments {
-                    baseHomeDir = file('${windowsCompatiblePath(testProjectDir.root)}/teamcity')
-                    baseDataDir = file('${windowsCompatiblePath(testProjectDir.root)}/data')
-                    teamcity9 {
-                        version = '9.1.6'
-                    }
-                }
-            }
-        """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
-
-        def baseHomeDir = "-Pteamcity.environments.baseHomeDir=${serversDir.root}/teamcity"
-        def baseDataDir = "-Pteamcity.environments.baseDataDir=${serversDir.root}/data"
-        BuildResult result = executeBuild(baseHomeDir, baseDataDir, 'build', 'startTeamcity9Server')
-
-        File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
-        assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
-        assertThat(result.output, not(containsString('deprecated')))
-    }
-
-    @Test
     public void 'deploy and undeploy multiple plugins to and from an environment'() {
         buildFile << """
             plugins {

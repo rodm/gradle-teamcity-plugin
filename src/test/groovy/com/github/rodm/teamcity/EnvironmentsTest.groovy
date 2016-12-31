@@ -31,6 +31,8 @@ import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.junit.Assert.assertThat
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 class EnvironmentsTest {
 
@@ -108,6 +110,58 @@ class EnvironmentsTest {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.environments.getBaseHomeDir(), equalTo('/tmp/servers'))
+    }
+
+    @Test
+    public void 'gradle properties should override default shared properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        Project mockProject = mock(Project)
+        configureGradleProjectProperties(mockProject)
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        extension.environments.project = mockProject
+
+        assertThat(extension.environments.getDownloadsDir(), equalTo('/alt/downloads'))
+        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://alt-repository'))
+        assertThat(extension.environments.getBaseHomeDir(), equalTo('/alt/servers'))
+        assertThat(extension.environments.getBaseDataDir(), equalTo('/alt/data'))
+    }
+
+    @Test
+    public void 'gradle properties should override shared properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        Project mockProject = mock(Project)
+        configureGradleProjectProperties(mockProject)
+
+        project.teamcity {
+            environments {
+                downloadsDir = '/tmp/downloads'
+                baseDownloadUrl = 'http://local-repository'
+                baseHomeDir = '/tmp/servers'
+                baseDataDir = '/tmp/data'
+            }
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        extension.environments.project = mockProject
+
+        assertThat(extension.environments.getDownloadsDir(), equalTo('/alt/downloads'))
+        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://alt-repository'))
+        assertThat(extension.environments.getBaseHomeDir(), equalTo('/alt/servers'))
+        assertThat(extension.environments.getBaseDataDir(), equalTo('/alt/data'))
+    }
+
+    private void configureGradleProjectProperties(Project mockProject) {
+        when(mockProject.hasProperty('teamcity.environments.downloadsDir')).thenReturn(true)
+        when(mockProject.property('teamcity.environments.downloadsDir')).thenReturn('/alt/downloads')
+        when(mockProject.hasProperty('teamcity.environments.baseDownloadUrl')).thenReturn(true)
+        when(mockProject.property('teamcity.environments.baseDownloadUrl')).thenReturn('http://alt-repository')
+        when(mockProject.hasProperty('teamcity.environments.baseHomeDir')).thenReturn(true)
+        when(mockProject.property('teamcity.environments.baseHomeDir')).thenReturn('/alt/servers')
+        when(mockProject.hasProperty('teamcity.environments.baseDataDir')).thenReturn(true)
+        when(mockProject.property('teamcity.environments.baseDataDir')).thenReturn('/alt/data')
     }
 
     @Test
