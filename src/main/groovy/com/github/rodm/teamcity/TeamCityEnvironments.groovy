@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
@@ -51,6 +52,7 @@ class TeamCityEnvironments {
         return environments.getByName(name)
     }
 
+    @CompileStatic
     String getDownloadsDir() {
         return property(DOWNLOADS_DIR_PROPERTY, downloadsDir, DEFAULT_DOWNLOADS_DIR)
     }
@@ -59,6 +61,7 @@ class TeamCityEnvironments {
         this.downloadsDir = downloadsDir
     }
 
+    @CompileStatic
     String getBaseDownloadUrl() {
         return property(BASE_DOWNLOAD_URL_PROPERTY, baseDownloadUrl, DEFAULT_BASE_DOWNLOAD_URL)
     }
@@ -67,6 +70,7 @@ class TeamCityEnvironments {
         this.baseDownloadUrl = baseDownloadUrl
     }
 
+    @CompileStatic
     String getBaseDataDir() {
         return property(BASE_DATA_DIR_PROPERTY, baseDataDir, DEFAULT_BASE_DATA_DIR)
     }
@@ -75,6 +79,7 @@ class TeamCityEnvironments {
         this.baseDataDir = baseDataDir
     }
 
+    @CompileStatic
     String getBaseHomeDir() {
         return property(BASE_HOME_DIR_PROPERTY, baseHomeDir, DEFAULT_BASE_HOME_DIR)
     }
