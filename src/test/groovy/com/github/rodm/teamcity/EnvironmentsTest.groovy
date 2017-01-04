@@ -27,6 +27,7 @@ import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
@@ -326,6 +327,67 @@ class EnvironmentsTest {
 
         def environment = extension.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-DadditionalOption1=value1 -DadditionalOption2=value2'))
+    }
+
+    @Test
+    public void 'ConfigureEnvironmentTasks configures environments with default properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test1 {
+                    version = '9.1.7'
+                }
+                test2 {
+                    version = '10.0.4'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        def environment1 = extension.environments.getByName('test1')
+        assertThat(environment1.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment1.homeDir.toString(), endsWith('projectDir/servers/TeamCity-9.1.7'))
+        assertThat(environment1.dataDir.toString(), endsWith('projectDir/data/9.1'))
+
+        def environment2 = extension.environments.getByName('test2')
+        assertThat(environment2.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
+        assertThat(environment2.homeDir.toString(), endsWith('projectDir/servers/TeamCity-10.0.4'))
+        assertThat(environment2.dataDir.toString(), endsWith('projectDir/data/10.0'))
+    }
+
+    @Test
+    public void 'ConfigureEnvironmentTasks configures environments using shared properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                baseDownloadUrl = 'http://local-repository'
+                baseHomeDir = '/tmp/servers'
+                baseDataDir = '/tmp/data'
+                test1 {
+                    version = '9.1.7'
+                }
+                test2 {
+                    version = '10.0.4'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        def environment1 = extension.environments.getByName('test1')
+        assertThat(environment1.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment1.homeDir.toString(), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(environment1.dataDir.toString(), endsWith('/tmp/data/9.1'))
+
+        def environment2 = extension.environments.getByName('test2')
+        assertThat(environment2.downloadUrl, equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+        assertThat(environment2.homeDir.toString(), endsWith('/tmp/servers/TeamCity-10.0.4'))
+        assertThat(environment2.dataDir.toString(), endsWith('/tmp/data/10.0'))
     }
 
     @Test
