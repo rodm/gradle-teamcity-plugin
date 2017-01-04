@@ -40,6 +40,11 @@ class TeamCityPluginExtension {
         this.server = new ServerPluginConfiguration(project, environments)
     }
 
+    int getMajorVersion() {
+        String[] parts = version.split('\\.')
+        return parts[0] as int
+    }
+
     def getAgent() {
         return agent
     }
