@@ -349,13 +349,13 @@ class EnvironmentsTest {
 
         def environment1 = extension.environments.getByName('test1')
         assertThat(environment1.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
-        assertThat(environment1.homeDir.toString(), endsWith('projectDir/servers/TeamCity-9.1.7'))
-        assertThat(environment1.dataDir.toString(), endsWith('projectDir/data/9.1'))
+        assertThat(normalizePath(environment1.homeDir), endsWith('projectDir/servers/TeamCity-9.1.7'))
+        assertThat(normalizePath(environment1.dataDir), endsWith('projectDir/data/9.1'))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
-        assertThat(environment2.homeDir.toString(), endsWith('projectDir/servers/TeamCity-10.0.4'))
-        assertThat(environment2.dataDir.toString(), endsWith('projectDir/data/10.0'))
+        assertThat(normalizePath(environment2.homeDir), endsWith('projectDir/servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(environment2.dataDir), endsWith('projectDir/data/10.0'))
     }
 
     @Test
@@ -381,13 +381,13 @@ class EnvironmentsTest {
 
         def environment1 = extension.environments.getByName('test1')
         assertThat(environment1.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
-        assertThat(environment1.homeDir.toString(), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(environment1.dataDir.toString(), endsWith('/tmp/data/9.1'))
+        assertThat(normalizePath(environment1.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(normalizePath(environment1.dataDir), endsWith('/tmp/data/9.1'))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
-        assertThat(environment2.homeDir.toString(), endsWith('/tmp/servers/TeamCity-10.0.4'))
-        assertThat(environment2.dataDir.toString(), endsWith('/tmp/data/10.0'))
+        assertThat(normalizePath(environment2.homeDir), endsWith('/tmp/servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(environment2.dataDir), endsWith('/tmp/data/10.0'))
     }
 
     @Test
@@ -505,5 +505,9 @@ class EnvironmentsTest {
                 return item.findByName(name)
             }
         }
+    }
+
+    private String normalizePath(File path) {
+        path.canonicalPath.replace('\\', '/')
     }
 }
