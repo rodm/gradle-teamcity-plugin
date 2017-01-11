@@ -21,9 +21,6 @@ apply {
     plugin("com.github.rodm.teamcity-agent")
 }
 
-extra["kotlinVersion"] = "1.1-M03"
-extra["teamcityVersion"] = "9.1"
-
 repositories {
     mavenCentral()
     gradleScriptKotlin()
@@ -34,7 +31,7 @@ dependencies {
 }
 
 configure<TeamCityPluginExtension> {
-    version = extra["teamcityVersion"] as String
+    version = rootProject.extra["teamcityVersion"] as String
 
     agent(closureOf<AgentPluginConfiguration> {
         descriptor(closureOf<AgentPluginDescriptor> {

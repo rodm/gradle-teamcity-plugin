@@ -20,9 +20,6 @@ apply {
     plugin("com.github.rodm.teamcity-server")
 }
 
-extra["kotlinVersion"] = "1.1-M03"
-extra["teamcityVersion"] = "9.1"
-
 //ext {
 //    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
 //    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
@@ -43,7 +40,7 @@ dependencies {
 }
 
 configure<TeamCityPluginExtension> {
-    version = extra["teamcityVersion"] as String
+    version = rootProject.extra["teamcityVersion"] as String
 
     server(closureOf<ServerPluginConfiguration> {
         descriptor(closureOf<ServerPluginDescriptor> {
