@@ -72,11 +72,30 @@ class SamplesTest {
         assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
     }
 
+    @Test
+    public void 'build kotlin plugin'() {
+        File projectDir = new File(samplesDir, 'kotlin-plugin')
+        BuildResult result = executeBuildWithVersion(projectDir, '3.3')
+
+        assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
+    }
+
     private BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withArguments(args)
                 .withPluginClasspath()
+                .forwardOutput()
+                .build()
+        return result
+    }
+
+    private BuildResult executeBuildWithVersion(File projectDir, String version, String... args = ['clean', 'build']) {
+        BuildResult result = GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withArguments(args)
+                .withPluginClasspath()
+                .withGradleVersion(version)
                 .forwardOutput()
                 .build()
         return result
