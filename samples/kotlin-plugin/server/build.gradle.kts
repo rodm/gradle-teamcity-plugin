@@ -1,6 +1,8 @@
 
 import com.github.rodm.teamcity.ServerPluginConfiguration
 import com.github.rodm.teamcity.ServerPluginDescriptor
+import com.github.rodm.teamcity.TeamCityEnvironment
+import com.github.rodm.teamcity.TeamCityEnvironments
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
 buildscript {
@@ -20,12 +22,10 @@ apply {
     plugin("com.github.rodm.teamcity-server")
 }
 
-//ext {
-//    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
-//    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
-//    java7Home = project.findProperty('java7.home') ?: '/opt/jdk1.7.0_80'
-//    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
-//}
+extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
+extra["serversDir"] = project.findProperty("servers.dir") ?: "${rootDir}/servers"
+extra["java7Home"] = project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80"
+extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92"
 
 repositories {
     mavenCentral()
@@ -54,19 +54,19 @@ configure<TeamCityPluginExtension> {
         })
     })
 
-//    environments {
-//        downloadsDir = project.downloadsDir
-//        baseHomeDir = project.serversDir
-//        baseDataDir = 'data'
-//
-//        teamcity9 {
-//            version = '9.1.7'
-//            javaHome = file(java7Home)
-//        }
-//
-//        teamcity10 {
-//            version = '10.0.4'
-//            javaHome = file(java8Home)
-//        }
-//    }
+    environments(closureOf<TeamCityEnvironments> {
+        downloadsDir = extra["downloadsDir"] as String
+        baseHomeDir = extra["serversDir"] as String
+        baseDataDir = "${rootDir}/data"
+
+        methodMissing("teamcity9", arrayOf(closureOf<TeamCityEnvironment> {
+            version = "9.1.7"
+            javaHome = file(extra["java7Home"])
+        }))
+
+        methodMissing("teamcity10", arrayOf(closureOf<TeamCityEnvironment> {
+            version = "10.0.4"
+            javaHome = file(extra["java8Home"])
+        }))
+    })
 }
