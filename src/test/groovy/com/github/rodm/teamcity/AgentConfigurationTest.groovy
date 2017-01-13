@@ -17,11 +17,13 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.isA
@@ -248,5 +250,16 @@ class AgentConfigurationTest {
         catch (InvalidUserDataException expected) {
             assertEquals('Server plugin configuration is invalid for a project without the teamcity-server plugin', expected.message)
         }
+    }
+
+    @Test
+    public void 'apply adds agent-api to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'agent-api', '9.0'))
     }
 }

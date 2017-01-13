@@ -16,11 +16,13 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
 
+import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
@@ -166,5 +168,27 @@ public class TeamCityServerPluginTest {
         configureRepositories.execute(project)
 
         assertThat(project.repositories.size(), equalTo(0))
+    }
+
+    @Test
+    public void 'apply adds server-api to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'server-api', '9.0'))
+    }
+
+    @Test
+    public void 'apply adds tests-support to the testCompile configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('testCompile')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'tests-support', '9.0'))
     }
 }
