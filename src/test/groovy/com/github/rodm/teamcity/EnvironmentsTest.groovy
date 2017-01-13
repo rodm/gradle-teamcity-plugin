@@ -19,14 +19,11 @@ import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskContainer
 import org.gradle.testfixtures.ProjectBuilder
-import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.junit.Before
 import org.junit.Test
 
+import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.Matchers.hasItem
@@ -490,21 +487,6 @@ class EnvironmentsTest {
         assertThat(undeployPlugin.files.files, hasSize(2))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
-    }
-
-    private static Matcher<TaskContainer> hasTask(String name) {
-        return new TypeSafeDiagnosingMatcher<TaskContainer>() {
-            @Override
-            public void describeTo(final Description description) {
-                description.appendText("TaskContainer should contain task ").appendValue(name)
-            }
-
-            @Override
-            protected boolean matchesSafely(final TaskContainer item, final Description mismatchDescription) {
-                mismatchDescription.appendText(" was ").appendValue(item)
-                return item.findByName(name)
-            }
-        }
     }
 
     private String normalizePath(File path) {

@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.tasks.TaskContainer
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeDiagnosingMatcher
@@ -24,6 +25,21 @@ class GradleMatchers {
 
     static Matcher<Configuration> hasDependency(String group, String name, String version) {
         return new HasDependency(group, name, version)
+    }
+
+    static Matcher<TaskContainer> hasTask(String name) {
+        return new TypeSafeDiagnosingMatcher<TaskContainer>() {
+            @Override
+            public void describeTo(final Description description) {
+                description.appendText("TaskContainer should contain task ").appendValue(name)
+            }
+
+            @Override
+            protected boolean matchesSafely(final TaskContainer item, final Description mismatchDescription) {
+                mismatchDescription.appendText(" was ").appendValue(item)
+                return item.findByName(name)
+            }
+        }
     }
 
     static class HasDependency extends TypeSafeDiagnosingMatcher<Configuration> {
