@@ -201,6 +201,8 @@ Within the `environments` configuration block multiple TeamCity environments can
 * `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
  these plguin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
 * `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
+* `plugins` : The collection of plugins to be deployed to the TeamCity server for this environment. Defaults to the
+plugin output by the `serverPlugin` task.
 
 For each environment the following tasks are created based on the environment name:
 
