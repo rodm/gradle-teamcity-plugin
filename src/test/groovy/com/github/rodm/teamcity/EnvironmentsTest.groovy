@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.DeployPlugin
+import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -24,8 +25,8 @@ import org.junit.Before
 import org.junit.Test
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
-import static org.hamcrest.CoreMatchers.endsWith
-import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.Matchers.endsWith
+import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.junit.Assert.assertThat
@@ -385,6 +386,32 @@ class EnvironmentsTest {
         assertThat(environment2.downloadUrl, equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/tmp/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/tmp/data/10.0'))
+    }
+
+    @Test
+    public void 'ConfigureEnvironmentTasks configures environment using environment properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                    version = '9.1.7'
+                    downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
+                    homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
+                    dataDir = project.file('/tmp/data/teamcity9.1')
+                    javaHome = project.file('/tmp/java')
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        def environment = extension.environments.getByName('test')
+        assertThat(environment.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+        assertThat(normalizePath(environment.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(normalizePath(environment.dataDir), endsWith('/tmp/data/teamcity9.1'))
+        assertThat(normalizePath(environment.javaHome), endsWith('/tmp/java'))
     }
 
     @Test
