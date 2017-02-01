@@ -4,6 +4,7 @@ import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.TeamCityEnvironment
 import com.github.rodm.teamcity.TeamCityEnvironments
 import com.github.rodm.teamcity.TeamCityPluginExtension
+import org.gradle.api.Project
 
 buildscript {
     repositories {
@@ -39,11 +40,11 @@ dependencies {
     agent(project(path = ":agent", configuration = "plugin"))
 }
 
-configure<TeamCityPluginExtension> {
+teamcity {
     version = rootProject.extra["teamcityVersion"] as String
 
-    server(closureOf<ServerPluginConfiguration> {
-        descriptor(closureOf<ServerPluginDescriptor> {
+    server {
+        descriptor {
             name = "Example TeamCity Plugin"
             displayName = "Example TeamCity Plugin"
             version = rootProject.version as String?
@@ -51,22 +52,43 @@ configure<TeamCityPluginExtension> {
             description = "Example multi-project TeamCity plugin"
             email = "rod.n.mackenzie@gmail.com"
             useSeparateClassloader = true
-        })
-    })
+        }
+    }
 
-    environments(closureOf<TeamCityEnvironments> {
+    environments {
         downloadsDir = extra["downloadsDir"] as String
         baseHomeDir = extra["serversDir"] as String
         baseDataDir = "${rootDir}/data"
 
-        methodMissing("teamcity9", arrayOf(closureOf<TeamCityEnvironment> {
+        operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) {
+            environments.create(this, closureOf<TeamCityEnvironment>(block))
+        }
+
+        "teamcity9" {
             version = "9.1.7"
             javaHome = file(extra["java7Home"])
-        }))
+        }
 
-        methodMissing("teamcity10", arrayOf(closureOf<TeamCityEnvironment> {
+        "teamcity10" {
             version = "10.0.4"
             javaHome = file(extra["java8Home"])
-        }))
-    })
+        }
+    }
+}
+
+// Extension functions to allow cleaner configuration
+fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
+    configure(configuration)
+}
+
+fun TeamCityPluginExtension.server(configuration: ServerPluginConfiguration.() -> Unit) {
+    this.server(closureOf<ServerPluginConfiguration>(configuration))
+}
+
+fun TeamCityPluginExtension.environments(configuration: TeamCityEnvironments.() -> Unit) {
+    this.environments(closureOf<TeamCityEnvironments>(configuration))
+}
+
+fun ServerPluginConfiguration.descriptor(configuration: ServerPluginDescriptor.() -> Unit) {
+    this.descriptor(closureOf<ServerPluginDescriptor>(configuration))
 }
