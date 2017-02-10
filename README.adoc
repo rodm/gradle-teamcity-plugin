@@ -88,6 +88,8 @@ The following properties can be defined in the `server` configuration block.
 * `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
 if the descriptor is referencing an external file.
 * `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
+* `archiveName` : The archiveName property defines the name of the plugin archive output by the `serverPlugin` task.
+Defaults to the name of the root project and the project version.
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
 {uri-server-descriptor}[Server-Side Plugin Descriptor]
@@ -280,6 +282,8 @@ The following properties can be defined in the `agent` configuration block.
 * `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
 if the descriptor is referencing an external file.
 * `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
+* `archiveName` : The archiveName property defines the name of the plugin archive output by the `agentPlugin` task.
+Defaults to the name of the root project with '-agent' appended and the project version.
 
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
 {uri-agent-descriptor}[Agent-Side Plugin Descriptor]
