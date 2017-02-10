@@ -26,6 +26,8 @@ abstract class PluginConfiguration {
 
     private Map<String, Object> tokens = [:]
 
+    String archiveName
+
     PluginConfiguration(CopySpec copySpec) {
         this.files = copySpec
     }

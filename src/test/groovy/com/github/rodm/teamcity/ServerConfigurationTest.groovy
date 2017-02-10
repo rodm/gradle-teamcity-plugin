@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -217,5 +218,36 @@ class ServerConfigurationTest {
         catch (InvalidUserDataException expected) {
             assertEquals('Agent plugin configuration is invalid for a project without the teamcity-agent plugin', expected.message)
         }
+    }
+
+    @Test
+    public void 'apply configures archive name using defaults'() {
+        project.version = '1.2.3'
+        project.teamcity {
+            server {
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        assertThat(serverPlugin.archiveName, equalTo('test-1.2.3.zip'))
+    }
+
+    @Test
+    public void 'apply configures archive name using configuration value'() {
+        project.version = '1.2.3'
+        project.teamcity {
+            server {
+                archiveName = 'server-plugin.zip'
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
     }
 }

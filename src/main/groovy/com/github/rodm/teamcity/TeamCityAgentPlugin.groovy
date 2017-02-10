@@ -84,5 +84,12 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
 
         ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
         project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
+
+        project.afterEvaluate {
+            Zip agentPlugin = (Zip) project.tasks.getByPath('agentPlugin')
+            if (extension.agent.archiveName) {
+                agentPlugin.archiveName = extension.agent.archiveName
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -261,5 +262,36 @@ class AgentConfigurationTest {
 
         Configuration configuration = project.configurations.getByName('provided')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'agent-api', '9.0'))
+    }
+
+    @Test
+    public void 'apply configures archive name using defaults'() {
+        project.version = '1.2.3'
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
+        assertThat(agentPlugin.archiveName, equalTo('test-agent-1.2.3.zip'))
+    }
+
+    @Test
+    public void 'apply configures archive name using configuration value'() {
+        project.version = '1.2.3'
+        project.teamcity {
+            agent {
+                archiveName = 'agent-plugin.zip'
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
+        assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
     }
 }

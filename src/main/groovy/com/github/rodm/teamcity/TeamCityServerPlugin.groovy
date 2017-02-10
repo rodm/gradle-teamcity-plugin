@@ -105,6 +105,13 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor)
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
+
+        project.afterEvaluate {
+            Zip serverPlugin = (Zip) project.tasks.getByPath('serverPlugin')
+            if (extension.server.archiveName) {
+                serverPlugin.archiveName = extension.server.archiveName
+            }
+        }
     }
 
     private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
