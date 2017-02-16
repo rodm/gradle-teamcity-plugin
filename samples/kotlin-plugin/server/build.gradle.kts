@@ -73,6 +73,12 @@ teamcity {
             version = "10.0.4"
             javaHome = file(extra["java8Home"])
         }
+
+        "teamcity2017" {
+            version = "2017.1-EAP"
+            downloadUrl = "https://download.jetbrains.com/teamcity/eap/TeamCity-45965.tar.gz"
+            javaHome = file(extra["java8Home"])
+        }
     }
 }
 
