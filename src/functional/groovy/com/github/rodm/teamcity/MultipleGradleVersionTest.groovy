@@ -201,6 +201,12 @@ class MultipleGradleVersionTest {
         checkBuild(result)
     }
 
+    @Test
+    public void 'build plugin using Gradle 3.4'() {
+        BuildResult result = executeBuild('3.4')
+        checkBuild(result)
+    }
+
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.getRoot())
