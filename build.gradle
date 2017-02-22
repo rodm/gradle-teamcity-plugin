@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+    compile 'de.undercouch:gradle-download-task:3.2.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.xmlunit:xmlunit-matchers:2.2.1'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

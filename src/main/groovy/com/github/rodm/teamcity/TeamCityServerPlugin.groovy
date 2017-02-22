@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.DeployPlugin
-import com.github.rodm.teamcity.tasks.Download
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
@@ -26,6 +25,7 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
+import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -134,12 +134,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 defaultMissingProperties(project, server, environment)
 
                 String name = environment.name.capitalize()
-                def download = project.tasks.create(String.format("download%s", name), Download) {
-                    conventionMapping.map('source') { environment.downloadUrl }
-                    conventionMapping.map('target') {
-                        project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
-                    }
-                }
+                def download = project.tasks.create(String.format("download%s", name), Download)
+                download.src { environment.downloadUrl }
+                download.dest { project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}") }
+
                 def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
                     conventionMapping.map('source') {
                         project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
