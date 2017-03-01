@@ -456,13 +456,15 @@ class ServerPluginFunctionalTest {
             }
             teamcity {
                 version = 'SNAPSHOT'
-                descriptor {
-                    name = 'test-plugin'
-                    displayName = 'Some test plugin'
-                    version = '1.0-SNAPSHOT'
-                    vendorName = 'ACME Corp'
-                    vendorUrl = 'http://www.acme.com/'                    
-                    useSeparateClassloader = true
+                server {
+                    descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Some test plugin'
+                        version = '1.0-SNAPSHOT'
+                        vendorName = 'ACME Corp'
+                        vendorUrl = 'http://www.acme.com/'                    
+                        useSeparateClassloader = true
+                    }
                 }
             }                   
             """
