@@ -447,13 +447,22 @@ class ServerPluginFunctionalTest {
         assertFalse('Plugin2 archive not undeployed', plugin2File.exists())
     }
 
+    /**
+     * As we are not assembling actual project and SNAPSHOT libraries are not in any
+     * maven repository, we exclude dependencies from build script
+     */
     @Test
     void 'generate server plugin descriptor for SNAPSHOT TeamCity'() {
         buildFile << """
             plugins {
                 id 'java'
                 id 'com.github.rodm.teamcity-server'
-            }
+            }                                     
+            configurations.all {
+                dependencies {                            
+                    exclude group: 'org.jetbrains.teamcity', module: 'server-api'            
+                }            
+            }                                  
             teamcity {
                 version = 'SNAPSHOT'
                 server {

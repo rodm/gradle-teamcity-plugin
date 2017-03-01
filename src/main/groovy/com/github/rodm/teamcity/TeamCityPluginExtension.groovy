@@ -40,9 +40,9 @@ class TeamCityPluginExtension {
         this.server = new ServerPluginConfiguration(project, environments)
     }
 
-    int getMajorVersion() {
-        String[] parts = version.split('\\.')
-        return parts[0] as int
+    @SuppressWarnings("GroovyAssignabilityCheck")
+    Integer getMajorVersion() {
+        return (version ==~ /(\d+)\..*/) ? (version =~ /(\d+)\..*/)[0][1] as int : null
     }
 
     def getAgent() {
