@@ -312,6 +312,27 @@ class ServerDescriptorGeneratorTest {
     }
 
     @Test
+    void writeDescriptorForNonNumericTeamCityVersion() {
+        project.teamcity {
+            version = 'SNAPSHOT'
+            server {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name'
+                    }
+                }
+            }
+        }
+        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        StringWriter writer = new StringWriter()
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//dependencies'))
+    }
+
+    @Test
     void writeDependenciesForTeamCity10() {
         project.teamcity {
             version = '10.0'

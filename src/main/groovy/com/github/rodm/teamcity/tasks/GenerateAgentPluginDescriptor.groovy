@@ -49,7 +49,9 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
         if (descriptor == null) {
             descriptor = new AgentPluginDescriptor()
         }
-        if (extension.getMajorVersion() < 9 && descriptor.dependencies.hasDependencies()) {
+        
+        def version = extension.getMajorVersion()
+        if (version != null && version < 9 && descriptor.dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${extension.version}")
         }
         AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor)

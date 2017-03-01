@@ -95,7 +95,8 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (getMajorVersion(version) >= 9) {
+        def version = getMajorVersion(version)
+        if (version == null || version >= 9) {
             if (descriptor.getDependencies().hasDependencies()) {
                 Node dependencies = root.appendNode('dependencies')
                 descriptor.getDependencies().plugins.each { name ->
@@ -108,8 +109,8 @@ class ServerPluginDescriptorGenerator {
         }
     }
 
-    private static int getMajorVersion(String version) {
-        String[] parts = version.split('\\.')
-        return parts[0] as int
+    @SuppressWarnings("GroovyAssignabilityCheck")
+    private static Integer getMajorVersion(String version) {
+        return (version ==~ /(\d+)\..*/) ? (version =~ /(\d+)\..*/)[0][1] as int : null
     }
 }
