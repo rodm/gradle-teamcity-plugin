@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.CoreMatchers.notNullValue
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
 
@@ -70,6 +71,28 @@ public class TeamCityServerPluginTest {
             version = '8.1.5'
         }
         assertEquals('8.1.5', project.extensions.getByName('teamcity').version)
+    }
+
+    @Test
+    void 'return major number for API version'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            version = '10.0.4'
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertEquals(10, extension.getMajorVersion())
+    }
+
+    @Test
+    void 'return null for non numeric API version'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            version = 'SNAPSHOT'
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        assertNull(null, extension.getMajorVersion())
     }
 
     @Test
