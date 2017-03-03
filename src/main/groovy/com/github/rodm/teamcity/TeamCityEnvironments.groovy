@@ -27,7 +27,7 @@ class TeamCityEnvironments {
     public static final String BASE_HOME_DIR_PROPERTY = 'teamcity.environments.baseHomeDir'
 
     public static final String DEFAULT_DOWNLOADS_DIR = 'downloads'
-    public static final String DEFAULT_BASE_DOWNLOAD_URL = 'http://download.jetbrains.com/teamcity'
+    public static final String DEFAULT_BASE_DOWNLOAD_URL = 'https://download.jetbrains.com/teamcity'
     public static final String DEFAULT_BASE_DATA_DIR = 'data'
     public static final String DEFAULT_BASE_HOME_DIR = 'servers'
 

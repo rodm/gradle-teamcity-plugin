@@ -169,7 +169,7 @@ public class TeamCityServerPluginTest {
 
         List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
         assertThat(urls, hasItem('https://repo1.maven.org/maven2/'))
-        assertThat(urls, hasItem('http://download.jetbrains.com/teamcity-repository'))
+        assertThat(urls, hasItem('https://download.jetbrains.com/teamcity-repository'))
     }
 
     @Test

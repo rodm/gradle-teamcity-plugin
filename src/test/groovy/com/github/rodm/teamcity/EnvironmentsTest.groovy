@@ -50,7 +50,7 @@ class EnvironmentsTest {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.environments.getDownloadsDir(), equalTo('downloads'))
-        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://download.jetbrains.com/teamcity'))
+        assertThat(extension.environments.getBaseDownloadUrl(), equalTo('https://download.jetbrains.com/teamcity'))
         assertThat(extension.environments.getBaseDataDir(), equalTo('data'))
         assertThat(extension.environments.getBaseHomeDir(), equalTo('servers'))
     }
@@ -346,12 +346,12 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         def environment1 = extension.environments.getByName('test1')
-        assertThat(environment1.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('projectDir/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('projectDir/data/9.1'))
 
         def environment2 = extension.environments.getByName('test2')
-        assertThat(environment2.downloadUrl, equalTo('http://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
+        assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('projectDir/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('projectDir/data/10.0'))
     }
