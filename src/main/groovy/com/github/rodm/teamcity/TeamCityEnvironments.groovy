@@ -96,7 +96,7 @@ class TeamCityEnvironments {
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    def methodMissing(String name, args) {
+    methodMissing(String name, args) {
         if (args.length == 1 && args[0] instanceof Closure) {
             Closure configuration = args[0]
             environments.create(name, configuration)

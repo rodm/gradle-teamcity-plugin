@@ -36,7 +36,7 @@ import javax.xml.validation.SchemaFactory
 
 abstract class TeamCityPlugin implements Plugin<Project> {
 
-    private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class);
+    private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
 
     public static final String PLUGIN_DESCRIPTOR_FILENAME = 'teamcity-plugin.xml'
 
@@ -46,13 +46,13 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     static final String JETBRAINS_MAVEN_REPOSITORY = 'http://download.jetbrains.com/teamcity-repository'
 
-    static final String CLASSES_PATTERN = "**/*.class";
+    static final String CLASSES_PATTERN = "**/*.class"
 
-    static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar.";
+    static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar."
 
-    static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans.";
+    static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans."
 
-    static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
+    static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF"
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
@@ -79,24 +79,24 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         configureTasks(project, extension)
     }
 
-    private boolean isRootProject(Project project) {
+    private static boolean isRootProject(Project project) {
         project.rootProject == project
     }
 
-    private configureRepositories(Project project, TeamCityPluginExtension extension) {
+    private static configureRepositories(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate new ConfigureRepositories(extension)
     }
 
-    void configureConfigurations(final Project project) {
-        ConfigurationContainer configurations = project.getConfigurations();
+    static void configureConfigurations(final Project project) {
+        ConfigurationContainer configurations = project.getConfigurations()
         configurations.maybeCreate('agent')
                 .setVisible(false)
                 .setTransitive(false)
-                .setDescription("Configuration for agent plugin.");
+                .setDescription("Configuration for agent plugin.")
         configurations.maybeCreate('server')
                 .setVisible(false)
                 .setTransitive(false)
-                .setDescription("Configuration for server plugin.");
+                .setDescription("Configuration for server plugin.")
         configurations.maybeCreate('plugin')
                 .setVisible(false)
                 .setTransitive(false)
@@ -111,7 +111,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     abstract void configureTasks(final Project project, TeamCityPluginExtension extension)
 
-    void configureJarTask(Project project, String pattern) {
+    static void configureJarTask(Project project, String pattern) {
         Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
         if (jarTask) {
             List<PluginDefinition> pluginDefinitions = []
@@ -185,7 +185,7 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         @Override
         void execute(Task task) {
             if (definitions.isEmpty()) {
-                LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()));
+                LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
             } else {
                 for (PluginDefinition definition : definitions) {
                     validateDefinition(definition, task)
@@ -232,9 +232,9 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             return pluginBeans
         }
 
-        private void setParserProperty(XmlParser parser, String uri, Object value) {
+        private static void setParserProperty(XmlParser parser, String uri, Object value) {
             try {
-                parser.setProperty(uri, value);
+                parser.setProperty(uri, value)
             }
             catch (SAXNotRecognizedException ignore) { }
         }

@@ -27,6 +27,6 @@ class ExecutableFiles {
     }
 
     boolean hasFiles() {
-        return includes.size() > 0;
+        return includes.size() > 0
     }
 }

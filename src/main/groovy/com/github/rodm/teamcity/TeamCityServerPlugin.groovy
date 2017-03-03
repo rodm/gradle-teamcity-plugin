@@ -114,7 +114,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         }
     }
 
-    private void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
+    private static void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
     }
 
@@ -176,20 +176,20 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 }
                 stopServer.finalizedBy undeployPlugin
 
-                def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
+                project.tasks.create(String.format('start%sAgent', name), StartAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                     conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
 
-                def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
+                project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                 }
             }
         }
 
-        private void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
+        private static void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
             environment.with {
                 downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
                 homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
@@ -205,7 +205,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
             }
         }
 
-        private String toFilename(String url) {
+        private static String toFilename(String url) {
             return url[(url.lastIndexOf('/') + 1)..-1]
         }
     }

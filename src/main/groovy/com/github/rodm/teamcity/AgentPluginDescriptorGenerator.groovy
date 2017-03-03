@@ -25,7 +25,7 @@ class AgentPluginDescriptorGenerator {
         this.descriptor = descriptor
     }
 
-    public void writeTo(Writer writer) {
+    void writeTo(Writer writer) {
         Node root = new Node(null, 'teamcity-agent-plugin', [
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:noNamespaceSchemaLocation": "urn:schemas-jetbrains-com:teamcity-plugin-v1-xml"

@@ -82,7 +82,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         generateDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof AgentPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
 
-        ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin);
+        ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin)
         project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
 
         project.afterEvaluate {
