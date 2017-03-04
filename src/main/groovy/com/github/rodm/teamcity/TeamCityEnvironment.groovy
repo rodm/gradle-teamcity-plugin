@@ -55,6 +55,11 @@ class TeamCityEnvironment {
         this.plugins.addAll(plugins)
     }
 
+    def setPlugins(List<Object> plugins) {
+        this.plugins.clear()
+        this.plugins.addAll(plugins)
+    }
+
     def plugins(Object plugin) {
         this.plugins.add(plugin)
     }

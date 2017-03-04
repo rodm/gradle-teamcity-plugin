@@ -328,6 +328,61 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'configure multiple plugins for an environment'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                    plugins 'plugin1.zip'
+                    plugins 'plugin2.zip'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        TeamCityEnvironment environment = extension.environments.getByName('test')
+        assertThat(environment.plugins, hasSize(2))
+        assertThat(environment.plugins, hasItem('plugin1.zip'))
+        assertThat(environment.plugins, hasItem('plugin2.zip'))
+    }
+
+    @Test
+    void 'configure plugin with assignment replaces'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                    plugins = 'plugin1.zip'
+                    plugins = 'plugin2.zip'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        TeamCityEnvironment environment = extension.environments.getByName('test')
+        assertThat(environment.plugins, hasSize(1))
+        assertThat(environment.plugins, hasItem('plugin2.zip'))
+    }
+
+    @Test
+    void 'configure multiple plugins for an environment with a list'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                    plugins = ['plugin1.zip', 'plugin2.zip']
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+
+        TeamCityEnvironment environment = extension.environments.getByName('test')
+        assertThat(environment.plugins, hasSize(2))
+        assertThat(environment.plugins, hasItem('plugin1.zip'))
+        assertThat(environment.plugins, hasItem('plugin2.zip'))
+    }
+
+    @Test
     public void 'ConfigureEnvironmentTasks configures environments with default properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         project.teamcity {
