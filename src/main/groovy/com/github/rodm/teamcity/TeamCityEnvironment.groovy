@@ -38,10 +38,6 @@ class TeamCityEnvironment {
 
     private List<String> agentOptions = []
 
-    TeamCityEnvironment() {
-        this('default')
-    }
-
     TeamCityEnvironment(String name) {
         this.name = name
     }
