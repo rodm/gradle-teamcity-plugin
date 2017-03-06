@@ -68,7 +68,7 @@ descriptor can be specified as a path to a file or by a configuration block with
 
 * `version` : The version of the TeamCity API to build against. Defaults to '{default-api-version}'.
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
-and the TeamCity repository, http://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
+and the TeamCity repository, https://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
  flag to false allows a local repository to be used for resolving dependencies.
 
 ### TeamCity Server Plugin
@@ -181,7 +181,7 @@ The environments configuration is available by applying the `com.github.rodm.tea
 The following properties can be defined in the `environments` configuration block.
 
 * `downloadsDir` : The directory the TeamCity installers are downlowded to. Defaults to `downloads`
-* `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `http://download.jetbrains.com/teamcity`.
+* `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `https://download.jetbrains.com/teamcity`.
 * `baseHomeDir` : The base directory for a TeamCity install. Defaults to `servers`.
 * `baseDataDir` : The base directory for a TeamCity Data directory. Defaults to `data`.
 
