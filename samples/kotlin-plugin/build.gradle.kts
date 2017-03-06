@@ -1,6 +1,6 @@
 
 buildscript {
-    extra["kotlinVersion"] = "1.1-M03"
+    extra["kotlinVersion"] = "1.1.0"
 
     repositories {
         mavenLocal()
