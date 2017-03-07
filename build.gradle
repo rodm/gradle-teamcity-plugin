@@ -93,7 +93,7 @@ publishing {
 pluginBundle {
     website = 'https://github.com/rodm/gradle-teamcity-plugin'
     vcsUrl = 'https://github.com/rodm/gradle-teamcity-plugin'
-    description = 'Gradle plugin to support the development of TeamCity plugins'
+    description = 'Gradle plugin for developing TeamCity plugins'
     tags = ['teamcity']
 
     plugins {
