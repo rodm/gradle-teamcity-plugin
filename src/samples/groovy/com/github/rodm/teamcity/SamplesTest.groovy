@@ -28,12 +28,12 @@ class SamplesTest {
     private File samplesDir
 
     @Before
-    public void setup() throws IOException {
+    void setup() throws IOException {
         samplesDir = new File('samples')
     }
 
     @Test
-    public void serverPlugin() {
+    void serverPlugin() {
         File projectDir = new File(samplesDir, 'server-plugin')
         BuildResult result = executeBuild(projectDir)
 
@@ -41,7 +41,7 @@ class SamplesTest {
     }
 
     @Test
-    public void serverPluginWithAlternativeBuildFile() {
+    void serverPluginWithAlternativeBuildFile() {
         File projectDir = new File(samplesDir, 'server-plugin')
         BuildResult result = executeBuild(projectDir, '-b', 'build-alt.gradle', 'clean', 'build')
 
@@ -49,7 +49,7 @@ class SamplesTest {
     }
 
     @Test
-    public void agentServerPlugin() {
+    void agentServerPlugin() {
         File projectDir = new File(samplesDir, 'agent-server-plugin')
         BuildResult result = executeBuild(projectDir)
 
@@ -57,7 +57,7 @@ class SamplesTest {
     }
 
     @Test
-    public void agentToolPlugin() {
+    void agentToolPlugin() {
         File projectDir = new File(samplesDir, 'agent-tool-plugin')
         BuildResult result = executeBuild(projectDir)
 
@@ -65,7 +65,7 @@ class SamplesTest {
     }
 
     @Test
-    public void multiProjectPlugin() {
+    void multiProjectPlugin() {
         File projectDir = new File(samplesDir, 'multi-project-plugin')
         BuildResult result = executeBuild(projectDir)
 
@@ -73,14 +73,14 @@ class SamplesTest {
     }
 
     @Test
-    public void 'build kotlin plugin'() {
+    void 'build kotlin plugin'() {
         File projectDir = new File(samplesDir, 'kotlin-plugin')
         BuildResult result = executeBuildWithVersion(projectDir, '3.3')
 
         assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
     }
 
-    private BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
+    private static BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withArguments(args)
@@ -90,7 +90,7 @@ class SamplesTest {
         return result
     }
 
-    private BuildResult executeBuildWithVersion(File projectDir, String version, String... args = ['clean', 'build']) {
+    private static BuildResult executeBuildWithVersion(File projectDir, String version, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withArguments(args)
