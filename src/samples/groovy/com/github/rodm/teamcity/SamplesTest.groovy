@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -73,7 +72,7 @@ class SamplesTest {
         assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
     }
 
-    @Test @Ignore("currently failing to download the kotlin-gradle-plugin")
+    @Test
     public void 'build kotlin plugin'() {
         File projectDir = new File(samplesDir, 'kotlin-plugin')
         BuildResult result = executeBuildWithVersion(projectDir, '3.3')
