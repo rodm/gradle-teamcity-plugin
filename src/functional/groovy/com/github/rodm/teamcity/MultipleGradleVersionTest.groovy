@@ -43,7 +43,7 @@ class MultipleGradleVersionTest {
     private File buildFile
 
     @Before
-    public void setup() throws IOException {
+    void setup() throws IOException {
         buildFile = projectDir.newFile("build.gradle")
 
         buildFile << """
@@ -168,7 +168,7 @@ class MultipleGradleVersionTest {
     }
 
     @Test
-    public void buildPluginUsingGradle_2_8() {
+    void buildPluginUsingGradle_2_8() {
         // Test is unreliable on Windows (https://github.com/rodm/gradle-teamcity-plugin/issues/23)
         assumeThat(OperatingSystem.current(), not(OperatingSystem.forName('windows')))
 
@@ -177,31 +177,31 @@ class MultipleGradleVersionTest {
     }
 
     @Test
-    public void buildPluginUsingGradle_2_14_1() {
+    void buildPluginUsingGradle_2_14_1() {
         BuildResult result = executeBuild('2.14.1')
         checkBuild(result)
     }
 
     @Test
-    public void buildPluginUsingGradle_3_0() {
+    void buildPluginUsingGradle_3_0() {
         BuildResult result = executeBuild('3.0')
         checkBuild(result)
     }
 
     @Test
-    public void buildPluginUsingGradle_3_1() {
+    void buildPluginUsingGradle_3_1() {
         BuildResult result = executeBuild('3.1')
         checkBuild(result)
     }
 
     @Test
-    public void buildPluginUsingGradle_3_2() {
+    void buildPluginUsingGradle_3_2() {
         BuildResult result = executeBuild('3.2')
         checkBuild(result)
     }
 
     @Test
-    public void 'build plugin using Gradle 3.3'() {
+    void 'build plugin using Gradle 3.3'() {
         BuildResult result = executeBuild('3.3')
         checkBuild(result)
     }
