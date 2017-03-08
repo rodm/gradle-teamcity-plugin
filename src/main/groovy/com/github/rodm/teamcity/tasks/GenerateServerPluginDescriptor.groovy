@@ -46,10 +46,6 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
         ServerPluginDescriptor descriptor = extension.server.descriptor
 
-        if (descriptor == null) {
-            descriptor = new ServerPluginDescriptor()
-        }
-
         def version = extension.getMajorVersion()
         if (version != null && version < 9 && descriptor.dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${extension.version}")
