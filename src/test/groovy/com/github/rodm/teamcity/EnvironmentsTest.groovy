@@ -16,7 +16,12 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.DeployPlugin
+import com.github.rodm.teamcity.tasks.StartAgent
+import com.github.rodm.teamcity.tasks.StartServer
+import com.github.rodm.teamcity.tasks.StopAgent
+import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.UndeployPlugin
+import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -536,6 +541,7 @@ class EnvironmentsTest {
         DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10')
         assertThat(deployPlugin.files.files, hasSize(1))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
+        assertThat(deployPlugin.getTarget().absolutePath, endsWith('data/10.0/plugins'))
 
         UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10')
         assertThat(undeployPlugin.files.files, hasSize(1))
@@ -568,6 +574,82 @@ class EnvironmentsTest {
         assertThat(undeployPlugin.files.files, hasSize(2))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
+    }
+
+    private Closure TEAMCITY10_ENVIRONMENT = {
+        environments {
+            baseDownloadUrl = 'http://local-repository'
+            baseHomeDir = '/tmp/servers'
+            baseDataDir = '/tmp/data'
+            teamcity10 {
+                version = '10.0.4'
+                javaHome = project.file('/opt/jdk1.8.0')
+                agentOptions = '-DagentOption=agentValue'
+            }
+        }
+    }
+
+    @Test
+    void 'configures startServer task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
+        assertThat(normalizePath(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(startServer.getDataDir()), endsWith('data/10.0'))
+        assertThat(normalizePath(startServer.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(startServer.serverOptions, endsWith('-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'))
+    }
+
+    @Test
+    void 'configures stopServer task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
+        assertThat(normalizePath(stopServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(stopServer.javaHome), equalTo('/opt/jdk1.8.0'))
+    }
+
+    @Test
+    void 'configures startAgent task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
+        assertThat(normalizePath(startAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(startAgent.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(startAgent.agentOptions, endsWith('-DagentOption=agentValue'))
+    }
+
+    @Test
+    void 'configures stopAgent task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
+        assertThat(normalizePath(stopAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(stopAgent.javaHome), equalTo('/opt/jdk1.8.0'))
+    }
+
+    @Test
+    void 'configures unpack task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        Unpack unpack = project.tasks.getByName('unpackTeamcity10') as Unpack
+        assertThat(normalizePath(unpack.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
+        assertThat(normalizePath(unpack.getTarget()), endsWith('servers/TeamCity-10.0.4'))
     }
 
     private String normalizePath(File path) {
