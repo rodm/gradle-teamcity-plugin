@@ -156,7 +156,7 @@ class EnvironmentsTest {
         assertThat(extension.environments.getBaseDataDir(), equalTo('/alt/data'))
     }
 
-    private void configureGradleProjectProperties(Project mockProject) {
+    private static void configureGradleProjectProperties(Project mockProject) {
         when(mockProject.hasProperty('teamcity.environments.downloadsDir')).thenReturn(true)
         when(mockProject.property('teamcity.environments.downloadsDir')).thenReturn('/alt/downloads')
         when(mockProject.hasProperty('teamcity.environments.baseDownloadUrl')).thenReturn(true)
@@ -538,12 +538,12 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10')
+        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10') as DeployPlugin
         assertThat(deployPlugin.files.files, hasSize(1))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
         assertThat(deployPlugin.getTarget().absolutePath, endsWith('data/10.0/plugins'))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10')
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10') as UndeployPlugin
         assertThat(undeployPlugin.files.files, hasSize(1))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/test.zip')))
     }
@@ -565,12 +565,12 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10')
+        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10') as DeployPlugin
         assertThat(deployPlugin.files.files, hasSize(2))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin1.zip')))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin2.zip')))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10')
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10') as UndeployPlugin
         assertThat(undeployPlugin.files.files, hasSize(2))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
@@ -652,7 +652,7 @@ class EnvironmentsTest {
         assertThat(normalizePath(unpack.getTarget()), endsWith('servers/TeamCity-10.0.4'))
     }
 
-    private String normalizePath(File path) {
+    private static String normalizePath(File path) {
         path.canonicalPath.replace('\\', '/')
     }
 }
