@@ -541,7 +541,7 @@ class EnvironmentsTest {
         DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10') as DeployPlugin
         assertThat(deployPlugin.files.files, hasSize(1))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
-        assertThat(deployPlugin.getTarget().absolutePath, endsWith('data/10.0/plugins'))
+        assertThat(normalizePath(deployPlugin.getTarget()), endsWith('data/10.0/plugins'))
 
         UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10') as UndeployPlugin
         assertThat(undeployPlugin.files.files, hasSize(1))
@@ -599,7 +599,7 @@ class EnvironmentsTest {
         StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
         assertThat(normalizePath(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
         assertThat(normalizePath(startServer.getDataDir()), endsWith('data/10.0'))
-        assertThat(normalizePath(startServer.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(normalizePath(startServer.javaHome), endsWith('/opt/jdk1.8.0'))
         assertThat(startServer.serverOptions, endsWith('-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'))
     }
 
@@ -612,7 +612,7 @@ class EnvironmentsTest {
 
         StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
         assertThat(normalizePath(stopServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalizePath(stopServer.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(normalizePath(stopServer.javaHome), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test
@@ -624,7 +624,7 @@ class EnvironmentsTest {
 
         StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
         assertThat(normalizePath(startAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalizePath(startAgent.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(normalizePath(startAgent.javaHome), endsWith('/opt/jdk1.8.0'))
         assertThat(startAgent.agentOptions, endsWith('-DagentOption=agentValue'))
     }
 
@@ -637,7 +637,7 @@ class EnvironmentsTest {
 
         StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
         assertThat(normalizePath(stopAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalizePath(stopAgent.javaHome), equalTo('/opt/jdk1.8.0'))
+        assertThat(normalizePath(stopAgent.javaHome), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test
