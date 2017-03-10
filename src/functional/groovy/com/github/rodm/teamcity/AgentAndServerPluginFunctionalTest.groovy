@@ -29,7 +29,7 @@ import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.junit.Assert.assertEquals
 
-public class AgentAndServerPluginFunctionalTest {
+class AgentAndServerPluginFunctionalTest {
 
     @Rule
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
@@ -37,7 +37,7 @@ public class AgentAndServerPluginFunctionalTest {
     private File buildFile
 
     @Before
-    public void setup() throws IOException {
+    void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
     }
 
@@ -50,7 +50,7 @@ public class AgentAndServerPluginFunctionalTest {
     }
 
     @Test
-    public void agentAndServerPluginPackage() {
+    void agentAndServerPluginPackage() {
         buildFile << """
             plugins {
                 id 'com.github.rodm.teamcity-agent'
@@ -100,7 +100,7 @@ public class AgentAndServerPluginFunctionalTest {
     }
 
     @Test
-    public void multiProjectPlugin() {
+    void multiProjectPlugin() {
         buildFile << """
             plugins {
                 id 'com.github.rodm.teamcity-agent'
@@ -179,7 +179,7 @@ public class AgentAndServerPluginFunctionalTest {
     }
 
     @Test
-    public void pluginsWithJavaFail() {
+    void pluginsWithJavaFail() {
         buildFile << """
             plugins {
                 id 'java'
