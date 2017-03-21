@@ -74,7 +74,7 @@ teamcity {
 
         teamcity2017 {
             version = '2017.1-EAP'
-            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-45965.tar.gz'
+            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-46288.tar.gz'
             javaHome = file(java8Home)
         }
     }
