@@ -29,12 +29,12 @@ class TeamCityCommonPluginTest {
     private Project project;
 
     @Before
-    public void setup() {
+    void setup() {
         project = ProjectBuilder.builder().build()
     }
 
     @Test
-    public void 'apply adds common-api to the provided configuration'() {
+    void 'apply adds common-api to the provided configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-common'
 

@@ -69,14 +69,14 @@ class ValidateDefinitionActionTest {
     private Set<String> classes
 
     @Before
-    public void setup() {
+    void setup() {
         stubTask = mock(Task)
         definitions = []
         classes = new HashSet<String>()
     }
 
     @Test
-    public void logWarningMessageForMissingPluginDefinitionFiles() {
+    void logWarningMessageForMissingPluginDefinitionFiles() {
         Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
 
         pluginValidationAction.execute(stubTask)
@@ -85,7 +85,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void noWarningMessageWithPluginDefinition() {
+    void noWarningMessageWithPluginDefinition() {
         Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
@@ -99,7 +99,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void logWarningMessageForEmptyDefinitionFile() {
+    void logWarningMessageForEmptyDefinitionFile() {
         Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << EMPTY_BEAN_DEFINITION_FILE
@@ -114,7 +114,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void logWarningMessageForMissingClass() {
+    void logWarningMessageForMissingClass() {
         Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
@@ -129,7 +129,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void noWarningMessageWithClass() {
+    void noWarningMessageWithClass() {
         Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
@@ -145,7 +145,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'server plugin apply configures filesMatching actions on jar spec'() {
+    void 'server plugin apply configures filesMatching actions on jar spec'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
@@ -157,7 +157,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'server plugin apply configures doLast action on jar task'() {
+    void 'server plugin apply configures doLast action on jar task'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
@@ -168,7 +168,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'agent plugin apply configures filesMatching actions on jar spec'() {
+    void 'agent plugin apply configures filesMatching actions on jar spec'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
@@ -180,7 +180,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'agent plugin apply configures doLast action on jar task'() {
+    void 'agent plugin apply configures doLast action on jar task'() {
         Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
@@ -191,7 +191,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void 'PluginDefinitionCollector collects plugin definition files'() {
+    void 'PluginDefinitionCollector collects plugin definition files'() {
         Project project = ProjectBuilder.builder().build()
         List<TeamCityPlugin.PluginDefinition> definitions = new ArrayList<TeamCityPlugin.PluginDefinition>()
         Action<FileCopyDetails> collectorAction = new TeamCityPlugin.PluginDefinitionCollectorAction(definitions)
@@ -206,7 +206,7 @@ class ValidateDefinitionActionTest {
     }
 
     @Test
-    public void "ClassCollector collects classes"() {
+    void "ClassCollector collects classes"() {
         Set<String> classList = new HashSet<String>()
         Action<FileCopyDetails> classManifestCollector = new TeamCityPlugin.ClassCollectorAction(classList)
         FileCopyDetails stubDetails = mock(FileCopyDetails)
