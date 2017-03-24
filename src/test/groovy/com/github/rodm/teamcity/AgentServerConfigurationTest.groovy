@@ -22,11 +22,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import org.junit.rules.TemporaryFolder
 
 import static org.hamcrest.CoreMatchers.isA
 import static org.junit.Assert.assertThat
 
 class AgentServerConfigurationTest {
+
+    @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
 
     @Rule
     public ExpectedException thrown = ExpectedException.none()
@@ -35,7 +39,7 @@ class AgentServerConfigurationTest {
 
     @Before
     public void setup() {
-        project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
     }
 
     @Test

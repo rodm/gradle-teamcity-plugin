@@ -18,7 +18,9 @@ package com.github.rodm.teamcity
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static XPathMatcher.hasXPath
 import static org.hamcrest.MatcherAssert.assertThat
@@ -26,6 +28,9 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.not
 
 public class AgentDescriptorGeneratorTest {
+
+    @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
 
     private Project project
 
@@ -38,6 +43,7 @@ public class AgentDescriptorGeneratorTest {
     @Before
     public void setup() {
         project = ProjectBuilder.builder()
+                .withProjectDir(projectDir.root)
                 .withName('test-plugin')
                 .build()
         project.apply plugin: 'com.github.rodm.teamcity-agent'

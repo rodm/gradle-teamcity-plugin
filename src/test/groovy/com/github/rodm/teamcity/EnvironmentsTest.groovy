@@ -26,7 +26,9 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static org.hamcrest.Matchers.endsWith
@@ -39,13 +41,16 @@ import static org.mockito.Mockito.when
 
 class EnvironmentsTest {
 
+    @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
+
     private String defaultOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
 
     private Project project
 
     @Before
     void setup() {
-        project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
     }
 
     @Test
@@ -406,13 +411,13 @@ class EnvironmentsTest {
 
         def environment1 = extension.environments.getByName('test1')
         assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
-        assertThat(normalizePath(environment1.homeDir), endsWith('projectDir/servers/TeamCity-9.1.7'))
-        assertThat(normalizePath(environment1.dataDir), endsWith('projectDir/data/9.1'))
+        assertThat(normalizePath(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
+        assertThat(normalizePath(environment1.dataDir), endsWith('/data/9.1'))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalizePath(environment2.homeDir), endsWith('projectDir/servers/TeamCity-10.0.4'))
-        assertThat(normalizePath(environment2.dataDir), endsWith('projectDir/data/10.0'))
+        assertThat(normalizePath(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
+        assertThat(normalizePath(environment2.dataDir), endsWith('/data/10.0'))
     }
 
     @Test

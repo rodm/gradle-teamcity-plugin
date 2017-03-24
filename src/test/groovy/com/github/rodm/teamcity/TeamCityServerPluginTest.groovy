@@ -20,7 +20,9 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static org.hamcrest.CoreMatchers.equalTo
@@ -35,11 +37,14 @@ import static org.junit.Assert.assertTrue
 
 public class TeamCityServerPluginTest {
 
+    @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
+
     private Project project;
 
     @Before
     public void setup() {
-        project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
     }
 
     @Test

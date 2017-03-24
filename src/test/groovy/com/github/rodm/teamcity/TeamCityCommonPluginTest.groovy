@@ -19,18 +19,23 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static org.junit.Assert.assertThat
 
 class TeamCityCommonPluginTest {
 
+    @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
+
     private Project project;
 
     @Before
     void setup() {
-        project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
     }
 
     @Test

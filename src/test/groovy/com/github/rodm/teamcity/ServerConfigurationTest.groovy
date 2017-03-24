@@ -22,6 +22,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
@@ -39,6 +40,9 @@ class ServerConfigurationTest {
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
     @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
+
+    @Rule
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project;
@@ -47,7 +51,7 @@ class ServerConfigurationTest {
 
     @Before
     public void setup() {
-        project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
         project.apply plugin: 'com.github.rodm.teamcity-server'
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }

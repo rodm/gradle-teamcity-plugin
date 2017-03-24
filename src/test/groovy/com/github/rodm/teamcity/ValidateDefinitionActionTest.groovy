@@ -28,6 +28,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.equalTo
@@ -62,14 +63,19 @@ class ValidateDefinitionActionTest {
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
     @Rule
+    public final TemporaryFolder projectDir = new TemporaryFolder()
+
+    @Rule
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
+    private Project project
     private Task stubTask
     private List<TeamCityPlugin.PluginDefinition> definitions
     private Set<String> classes
 
     @Before
     void setup() {
+        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
         stubTask = mock(Task)
         definitions = []
         classes = new HashSet<String>()
@@ -86,7 +92,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void noWarningMessageWithPluginDefinition() {
-        Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
@@ -100,7 +105,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void logWarningMessageForEmptyDefinitionFile() {
-        Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << EMPTY_BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
@@ -115,7 +119,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void logWarningMessageForMissingClass() {
-        Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
@@ -130,7 +133,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void noWarningMessageWithClass() {
-        Project project = ProjectBuilder.builder().build()
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
@@ -146,7 +148,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void 'server plugin apply configures filesMatching actions on jar spec'() {
-        Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
 
@@ -158,7 +159,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void 'server plugin apply configures doLast action on jar task'() {
-        Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
 
@@ -169,7 +169,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void 'agent plugin apply configures filesMatching actions on jar spec'() {
-        Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
 
@@ -181,7 +180,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void 'agent plugin apply configures doLast action on jar task'() {
-        Project project = ProjectBuilder.builder().build()
         project.pluginManager.apply(JavaPlugin)
         Jar mockJarTask = mockJar(project)
 
@@ -192,7 +190,6 @@ class ValidateDefinitionActionTest {
 
     @Test
     void 'PluginDefinitionCollector collects plugin definition files'() {
-        Project project = ProjectBuilder.builder().build()
         List<TeamCityPlugin.PluginDefinition> definitions = new ArrayList<TeamCityPlugin.PluginDefinition>()
         Action<FileCopyDetails> collectorAction = new TeamCityPlugin.PluginDefinitionCollectorAction(definitions)
         File definitionFile = project.file('build-server-plugin.xml')
