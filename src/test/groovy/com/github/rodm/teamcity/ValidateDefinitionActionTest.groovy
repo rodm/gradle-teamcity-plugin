@@ -215,7 +215,7 @@ class ValidateDefinitionActionTest {
         assertThat(classList, hasItem('com/example/Plugin.class'))
     }
 
-    private Jar mockJar(Project project) {
+    private static Jar mockJar(Project project) {
         Jar mockJar = mock(Jar)
         when(mockJar.getName()).thenReturn(JavaPlugin.JAR_TASK_NAME)
         when(mockJar.getConventionMapping()).thenReturn(mock(ConventionMapping))

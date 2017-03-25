@@ -31,7 +31,7 @@ class TeamCityCommonPluginTest {
     @Rule
     public final TemporaryFolder projectDir = new TemporaryFolder()
 
-    private Project project;
+    private Project project
 
     @Before
     void setup() {

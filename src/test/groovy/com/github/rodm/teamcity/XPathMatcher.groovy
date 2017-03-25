@@ -17,9 +17,9 @@ package com.github.rodm.teamcity
 
 import org.hamcrest.Matcher
 import org.xmlunit.matchers.EvaluateXPathMatcher
-import org.xmlunit.matchers.HasXPathMatcher;
+import org.xmlunit.matchers.HasXPathMatcher
 
-public class XPathMatcher {
+class XPathMatcher {
     static HasXPathMatcher hasXPath(String xPath) {
         return HasXPathMatcher.hasXPath(xPath)
     }

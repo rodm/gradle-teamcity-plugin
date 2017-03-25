@@ -30,7 +30,7 @@ class GradleMatchers {
     static Matcher<TaskContainer> hasTask(String name) {
         return new TypeSafeDiagnosingMatcher<TaskContainer>() {
             @Override
-            public void describeTo(final Description description) {
+            void describeTo(final Description description) {
                 description.appendText("TaskContainer should contain task ").appendValue(name)
             }
 
