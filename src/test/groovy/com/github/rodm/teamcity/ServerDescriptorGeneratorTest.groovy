@@ -34,6 +34,8 @@ class ServerDescriptorGeneratorTest {
 
     private Project project
 
+    private StringWriter writer
+
     private TeamCityPluginExtension extension
 
     @Before
@@ -43,12 +45,12 @@ class ServerDescriptorGeneratorTest {
                 .withName('test-plugin')
                 .build()
         project.apply plugin: 'com.github.rodm.teamcity-server'
+        writer = new StringWriter()
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }
 
     @Test
     void writesTeamCityPluginRootNode() {
-        StringWriter writer = new StringWriter()
         ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
@@ -71,7 +73,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -85,7 +86,6 @@ class ServerDescriptorGeneratorTest {
     void writesRequiredInfoPropertiesWhenNotSet() {
         ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -103,7 +103,6 @@ class ServerDescriptorGeneratorTest {
         defaults << ['version': '1.2.3']
         ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, "9.0", defaults)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -127,7 +126,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -148,7 +146,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -170,7 +167,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -189,7 +185,6 @@ class ServerDescriptorGeneratorTest {
 
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -206,7 +201,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -228,7 +222,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -250,7 +243,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -270,7 +262,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -289,7 +280,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -310,7 +300,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -331,7 +320,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -352,7 +340,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -371,7 +358,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -390,7 +376,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -409,7 +394,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
@@ -427,7 +411,6 @@ class ServerDescriptorGeneratorTest {
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
-        StringWriter writer = new StringWriter()
 
         generator.writeTo(writer)
 
