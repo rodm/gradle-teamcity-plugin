@@ -16,13 +16,9 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.InvalidUserDataException
-import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
@@ -35,23 +31,10 @@ import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.fail
 
-class ServerConfigurationTest {
-
-    private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
-
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
-    public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
-
-    private Project project;
-
-    private TeamCityPluginExtension extension
+class ServerConfigurationTest extends ConfigurationTestCase {
 
     @Before
-    public void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    void applyPlugin() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }
