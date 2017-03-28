@@ -27,7 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.not
 
-public class AgentDescriptorGeneratorTest {
+class AgentDescriptorGeneratorTest {
 
     @Rule
     public final TemporaryFolder projectDir = new TemporaryFolder()
@@ -41,7 +41,7 @@ public class AgentDescriptorGeneratorTest {
     private AgentPluginDescriptorGenerator generator
 
     @Before
-    public void setup() {
+    void setup() {
         project = ProjectBuilder.builder()
                 .withProjectDir(projectDir.root)
                 .withName('test-plugin')
@@ -53,14 +53,14 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writesRootNode() {
+    void writesRootNode() {
         generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin'))
     }
 
     @Test
-    public void writesPluginDeployment() {
+    void writesPluginDeployment() {
         descriptor.deployment = new PluginDeployment()
 
         generator.writeTo(writer);
@@ -70,7 +70,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeOptionalUseSeparateClassloader() {
+    void writeOptionalUseSeparateClassloader() {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.useSeparateClassloader = true
 
@@ -80,7 +80,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeOptionalUseSeparateClassloaderWhenFalse() {
+    void writeOptionalUseSeparateClassloaderWhenFalse() {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.useSeparateClassloader = false
 
@@ -90,7 +90,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writePluginDeploymentExecutableFiles() {
+    void writePluginDeploymentExecutableFiles() {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.executableFiles {
             include 'file1'
@@ -105,7 +105,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writePluginDeploymentExecutableFilesOnlyIfSpecified() {
+    void writePluginDeploymentExecutableFilesOnlyIfSpecified() {
         descriptor.deployment = new PluginDeployment()
 
         generator.writeTo(writer);
@@ -115,7 +115,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writesToolDeployment() {
+    void writesToolDeployment() {
         descriptor.deployment = new ToolDeployment()
 
         generator.writeTo(writer);
@@ -124,7 +124,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeToolDeploymentExecutableFiles() {
+    void writeToolDeploymentExecutableFiles() {
         descriptor.deployment = new ToolDeployment()
         descriptor.deployment.executableFiles {
             include 'file1'
@@ -139,7 +139,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeToolDeploymentExecutableFilesOnlyIfSpecified() {
+    void writeToolDeploymentExecutableFilesOnlyIfSpecified() {
         descriptor.deployment = new PluginDeployment()
 
         generator.writeTo(writer);
@@ -149,7 +149,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writePluginDependency() {
+    void writePluginDependency() {
         descriptor.dependencies {
             plugin 'plugin-name'
         }
@@ -160,7 +160,7 @@ public class AgentDescriptorGeneratorTest {
     }
 
     @Test
-    public void writeToolDependency() {
+    void writeToolDependency() {
         descriptor.dependencies {
             tool 'tool-name'
         }
