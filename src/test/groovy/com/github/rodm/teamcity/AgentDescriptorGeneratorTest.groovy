@@ -63,7 +63,7 @@ class AgentDescriptorGeneratorTest {
     void writesPluginDeployment() {
         descriptor.deployment = new PluginDeployment()
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin/plugin-deployment'))
         assertThat(writer.toString(), not(hasXPath('/teamcity-agent-plugin/plugin-deployment/@use-separate-classloader')))
@@ -74,7 +74,7 @@ class AgentDescriptorGeneratorTest {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.useSeparateClassloader = true
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('//plugin-deployment/@use-separate-classloader', equalTo('true')))
     }
@@ -84,7 +84,7 @@ class AgentDescriptorGeneratorTest {
         descriptor.deployment = new PluginDeployment()
         descriptor.deployment.useSeparateClassloader = false
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('//plugin-deployment/@use-separate-classloader', equalTo('false')))
     }
@@ -97,7 +97,7 @@ class AgentDescriptorGeneratorTest {
             include 'file2'
         }
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('//plugin-deployment/layout/executable-files'))
         assertThat(writer.toString(), hasXPath('//executable-files/include[1]/@name', equalTo('file1')))
@@ -108,7 +108,7 @@ class AgentDescriptorGeneratorTest {
     void writePluginDeploymentExecutableFilesOnlyIfSpecified() {
         descriptor.deployment = new PluginDeployment()
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout')))
         assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout/executable-files')))
@@ -118,7 +118,7 @@ class AgentDescriptorGeneratorTest {
     void writesToolDeployment() {
         descriptor.deployment = new ToolDeployment()
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin/tool-deployment'))
     }
@@ -131,7 +131,7 @@ class AgentDescriptorGeneratorTest {
             include 'file2'
         }
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('//tool-deployment/layout/executable-files'))
         assertThat(writer.toString(), hasXPath('//executable-files/include[1]/@name', equalTo('file1')))
@@ -142,7 +142,7 @@ class AgentDescriptorGeneratorTest {
     void writeToolDeploymentExecutableFilesOnlyIfSpecified() {
         descriptor.deployment = new PluginDeployment()
 
-        generator.writeTo(writer);
+        generator.writeTo(writer)
 
         assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout')))
         assertThat(writer.toString(), not(hasXPath('//plugin-deployment/layout/executable-files')))

@@ -40,7 +40,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void buildScriptPluginDescriptor() {
+    void buildScriptPluginDescriptor() {
         project.teamcity {
             server {
                 descriptor {
@@ -53,7 +53,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void filePluginDescriptor() {
+    void filePluginDescriptor() {
         project.teamcity {
             server {
                 descriptor = project.file('test-teamcity-plugin.xml')
@@ -65,7 +65,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void serverPluginTasks() {
+    void serverPluginTasks() {
         project.teamcity {
             server {
                 descriptor {}
@@ -78,7 +78,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void serverPluginTasksWithFileDescriptor() {
+    void serverPluginTasksWithFileDescriptor() {
         project.teamcity {
             server {
                 descriptor = project.file('test-teamcity-plugin')
@@ -91,7 +91,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void agentPluginDescriptorReplacementTokens() {
+    void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             server {
                 descriptor = project.file('test-teamcity-plugin')
@@ -106,7 +106,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void serverPluginWithAdditionalFiles() {
+    void serverPluginWithAdditionalFiles() {
         project.teamcity {
             server {
                 files {
@@ -117,9 +117,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(extension.server.files.childSpecs.size, is(1))
     }
 
-
     @Test
-    public void deprecatedEnvironmentsConfiguration() {
+    void deprecatedEnvironmentsConfiguration() {
         project.teamcity {
             version = '8.1.5'
             server {
@@ -143,7 +142,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void deprecatedDescriptorCreationForServerProjectType() {
+    void deprecatedDescriptorCreationForServerProjectType() {
         project.teamcity {
             descriptor {
             }
@@ -154,7 +153,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void deprecatedDescriptorAssignmentForServerProjectType() {
+    void deprecatedDescriptorAssignmentForServerProjectType() {
         project.teamcity {
             descriptor = project.file('teamcity-plugin.xml')
         }
@@ -164,7 +163,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void deprecatedAdditionalFilesForServerPlugin() {
+    void deprecatedAdditionalFilesForServerPlugin() {
         project.teamcity {
             files {
             }
@@ -175,7 +174,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void deprecatedTokensForServerPlugin() {
+    void deprecatedTokensForServerPlugin() {
         project.teamcity {
             tokens VERSION: project.version
         }
@@ -185,7 +184,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void deprecatedTokensAssignmentForServerPlugin() {
+    void deprecatedTokensAssignmentForServerPlugin() {
         project.teamcity {
             tokens = [VERSION: project.version]
         }
@@ -195,7 +194,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void configuringAgentWithOnlyServerPluginFails() {
+    void configuringAgentWithOnlyServerPluginFails() {
         try {
             project.teamcity {
                 agent {}
@@ -208,7 +207,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void 'apply configures archive name using defaults'() {
+    void 'apply configures archive name using defaults'() {
         project.version = '1.2.3'
         project.teamcity {
             server {
@@ -223,7 +222,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    public void 'apply configures archive name using configuration value'() {
+    void 'apply configures archive name using configuration value'() {
         project.version = '1.2.3'
         project.teamcity {
             server {
