@@ -28,9 +28,9 @@ import java.util.zip.ZipFile
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem
+import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.Assert.assertEquals
 import static org.junit.Assume.assumeThat
 
 class MultipleGradleVersionTest {
@@ -223,8 +223,8 @@ class MultipleGradleVersionTest {
     }
 
     private void checkBuild(BuildResult result) {
-        assertEquals(result.task(":agent:agentPlugin").getOutcome(), SUCCESS)
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":agent:agentPlugin").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class')))

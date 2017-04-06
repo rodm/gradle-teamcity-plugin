@@ -20,8 +20,9 @@ import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.CoreMatchers.is
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import static org.junit.Assert.assertEquals
 
 class SamplesTest {
 
@@ -37,7 +38,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'server-plugin')
         BuildResult result = executeBuild(projectDir)
 
-        assertEquals(result.task(':build').getOutcome(), SUCCESS)
+        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
 
     @Test
@@ -45,7 +46,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'server-plugin')
         BuildResult result = executeBuild(projectDir, '-b', 'build-alt.gradle', 'clean', 'build')
 
-        assertEquals(result.task(':build').getOutcome(), SUCCESS)
+        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
 
     @Test
@@ -53,7 +54,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'agent-server-plugin')
         BuildResult result = executeBuild(projectDir)
 
-        assertEquals(result.task(':build').getOutcome(), SUCCESS)
+        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
 
     @Test
@@ -61,7 +62,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'agent-tool-plugin')
         BuildResult result = executeBuild(projectDir)
 
-        assertEquals(result.task(':build').getOutcome(), SUCCESS)
+        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
 
     @Test
@@ -69,7 +70,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'multi-project-plugin')
         BuildResult result = executeBuild(projectDir)
 
-        assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
+        assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
 
     @Test
@@ -77,7 +78,7 @@ class SamplesTest {
         File projectDir = new File(samplesDir, 'kotlin-plugin')
         BuildResult result = executeBuildWithVersion(projectDir, '3.5-rc-1')
 
-        assertEquals(result.task(':server:build').getOutcome(), SUCCESS)
+        assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
 
     private static BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {

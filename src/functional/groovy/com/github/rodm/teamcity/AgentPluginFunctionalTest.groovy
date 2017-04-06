@@ -27,7 +27,6 @@ import java.util.zip.ZipFile
 import static org.gradle.testkit.runner.TaskOutcome.*
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.Assert.assertEquals
 
 class AgentPluginFunctionalTest {
 
@@ -97,9 +96,9 @@ class AgentPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SUCCESS)
-        assertEquals(result.task(":processAgentDescriptor").getOutcome(), SKIPPED)
-        assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
 
         ZipFile pluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
         List<String> entries = pluginFile.entries().collect { it.name }
@@ -121,9 +120,9 @@ class AgentPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":generateAgentDescriptor").getOutcome(), SKIPPED)
-        assertEquals(result.task(":processAgentDescriptor").getOutcome(), SUCCESS)
-        assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.getOutput(), not(containsString("Plugin descriptor is invalid")))
     }
 

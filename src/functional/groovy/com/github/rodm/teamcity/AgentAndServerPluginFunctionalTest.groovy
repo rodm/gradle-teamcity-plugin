@@ -27,7 +27,6 @@ import java.util.zip.ZipFile
 import static org.gradle.testkit.runner.TaskOutcome.*
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.Assert.assertEquals
 
 class AgentAndServerPluginFunctionalTest {
 
@@ -84,8 +83,8 @@ class AgentAndServerPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
         ZipFile agentPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
@@ -159,8 +158,8 @@ class AgentAndServerPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":agentPlugin").getOutcome(), SUCCESS)
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
         ZipFile agentPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }

@@ -29,7 +29,6 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
-import static org.junit.Assert.assertEquals
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
@@ -104,9 +103,9 @@ class ServerPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":generateServerDescriptor").getOutcome(), SUCCESS)
-        assertEquals(result.task(":processServerDescriptor").getOutcome(), SKIPPED)
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":generateServerDescriptor").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":processServerDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
         ZipFile pluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
         List<String> entries = pluginFile.entries().collect { it.name }
@@ -132,9 +131,9 @@ class ServerPluginFunctionalTest {
 
         BuildResult result = executeBuild()
 
-        assertEquals(result.task(":generateServerDescriptor").getOutcome(), SKIPPED)
-        assertEquals(result.task(":processServerDescriptor").getOutcome(), SUCCESS)
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":generateServerDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":processServerDescriptor").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.getOutput(), not(containsString("Plugin descriptor is invalid")))
     }
 
@@ -281,7 +280,7 @@ class ServerPluginFunctionalTest {
 
         BuildResult result = executeBuild('--init-script', 'init.gradle', '--refresh-dependencies', 'serverPlugin')
 
-        assertEquals(result.task(":serverPlugin").getOutcome(), SUCCESS)
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
     }
 
     @Test
