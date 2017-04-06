@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
@@ -23,12 +22,13 @@ import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
 
 class TeamCityServerPlugin extends TeamCityPlugin {
@@ -148,18 +148,14 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
                 install.dependsOn unpack
 
-                def deployPlugin = project.tasks.create(String.format('deployTo%s', name), DeployPlugin) {
-                    conventionMapping.map('files') { project.files(environment.plugins) }
-                    conventionMapping.map('target') { project.file(environment.pluginsDir) }
+                def deployPlugin = project.tasks.create(String.format('deployTo%s', name), Copy) {
+                    from { environment.plugins }
+                    into { environment.pluginsDir }
                 }
                 deployPlugin.dependsOn build
 
-                def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), UndeployPlugin) {
-                    conventionMapping.map('files') {
-                        project.files(project.files(environment.plugins).collect { plugin ->
-                            "${environment.pluginsDir}/${plugin.name}"
-                        })
-                    }
+                def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
+                    delete { deployPlugin.outputs.files }
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {

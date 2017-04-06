@@ -15,15 +15,15 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.tasks.DeployPlugin
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.UndeployPlugin
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Delete
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -543,14 +543,15 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployToTeamcity10') as DeployPlugin
-        assertThat(deployPlugin.files.files, hasSize(1))
-        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
-        assertThat(normalizePath(deployPlugin.getTarget()), endsWith('data/10.0/plugins'))
+        Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
+        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call()
+        assertThat(deployFiles, hasSize(1))
+        assertThat(deployFiles, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
+        assertThat(normalizePath(deployPlugin.rootSpec.destinationDir), endsWith('data/10.0/plugins'))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as UndeployPlugin
-        assertThat(undeployPlugin.files.files, hasSize(1))
-        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/test.zip')))
+        Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
+        assertThat(undeployPlugin.delete, hasSize(1))
+        assertThat(undeployPlugin.delete[0].call().files, hasItem(new File(project.rootDir, 'data/10.0/plugins')))
     }
 
     @Test
@@ -570,15 +571,15 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployToTeamcity10') as DeployPlugin
-        assertThat(deployPlugin.files.files, hasSize(2))
-        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin1.zip')))
-        assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin2.zip')))
+        Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
+        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call()
+        assertThat(deployFiles, hasSize(2))
+        assertThat(deployFiles, hasItem('plugin1.zip'))
+        assertThat(deployFiles, hasItem('plugin2.zip'))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as UndeployPlugin
-        assertThat(undeployPlugin.files.files, hasSize(2))
-        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
-        assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
+        Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
+        assertThat(undeployPlugin.delete, hasSize(1))
+        assertThat(undeployPlugin.delete[0].call().files, hasItem(new File(project.rootDir, 'data/10.0/plugins')))
     }
 
     private Closure TEAMCITY10_ENVIRONMENT = {
