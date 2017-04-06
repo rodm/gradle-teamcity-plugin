@@ -148,13 +148,13 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
                 install.dependsOn unpack
 
-                def deployPlugin = project.tasks.create(String.format('deployPluginTo%s', name), DeployPlugin) {
+                def deployPlugin = project.tasks.create(String.format('deployTo%s', name), DeployPlugin) {
                     conventionMapping.map('files') { project.files(environment.plugins) }
                     conventionMapping.map('target') { project.file(environment.pluginsDir) }
                 }
                 deployPlugin.dependsOn build
 
-                def undeployPlugin = project.tasks.create(String.format('undeployPluginFrom%s', name), UndeployPlugin) {
+                def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), UndeployPlugin) {
                     conventionMapping.map('files') {
                         project.files(project.files(environment.plugins).collect { plugin ->
                             "${environment.pluginsDir}/${plugin.name}"

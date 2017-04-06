@@ -318,7 +318,7 @@ class ServerPluginFunctionalTest {
 
         File pluginFile = new File(dataDir, 'plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
-        assertThat(result.task(":deployPluginToTeamcity").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
         assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('deprecated')))
     }
@@ -432,16 +432,16 @@ class ServerPluginFunctionalTest {
         testProjectDir.newFile('plugin1.zip')
         testProjectDir.newFile('plugin2.zip')
 
-        BuildResult result = executeBuild('-S', 'deployPluginToTeamcity')
+        BuildResult result = executeBuild('-S', 'deployToTeamcity')
 
         File plugin1File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin1.zip')
         File plugin2File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin2.zip')
-        assertThat(result.task(":deployPluginToTeamcity").getOutcome(), is(SUCCESS))
+        assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
         assertTrue('Plugin1 archive not deployed', plugin1File.exists())
         assertTrue('Plugin2 archive not deployed', plugin2File.exists())
 
-        result = executeBuild('undeployPluginFromTeamcity')
-        assertThat(result.task(":undeployPluginFromTeamcity").getOutcome(), is(SUCCESS))
+        result = executeBuild('undeployFromTeamcity')
+        assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(SUCCESS))
         assertFalse('Plugin1 archive not undeployed', plugin1File.exists())
         assertFalse('Plugin2 archive not undeployed', plugin2File.exists())
     }

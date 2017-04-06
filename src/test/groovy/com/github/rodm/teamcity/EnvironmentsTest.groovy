@@ -497,8 +497,8 @@ class EnvironmentsTest {
         assertThat(project.tasks, hasTask('unpackTeamcity9'))
         assertThat(project.tasks, hasTask('installTeamcity9'))
 
-        assertThat(project.tasks, hasTask('deployPluginToTeamcity9'))
-        assertThat(project.tasks, hasTask('undeployPluginFromTeamcity9'))
+        assertThat(project.tasks, hasTask('deployToTeamcity9'))
+        assertThat(project.tasks, hasTask('undeployFromTeamcity9'))
 
         assertThat(project.tasks, hasTask('startTeamcity9Server'))
         assertThat(project.tasks, hasTask('stopTeamcity9Server'))
@@ -543,12 +543,12 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10') as DeployPlugin
+        DeployPlugin deployPlugin = project.tasks.getByName('deployToTeamcity10') as DeployPlugin
         assertThat(deployPlugin.files.files, hasSize(1))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
         assertThat(normalizePath(deployPlugin.getTarget()), endsWith('data/10.0/plugins'))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10') as UndeployPlugin
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as UndeployPlugin
         assertThat(undeployPlugin.files.files, hasSize(1))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/test.zip')))
     }
@@ -570,12 +570,12 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        DeployPlugin deployPlugin = project.tasks.getByName('deployPluginToTeamcity10') as DeployPlugin
+        DeployPlugin deployPlugin = project.tasks.getByName('deployToTeamcity10') as DeployPlugin
         assertThat(deployPlugin.files.files, hasSize(2))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin1.zip')))
         assertThat(deployPlugin.files.files, hasItem(new File(project.rootDir, 'plugin2.zip')))
 
-        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployPluginFromTeamcity10') as UndeployPlugin
+        UndeployPlugin undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as UndeployPlugin
         assertThat(undeployPlugin.files.files, hasSize(2))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin1.zip')))
         assertThat(undeployPlugin.files.files, hasItem(new File(project.rootDir, 'data/10.0/plugins/plugin2.zip')))
