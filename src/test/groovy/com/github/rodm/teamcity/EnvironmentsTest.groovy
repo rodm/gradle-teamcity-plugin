@@ -31,6 +31,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
+import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
@@ -656,9 +657,5 @@ class EnvironmentsTest {
         Unpack unpack = project.tasks.getByName('unpackTeamcity10') as Unpack
         assertThat(normalizePath(unpack.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(unpack.getTarget()), endsWith('servers/TeamCity-10.0.4'))
-    }
-
-    private static String normalizePath(File path) {
-        path.canonicalPath.replace('\\', '/')
     }
 }

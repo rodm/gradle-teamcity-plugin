@@ -106,6 +106,8 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
 
+        project.artifacts.add('plugin', packagePlugin)
+
         project.afterEvaluate {
             Zip serverPlugin = (Zip) project.tasks.getByPath('serverPlugin')
             if (extension.server.archiveName) {

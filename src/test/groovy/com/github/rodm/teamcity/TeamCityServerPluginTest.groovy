@@ -25,11 +25,14 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
+import static com.github.rodm.teamcity.TestSupport.normalizePath
+import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.CoreMatchers.notNullValue
+import static org.hamcrest.Matchers.hasSize
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
@@ -218,5 +221,17 @@ class TeamCityServerPluginTest {
 
         Configuration configuration = project.configurations.getByName('testCompile')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'tests-support', '9.0'))
+    }
+
+    @Test
+    void 'server-side plugin artifact is published to the plugin configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('plugin')
+        assertThat(configuration.artifacts, hasSize(1))
+        assertThat(normalizePath(configuration.artifacts[0].file), endsWith('/build/distributions/test.zip'))
     }
 }
