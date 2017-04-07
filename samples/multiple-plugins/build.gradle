@@ -1,0 +1,71 @@
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.12-SNAPSHOT'
+    }
+}
+
+apply plugin: 'com.github.rodm.teamcity-server'
+
+group = 'com.github.rodm.teamcity'
+version = '1.0-SNAPSHOT'
+
+ext {
+    vendorName = 'rodm'
+    teamcityVersion = '8.1.5'
+
+    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
+    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
+    java7Home = project.findProperty('java7.home') ?: '/opt/jdk1.7.0_80'
+    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_121'
+}
+
+configurations {
+    teamcityPlugins
+}
+
+dependencies {
+    teamcityPlugins project(path: ':plugin1', configuration: 'plugin')
+    teamcityPlugins project(path: ':plugin2', configuration: 'plugin')
+}
+
+teamcity {
+    version = teamcityVersion
+
+    environments {
+        downloadsDir = project.downloadsDir
+        baseHomeDir = project.serversDir
+        baseDataDir = 'data'
+
+        teamcity81 {
+            version = '8.1.5'
+            javaHome = file(java7Home)
+            plugins = configurations.teamcityPlugins
+        }
+
+        teamcity91 {
+            version = '9.1.7'
+            javaHome = file(java7Home)
+            plugins = configurations.teamcityPlugins
+        }
+
+        teamcity10 {
+            version = '10.0.5'
+            javaHome = file(java8Home)
+            plugins = configurations.teamcityPlugins
+        }
+
+        teamcity2017 {
+            version = '2017.1-EAP'
+            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-46288.tar.gz'
+            javaHome = file(java8Home)
+            plugins = configurations.teamcityPlugins
+        }
+    }
+}
