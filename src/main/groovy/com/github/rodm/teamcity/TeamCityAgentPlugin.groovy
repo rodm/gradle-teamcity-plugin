@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import org.gradle.api.Project
-import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
@@ -82,8 +81,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
         generateDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof AgentPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
 
-        ArchivePublishArtifact pluginArtifact = new ArchivePublishArtifact(packagePlugin)
-        project.getConfigurations().getByName('plugin').getArtifacts().add(pluginArtifact)
+        project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
             Zip agentPlugin = (Zip) project.tasks.getByPath('agentPlugin')

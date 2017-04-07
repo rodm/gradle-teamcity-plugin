@@ -22,6 +22,7 @@ import org.junit.Before
 import org.junit.Test
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
+import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.isA
@@ -249,6 +250,18 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
         Configuration configuration = project.configurations.getByName('provided')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'agent-api', '9.0'))
+    }
+
+    @Test
+    void 'agent-side plugin artifact is published to the plugin configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('plugin')
+        assertThat(configuration.artifacts, hasSize(1))
+        assertThat(normalizePath(configuration.artifacts[0].file), endsWith('/build/distributions/test-agent.zip'))
     }
 
     @Test
