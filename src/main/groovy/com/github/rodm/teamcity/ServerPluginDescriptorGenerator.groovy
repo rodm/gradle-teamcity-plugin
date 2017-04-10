@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import groovy.xml.XmlUtil
 
 class ServerPluginDescriptorGenerator {
@@ -94,6 +95,7 @@ class ServerPluginDescriptorGenerator {
         }
     }
 
+    @CompileStatic
     private void buildDependenciesNode(Node root) {
         def version = getMajorVersion(version)
         if (version == null || version >= 9) {
