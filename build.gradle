@@ -33,7 +33,7 @@ dependencies {
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-version = '0.12-SNAPSHOT'
+version = '1.0-rc-1'
 group = 'com.github.rodm'
 
 sourceSets {
