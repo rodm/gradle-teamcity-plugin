@@ -81,6 +81,15 @@ class SamplesTest {
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
 
+    @Test
+    void 'multiple plugins'() {
+        File projectDir = new File(samplesDir, 'multiple-plugins')
+        BuildResult result = executeBuild(projectDir)
+
+        assertThat(result.task(':plugin1:build').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':plugin2:build').getOutcome(), is(SUCCESS))
+    }
+
     private static BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir)
