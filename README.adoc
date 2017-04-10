@@ -359,31 +359,24 @@ Agent tool descriptor
 
 ## Samples
 
-The samples directory contains some simple examples of using the plugin.
-
-* `server-plugin` : A simple server-side only plugin.
-* `agent-server-plugin` : A simple plugin with an agent-side and server-side components.
-* `multi-project-plugin` : A plugin with agent-side and server-side built from multiple Gradle Builds and packages a TeamCity plugin.
-* `agent-tool-plugin` : A simple tool plugin that repackages Maven.
+The link:samples[samples] directory contains a number of projects using the plugin.
 
 The following projects use the plugin.
 
-* https://github.com/JetBrains/teamcity-aws-codedeploy-plugin[AWS CodeDeploy] plugin
-* https://github.com/JetBrains/teamcity-aws-codepipeline-plugin[AWS CodePipeline] plugin
-* https://github.com/JetBrains/teamcity-rust-plugin[Rust and Cargo Support] plugin
-* https://github.com/JetBrains/teamcity-process-output-parsers[Framework for process output parsers] plugin
-* https://github.com/JetBrains/teamcity-azure-plugin[Azure Support] plugins
-* https://github.com/JetBrains/teamcity-dotnet-plugin[.NET Core Support] plugin
-* https://github.com/JetBrains/teamcity-nuget-support[NuGet Support] plugin
-* https://github.com/JetBrains/teamcity-github-auth[TeamCity GitHub Auth] plugin
-* https://github.com/JetBrains/teamcity-commit-hooks[TeamCity Commit Hooks] plugin
-* https://github.com/pwielgolaski/teamcity-oauth[TeamCity oAuth authentication] plugin
-* https://github.com/codeamatic/teamcity-docker-runner[Docker Deploy] plugin
-* https://github.com/grundic/teamcity-web-parameters[Teamcity web parameters] plugin
-* https://github.com/grundic/teamcity-browser-notify[Teamcity browser notify] plugin
-* https://github.com/graf/digitalocean-teamcity-plugin[DigitalOcean Support] plugin
-* https://github.com/dmitry-zhuravlev/kobalt-runner-teamcity-plugin[Kobalt Runner] plugin
-* https://github.com/cprieto/tsqlt-teamcity[TeamCity test runner for the tSQLt testing framework] plugin
-* https://github.com/etiennestuder/teamcity-build-scan-plugin[Gradle Build Scan Integration] plugin
-* https://github.com/rodm/teamcity-jmx-plugin[JMX Plugin] plugin
-* https://github.com/rodm/teamcity-jvm-monitor-plugin[JVM Monitor Plugin] plugin
+* https://github.com/JetBrains/teamcity-aws-codedeploy-plugin[AWS CodeDeploy]
+* https://github.com/JetBrains/teamcity-aws-codepipeline-plugin[AWS CodePipeline]
+* https://github.com/JetBrains/teamcity-rust-plugin[Rust and Cargo Support]
+* https://github.com/JetBrains/teamcity-process-output-parsers[Framework for process output parsers]
+* https://github.com/JetBrains/teamcity-azure-plugin[Azure Support]
+* https://github.com/JetBrains/teamcity-dotnet-plugin[.NET Core Support]
+* https://github.com/JetBrains/teamcity-nuget-support[NuGet Support]
+* https://github.com/JetBrains/teamcity-github-auth[TeamCity GitHub Auth]
+* https://github.com/JetBrains/teamcity-commit-hooks[TeamCity Commit Hooks]
+* https://github.com/pwielgolaski/teamcity-oauth[TeamCity oAuth authentication]
+* https://github.com/codeamatic/teamcity-docker-runner[Docker Deploy]
+* https://github.com/grundic/teamcity-web-parameters[Teamcity web parameters]
+* https://github.com/grundic/teamcity-browser-notify[Teamcity browser notify]
+* https://github.com/graf/digitalocean-teamcity-plugin[DigitalOcean Support]
+* https://github.com/dmitry-zhuravlev/kobalt-runner-teamcity-plugin[Kobalt Runner]
+* https://github.com/cprieto/tsqlt-teamcity[TeamCity test runner for the tSQLt testing framework]
+* https://github.com/etiennestuder/teamcity-build-scan-plugin[Gradle Build Scan Integration]

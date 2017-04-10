@@ -1,0 +1,68 @@
+= Sample TeamCity plugins using the Gradle TeamCity plugin.
+:uri-gradle-script-kotlin: https://github.com/gradle/gradle-script-kotlin
+
+The following projects demonstrate the features of the Gradle TeamCity plugin.
+
+* `server-plugin` : A simple server-side only plugin.
+* `agent-server-plugin` : A simple plugin with an agent-side and a server-side component.
+* `multi-project-plugin` : A plugin with agent-side and server-side built from multiple Gradle projects.
+* `agent-tool-plugin` : A simple tool plugin that repackages Apache Maven.
+* `kotlin-plugin` : A simple plugin with an agent-side and a server-side component written in Kotlin and built
+with scripts written in Kotlin using the {uri-gradle-script-kotlin}[Gradle Script Kotlin] plugin.
+* `multiple-plugins` : A sample that demonstrates building and deploying multiple plugins to a TeamCity environment.
+
+== To build the plugins
+
+To build a sample plugin change into the plugin's directory the execute the following Gradle task
+
+    ../../gradlew build
+
+The `server-plugin` sample contains an alternative build file the demonstrates using an external descriptor file.
+The plugin can be built by executing the following command
+
+    ../../gradlew -b build-alt.gradle clean build
+
+To download and install a TeamCity distribution to test the plugin execute the following Gradle task
+
+    ../../gradlew installTeamCity10
+
+This command will take some time but only needs to be executed once. To have the samples use the same TeamCity
+installation set the `teamcity.environments.baseHomeDir` Gradle property in a `gradle.properties` file for each
+project.
+
+To deploy the plugin to TeamCity execute the following task
+
+    ../../gradlew deployToTeamCity10
+
+To start the TeamCity Server and Build Agent execute the following tasks
+
+    ../../gradlew startTeamcity10Server
+    ../../gradlew startTeamcity10Agent
+
+To stop the TeamCity Server and Build Agent execute the following tasks
+
+    ../../gradlew stopTeamcity10Agent
+    ../../gradlew stopTeamcity10Server
+
+There are also tasks for TeamCity 8.1 and TeamCity 9.1, to use these versions replace the number `10` in the tasks
+above with `81` for TeamCity 8.1 and `91` for TeamCity 9.1.
+
+== To try the plugins
+
+After building the plugins and starting the TeamCity Server, login to the server as an Administrator and view the
+installed plugins on the Administration page. The sample plugin or plugins should appear in External Plugins list.
+
+The `server-plugin` only outputs a log message when it starts, check the `teamcity-server.log` for entries from the
+`ExampleServerPlugin`.
+
+The `agent-server-plugin`, `multi-project-plugin` and `kotlin-plugin` samples create a Build Feature plugin.
+Create a project and a build configuration, on the Build Features page of the build configuration select the
+'Example Build Feature'. Running the build will output the message `ExampleBuildFeature enabled for build` to
+the `teamcity-agent.log` file.
+
+The `multiple-plugins` sample builds two plugins that output a log message to the `teamcity-server.log` when they
+are started, search for `Example1ServerPlugin` and `Example2ServerPlugin`.
+
+The `agent-tool-plugin` sample creates a tool that can be used in a Maven build step. Create a build configuration
+and add a Maven build step, set the Maven selection to `Custom` and the `Custom path` to `%teamcity.tool.maven3_3%`.
+Running the build will show the version of Maven used in the `Maven Build Info` tab.
