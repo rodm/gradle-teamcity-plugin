@@ -64,5 +64,5 @@ The `multiple-plugins` sample builds two plugins that output a log message to th
 are started, search for `Example1ServerPlugin` and `Example2ServerPlugin`.
 
 The `agent-tool-plugin` sample creates a tool that can be used in a Maven build step. Create a build configuration
-and add a Maven build step, set the Maven selection to `Custom` and the `Custom path` to `%teamcity.tool.maven3_3%`.
+and add a Maven build step, set the Maven selection to `Custom` and the `Custom path` to `%teamcity.tool.maven3_5%`.
 Running the build will show the version of Maven used in the `Maven Build Info` tab.

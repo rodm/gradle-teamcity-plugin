@@ -35,16 +35,16 @@ configurations {
 }
 
 dependencies {
-    maven group: 'org.apache.maven', name: 'apache-maven', version: '3.3.3', classifier: 'bin', ext: 'zip'
+    maven group: 'org.apache.maven', name: 'apache-maven', version: '3.5.0', classifier: 'bin', ext: 'zip'
 }
 
 agentPlugin {
-    baseName = 'maven3_3'
+    baseName = 'maven3_5'
     version = ''
 }
 
 serverPlugin {
-    baseName = 'maven3_3-tool'
+    baseName = 'maven3_5-tool'
     version = ''
 }
 
@@ -72,11 +72,11 @@ teamcity {
 
     server {
         descriptor {
-            name = 'maven3_3-tool'
-            displayName = 'Repacked Maven 3.3'
+            name = 'maven3_5-tool'
+            displayName = 'Repacked Maven 3.5'
             version = project.version
             vendorName = 'rodm'
-            description = 'TeamCity Example Tool Plugin - Repacked Maven 3.3'
+            description = 'TeamCity Example Tool Plugin - Repacked Maven 3.5'
             downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
             email = 'rod.n.mackenzie@gmail.com'
         }
