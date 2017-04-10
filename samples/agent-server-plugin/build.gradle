@@ -62,7 +62,7 @@ teamcity {
         }
 
         teamcity10 {
-            version = '10.0.4'
+            version = '10.0.5'
             javaHome = file(java8Home)
             serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
             agentOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
