@@ -76,7 +76,7 @@ class SamplesTest {
     @Test
     void 'build kotlin plugin'() {
         File projectDir = new File(samplesDir, 'kotlin-plugin')
-        BuildResult result = executeBuildWithVersion(projectDir, '3.5-rc-1')
+        BuildResult result = executeBuildWithVersion(projectDir, '3.5')
 
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
