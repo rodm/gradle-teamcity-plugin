@@ -157,7 +157,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
                 deployPlugin.dependsOn build
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
-                    delete { deployPlugin.outputs.files }
+                    delete {
+                        project.fileTree(dir: environment.pluginsDir,
+                                         includes: project.files(environment.plugins).collect { it.name })
+                    }
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {

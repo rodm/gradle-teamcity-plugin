@@ -22,6 +22,7 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.testfixtures.ProjectBuilder
@@ -551,8 +552,10 @@ class EnvironmentsTest {
         assertThat(normalizePath(deployPlugin.rootSpec.destinationDir), endsWith('data/10.0/plugins'))
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
-        assertThat(undeployPlugin.delete, hasSize(1))
-        assertThat(undeployPlugin.delete[0].call().files, hasItem(new File(project.rootDir, 'data/10.0/plugins')))
+        ConfigurableFileTree fileTree = undeployPlugin.delete[0].call()
+        assertThat(normalizePath(fileTree.dir), endsWith('data/10.0/plugins'))
+        assertThat(fileTree.patterns.includes, hasSize(1))
+        assertThat(fileTree.patterns.includes, hasItem('test.zip'))
     }
 
     @Test
@@ -579,8 +582,10 @@ class EnvironmentsTest {
         assertThat(deployFiles, hasItem('plugin2.zip'))
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
-        assertThat(undeployPlugin.delete, hasSize(1))
-        assertThat(undeployPlugin.delete[0].call().files, hasItem(new File(project.rootDir, 'data/10.0/plugins')))
+        ConfigurableFileTree fileTree = undeployPlugin.delete[0].call()
+        assertThat(fileTree.patterns.includes, hasSize(2))
+        assertThat(fileTree.patterns.includes, hasItem('plugin1.zip'))
+        assertThat(fileTree.patterns.includes, hasItem('plugin2.zip'))
     }
 
     private Closure TEAMCITY10_ENVIRONMENT = {
