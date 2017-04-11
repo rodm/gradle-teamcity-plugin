@@ -55,13 +55,12 @@ teamcity {
         }
 
         teamcity10 {
-            version = '10.0.4'
+            version = '10.0.5'
             javaHome = file(java8Home)
         }
 
         teamcity2017 {
-            version = '2017.1-EAP'
-            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-46288.tar.gz'
+            version = '2017.1'
             javaHome = file(java8Home)
         }
     }
