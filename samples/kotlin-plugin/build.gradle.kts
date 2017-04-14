@@ -11,7 +11,7 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${extra["kotlinVersion"]}")
-        classpath("com.github.rodm:gradle-teamcity-plugin:1.0-rc-1")
+        classpath("com.github.rodm:gradle-teamcity-plugin:1.0")
     }
 }
 
