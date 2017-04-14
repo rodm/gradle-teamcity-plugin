@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath(kotlinModule("gradle-plugin"))
-        classpath("com.github.rodm:gradle-teamcity-plugin:1.0")
+        classpath("com.github.rodm:gradle-teamcity-plugin:1.1-SNAPSHOT")
     }
 }
 
