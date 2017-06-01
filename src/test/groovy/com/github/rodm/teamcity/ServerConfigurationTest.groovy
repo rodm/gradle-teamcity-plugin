@@ -236,4 +236,19 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
         assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
     }
+
+    @Test
+    void 'archive name is appended with .zip if missing'() {
+        project.teamcity {
+            server {
+                archiveName = 'server-plugin'
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
+    }
 }

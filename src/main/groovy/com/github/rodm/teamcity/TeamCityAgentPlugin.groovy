@@ -85,9 +85,7 @@ class TeamCityAgentPlugin extends TeamCityPlugin {
 
         project.afterEvaluate {
             Zip agentPlugin = (Zip) project.tasks.getByPath('agentPlugin')
-            if (extension.agent.archiveName) {
-                agentPlugin.archiveName = extension.agent.archiveName
-            }
+            configurePluginArchiveTask(agentPlugin, extension.agent.archiveName)
         }
     }
 }

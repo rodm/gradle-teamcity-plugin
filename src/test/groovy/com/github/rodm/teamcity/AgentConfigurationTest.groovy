@@ -294,4 +294,20 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
         assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
     }
+
+    @Test
+    void 'archive name is appended with .zip if missing'() {
+        project.version = '1.2.3'
+        project.teamcity {
+            agent {
+                archiveName = 'agent-plugin'
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
+        assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
+    }
 }

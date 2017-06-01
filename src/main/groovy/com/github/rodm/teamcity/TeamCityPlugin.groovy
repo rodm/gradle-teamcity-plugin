@@ -28,6 +28,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.Zip
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
@@ -119,6 +120,16 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
             jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
             jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+        }
+    }
+
+    static void configurePluginArchiveTask(Zip task, String archiveName) {
+        if (archiveName) {
+            if (archiveName.endsWith('.zip')) {
+                task.archiveName = archiveName
+            } else {
+                task.archiveName = archiveName + '.zip'
+            }
         }
     }
 

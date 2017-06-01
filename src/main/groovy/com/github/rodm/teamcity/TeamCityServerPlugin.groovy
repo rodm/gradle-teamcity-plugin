@@ -110,9 +110,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
         project.afterEvaluate {
             Zip serverPlugin = (Zip) project.tasks.getByPath('serverPlugin')
-            if (extension.server.archiveName) {
-                serverPlugin.archiveName = extension.server.archiveName
-            }
+            configurePluginArchiveTask(serverPlugin, extension.server.archiveName)
         }
     }
 
