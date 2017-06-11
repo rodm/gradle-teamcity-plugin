@@ -50,10 +50,6 @@ class TeamCityPluginExtension {
         return agent
     }
 
-    def agent(@DelegatesTo(AgentPluginConfiguration) Closure closure) {
-        agent(ConfigureUtil.configureUsing(closure))
-    }
-
     def agent(Action<? extends AgentPluginConfiguration> configuration) {
         if (!project.plugins.hasPlugin(TeamCityAgentPlugin))
             throw new InvalidUserDataException('Agent plugin configuration is invalid for a project without the teamcity-agent plugin')
@@ -62,10 +58,6 @@ class TeamCityPluginExtension {
 
     def getServer() {
         return server
-    }
-
-    def server(@DelegatesTo(ServerPluginConfiguration) Closure closure) {
-        server(ConfigureUtil.configureUsing(closure))
     }
 
     def server(Action<? extends ServerPluginConfiguration> configuration) {

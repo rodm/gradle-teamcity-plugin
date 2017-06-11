@@ -4,7 +4,6 @@ import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.TeamCityEnvironment
 import com.github.rodm.teamcity.TeamCityEnvironments
 import com.github.rodm.teamcity.TeamCityPluginExtension
-import org.gradle.api.Project
 
 buildscript {
     repositories {
@@ -84,10 +83,6 @@ teamcity {
 // Extension functions to allow cleaner configuration
 fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
     configure(configuration)
-}
-
-fun TeamCityPluginExtension.server(configuration: ServerPluginConfiguration.() -> Unit) {
-    this.server(closureOf<ServerPluginConfiguration>(configuration))
 }
 
 fun TeamCityPluginExtension.environments(configuration: TeamCityEnvironments.() -> Unit) {
