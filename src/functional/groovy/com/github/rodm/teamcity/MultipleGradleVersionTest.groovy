@@ -220,7 +220,7 @@ class MultipleGradleVersionTest {
 
     @Test
     void 'build plugin using Gradle 4.0'() {
-        BuildResult result = executeBuild('4.0-rc-1')
+        BuildResult result = executeBuild('4.0')
         checkBuild(result)
     }
 

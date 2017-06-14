@@ -84,7 +84,7 @@ class SamplesTest {
     @Test
     void 'build kotlin plugin with Gradle 4.0'() {
         File projectDir = new File(samplesDir, 'kotlin-plugin')
-        BuildResult result = executeBuildWithVersion(projectDir, '4.0-rc-1')
+        BuildResult result = executeBuildWithVersion(projectDir, '4.0')
 
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
