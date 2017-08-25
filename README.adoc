@@ -58,7 +58,8 @@ lib directory when used with the agent plugin. When used with the server plugin 
  agent directory of the plugin archive.
 * `server` : The `server` configuration is used to define additional dependencies to be included in the server plugin
 lib directory when used with the server plugin.
-* `plugin` : The `plugin` configuration is used by the agent plugin when publishing the agent plugin archive.
+* `plugin` : The `plugin` configuration is used by the agent and server plugins to publish the agent and
+server plugin archives.
 
 ### Extension Properties
 
