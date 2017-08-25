@@ -2,10 +2,46 @@
 apply plugin: 'java'
 apply plugin: 'com.github.rodm.teamcity-server'
 
+ext {
+    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
+    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
+    java7Home = project.findProperty('java7.home') ?: '/opt/jdk1.7.0_80'
+    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
+}
+
 dependencies {
     compile project(':common')
+    agent project(path: ':agent', configuration: 'plugin')
 }
 
 teamcity {
     version = teamcityVersion
+
+    server {
+        descriptor {
+            name = 'Example TeamCity Plugin'
+            displayName = 'Example TeamCity Plugin'
+            version = project.version
+            vendorName = 'rodm'
+            description = 'Example multi-project TeamCity plugin'
+            email = 'rod.n.mackenzie@gmail.com'
+            useSeparateClassloader = true
+        }
+    }
+
+    environments {
+        downloadsDir = project.downloadsDir
+        baseHomeDir = project.serversDir
+        baseDataDir = 'data'
+        
+        teamcity10 {
+            version = '10.0.5'
+            javaHome = file(java8Home)
+        }
+
+        teamcity2017 {
+            version = '2017.1.3'
+            javaHome = file(java8Home)
+        }
+    }
 }

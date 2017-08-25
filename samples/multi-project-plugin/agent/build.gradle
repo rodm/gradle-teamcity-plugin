@@ -8,4 +8,12 @@ dependencies {
 
 teamcity {
     version = teamcityVersion
+
+    agent {
+        descriptor {
+            pluginDeployment {
+                useSeparateClassloader = true
+            }
+        }
+    }
 }
