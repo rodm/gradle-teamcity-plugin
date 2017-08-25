@@ -220,7 +220,13 @@ class MultipleGradleVersionTest {
 
     @Test
     void 'build plugin using Gradle 4.0'() {
-        BuildResult result = executeBuild('4.0')
+        BuildResult result = executeBuild('4.0.2')
+        checkBuild(result)
+    }
+
+    @Test
+    void 'build plugin using Gradle 4.1'() {
+        BuildResult result = executeBuild('4.1')
         checkBuild(result)
     }
 
