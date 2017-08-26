@@ -37,7 +37,7 @@ class TeamCityPluginExtension {
     TeamCityPluginExtension(Project project) {
         this.project = project
         this.environments = new TeamCityEnvironments(project)
-        this.agent = new AgentPluginConfiguration(project.copySpec {})
+        this.agent = new AgentPluginConfiguration(project)
         this.server = new ServerPluginConfiguration(project, environments)
     }
 

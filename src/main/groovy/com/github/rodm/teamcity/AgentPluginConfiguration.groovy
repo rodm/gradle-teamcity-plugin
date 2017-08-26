@@ -15,13 +15,13 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.api.file.CopySpec
+import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
 class AgentPluginConfiguration extends PluginConfiguration {
 
-    AgentPluginConfiguration(CopySpec copySpec) {
-        super(copySpec)
+    AgentPluginConfiguration(Project project) {
+        super(project.copySpec())
     }
 
     def descriptor(Closure closure) {
