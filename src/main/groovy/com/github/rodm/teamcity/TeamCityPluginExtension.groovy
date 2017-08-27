@@ -36,9 +36,9 @@ class TeamCityPluginExtension {
 
     TeamCityPluginExtension(Project project) {
         this.project = project
-        this.environments = new TeamCityEnvironments(project)
-        this.agent = new AgentPluginConfiguration(project)
-        this.server = new ServerPluginConfiguration(project, environments)
+        this.environments = extensions.create('teamcity', TeamCityEnvironments, project)
+        this.agent = extensions.create('agent', AgentPluginConfiguration, project)
+        this.server = extensions.create('server', ServerPluginConfiguration, project, environments)
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")

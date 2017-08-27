@@ -19,6 +19,8 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
@@ -33,8 +35,9 @@ class ServerPluginConfiguration extends PluginConfiguration {
         this.environments = environments
     }
 
+    @CompileStatic(SKIP)
     def descriptor(Closure closure) {
-        descriptor = new ServerPluginDescriptor()
+        descriptor = extensions.create('descriptor', ServerPluginDescriptor)
         ConfigureUtil.configure(closure, descriptor)
     }
 

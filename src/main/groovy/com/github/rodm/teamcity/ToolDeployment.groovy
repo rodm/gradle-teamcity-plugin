@@ -15,13 +15,11 @@
  */
 package com.github.rodm.teamcity
 
-import groovy.transform.CompileStatic
 import org.gradle.util.ConfigureUtil
 
-@CompileStatic
 class ToolDeployment {
 
-    ExecutableFiles executableFiles = new ExecutableFiles()
+    ExecutableFiles executableFiles = extensions.create('executableFiles', ExecutableFiles)
 
     def executableFiles(Closure closure) {
         ConfigureUtil.configure(closure, executableFiles)

@@ -48,7 +48,7 @@ class AgentDescriptorGeneratorTest {
                 .build()
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         writer = new StringWriter()
-        descriptor = new AgentPluginDescriptor()
+        descriptor = project.extensions.create('descriptor', AgentPluginDescriptor)
         generator = new AgentPluginDescriptorGenerator(descriptor)
     }
 
@@ -61,7 +61,7 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writesPluginDeployment() {
-        descriptor.deployment = new PluginDeployment()
+        descriptor.pluginDeployment {}
 
         generator.writeTo(writer)
 
@@ -71,8 +71,9 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writeOptionalUseSeparateClassloader() {
-        descriptor.deployment = new PluginDeployment()
-        descriptor.deployment.useSeparateClassloader = true
+        descriptor.pluginDeployment {
+            useSeparateClassloader = true
+        }
 
         generator.writeTo(writer)
 
@@ -81,8 +82,9 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writeOptionalUseSeparateClassloaderWhenFalse() {
-        descriptor.deployment = new PluginDeployment()
-        descriptor.deployment.useSeparateClassloader = false
+        descriptor.pluginDeployment {
+            useSeparateClassloader = false
+        }
 
         generator.writeTo(writer)
 
@@ -91,10 +93,11 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writePluginDeploymentExecutableFiles() {
-        descriptor.deployment = new PluginDeployment()
-        descriptor.deployment.executableFiles {
-            include 'file1'
-            include 'file2'
+        descriptor.pluginDeployment {
+            executableFiles {
+                include 'file1'
+                include 'file2'
+            }
         }
 
         generator.writeTo(writer)
@@ -106,7 +109,7 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writePluginDeploymentExecutableFilesOnlyIfSpecified() {
-        descriptor.deployment = new PluginDeployment()
+        descriptor.pluginDeployment {}
 
         generator.writeTo(writer)
 
@@ -116,7 +119,7 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writesToolDeployment() {
-        descriptor.deployment = new ToolDeployment()
+        descriptor.toolDeployment {}
 
         generator.writeTo(writer)
 
@@ -125,10 +128,11 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writeToolDeploymentExecutableFiles() {
-        descriptor.deployment = new ToolDeployment()
-        descriptor.deployment.executableFiles {
-            include 'file1'
-            include 'file2'
+        descriptor.toolDeployment {
+            executableFiles {
+                include 'file1'
+                include 'file2'
+            }
         }
 
         generator.writeTo(writer)
@@ -140,7 +144,7 @@ class AgentDescriptorGeneratorTest {
 
     @Test
     void writeToolDeploymentExecutableFilesOnlyIfSpecified() {
-        descriptor.deployment = new PluginDeployment()
+        descriptor.pluginDeployment {}
 
         generator.writeTo(writer)
 

@@ -25,7 +25,7 @@ class AgentPluginConfiguration extends PluginConfiguration {
     }
 
     def descriptor(Closure closure) {
-        descriptor = new AgentPluginDescriptor()
+        descriptor = extensions.create('descriptor', AgentPluginDescriptor)
         ConfigureUtil.configure(closure, descriptor)
     }
 }

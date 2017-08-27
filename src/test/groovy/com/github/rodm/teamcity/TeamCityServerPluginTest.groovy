@@ -170,7 +170,7 @@ class TeamCityServerPluginTest {
     void 'ConfigureRepositories adds MavenCentral and JetBrains repositories'() {
         project.apply plugin: 'java'
 
-        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
         TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
 
         configureRepositories.execute(project)
@@ -182,7 +182,7 @@ class TeamCityServerPluginTest {
 
     @Test
     void 'ConfigureRepositories adds no repositories when Java plugin is not applied'() {
-        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
         TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
 
         configureRepositories.execute(project)
@@ -192,7 +192,7 @@ class TeamCityServerPluginTest {
 
     @Test
     void 'ConfigureRepositories adds no repositories when defaultRepositories is false'() {
-        TeamCityPluginExtension extension = new TeamCityPluginExtension(project)
+        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
         TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
         extension.defaultRepositories = false
 

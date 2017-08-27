@@ -18,12 +18,19 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.util.ConfigureUtil
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
 @CompileStatic
 class PluginDeployment {
 
     Boolean useSeparateClassloader
 
-    ExecutableFiles executableFiles = new ExecutableFiles()
+    ExecutableFiles executableFiles
+
+    @CompileStatic(SKIP)
+    PluginDeployment() {
+        executableFiles = extensions.create('executableFiles', ExecutableFiles)
+    }
 
     def executableFiles(Closure closure) {
         ConfigureUtil.configure(closure, executableFiles)

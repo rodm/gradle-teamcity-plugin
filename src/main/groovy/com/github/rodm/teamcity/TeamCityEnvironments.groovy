@@ -19,6 +19,9 @@ import groovy.transform.CompileStatic
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
+@CompileStatic
 class TeamCityEnvironments {
 
     public static final String DOWNLOADS_DIR_PROPERTY = 'teamcity.environments.downloadsDir'
@@ -41,7 +44,7 @@ class TeamCityEnvironments {
 
     final NamedDomainObjectContainer<TeamCityEnvironment> environments
 
-    private Project project
+    Project project
 
     TeamCityEnvironments(Project project) {
         this.project = project
@@ -52,7 +55,6 @@ class TeamCityEnvironments {
         return environments.getByName(name)
     }
 
-    @CompileStatic
     String getDownloadsDir() {
         return property(DOWNLOADS_DIR_PROPERTY, downloadsDir, DEFAULT_DOWNLOADS_DIR)
     }
@@ -61,7 +63,6 @@ class TeamCityEnvironments {
         this.downloadsDir = downloadsDir
     }
 
-    @CompileStatic
     String getBaseDownloadUrl() {
         return property(BASE_DOWNLOAD_URL_PROPERTY, baseDownloadUrl, DEFAULT_BASE_DOWNLOAD_URL)
     }
@@ -70,7 +71,6 @@ class TeamCityEnvironments {
         this.baseDownloadUrl = baseDownloadUrl
     }
 
-    @CompileStatic
     String getBaseDataDir() {
         return property(BASE_DATA_DIR_PROPERTY, baseDataDir, DEFAULT_BASE_DATA_DIR)
     }
@@ -79,7 +79,6 @@ class TeamCityEnvironments {
         this.baseDataDir = baseDataDir
     }
 
-    @CompileStatic
     String getBaseHomeDir() {
         return property(BASE_HOME_DIR_PROPERTY, baseHomeDir, DEFAULT_BASE_HOME_DIR)
     }
@@ -96,6 +95,7 @@ class TeamCityEnvironments {
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
+    @CompileStatic(SKIP)
     methodMissing(String name, args) {
         if (args.length == 1 && args[0] instanceof Closure) {
             Closure configuration = args[0]

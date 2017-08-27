@@ -18,6 +18,8 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.util.ConfigureUtil
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
 @CompileStatic
 class ServerPluginDescriptor {
 
@@ -45,13 +47,19 @@ class ServerPluginDescriptor {
 
     Boolean useSeparateClassloader
 
-    Parameters parameters = new Parameters()
+    Parameters parameters
+
+    Dependencies dependencies
+
+    @CompileStatic(SKIP)
+    ServerPluginDescriptor() {
+        this.parameters = extensions.create('parameters', Parameters)
+        this.dependencies = extensions.create('dependencies', Dependencies)
+    }
 
     def parameters(Closure closure) {
         ConfigureUtil.configure(closure, parameters)
     }
-
-    Dependencies dependencies = new Dependencies()
 
     def dependencies(Closure closure) {
         ConfigureUtil.configure(closure, dependencies)

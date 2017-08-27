@@ -51,7 +51,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesTeamCityPluginRootNode() {
-        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -84,7 +84,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesRequiredInfoPropertiesWhenNotSet() {
-        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -101,7 +101,7 @@ class ServerDescriptorGeneratorTest {
         defaults << ['name': 'test-plugin name']
         defaults << ['displayName': 'test-plugin display name']
         defaults << ['version': '1.2.3']
-        ServerPluginDescriptor descriptor = new ServerPluginDescriptor()
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, "9.0", defaults)
 
         generator.writeTo(writer)

@@ -15,25 +15,23 @@
  */
 package com.github.rodm.teamcity
 
-import groovy.transform.CompileStatic
 import org.gradle.util.ConfigureUtil
 
-@CompileStatic
 class AgentPluginDescriptor {
 
     def deployment
 
     def pluginDeployment(Closure closure) {
-        deployment = new PluginDeployment()
+        deployment = extensions.create('deployment', PluginDeployment)
         ConfigureUtil.configure(closure, deployment)
     }
 
     def toolDeployment(Closure closure) {
-        deployment = new ToolDeployment()
+        deployment = extensions.create('deployment', ToolDeployment)
         ConfigureUtil.configure(closure, deployment)
     }
 
-    Dependencies dependencies = new Dependencies()
+    Dependencies dependencies = extensions.create('dependencies', Dependencies)
 
     def dependencies(Closure closure) {
         ConfigureUtil.configure(closure, dependencies)
