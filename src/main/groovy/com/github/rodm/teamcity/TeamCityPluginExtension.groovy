@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
-import org.gradle.util.ConfigureUtil
 
 class TeamCityPluginExtension {
 
@@ -115,7 +114,7 @@ class TeamCityPluginExtension {
         return environments
     }
 
-    void environments(Closure config) {
-        ConfigureUtil.configure(config, environments)
+    void environments(Action<TeamCityEnvironments> configuration) {
+        configuration.execute(environments)
     }
 }
