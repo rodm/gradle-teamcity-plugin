@@ -15,13 +15,13 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.Action
 
 class ToolDeployment {
 
     ExecutableFiles executableFiles = extensions.create('executableFiles', ExecutableFiles)
 
-    def executableFiles(Closure closure) {
-        ConfigureUtil.configure(closure, executableFiles)
+    def executableFiles(Action<ExecutableFiles> configuration) {
+        configuration.execute(executableFiles)
     }
 }

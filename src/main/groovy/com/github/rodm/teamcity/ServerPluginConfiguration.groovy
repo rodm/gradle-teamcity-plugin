@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.util.ConfigureUtil
 
@@ -36,9 +37,9 @@ class ServerPluginConfiguration extends PluginConfiguration {
     }
 
     @CompileStatic(SKIP)
-    def descriptor(Closure closure) {
+    def descriptor(Action<ServerPluginDescriptor> configuration) {
         descriptor = extensions.create('descriptor', ServerPluginDescriptor)
-        ConfigureUtil.configure(closure, descriptor)
+        configuration.execute(descriptor)
     }
 
     void setDownloadsDir(String downloadsDir) {

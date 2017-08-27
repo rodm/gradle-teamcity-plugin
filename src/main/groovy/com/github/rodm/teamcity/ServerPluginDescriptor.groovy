@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.Action
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
@@ -57,11 +57,11 @@ class ServerPluginDescriptor {
         this.dependencies = extensions.create('dependencies', Dependencies)
     }
 
-    def parameters(Closure closure) {
-        ConfigureUtil.configure(closure, parameters)
+    def parameters(Action<Parameters> configuration) {
+        configuration.execute(parameters)
     }
 
-    def dependencies(Closure closure) {
-        ConfigureUtil.configure(closure, dependencies)
+    def dependencies(Action<Dependencies> configuration) {
+        configuration.execute(dependencies)
     }
 }

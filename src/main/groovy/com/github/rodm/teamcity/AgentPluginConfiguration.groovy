@@ -15,8 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.util.ConfigureUtil
 
 class AgentPluginConfiguration extends PluginConfiguration {
 
@@ -24,8 +24,8 @@ class AgentPluginConfiguration extends PluginConfiguration {
         super(project.copySpec())
     }
 
-    def descriptor(Closure closure) {
+    def descriptor(Action<AgentPluginDescriptor> configuration) {
         descriptor = extensions.create('descriptor', AgentPluginDescriptor)
-        ConfigureUtil.configure(closure, descriptor)
+        configuration.execute(descriptor)
     }
 }

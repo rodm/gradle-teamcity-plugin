@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.Action
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
@@ -32,7 +32,7 @@ class PluginDeployment {
         executableFiles = extensions.create('executableFiles', ExecutableFiles)
     }
 
-    def executableFiles(Closure closure) {
-        ConfigureUtil.configure(closure, executableFiles)
+    def executableFiles(Action<ExecutableFiles> configuration) {
+        configuration.execute(executableFiles)
     }
 }

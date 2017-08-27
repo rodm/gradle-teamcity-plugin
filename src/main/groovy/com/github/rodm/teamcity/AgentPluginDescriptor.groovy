@@ -15,25 +15,25 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.util.ConfigureUtil
+import org.gradle.api.Action
 
 class AgentPluginDescriptor {
 
     def deployment
 
-    def pluginDeployment(Closure closure) {
+    def pluginDeployment(Action<PluginDeployment> configuration) {
         deployment = extensions.create('deployment', PluginDeployment)
-        ConfigureUtil.configure(closure, deployment)
+        configuration.execute(deployment)
     }
 
-    def toolDeployment(Closure closure) {
+    def toolDeployment(Action<ToolDeployment> configuration) {
         deployment = extensions.create('deployment', ToolDeployment)
-        ConfigureUtil.configure(closure, deployment)
+        configuration.execute(deployment)
     }
 
     Dependencies dependencies = extensions.create('dependencies', Dependencies)
 
-    def dependencies(Closure closure) {
-        ConfigureUtil.configure(closure, dependencies)
+    def dependencies(Action<Dependencies> configuration) {
+        configuration.execute(dependencies)
     }
 }

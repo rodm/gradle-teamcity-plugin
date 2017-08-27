@@ -32,8 +32,6 @@ abstract class PluginConfiguration {
         this.files = copySpec
     }
 
-    abstract descriptor(Closure closure)
-
     def files(Closure closure) {
         ConfigureUtil.configure(closure, files.addChild())
     }
