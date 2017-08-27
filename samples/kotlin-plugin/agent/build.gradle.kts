@@ -1,6 +1,4 @@
 
-import com.github.rodm.teamcity.AgentPluginDescriptor
-import com.github.rodm.teamcity.PluginDeployment
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
 buildscript {
@@ -33,10 +31,10 @@ configure<TeamCityPluginExtension> {
     version = rootProject.extra["teamcityVersion"] as String
 
     agent {
-        descriptor(closureOf<AgentPluginDescriptor> {
-            pluginDeployment(closureOf<PluginDeployment> {
+        descriptor {
+            pluginDeployment {
                 useSeparateClassloader = true
-            })
-        })
+            }
+        }
     }
 }

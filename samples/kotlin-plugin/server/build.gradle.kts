@@ -1,8 +1,5 @@
 
-import com.github.rodm.teamcity.ServerPluginConfiguration
-import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.TeamCityEnvironment
-import com.github.rodm.teamcity.TeamCityEnvironments
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
 buildscript {
@@ -80,15 +77,7 @@ teamcity {
     }
 }
 
-// Extension functions to allow cleaner configuration
+// Extension function to allow cleaner configuration
 fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
     configure(configuration)
-}
-
-fun TeamCityPluginExtension.environments(configuration: TeamCityEnvironments.() -> Unit) {
-    this.environments(closureOf<TeamCityEnvironments>(configuration))
-}
-
-fun ServerPluginConfiguration.descriptor(configuration: ServerPluginDescriptor.() -> Unit) {
-    this.descriptor(closureOf<ServerPluginDescriptor>(configuration))
 }
