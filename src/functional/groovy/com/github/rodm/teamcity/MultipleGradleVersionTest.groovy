@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.internal.os.OperatingSystem
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
@@ -31,7 +30,6 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.Assume.assumeThat
 
 class MultipleGradleVersionTest {
 
@@ -165,21 +163,6 @@ class MultipleGradleVersionTest {
                 <bean id="examplePlugin" class="example.server.ExampleServerPlugin"></bean>
             </beans>
         """
-    }
-
-    @Test
-    void buildPluginUsingGradle_2_8() {
-        // Test is unreliable on Windows (https://github.com/rodm/gradle-teamcity-plugin/issues/23)
-        assumeThat(OperatingSystem.current(), not(OperatingSystem.forName('windows')))
-
-        BuildResult result = executeBuild('2.8')
-        checkBuild(result)
-    }
-
-    @Test
-    void buildPluginUsingGradle_2_14_1() {
-        BuildResult result = executeBuild('2.14.1')
-        checkBuild(result)
     }
 
     @Test
