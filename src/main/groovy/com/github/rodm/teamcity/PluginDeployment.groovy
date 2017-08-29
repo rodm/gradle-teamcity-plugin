@@ -17,14 +17,20 @@ package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
 class PluginDeployment {
 
+    @Input
+    @Optional
     Boolean useSeparateClassloader
 
+    @Nested
     ExecutableFiles executableFiles
 
     @CompileStatic(SKIP)

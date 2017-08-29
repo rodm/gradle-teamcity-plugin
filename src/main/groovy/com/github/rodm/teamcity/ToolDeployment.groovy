@@ -16,9 +16,11 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.tasks.Nested
 
 class ToolDeployment {
 
+    @Nested
     ExecutableFiles executableFiles = extensions.create('executableFiles', ExecutableFiles)
 
     def executableFiles(Action<ExecutableFiles> configuration) {

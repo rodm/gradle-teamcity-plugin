@@ -38,6 +38,7 @@ class AgentPluginFunctionalTest {
         teamcity {
             version = '8.1.5'
             descriptor {
+                pluginDeployment {}
             }
         }
     """

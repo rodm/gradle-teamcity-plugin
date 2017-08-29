@@ -21,16 +21,27 @@ import com.github.rodm.teamcity.TeamCityAgentPlugin
 import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
 import org.gradle.api.DefaultTask
-import org.gradle.api.specs.Specs
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class GenerateAgentPluginDescriptor extends DefaultTask {
 
+    private String version
+
+    private AgentPluginDescriptor descriptor
+
     private File destination
 
-    GenerateAgentPluginDescriptor() {
-        getOutputs().upToDateWhen(Specs.satisfyNone())
+    @Input
+    String getVersion() {
+        return version
+    }
+
+    @Nested
+    AgentPluginDescriptor getDescriptor() {
+        return descriptor
     }
 
     @OutputFile
@@ -44,13 +55,12 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     @TaskAction
     void generateDescriptor() {
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-        AgentPluginDescriptor descriptor = extension.agent.descriptor
 
-        def version = extension.getMajorVersion()
-        if (version != null && version < 9 && descriptor.dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${extension.version}")
+        def majorVersion = extension.getMajorVersion()
+        if (majorVersion != null && majorVersion < 9 && getDescriptor().dependencies.hasDependencies()) {
+            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
-        AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor)
+        AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 }

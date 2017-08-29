@@ -16,11 +16,17 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.tasks.Input
 
 @CompileStatic
 class ExecutableFiles {
 
     List<String> includes = []
+
+    @Input
+    List<String> getIncludes() {
+        return includes
+    }
 
     void include(String name) {
         includes << name

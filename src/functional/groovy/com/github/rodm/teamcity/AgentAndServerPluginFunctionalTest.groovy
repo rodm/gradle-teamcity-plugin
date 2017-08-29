@@ -63,6 +63,7 @@ class AgentAndServerPluginFunctionalTest {
                 version = '8.1.5'
                 agent {
                     descriptor {
+                        pluginDeployment {}
                     }
                 }
                 server {
@@ -139,6 +140,7 @@ class AgentAndServerPluginFunctionalTest {
                 version = '8.1.5'
                 agent {
                     descriptor {
+                        pluginDeployment {}
                     }
                 }
                 server {

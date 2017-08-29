@@ -16,9 +16,11 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.tasks.Nested
 
 class AgentPluginDescriptor {
 
+    @Nested
     def deployment
 
     def pluginDeployment(Action<PluginDeployment> configuration) {
@@ -31,6 +33,7 @@ class AgentPluginDescriptor {
         configuration.execute(deployment)
     }
 
+    @Nested
     Dependencies dependencies = extensions.create('dependencies', Dependencies)
 
     def dependencies(Action<Dependencies> configuration) {
