@@ -45,6 +45,10 @@ class ServerPluginFunctionalTest {
         teamcity {
             version = '8.1.5'
             descriptor {
+                name = 'test-plugin'
+                displayName = 'Test plugin'
+                version = '1.0'
+                vendorName = 'vendor name'
             }
         }
     """
@@ -297,6 +301,10 @@ class ServerPluginFunctionalTest {
                 version = '8.1.5'
                 server {
                     descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
                     }
                 }
                 environments {
@@ -336,6 +344,10 @@ class ServerPluginFunctionalTest {
                 version = '8.1.5'
                 server {
                     descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
                     }
                 }
                 environments {
@@ -380,6 +392,10 @@ class ServerPluginFunctionalTest {
                 version = '8.1.5'
                 server {
                     descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
                     }
                 }
                 environments {

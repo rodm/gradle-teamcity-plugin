@@ -16,17 +16,28 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.tasks.Input
 
 @CompileStatic
 class Dependencies {
 
     List<String> plugins = []
 
+    @Input
+    List<String> getPlugins() {
+        return plugins
+    }
+
     void plugin(String name) {
         plugins << name
     }
 
     List<String> tools = []
+
+    @Input
+    List<String> getTools() {
+        return tools
+    }
 
     void tool(String name) {
         tools << name

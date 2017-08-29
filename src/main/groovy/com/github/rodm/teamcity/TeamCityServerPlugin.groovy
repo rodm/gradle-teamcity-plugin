@@ -102,7 +102,10 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }
         packagePlugin.dependsOn processDescriptor
 
-        def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor)
+        def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor) {
+            conventionMapping.version = { extension.version }
+            conventionMapping.descriptor = { extension.server.descriptor instanceof ServerPluginDescriptor ? extension.server.descriptor : null }
+        }
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
 

@@ -67,6 +67,10 @@ class AgentAndServerPluginFunctionalTest {
                 }
                 server {
                     descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
                     }
                 }
             }
@@ -139,6 +143,10 @@ class AgentAndServerPluginFunctionalTest {
                 }
                 server {
                     descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
                     }
                 }
             }

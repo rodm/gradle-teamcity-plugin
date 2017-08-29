@@ -21,16 +21,27 @@ import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityServerPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
 import org.gradle.api.DefaultTask
-import org.gradle.api.specs.Specs
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 class GenerateServerPluginDescriptor extends DefaultTask {
 
+    private String version
+
+    private ServerPluginDescriptor descriptor
+
     private File destination
 
-    GenerateServerPluginDescriptor() {
-        getOutputs().upToDateWhen(Specs.satisfyNone())
+    @Input
+    String getVersion() {
+        return version
+    }
+
+    @Nested
+    ServerPluginDescriptor getDescriptor() {
+        return descriptor
     }
 
     @OutputFile
@@ -44,13 +55,12 @@ class GenerateServerPluginDescriptor extends DefaultTask {
     @TaskAction
     void generateDescriptor() {
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-        ServerPluginDescriptor descriptor = extension.server.descriptor
 
-        def version = extension.getMajorVersion()
-        if (version != null && version < 9 && descriptor.dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${extension.version}")
+        def majorVersion = extension.getMajorVersion()
+        if (majorVersion != null && majorVersion < 9 && getDescriptor().dependencies.hasDependencies()) {
+            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion(), defaults())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion(), defaults())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 

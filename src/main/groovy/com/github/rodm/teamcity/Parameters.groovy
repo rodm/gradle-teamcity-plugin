@@ -16,10 +16,16 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.tasks.Input
 
 @CompileStatic
 class Parameters {
     Map<String, Object> parameters = [:]
+
+    @Input
+    Map<String, Object> getParameters() {
+        return parameters
+    }
 
     void parameter(String key, Object value) {
         parameters[key] = value

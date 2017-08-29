@@ -17,38 +17,63 @@ package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
 class ServerPluginDescriptor {
 
+    @Input
     String name
 
+    @Input
     String displayName
 
+    @Input
     String version
 
+    @Input
+    @Optional
     String description
 
+    @Input
+    @Optional
     String downloadUrl
 
+    @Input
+    @Optional
     String email
 
+    @Input
     String vendorName
 
+    @Input
+    @Optional
     String vendorUrl
 
+    @Input
+    @Optional
     String vendorLogo
 
+    @Input
+    @Optional
     String minimumBuild
 
+    @Input
+    @Optional
     String maximumBuild
 
+    @Input
+    @Optional
     Boolean useSeparateClassloader
 
+    @Nested
     Parameters parameters
 
+    @Nested
     Dependencies dependencies
 
     @CompileStatic(SKIP)
