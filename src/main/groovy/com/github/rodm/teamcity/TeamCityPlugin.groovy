@@ -29,6 +29,7 @@ import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.util.GradleVersion
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
@@ -57,6 +58,10 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
+
+        if (GradleVersion.current() < GradleVersion.version('3.0')) {
+            throw new GradleException('Gradle TeamCity plugin requires Gradle version 3.0 or later')
+        }
 
         if (project.plugins.hasPlugin(JavaPlugin) &&
                 (project.plugins.hasPlugin(TeamCityAgentPlugin) || project.plugins.hasPlugin(TeamCityServerPlugin))) {
