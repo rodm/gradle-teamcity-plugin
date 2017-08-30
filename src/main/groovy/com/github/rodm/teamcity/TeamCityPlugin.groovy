@@ -212,9 +212,10 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         }
 
         private void validateDefinition(PluginDefinition definition, Task task) {
+            boolean offline = task.project.gradle.startParameter.isOffline()
             List<PluginBean> beans
             try {
-                beans = definition.getBeans()
+                beans = definition.getBeans(offline)
             } catch (Exception e) {
                 LOGGER.warn(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
                 return
@@ -244,11 +245,13 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             return this.definitionFile.name
         }
 
-        def getBeans() {
+        def getBeans(boolean offline) {
             List<PluginBean> pluginBeans = []
             def parser = new XmlParser()
+            if (offline) {
+                parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+            }
             parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-            // TODO: Disable 'http' if gradle is in offline mode or network is unavailable using org.gradle.StartParameter#isOffline
             setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
             setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
             def beans = parser.parse(definitionFile)

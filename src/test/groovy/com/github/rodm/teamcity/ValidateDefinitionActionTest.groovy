@@ -79,6 +79,7 @@ class ValidateDefinitionActionTest {
         stubTask = mock(Task)
         definitions = []
         classes = new HashSet<String>()
+        when(stubTask.getProject()).thenReturn(project)
     }
 
     @Test
