@@ -54,6 +54,8 @@ abstract class TeamCityPlugin implements Plugin<Project> {
 
     static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans."
 
+    static final String NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE = "%s: Failed to parse plugin definition file %s: %s"
+
     static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF"
 
     void apply(Project project) {
@@ -210,7 +212,13 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         }
 
         private void validateDefinition(PluginDefinition definition, Task task) {
-            List<PluginBean> beans = definition.getBeans()
+            List<PluginBean> beans
+            try {
+                beans = definition.getBeans()
+            } catch (Exception e) {
+                LOGGER.warn(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
+                return
+            }
             if (beans.isEmpty()) {
                 LOGGER.warn(String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
             } else {
@@ -240,7 +248,9 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             List<PluginBean> pluginBeans = []
             def parser = new XmlParser()
             parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-            setParserProperty(parser, "http://javax.xml.XMLConstants/property/accessExternalDTD", "file,http")
+            // TODO: Disable 'http' if gradle is in offline mode or network is unavailable using org.gradle.StartParameter#isOffline
+            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
+            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
             def beans = parser.parse(definitionFile)
             beans.bean.each { bean ->
                 pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
