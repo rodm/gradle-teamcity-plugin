@@ -1,11 +1,13 @@
 
+dist: precise
+
 # Don't use the Travis Container-Based Infrastructure
 sudo: true
 
 language: java
 
 jdk:
-  - openjdk7
+  - oraclejdk7
   - oraclejdk8
 
 script:
