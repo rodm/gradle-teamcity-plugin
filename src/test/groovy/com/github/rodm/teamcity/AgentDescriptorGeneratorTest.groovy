@@ -22,6 +22,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import javax.xml.XMLConstants
+
 import static XPathMatcher.hasXPath
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
@@ -57,6 +59,17 @@ class AgentDescriptorGeneratorTest {
         generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('/teamcity-agent-plugin'))
+    }
+
+    @Test
+    void 'descriptor schema location'() {
+        generator.writeTo(writer)
+
+        def path = '/teamcity-agent-plugin/@xsi:noNamespaceSchemaLocation'
+        def schemaLocation = 'urn:schemas-jetbrains-com:teamcity-agent-plugin-v1-xml'
+        def context = ['xsi': XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI]
+        def matcher = hasXPath(path, equalTo(schemaLocation)).withNamespaceContext(context)
+        assertThat(writer.toString(), matcher)
     }
 
     @Test
