@@ -18,11 +18,22 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.tasks.Nested
 
+/**
+ * Agent-side plugin tool deployment configuration
+ */
 class ToolDeployment {
 
     @Nested
     ExecutableFiles executableFiles = extensions.create('executableFiles', ExecutableFiles)
 
+    /**
+     * Configures the executable files for the agent-side tool plugin.
+     *
+     * <p>The given action is executed to configure the executable files.</p>
+
+     * @param configuration The action
+     * @return
+     */
     def executableFiles(Action<ExecutableFiles> configuration) {
         configuration.execute(executableFiles)
     }

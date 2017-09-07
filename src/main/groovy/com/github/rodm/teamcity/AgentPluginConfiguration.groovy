@@ -18,12 +18,22 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.Project
 
+/**
+ * Agent-side plugin configuration
+ */
 class AgentPluginConfiguration extends PluginConfiguration {
 
     AgentPluginConfiguration(Project project) {
         super(project.copySpec())
     }
 
+    /**
+     * Configures the agent-side plugin descriptor for the TeamCity plugin.
+     *
+     * <p>The given action is executed to configure the agent-side plugin descriptor.</p>
+     *
+     * @param configuration The action.
+     */
     def descriptor(Action<AgentPluginDescriptor> configuration) {
         descriptor = extensions.create('descriptor', AgentPluginDescriptor)
         configuration.execute(descriptor)

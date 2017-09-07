@@ -18,16 +18,35 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.tasks.Nested
 
+/**
+ * Agent-side plugin descriptor
+ */
 class AgentPluginDescriptor {
 
     @Nested
     def deployment
 
+    /**
+     * Configures the agent-side plugin for plugin deployment.
+     *
+     * <p>The given action is executed to configure the agent-side plugin deployment.</p>
+
+     * @param configuration The action
+     * @return
+     */
     def pluginDeployment(Action<PluginDeployment> configuration) {
         deployment = extensions.create('deployment', PluginDeployment)
         configuration.execute(deployment)
     }
 
+    /**
+     * Configures the agent-side plugin for tool deployment.
+     *
+     * <p>The given action is executed to configure the agent-side plugin deployment.</p>
+
+     * @param configuration The action
+     * @return
+     */
     def toolDeployment(Action<ToolDeployment> configuration) {
         deployment = extensions.create('deployment', ToolDeployment)
         configuration.execute(deployment)
@@ -36,6 +55,14 @@ class AgentPluginDescriptor {
     @Nested
     Dependencies dependencies = extensions.create('dependencies', Dependencies)
 
+    /**
+     * Configures the dependencies for the plugin.
+     *
+     * <p>The given action is executed to configure the plugin's dependencies.</p>
+
+     * @param configuration The action
+     * @return
+     */
     def dependencies(Action<Dependencies> configuration) {
         configuration.execute(dependencies)
     }

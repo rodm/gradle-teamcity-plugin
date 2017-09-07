@@ -55,6 +55,9 @@ class TeamCityEnvironments {
         return environments.getByName(name)
     }
 
+    /**
+     * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".
+     */
     String getDownloadsDir() {
         return property(DOWNLOADS_DIR_PROPERTY, downloadsDir, DEFAULT_DOWNLOADS_DIR)
     }
@@ -63,6 +66,9 @@ class TeamCityEnvironments {
         this.downloadsDir = downloadsDir
     }
 
+    /**
+     * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
+     */
     String getBaseDownloadUrl() {
         return property(BASE_DOWNLOAD_URL_PROPERTY, baseDownloadUrl, DEFAULT_BASE_DOWNLOAD_URL)
     }
@@ -71,6 +77,9 @@ class TeamCityEnvironments {
         this.baseDownloadUrl = baseDownloadUrl
     }
 
+    /**
+     * The base data directory used to store TeamCity configurations. Defaults to "data"
+     */
     String getBaseDataDir() {
         return property(BASE_DATA_DIR_PROPERTY, baseDataDir, DEFAULT_BASE_DATA_DIR)
     }
@@ -79,6 +88,9 @@ class TeamCityEnvironments {
         this.baseDataDir = baseDataDir
     }
 
+    /**
+     * The base home directory used to install TeamCity distributions. Defaults to "servers"
+     */
     String getBaseHomeDir() {
         return property(BASE_HOME_DIR_PROPERTY, baseHomeDir, DEFAULT_BASE_HOME_DIR)
     }

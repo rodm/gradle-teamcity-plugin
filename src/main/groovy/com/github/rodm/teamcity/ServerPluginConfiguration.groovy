@@ -22,6 +22,9 @@ import org.gradle.util.ConfigureUtil
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
+/**
+ * Server-side plugin configuration
+ */
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
@@ -36,6 +39,13 @@ class ServerPluginConfiguration extends PluginConfiguration {
         this.environments = environments
     }
 
+    /**
+     * Configures the server-side plugin descriptor for the TeamCity plugin.
+     *
+     * <p>The given action is executed to configure the server-side plugin descriptor.</p>
+     *
+     * @param configuration The action.
+     */
     @CompileStatic(SKIP)
     def descriptor(Action<ServerPluginDescriptor> configuration) {
         descriptor = extensions.create('descriptor', ServerPluginDescriptor)

@@ -20,16 +20,34 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class TeamCityEnvironment {
 
+    /**
+     * The name of the environment
+     */
     final String name
 
+    /**
+     * The version of TeamCity this environment uses. Defaults to version '9.0'
+     */
     String version = '9.0'
 
+    /**
+     * The download URL used to download the TeamCity distribution for this environment.
+     */
     String downloadUrl
 
+    /**
+     * The home directory for this environment's TeamCity installation.
+     */
     File homeDir
 
+    /**
+     * The data directory for this environment's TeamCity configuration.
+     */
     File dataDir
 
+    /**
+     * The Java home directory used to start the server and agent for this environment.
+     */
     File javaHome
 
     private List<Object> plugins = []
@@ -46,6 +64,9 @@ class TeamCityEnvironment {
         return new File(dataDir, 'plugins')
     }
 
+    /**
+     * The list of plugins to be deployed to this environment.
+     */
     List<Object> getPlugins() {
         return plugins
     }
@@ -64,6 +85,10 @@ class TeamCityEnvironment {
         this.plugins.add(plugin)
     }
 
+    /**
+     * The Java command line options to be used when starting the TeamCity Server.
+     * Defaults to '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+     */
     def getServerOptions() {
         return serverOptions.join(' ')
     }
@@ -82,6 +107,9 @@ class TeamCityEnvironment {
         this.serverOptions.addAll(options)
     }
 
+    /**
+     * The Java command line options to be used when starting the TeamCity Agent.
+     */
     def getAgentOptions() {
         return agentOptions.join(' ')
     }

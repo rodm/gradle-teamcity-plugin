@@ -18,6 +18,9 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Input
 
+/**
+ * Executable files
+ */
 @CompileStatic
 class ExecutableFiles {
 
@@ -28,8 +31,13 @@ class ExecutableFiles {
         return includes
     }
 
-    void include(String name) {
-        includes << name
+    /**
+     * Add a path to an executable.
+     *
+     * @param path The relative path of a file to be set as executable after unpacking.
+     */
+    void include(String path) {
+        includes << path
     }
 
     boolean hasFiles() {

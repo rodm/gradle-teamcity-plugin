@@ -18,6 +18,9 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Input
 
+/**
+ * Plugin dependencies
+ */
 @CompileStatic
 class Dependencies {
 
@@ -28,6 +31,11 @@ class Dependencies {
         return plugins
     }
 
+    /**
+     * Add a plugin as a dependency.
+     *
+     * @param name The name of the plugin to add as a dependency.
+     */
     void plugin(String name) {
         plugins << name
     }
@@ -39,6 +47,11 @@ class Dependencies {
         return tools
     }
 
+    /**
+     * Add a tool as a dependency.
+     *
+     * @param name The name of the tool to add as a dependency.
+     */
     void tool(String name) {
         tools << name
     }

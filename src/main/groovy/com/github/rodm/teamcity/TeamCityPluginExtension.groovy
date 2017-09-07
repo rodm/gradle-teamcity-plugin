@@ -19,6 +19,9 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 
+/**
+ * TeamCity Plugin extension.
+ */
 class TeamCityPluginExtension {
 
     String version = '9.0'
@@ -49,6 +52,13 @@ class TeamCityPluginExtension {
         return agent
     }
 
+    /**
+     * Configures the agent-side plugin.
+     *
+     * <p>The given action is executed to configure the agent-side plugin configuration.</p>
+     *
+     * @param configuration The action.
+     */
     def agent(Action<? extends AgentPluginConfiguration> configuration) {
         if (!project.plugins.hasPlugin(TeamCityAgentPlugin))
             throw new InvalidUserDataException('Agent plugin configuration is invalid for a project without the teamcity-agent plugin')
@@ -59,6 +69,13 @@ class TeamCityPluginExtension {
         return server
     }
 
+    /**
+     * Configures the server-side plugin.
+     *
+     * <p>The given action is executed to configure the server-side plugin configuration.</p>
+     *
+     * @param configuration The action.
+     */
     def server(Action<? extends ServerPluginConfiguration> configuration) {
         if (!project.plugins.hasPlugin(TeamCityServerPlugin))
             throw new InvalidUserDataException('Server plugin configuration is invalid for a project without the teamcity-server plugin')
@@ -114,6 +131,13 @@ class TeamCityPluginExtension {
         return environments
     }
 
+    /**
+     * Configures the TeamCity environments.
+     *
+     * <p>The given action is executed to configure the environments.</p>
+     *
+     * @param configuration The action.
+     */
     void environments(Action<TeamCityEnvironments> configuration) {
         configuration.execute(environments)
     }

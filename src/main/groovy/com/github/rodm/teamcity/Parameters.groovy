@@ -18,6 +18,9 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.tasks.Input
 
+/**
+ * TeamCity plugin parameters
+ */
 @CompileStatic
 class Parameters {
     Map<String, Object> parameters = [:]
@@ -27,10 +30,21 @@ class Parameters {
         return parameters
     }
 
-    void parameter(String key, Object value) {
-        parameters[key] = value
+    /**
+     * Add a plugin parameter.
+     *
+     * @param name The name of the parameter
+     * @param value The value of the parameter
+     */
+    void parameter(String name, Object value) {
+        parameters[name] = value
     }
 
+    /**
+     * Add a map of plugin parameters.
+     *
+     * @param parameters The map of parameters to add.
+     */
     void parameters(Map<String, ?> parameters) {
         this.parameters.putAll(parameters)
     }

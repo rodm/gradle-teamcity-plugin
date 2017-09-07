@@ -23,9 +23,15 @@ import org.gradle.api.tasks.Optional
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
+/**
+ * Agent-side plugin deployment configuration
+ */
 @CompileStatic
 class PluginDeployment {
 
+    /**
+     * Use a separate classloader to load the agent-side plugin's classes.
+     */
     @Input
     @Optional
     Boolean useSeparateClassloader
@@ -38,6 +44,14 @@ class PluginDeployment {
         executableFiles = extensions.create('executableFiles', ExecutableFiles)
     }
 
+    /**
+     * Configures the executable files for the agent-side tool plugin.
+     *
+     * <p>The given action is executed to configure the executable files.</p>
+
+     * @param configuration The action
+     * @return
+     */
     def executableFiles(Action<ExecutableFiles> configuration) {
         configuration.execute(executableFiles)
     }
