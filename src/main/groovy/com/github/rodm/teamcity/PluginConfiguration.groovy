@@ -15,8 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Action
 import org.gradle.api.file.CopySpec
-import org.gradle.util.ConfigureUtil
 
 /**
  * Base class for plugin configuration.
@@ -38,13 +38,15 @@ abstract class PluginConfiguration {
     /**
      * Adds additional files to the TeamCity plugin archive.
      *
-     * <p>The given closure is executed to configure a {@code CopySpec}.</p>
+     * <p>The given action is executed to configure a {@code CopySpec}.</p>
      *
-     * @param closure The configuration closure.
+     * @param configuration The action.
      * @return The created {@code CopySpec}
      */
-    def files(Closure closure) {
-        ConfigureUtil.configure(closure, files.addChild())
+    def files(Action<? super CopySpec> configuration) {
+        CopySpec copySpec = files.addChild()
+        configuration.execute(copySpec)
+        return copySpec
     }
 
     CopySpec getFiles() {

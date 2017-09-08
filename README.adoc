@@ -216,11 +216,11 @@ The following example uses the Kotlin DSL.
                 }
             }
 
-            files(closureOf<CopySpec> {
+            files {
                 into("tooldir") {
                     from("tooldir")
                 }
-            })
+            }
         }
     }
 ----
@@ -482,11 +482,11 @@ The following example uses the Kotlin DSL.
                 }
             }
 
-            files(closureOf<CopySpec> {
+            files {
                 into("tooldir") {
                     from("tooldir")
                 }
-            })
+            }
         }
     }
 ----
