@@ -26,10 +26,16 @@ import com.github.rodm.teamcity.tasks.Unpack
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
+import org.xml.sax.SAXNotRecognizedException
+
+import javax.xml.XMLConstants
 
 class TeamCityServerPlugin extends TeamCityPlugin {
 
@@ -88,6 +94,7 @@ class TeamCityServerPlugin extends TeamCityPlugin {
         }
         def descriptorFile = new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-server-plugin-descriptor.xsd', descriptorFile))
+        packagePlugin.doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
         packagePlugin.with(extension.server.files)
         packagePlugin.onlyIf { extension.server.descriptor != null }
 
@@ -119,6 +126,48 @@ class TeamCityServerPlugin extends TeamCityPlugin {
 
     private static void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
+    }
+
+    static class PluginDescriptorContentsValidationAction implements Action<Task> {
+
+        private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
+
+        static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty."
+
+        private File descriptorFile
+
+        PluginDescriptorContentsValidationAction(File descriptorFile) {
+            this.descriptorFile = descriptorFile
+        }
+
+        @Override
+        void execute(Task task) {
+            def parser = new XmlParser()
+            parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
+            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
+            def descriptor = parser.parse(descriptorFile)
+
+            if (descriptor.info.name.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))
+            }
+            if (descriptor.info.'display-name'.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'display name'))
+            }
+            if (descriptor.info.version.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'version'))
+            }
+            if (descriptor.info.vendor.name.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor name'))
+            }
+        }
+
+        private static void setParserProperty(XmlParser parser, String uri, Object value) {
+            try {
+                parser.setProperty(uri, value)
+            }
+            catch (SAXNotRecognizedException ignore) { }
+        }
     }
 
     static class ConfigureEnvironmentTasksAction implements Action<Project> {
