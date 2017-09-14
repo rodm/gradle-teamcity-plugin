@@ -15,13 +15,16 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
-class TeamCityCommonPlugin extends TeamCityPlugin {
+class TeamCityCommonPlugin implements Plugin<Project> {
 
-    @Override
-    void configureTasks(Project project, TeamCityPluginExtension extension) {
+    void apply(Project project) {
+        project.plugins.apply(TeamCityPlugin)
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {

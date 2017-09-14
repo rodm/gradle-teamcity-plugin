@@ -17,17 +17,34 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
+import org.gradle.api.GradleException
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
-class TeamCityAgentPlugin extends TeamCityPlugin {
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
+import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
+import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
+import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
+
+class TeamCityAgentPlugin implements Plugin<Project> {
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
 
     public static final String AGENT_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/agent'
 
-    @Override
+    void apply(Project project) {
+        project.plugins.apply(TeamCityPlugin)
+
+        if (project.plugins.hasPlugin(JavaPlugin) && project.plugins.hasPlugin(TeamCityServerPlugin)) {
+            throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
+        }
+
+        configureTasks(project, project.extensions.getByType(TeamCityPluginExtension))
+    }
+
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {

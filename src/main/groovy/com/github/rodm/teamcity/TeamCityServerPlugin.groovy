@@ -25,6 +25,8 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Unpack
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
+import org.gradle.api.GradleException
+import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.logging.Logger
@@ -37,14 +39,26 @@ import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
 
-class TeamCityServerPlugin extends TeamCityPlugin {
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
+import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
+import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
+import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
+
+class TeamCityServerPlugin implements Plugin<Project> {
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-server-plugin*.xml"
 
     public static final String SERVER_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/server'
 
-    @Override
-    void configureTasks(Project project, TeamCityPluginExtension extension) {
+    void apply(Project project) {
+        project.plugins.apply(TeamCityPlugin)
+
+        if (project.plugins.hasPlugin(JavaPlugin) && project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+            throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
+        }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureServerPluginTasks(project, extension)
         configureEnvironmentTasks(project, extension)
     }

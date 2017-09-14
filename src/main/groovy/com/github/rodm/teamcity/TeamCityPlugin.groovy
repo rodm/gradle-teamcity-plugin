@@ -36,7 +36,7 @@ import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
 
-abstract class TeamCityPlugin implements Plugin<Project> {
+class TeamCityPlugin implements Plugin<Project> {
 
     private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
 
@@ -84,7 +84,6 @@ abstract class TeamCityPlugin implements Plugin<Project> {
         }
         configureRepositories(project, extension)
         configureConfigurations(project)
-        configureTasks(project, extension)
     }
 
     private static boolean isRootProject(Project project) {
@@ -116,8 +115,6 @@ abstract class TeamCityPlugin implements Plugin<Project> {
             configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
         }
     }
-
-    abstract void configureTasks(final Project project, TeamCityPluginExtension extension)
 
     static void configureJarTask(Project project, String pattern) {
         Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
