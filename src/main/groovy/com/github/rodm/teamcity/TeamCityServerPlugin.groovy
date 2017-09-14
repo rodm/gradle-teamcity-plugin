@@ -59,11 +59,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        configureDependencies(project, extension)
         configureServerPluginTasks(project, extension)
         configureEnvironmentTasks(project, extension)
     }
 
-    void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
+    void configureDependencies(Project project, TeamCityPluginExtension extension) {
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
@@ -73,7 +74,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 }
             }
         }
+    }
 
+    void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
         def packagePlugin = project.tasks.create('serverPlugin', Zip)

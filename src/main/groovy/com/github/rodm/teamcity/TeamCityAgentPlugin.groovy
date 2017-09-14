@@ -42,10 +42,12 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
         }
 
-        configureTasks(project, project.extensions.getByType(TeamCityPluginExtension))
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        configureDependencies(project, extension)
+        configureTasks(project, extension)
     }
 
-    void configureTasks(Project project, TeamCityPluginExtension extension) {
+    void configureDependencies(Project project, TeamCityPluginExtension extension) {
         project.plugins.withType(JavaPlugin) {
             project.afterEvaluate {
                 project.dependencies {
@@ -53,7 +55,9 @@ class TeamCityAgentPlugin implements Plugin<Project> {
                 }
             }
         }
+    }
 
+    void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
         def packagePlugin = project.tasks.create('agentPlugin', Zip)
