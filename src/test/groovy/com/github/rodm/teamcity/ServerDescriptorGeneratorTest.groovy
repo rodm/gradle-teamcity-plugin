@@ -53,7 +53,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesTeamCityPluginRootNode() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -63,7 +63,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void 'descriptor schema location'() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -100,7 +100,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesRequiredInfoPropertiesWhenNotSet() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -113,17 +113,14 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesRequiredInfoPropertiesUsingDefaults() {
-        def defaults = [:]
-        defaults << ['name': 'test-plugin name']
-        defaults << ['displayName': 'test-plugin display name']
-        defaults << ['version': '1.2.3']
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, "9.0", defaults)
+        project.version = '1.2.3'
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
 
         generator.writeTo(writer)
 
-        assertThat(writer.toString(), hasXPath('//info/name', equalTo('test-plugin name')))
-        assertThat(writer.toString(), hasXPath('//info/display-name', equalTo('test-plugin display name')))
+        assertThat(writer.toString(), hasXPath('//info/name', equalTo('test-plugin')))
+        assertThat(writer.toString(), hasXPath('//info/display-name', equalTo('test-plugin')))
         assertThat(writer.toString(), hasXPath('//info/version', equalTo('1.2.3')))
     }
 

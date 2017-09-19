@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -29,23 +30,9 @@ import static groovy.transform.TypeCheckingMode.SKIP
 @CompileStatic
 class ServerPluginDescriptor {
 
-    /**
-     * The internal name of the plugin.
-     */
-    @Input
-    String name
-
-    /**
-     * The display name of the plugin. The display name is shown in TeamCity's Plugins List.
-     */
-    @Input
-    String displayName
-
-    /**
-     * The version of the plugin.
-     */
-    @Input
-    String version
+    private String name
+    private String displayName
+    private String version
 
     /**
      * The description of the plugin. The description is shown in TeamCity's Plugins List.
@@ -115,10 +102,50 @@ class ServerPluginDescriptor {
     @Nested
     Dependencies dependencies
 
+    private Project project
+
     @CompileStatic(SKIP)
-    ServerPluginDescriptor() {
+    ServerPluginDescriptor(Project project) {
+        this.project = project
         this.parameters = extensions.create('parameters', Parameters)
         this.dependencies = extensions.create('dependencies', Dependencies)
+    }
+
+    /**
+     * The internal name of the plugin.
+     */
+    @Input
+    String getName() {
+        return name ? name : project.name
+    }
+
+    void setName(String name) {
+        this.name = name
+    }
+
+    /**
+     * The display name of the plugin. The display name is shown in TeamCity's Plugins List.
+     */
+    @Input
+    String getDisplayName() {
+        return displayName ? displayName : project.name
+    }
+
+    void setDisplayName(String displayName) {
+        this.displayName = displayName
+    }
+
+
+    /**
+     * The version of the plugin.
+     */
+    @Input
+    String getVersion() {
+        return version ? version : project.version
+    }
+
+    void setVersion(String version) {
+        this.version = version
     }
 
     /**

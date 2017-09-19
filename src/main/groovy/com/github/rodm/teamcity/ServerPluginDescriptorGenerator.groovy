@@ -27,12 +27,9 @@ class ServerPluginDescriptorGenerator {
 
     private String version
 
-    private Map<String, String> defaults
-
-    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version = "9.0", Map defaults = [:]) {
+    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version = "9.0") {
         this.descriptor = descriptor
         this.version = version
-        this.defaults = defaults
     }
 
     void writeTo(Writer writer) {
@@ -50,9 +47,9 @@ class ServerPluginDescriptorGenerator {
 
     private void buildInfoNode(Node root) {
         Node info = root.appendNode('info')
-        def name = descriptor.getName() ? descriptor.getName() : defaults.name
-        def displayName = descriptor.getDisplayName() ? descriptor.getDisplayName() : defaults.displayName
-        def version = descriptor.getVersion() ? descriptor.getVersion() : defaults.version
+        def name = descriptor.getName()
+        def displayName = descriptor.getDisplayName()
+        def version = descriptor.getVersion()
         info.appendNode('name', name)
         info.appendNode('display-name', displayName)
         info.appendNode('version', version)

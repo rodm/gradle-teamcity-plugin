@@ -27,8 +27,6 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-import static groovy.transform.TypeCheckingMode.SKIP
-
 @CompileStatic
 class GenerateServerPluginDescriptor extends DefaultTask {
 
@@ -64,15 +62,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         if (majorVersion != null && majorVersion < 9 && getDescriptor().dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion(), defaults())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
-    }
-
-    @CompileStatic(SKIP)
-    private Map<String, String> defaults() {
-        Map<String, String> defaults = [:]
-        defaults << ['name': project.name]
-        defaults << ['displayName': project.name]
-        defaults << ['version': project.version]
     }
 }

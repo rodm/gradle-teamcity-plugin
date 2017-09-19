@@ -48,7 +48,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
      */
     @CompileStatic(SKIP)
     def descriptor(Action<ServerPluginDescriptor> configuration) {
-        descriptor = extensions.create('descriptor', ServerPluginDescriptor)
+        descriptor = extensions.create('descriptor', ServerPluginDescriptor, project)
         configuration.execute(descriptor)
     }
 
