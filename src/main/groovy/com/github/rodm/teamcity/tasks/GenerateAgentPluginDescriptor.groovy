@@ -20,12 +20,14 @@ import com.github.rodm.teamcity.AgentPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityAgentPlugin
 import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
+import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+@CompileStatic
 class GenerateAgentPluginDescriptor extends DefaultTask {
 
     private String version

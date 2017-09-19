@@ -15,11 +15,13 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.xml.sax.ErrorHandler
 import org.xml.sax.SAXException
 import org.xml.sax.SAXParseException
 
+@CompileStatic
 class PluginDescriptorErrorHandler implements ErrorHandler {
 
     private Project project

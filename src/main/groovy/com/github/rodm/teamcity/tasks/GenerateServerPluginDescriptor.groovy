@@ -20,12 +20,16 @@ import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityPlugin
 import com.github.rodm.teamcity.TeamCityServerPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
+import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
+@CompileStatic
 class GenerateServerPluginDescriptor extends DefaultTask {
 
     private String version
@@ -64,6 +68,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 
+    @CompileStatic(SKIP)
     private Map<String, String> defaults() {
         Map<String, String> defaults = [:]
         defaults << ['name': project.name]

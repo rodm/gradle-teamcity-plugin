@@ -18,6 +18,9 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import groovy.xml.XmlUtil
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
+@CompileStatic
 class ServerPluginDescriptorGenerator {
 
     private ServerPluginDescriptor descriptor
@@ -95,7 +98,6 @@ class ServerPluginDescriptorGenerator {
         }
     }
 
-    @CompileStatic
     private void buildDependenciesNode(Node root) {
         def version = getMajorVersion(version)
         if (version == null || version >= 9) {
@@ -111,6 +113,7 @@ class ServerPluginDescriptorGenerator {
         }
     }
 
+    @CompileStatic(SKIP)
     @SuppressWarnings("GroovyAssignabilityCheck")
     private static Integer getMajorVersion(String version) {
         return (version ==~ /(\d+)\..*/) ? (version =~ /(\d+)\..*/)[0][1] as int : null
