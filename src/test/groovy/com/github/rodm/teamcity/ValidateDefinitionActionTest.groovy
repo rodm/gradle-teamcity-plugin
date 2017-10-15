@@ -154,8 +154,8 @@ class ValidateDefinitionActionTest {
 
         project.pluginManager.apply(TeamCityServerPlugin)
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class'), any(TeamCityPlugin.ClassCollectorAction))
+        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
+        verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
     }
 
     @Test
@@ -175,8 +175,8 @@ class ValidateDefinitionActionTest {
 
         project.pluginManager.apply(TeamCityAgentPlugin)
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml'), any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class'), any(TeamCityPlugin.ClassCollectorAction))
+        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
+        verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
     }
 
     @Test
