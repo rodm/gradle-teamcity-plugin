@@ -296,7 +296,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'archive name is appended with .zip if missing'() {
+    void 'archive name is appended with zip extension if missing'() {
         project.version = '1.2.3'
         project.teamcity {
             agent {

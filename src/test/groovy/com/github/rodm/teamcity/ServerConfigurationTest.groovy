@@ -238,7 +238,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'archive name is appended with .zip if missing'() {
+    void 'archive name is appended with zip extension if missing'() {
         project.teamcity {
             server {
                 archiveName = 'server-plugin'
