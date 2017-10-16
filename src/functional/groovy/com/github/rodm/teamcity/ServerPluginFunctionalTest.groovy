@@ -328,7 +328,8 @@ class ServerPluginFunctionalTest {
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
         assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
-        assertThat(result.output, not(containsString('deprecated')))
+        assertThat(result.output, not(containsString('property is deprecated')))
+        assertThat(result.output, not(containsString('server configuration is deprecated')))
     }
 
     @Test
@@ -373,7 +374,8 @@ class ServerPluginFunctionalTest {
         File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
-        assertThat(result.output, not(containsString('deprecated')))
+        assertThat(result.output, not(containsString('property is deprecated')))
+        assertThat(result.output, not(containsString('server configuration is deprecated')))
     }
 
     @Rule
@@ -422,7 +424,8 @@ class ServerPluginFunctionalTest {
         File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
-        assertThat(result.output, not(containsString('deprecated')))
+        assertThat(result.output, not(containsString('property is deprecated')))
+        assertThat(result.output, not(containsString('server configuration is deprecated')))
     }
 
     @Test
