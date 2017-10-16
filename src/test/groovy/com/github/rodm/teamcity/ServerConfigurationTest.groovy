@@ -114,7 +114,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.server.files.childSpecs.size, is(1))
+        assertThat(extension.server.files.children.size, is(1))
     }
 
     @Test
@@ -169,7 +169,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.server.files.childSpecs.size, is(1))
+        assertThat(extension.server.files.children.size, is(1))
         assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
     }
 

@@ -173,7 +173,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.agent.files.childSpecs.size, is(1))
+        assertThat(extension.agent.files.children.size, is(1))
     }
 
     @Test
@@ -204,7 +204,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.agent.files.childSpecs.size, is(1))
+        assertThat(extension.agent.files.children.size, is(1))
         assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
     }
 
