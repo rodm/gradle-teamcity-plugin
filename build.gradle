@@ -46,7 +46,11 @@ gradlePlugin {
 task functionalTest(type: Test) {
     description = 'Runs the functional tests.'
     group = 'verification'
-    testClassesDir = sourceSets.functionalTest.output.classesDir
+    if (GradleVersion.current() < GradleVersion.version('4.0')) {
+        testClassesDir = sourceSets.functionalTest.output.classesDir
+    } else {
+        testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    }
     classpath = sourceSets.functionalTest.runtimeClasspath
 
     reports {
@@ -58,7 +62,11 @@ task functionalTest(type: Test) {
 task samplesTest(type: Test, dependsOn: 'publish') {
     description = 'Runs the sample builds.'
     group = 'verification'
-    testClassesDir = sourceSets.samples.output.classesDir
+    if (GradleVersion.current() < GradleVersion.version('4.0')) {
+        testClassesDir = sourceSets.samples.output.classesDir
+    } else {
+        testClassesDirs = sourceSets.samples.output.classesDirs
+    }
     classpath = sourceSets.samples.runtimeClasspath
 
     reports {
