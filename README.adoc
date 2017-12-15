@@ -5,11 +5,12 @@
 :uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
 :uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
 :uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
+:uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/
 :plugin-version: 1.0
 :default-api-version: 9.0
 :example-api-version: 8.1
 
-The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins], creating agent and server side archives, downloading and
+The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 image:https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/rodm/gradle-teamcity-plugin"]
@@ -75,8 +76,8 @@ and the TeamCity repository, https://download.jetbrains.com/teamcity-repository,
 ### TeamCity Server Plugin
 
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity server-api and
-tests-supprt dependencies to the compile and testCompile configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package the server side plugin archive if a plugin descriptor is defined.
+tests-support dependencies to the compile and testCompile configurations. If the Java Plugin is not applied the plugin
+provides only the tasks to package and publish the server side plugin archive if a plugin descriptor is defined.
 
 The server plugin can be combined with the agent plugin but not with the Java Plugin.
 
@@ -98,6 +99,7 @@ The plugin descriptor properties are shown in the examples below and described i
 ### TeamCity Server Plugin Tasks
 
 * `serverPlugin` : Builds and packages a TeamCity plugin.
+* `publishPlugin` : Publishes plugin to {uri-jetbrains-plugin-portal}[plugins portal]
 * `generateDescriptor` : If the descriptor is defined in the build script this task is enabled and will
 output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
@@ -110,6 +112,11 @@ Plugin descriptor defined in the build script.
 [source,groovy]
 [subs="attributes"]
 ----
+    publishPlugin {
+        username = 'ExampleUsername'
+        password = 'ExamplePassword'
+    }
+
     teamcity {
         // Use TeamCity {example-api-version} API
         version = '{example-api-version}'
@@ -181,6 +188,11 @@ The following example uses the Kotlin DSL.
 [subs="attributes"]
 .build.gradle.kts
 ----
+    tasks.withType<PublishTask> {
+        username = "ExampleUsername"
+        password = "ExamplePassword"
+    }
+
     teamcity {
         version = "{example-api-version}"
 
