@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
+import com.github.rodm.teamcity.tasks.PublishTask
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
@@ -35,6 +36,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
+import org.jetbrains.annotations.NotNull
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
@@ -61,6 +63,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
         configureServerPluginTasks(project, extension)
+        configurePublishPluginTask(project)
         configureEnvironmentTasks(project, extension)
     }
 
@@ -143,6 +146,19 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     private static void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
+    }
+
+    private static void configurePublishPluginTask(@NotNull Project project) {
+        def buildPluginTask = project.tasks.findByName('serverPlugin') as Zip
+        project.tasks.create("publishPlugin", PublishTask).with {
+            group = TeamCityPlugin.GROUP_NAME
+            description = "Publish plugin distribution on plugins.jetbrains.com."
+            conventionMapping('distributionFile', {
+                def distributionFile = buildPluginTask?.archivePath
+                return distributionFile?.exists() ? distributionFile : null
+            })
+            dependsOn(buildPluginTask)
+        }
     }
 
     static class PluginDescriptorContentsValidationAction implements Action<Task> {
