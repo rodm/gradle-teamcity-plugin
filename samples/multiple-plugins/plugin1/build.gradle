@@ -13,6 +13,7 @@ teamcity {
             displayName = project.name
             version = project.version
             vendorName = project.vendorName
+            vendorUrl = 'http://example.com'
             description = 'TeamCity Example 1 Server Plugin'
 
             downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
