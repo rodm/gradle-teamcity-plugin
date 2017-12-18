@@ -193,6 +193,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
             if (descriptor.info.vendor.name.text().trim().isEmpty()) {
                 LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor name'))
             }
+            if (descriptor.info.description.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'description'))
+            }
+            if (descriptor.info.vendor.url.text().trim().isEmpty()) {
+                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor url'))
+            }
         }
 
         private static void setParserProperty(XmlParser parser, String uri, Object value) {

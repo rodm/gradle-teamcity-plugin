@@ -80,6 +80,31 @@ class ValidateDescriptorActionTest {
     }
 
     @Test
+    void 'warn about empty descriptor values required for publishing a plugin'() {
+        // publishing a plugin to the JetBrains TeamCity Plugin Repository, https://plugins.jetbrains.com/teamcity
+        // requires the description and vendor url descriptor elements to be populated
+        File descriptorFile = project.file('teamcity-plugin.xml')
+        descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
+        <teamcity-plugin>
+            <info>
+                <name>plugin </name>
+                <display-name>Example plugin</display-name>
+                <version>1.0</version>
+                <vendor>
+                    <name>example</name>
+                </vendor>
+            </info>
+        </teamcity-plugin>
+        '''
+
+        Action<Task> validationAction = new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(descriptorFile)
+        validationAction.execute(stubTask)
+
+        assertThat(outputEventListener.toString(), containsString(warningFor('description')))
+        assertThat(outputEventListener.toString(), containsString(warningFor('vendor url')))
+    }
+
+    @Test
     void 'no warnings when required descriptor values are not empty'() {
         File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
@@ -87,9 +112,11 @@ class ValidateDescriptorActionTest {
             <info>
                 <name>name</name>
                 <display-name>display name</display-name>
+                <description>plugin description</description>
                 <version>version</version>
                 <vendor>
                     <name>vendor name</name>
+                    <url>http://example.com</url>
                 </vendor>
             </info>
         </teamcity-plugin>
@@ -103,6 +130,8 @@ class ValidateDescriptorActionTest {
         assertThat(outputEventListener.toString(), not(containsString(warningFor('display name'))))
         assertThat(outputEventListener.toString(), not(containsString(warningFor('version'))))
         assertThat(outputEventListener.toString(), not(containsString(warningFor('vendor name'))))
+        assertThat(outputEventListener.toString(), not(containsString(warningFor('description'))))
+        assertThat(outputEventListener.toString(), not(containsString(warningFor('vendor url'))))
     }
 
     private static String warningFor(String name) {
