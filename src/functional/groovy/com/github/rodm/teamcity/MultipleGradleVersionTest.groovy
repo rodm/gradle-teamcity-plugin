@@ -188,37 +188,37 @@ class MultipleGradleVersionTest {
     }
 
     @Test
-    void 'build plugin using Gradle 3.3'() {
+    void 'build plugin using Gradle 3_3'() {
         BuildResult result = executeBuild('3.3')
         checkBuild(result)
     }
 
     @Test
-    void 'build plugin using Gradle 3.4.1'() {
+    void 'build plugin using Gradle 3_4_1'() {
         BuildResult result = executeBuild('3.4.1')
         checkBuild(result)
     }
 
     @Test
-    void 'build plugin using Gradle 3.5'() {
+    void 'build plugin using Gradle 3_5'() {
         BuildResult result = executeBuild('3.5')
         checkBuild(result)
     }
 
     @Test
-    void 'build plugin using Gradle 4.0'() {
+    void 'build plugin using Gradle 4_0'() {
         BuildResult result = executeBuild('4.0.2')
         checkBuild(result)
     }
 
     @Test
-    void 'build plugin using Gradle 4.1'() {
+    void 'build plugin using Gradle 4_1'() {
         BuildResult result = executeBuild('4.1')
         checkBuild(result)
     }
 
     @Test
-    void 'build plugin using Gradle 4.2'() {
+    void 'build plugin using Gradle 4_2'() {
         BuildResult result = executeBuild('4.2')
         checkBuild(result)
     }
