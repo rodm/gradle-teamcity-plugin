@@ -5,7 +5,7 @@
 :uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
 :uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
 :uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
-:uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/
+:uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :plugin-version: 1.0
 :default-api-version: 9.0
 :example-api-version: 8.1
@@ -36,6 +36,34 @@ The following code adds the plugin to your build script.
         classpath "com.github.rodm:gradle-teamcity-plugin:{plugin-version}"
       }
     }
+----
+
+The settings file requires the following repositories to resolve the plugin's dependencies
+
+For Gradle 3.0 and later
+
+[source,groovy]
+----
+pluginRepositories {
+    gradlePluginPortal()
+    maven {
+        url "http://dl.bintray.com/jetbrains/intellij-plugin-service"
+    }
+}
+----
+
+For Gradle 3.5 and later
+
+[source,groovy]
+----
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url "http://dl.bintray.com/jetbrains/intellij-plugin-service"
+        }
+    }
+}
 ----
 
 ### Plugins
@@ -99,7 +127,7 @@ The plugin descriptor properties are shown in the examples below and described i
 ### TeamCity Server Plugin Tasks
 
 * `serverPlugin` : Builds and packages a TeamCity plugin.
-* `publishPlugin` : Publishes plugin to {uri-jetbrains-plugin-portal}[plugins portal]
+* `publishPlugin` : Publishes a plugin to the {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]
 * `generateDescriptor` : If the descriptor is defined in the build script this task is enabled and will
 output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
@@ -112,11 +140,6 @@ Plugin descriptor defined in the build script.
 [source,groovy]
 [subs="attributes"]
 ----
-    publishPlugin {
-        username = 'ExampleUsername'
-        password = 'ExamplePassword'
-    }
-
     teamcity {
         // Use TeamCity {example-api-version} API
         version = '{example-api-version}'
@@ -188,11 +211,6 @@ The following example uses the Kotlin DSL.
 [subs="attributes"]
 .build.gradle.kts
 ----
-    tasks.withType<PublishTask> {
-        username = "ExampleUsername"
-        password = "ExamplePassword"
-    }
-
     teamcity {
         version = "{example-api-version}"
 
@@ -236,6 +254,38 @@ The following example uses the Kotlin DSL.
         }
     }
 ----
+
+### Publishing a plugin
+
+The `publishPlugin` task is used to upload the plugin archive to the
+{uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]. Before publishing a plugin you will need
+to create a JetBrains Account, follow the 'Sign In' link at the top of the plugin repository page.
+
+The `publishPlugin` task requires a username and password to publish a plugin to the repository as shown in
+the following example.
+
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+publishPlugin {
+    username = findProperty('jetbrains.username')
+    password = findProperty('jetbrains.password')
+}
+----
+
+The following example uses the Kotlin DSL.
+
+[source,groovy]
+.build.gradle.kts
+----
+tasks.withType<PublishTask> {
+    username = findProperty("jetbrains.username")
+    password = findProperty("jetbrains.password")
+}
+----
+
+It is recommended that the credentials for the JetBrains Plugin Repository are stored in `$HOME/.gradle/gradle.properties`.
 
 ### TeamCity Environments Configuration
 
