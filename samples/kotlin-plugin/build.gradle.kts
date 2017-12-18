@@ -6,6 +6,7 @@ buildscript {
         mavenLocal()
         maven { setUrl("https://repo.gradle.org/gradle/repo") }
         maven { setUrl("https://plugins.gradle.org/m2/") }
+        maven { setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service") }
         mavenCentral()
     }
 
