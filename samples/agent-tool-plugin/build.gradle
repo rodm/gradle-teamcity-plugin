@@ -76,6 +76,7 @@ teamcity {
             displayName = 'Repacked Maven 3.5'
             version = project.version
             vendorName = 'rodm'
+            vendorUrl = 'http://example.com'
             description = 'TeamCity Example Tool Plugin - Repacked Maven 3.5'
             downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
             email = 'rod.n.mackenzie@gmail.com'

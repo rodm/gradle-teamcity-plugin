@@ -23,6 +23,7 @@ teamcity {
             displayName = 'Example TeamCity Plugin'
             version = project.version
             vendorName = 'rodm'
+            vendorUrl = 'http://example.com'
             description = 'Example multi-project TeamCity plugin'
             email = 'rod.n.mackenzie@gmail.com'
             useSeparateClassloader = true

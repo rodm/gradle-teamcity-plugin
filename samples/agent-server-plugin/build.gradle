@@ -39,6 +39,7 @@ teamcity {
             displayName = project.name
             version = project.version
             vendorName = 'vendor name'
+            vendorUrl = 'http://example.com'
             description = 'TeamCity Example Build Feature Plugin'
             downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
             email = 'rod.n.mackenzie@gmail.com'
