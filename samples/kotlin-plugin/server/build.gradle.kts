@@ -5,7 +5,6 @@ import com.github.rodm.teamcity.TeamCityPluginExtension
 buildscript {
     repositories {
         mavenLocal()
-        maven { setUrl("https://dl.bintray.com/jetbrains/intellij-plugin-service") }
         gradleScriptKotlin()
     }
 

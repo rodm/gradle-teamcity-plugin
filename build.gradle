@@ -10,7 +10,6 @@ plugins {
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "http://dl.bintray.com/jetbrains/intellij-plugin-service" }
 }
 
 dependencies {

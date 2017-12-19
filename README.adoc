@@ -38,34 +38,6 @@ The following code adds the plugin to your build script.
     }
 ----
 
-The settings file requires the following repositories to resolve the plugin's dependencies
-
-For Gradle 3.0 and later
-
-[source,groovy]
-----
-pluginRepositories {
-    gradlePluginPortal()
-    maven {
-        url "http://dl.bintray.com/jetbrains/intellij-plugin-service"
-    }
-}
-----
-
-For Gradle 3.5 and later
-
-[source,groovy]
-----
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        maven {
-            url "http://dl.bintray.com/jetbrains/intellij-plugin-service"
-        }
-    }
-}
-----
-
 ### Plugins
 
 The jar contains three plugins:

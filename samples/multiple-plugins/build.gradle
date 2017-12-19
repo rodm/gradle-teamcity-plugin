@@ -3,9 +3,6 @@ buildscript {
     repositories {
         mavenLocal()
         maven {
-            url "https://dl.bintray.com/jetbrains/intellij-plugin-service"
-        }
-        maven {
             url "https://plugins.gradle.org/m2/"
         }
     }
