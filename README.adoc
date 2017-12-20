@@ -252,8 +252,8 @@ The following example uses the Kotlin DSL.
 .build.gradle.kts
 ----
 tasks.withType<PublishTask> {
-    username = findProperty("jetbrains.username")
-    password = findProperty("jetbrains.password")
+    username = findProperty("jetbrains.username") as String?
+    password = findProperty("jetbrains.password") as String?
 }
 ----
 
