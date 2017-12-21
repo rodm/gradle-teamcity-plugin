@@ -31,21 +31,37 @@ import org.gradle.api.tasks.TaskExecutionException
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
 
 class PublishTask extends ConventionTask {
+
     private static final Logger LOGGER = Logging.getLogger(PublishTask.class)
 
     private static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
 
     @Input
-    public String password
-    @Input
     public String host = DEFAULT_HOST
+
+    /**
+     * The username for uploading the plugin to the plugin repository
+     */
     @Input
     public String username
 
-    public File distributionFile
+    /**
+     * The password for uploading the plugin to the plugin repository
+     */
+    @Input
+    public String password
+
+    /**
+     * The list of channel names that the plugin will be published to on the plugin repository
+     */
     @Input
     public List<String> channels = ['default']
 
+    public File distributionFile
+
+    /**
+     * @return the plugin distribution file
+     */
     @InputFile
     File getDistributionFile() {
         return distributionFile
