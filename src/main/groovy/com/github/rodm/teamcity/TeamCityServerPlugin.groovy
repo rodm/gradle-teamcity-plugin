@@ -153,10 +153,10 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.tasks.create("publishPlugin", PublishTask).with {
             group = TeamCityPlugin.GROUP_NAME
             description = "Publish plugin distribution on plugins.jetbrains.com."
-            conventionMapping('distributionFile', {
+            conventionMapping.distributionFile = {
                 def distributionFile = buildPluginTask?.archivePath
                 return distributionFile?.exists() ? distributionFile : null
-            })
+            }
             dependsOn(buildPluginTask)
         }
     }

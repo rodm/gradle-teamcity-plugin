@@ -20,8 +20,8 @@ import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
 import com.jetbrains.plugin.structure.base.plugin.PluginProblem
 import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.internal.ConventionTask
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
@@ -30,7 +30,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskExecutionException
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
 
-class PublishTask extends ConventionTask {
+class PublishTask extends DefaultTask {
 
     private static final Logger LOGGER = Logging.getLogger(PublishTask.class)
 
