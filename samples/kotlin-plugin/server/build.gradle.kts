@@ -2,20 +2,11 @@
 import com.github.rodm.teamcity.TeamCityEnvironment
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
-buildscript {
-    repositories {
-        mavenLocal()
-        gradleScriptKotlin()
-    }
-
-    dependencies {
-        classpath(kotlinModule("gradle-plugin"))
-        classpath("com.github.rodm:gradle-teamcity-plugin:1.1-SNAPSHOT")
-    }
+plugins {
+    kotlin("jvm")
 }
 
 apply {
-    plugin("kotlin")
     plugin("com.github.rodm.teamcity-server")
 }
 
@@ -23,11 +14,6 @@ extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/dow
 extra["serversDir"] = project.findProperty("servers.dir") ?: "${rootDir}/servers"
 extra["java7Home"] = project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80"
 extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92"
-
-repositories {
-    mavenCentral()
-    gradleScriptKotlin()
-}
 
 val agent = configurations.getByName("agent")
 
@@ -63,17 +49,17 @@ teamcity {
 
         "teamcity9" {
             version = "9.1.7"
-            javaHome = file(extra["java7Home"])
+            javaHome = file(extra["java7Home"] as String)
         }
 
         "teamcity10" {
             version = "10.0.5"
-            javaHome = file(extra["java8Home"])
+            javaHome = file(extra["java8Home"] as String)
         }
 
         "teamcity2017" {
             version = "2017.1"
-            javaHome = file(extra["java8Home"])
+            javaHome = file(extra["java8Home"] as String)
         }
     }
 }

@@ -1,30 +1,16 @@
 
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
-buildscript {
-    repositories {
-        mavenLocal()
-        gradleScriptKotlin()
-    }
-
-    dependencies {
-        classpath(kotlinModule("gradle-plugin"))
-        classpath("com.github.rodm:gradle-teamcity-plugin:1.1-SNAPSHOT")
-    }
+plugins {
+    kotlin("jvm")
 }
 
 apply {
-    plugin("kotlin")
     plugin("com.github.rodm.teamcity-common")
 }
 
-repositories {
-    mavenCentral()
-    gradleScriptKotlin()
-}
-
 dependencies {
-    compile(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = rootProject.extra["kotlinVersion"] as String)
+    compile(kotlin("stdlib"))
 }
 
 configure<TeamCityPluginExtension> {

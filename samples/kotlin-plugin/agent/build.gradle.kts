@@ -1,26 +1,12 @@
 
 import com.github.rodm.teamcity.TeamCityPluginExtension
 
-buildscript {
-    repositories {
-        mavenLocal()
-        gradleScriptKotlin()
-    }
-
-    dependencies {
-        classpath(kotlinModule("gradle-plugin"))
-        classpath("com.github.rodm:gradle-teamcity-plugin:1.1-SNAPSHOT")
-    }
+plugins {
+    kotlin("jvm")
 }
 
 apply {
-    plugin("kotlin")
     plugin("com.github.rodm.teamcity-agent")
-}
-
-repositories {
-    mavenCentral()
-    gradleScriptKotlin()
 }
 
 dependencies {

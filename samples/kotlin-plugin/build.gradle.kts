@@ -1,7 +1,5 @@
 
 buildscript {
-    extra["kotlinVersion"] = "1.1.0"
-
     repositories {
         mavenLocal()
         maven { setUrl("https://repo.gradle.org/gradle/repo") }
@@ -10,9 +8,12 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${extra["kotlinVersion"]}")
         classpath("com.github.rodm:gradle-teamcity-plugin:1.1-SNAPSHOT")
     }
+}
+
+plugins {
+    kotlin("jvm") version "1.2.0" apply false
 }
 
 group = "com.github.rodm.teamcity"
