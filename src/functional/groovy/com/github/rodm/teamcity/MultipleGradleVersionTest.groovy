@@ -258,6 +258,12 @@ class MultipleGradleVersionTest {
         checkBuild(result)
     }
 
+    @Test
+    void 'build plugin using Gradle 4_5'() {
+        BuildResult result = executeBuild('4.5')
+        checkBuild(result)
+    }
+
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.getRoot())
