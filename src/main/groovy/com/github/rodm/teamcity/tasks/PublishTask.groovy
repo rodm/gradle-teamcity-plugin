@@ -42,14 +42,12 @@ class PublishTask extends DefaultTask {
     /**
      * The username for uploading the plugin to the plugin repository
      */
-    @Input
-    public String username
+    private String username
 
     /**
      * The password for uploading the plugin to the plugin repository
      */
-    @Input
-    public String password
+    private String password
 
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
@@ -58,6 +56,30 @@ class PublishTask extends DefaultTask {
     public List<String> channels = ['default']
 
     public File distributionFile
+
+    /**
+     * @return the username used for uploading the plugin to the plugin repository
+     */
+    @Input
+    String getUsername() {
+        return username
+    }
+
+    void setUsername(String username) {
+        this.username = username
+    }
+
+    /**
+     * @return the password used for uploading the plugin to the plugin repository
+     */
+    @Input
+    String getPassword() {
+        return password
+    }
+
+    void setPassword(String password) {
+        this.password = password
+    }
 
     /**
      * @return the plugin distribution file

@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.PublishTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.bundling.Zip
 import org.junit.Before
@@ -250,5 +251,23 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
         assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
+    }
+
+    @Test
+    void 'publish task is configured with username and password'() {
+        project.teamcity {
+            server {
+                publish {
+                    username = 'username'
+                    password = 'password'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.username, equalTo('username'))
+        assertThat(publishPlugin.password, equalTo('password'))
     }
 }

@@ -63,7 +63,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
         configureServerPluginTasks(project, extension)
-        configurePublishPluginTask(project)
+        configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
     }
 
@@ -148,11 +148,13 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
     }
 
-    private static void configurePublishPluginTask(@NotNull Project project) {
+    private static void configurePublishPluginTask(@NotNull Project project, TeamCityPluginExtension extension) {
         def buildPluginTask = project.tasks.findByName('serverPlugin') as Zip
-        project.tasks.create("publishPlugin", PublishTask).with {
+        project.tasks.create("publishPlugin", PublishTask) {
             group = TeamCityPlugin.GROUP_NAME
             description = "Publish plugin distribution on plugins.jetbrains.com."
+            conventionMapping.username = { extension.server.publish.username }
+            conventionMapping.password = { extension.server.publish.password }
             conventionMapping.distributionFile = {
                 def distributionFile = buildPluginTask?.archivePath
                 return distributionFile?.exists() ? distributionFile : null

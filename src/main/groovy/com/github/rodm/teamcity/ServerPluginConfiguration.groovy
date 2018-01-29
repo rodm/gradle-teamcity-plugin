@@ -28,6 +28,8 @@ import static groovy.transform.TypeCheckingMode.SKIP
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
+    private PublishConfiguration publish
+
     @Delegate
     private TeamCityEnvironments environments
 
@@ -50,6 +52,23 @@ class ServerPluginConfiguration extends PluginConfiguration {
     def descriptor(Action<ServerPluginDescriptor> configuration) {
         descriptor = extensions.create('descriptor', ServerPluginDescriptor, project)
         configuration.execute(descriptor)
+    }
+
+    /**
+     * Configures the credentials to publish the plugin to the JetBrains Plugin Repository.
+     *
+     * <p>The given action is executed to configure the publishing credentials.</p>
+     *
+     * @param configuration The action.
+     */
+    @CompileStatic(SKIP)
+    def publish(Action<PublishConfiguration> configuration) {
+        publish = extensions.create('publish', PublishConfiguration)
+        configuration.execute(publish)
+    }
+
+    PublishConfiguration getPublish() {
+        return publish
     }
 
     void setDownloadsDir(String downloadsDir) {
