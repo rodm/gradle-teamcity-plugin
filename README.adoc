@@ -257,6 +257,25 @@ tasks.withType<PublishTask> {
 }
 ----
 
+The username and password can also be configured in the `publish` section of the `server` configuration as shown in
+the following example.
+
+[source,groovy]
+.build.gradle
+----
+teamcity {
+    server {
+        descriptor {
+            ...
+        }
+        publish {
+            username = findProperty('jetbrains.username')
+            password = findProperty('jetbrains.password')
+        }
+    }
+}
+----
+
 It is recommended that the credentials for the JetBrains Plugin Repository are stored in `$HOME/.gradle/gradle.properties`.
 
 ### TeamCity Environments Configuration
