@@ -26,6 +26,7 @@ import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
+import static org.hamcrest.CoreMatchers.anyOf
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
@@ -176,7 +177,7 @@ class TeamCityServerPluginTest {
         configureRepositories.execute(project)
 
         List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
-        assertThat(urls, hasItem('https://repo1.maven.org/maven2/'))
+        assertThat(urls, anyOf(hasItem('https://repo1.maven.org/maven2/'), hasItem('https://repo.maven.apache.org/maven2/')))
         assertThat(urls, hasItem('https://download.jetbrains.com/teamcity-repository'))
     }
 
