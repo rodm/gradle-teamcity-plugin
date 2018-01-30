@@ -18,7 +18,10 @@ package com.github.rodm.teamcity
 import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.hamcrest.Matcher
 import org.junit.Before
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -33,9 +36,11 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.anything
 import static org.hamcrest.Matchers.isOneOf
 import static org.junit.Assume.assumeThat
 
+@RunWith(Parameterized)
 class MultipleGradleVersionTest {
 
     static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
@@ -44,6 +49,17 @@ class MultipleGradleVersionTest {
     public final TemporaryFolder projectDir = new TemporaryFolder()
 
     private File buildFile
+
+    @Parameterized.Parameter(0)
+    public String version
+
+    @Parameterized.Parameters(name = 'Gradle {0}')
+    static List<String> data() {
+        return [
+                '3.0', '3.1', '3.2', '3.3', '3.4.1', '3.5',
+                '4.0.2', '4.1', '4.2', '4.3', '4.4', '4.5'
+        ]
+    }
 
     @Before
     void setup() throws IOException {
@@ -175,93 +191,15 @@ class MultipleGradleVersionTest {
     }
 
     @Test
-    void buildPluginUsingGradle_3_0() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
+    void 'build plugin'() {
+        assumeThat(JavaVersion.current(), supportsGradle(version))
 
-        BuildResult result = executeBuild('3.0')
+        BuildResult result = executeBuild(version)
         checkBuild(result)
     }
 
-    @Test
-    void buildPluginUsingGradle_3_1() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('3.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void buildPluginUsingGradle_3_2() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('3.2')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3_3'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('3.3')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3_4_1'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('3.4.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3_5'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('3.5')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_0'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('4.0.2')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_1'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('4.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_2'() {
-        assumeThat(JavaVersion.current(), isOneOf(VERSION_1_7, VERSION_1_8))
-
-        BuildResult result = executeBuild('4.2')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_3'() {
-        BuildResult result = executeBuild('4.3')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_4'() {
-        BuildResult result = executeBuild('4.4')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 4_5'() {
-        BuildResult result = executeBuild('4.5')
-        checkBuild(result)
+    Matcher supportsGradle(String version) {
+        return version < '4.3' ? isOneOf(VERSION_1_7, VERSION_1_8) : anything()
     }
 
     private BuildResult executeBuild(String version) {
