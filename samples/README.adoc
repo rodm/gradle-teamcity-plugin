@@ -1,5 +1,5 @@
 = Sample TeamCity plugins using the Gradle TeamCity plugin.
-:uri-gradle-script-kotlin: https://github.com/gradle/gradle-script-kotlin
+:uri-gradle-kotlin: https://github.com/gradle/kotlin-dsl
 
 The following projects demonstrate the features of the Gradle TeamCity plugin.
 
@@ -8,7 +8,7 @@ The following projects demonstrate the features of the Gradle TeamCity plugin.
 * `multi-project-plugin` : A plugin with agent-side and server-side built from multiple Gradle projects.
 * `agent-tool-plugin` : A simple tool plugin that repackages Apache Maven.
 * `kotlin-plugin` : A simple plugin with an agent-side and a server-side component written in Kotlin and built
-with scripts written in Kotlin using the {uri-gradle-script-kotlin}[Gradle Script Kotlin] plugin.
+with scripts written in Kotlin using {uri-gradle-kotlin}[Gradle Kotlin DSL].
 * `multiple-plugins` : A sample that demonstrates building and deploying multiple plugins to a TeamCity environment.
 
 == To build the plugins
