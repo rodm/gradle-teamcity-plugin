@@ -4,7 +4,7 @@
 :uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
 :uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
 :uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
-:uri-gradle-plugin-portal: https://plugins.gradle.org/plugin/com.github.rodm.teamcity-server
+:uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :plugin-version: 1.0
 :default-api-version: 9.0
@@ -18,34 +18,19 @@ image:https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-pl
 
 == Using the plugin
 
-=== Apply the plugin to the build
+=== Applying the plugins to a build
 
-The plugin is published on the {uri-gradle-plugin-portal}[Gradle Plugin Portal].
-The following code adds the plugin to your build script.
-
-[source,groovy]
-[subs="attributes"]
-----
-    buildscript {
-      repositories {
-        maven {
-          url "https://plugins.gradle.org/m2/"
-        }
-      }
-      dependencies {
-        classpath "com.github.rodm:gradle-teamcity-plugin:{plugin-version}"
-      }
-    }
-----
-
-=== Plugins
-
-The jar contains three plugins:
+The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains three plugins:
 
 * `com.github.rodm.teamcity-server` - Provides tasks to package a TeamCity plugin, deploy and undeploy the plugin to a
 TeamCity server, and tasks to start and stop the server and default agent.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent side of a TeamCity plugin.
 * `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project.
+
+Refer to the Gradle Plugin Portal for instructions on how to apply the
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server[server],
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-agent[agent] and
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-common[common] plugins.
 
 === Configurations
 
