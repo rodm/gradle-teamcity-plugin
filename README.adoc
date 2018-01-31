@@ -1,5 +1,5 @@
 = Gradle TeamCity plugin
-:uri-teamcity-documentation: https://confluence.jetbrains.com/display/TCD9
+:uri-teamcity-documentation: https://confluence.jetbrains.com/display/TCD10
 :uri-teamcity-environment: {uri-teamcity-documentation}/Development+Environment
 :uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
 :uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
