@@ -59,6 +59,7 @@ task functionalTest(type: Test) {
     group = 'verification'
     testClassesDir = sourceSets.functionalTest.output.classesDir
     classpath = sourceSets.functionalTest.runtimeClasspath
+    jvmArgs "-XX:MaxPermSize=512m"
 
     reports {
         html.destination = project.file("$html.destination/functional")

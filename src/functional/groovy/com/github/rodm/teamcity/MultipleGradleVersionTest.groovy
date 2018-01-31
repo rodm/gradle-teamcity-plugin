@@ -15,24 +15,32 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.internal.os.OperatingSystem
+import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.hamcrest.Matcher
 import org.junit.Before
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static org.gradle.api.JavaVersion.VERSION_1_7
+import static org.gradle.api.JavaVersion.VERSION_1_8
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.anything
+import static org.hamcrest.Matchers.isOneOf
 import static org.junit.Assume.assumeThat
 
+@RunWith(Parameterized)
 class MultipleGradleVersionTest {
 
     static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
@@ -41,6 +49,18 @@ class MultipleGradleVersionTest {
     public final TemporaryFolder projectDir = new TemporaryFolder()
 
     private File buildFile
+
+    @Parameterized.Parameter(0)
+    public String version
+
+    @Parameterized.Parameters(name = 'Gradle {0}')
+    static List<String> data() {
+        return [
+                '2.8', '2.14.1',
+                '3.0', '3.1', '3.2.1', '3.3', '3.4.1', '3.5.1',
+                '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5'
+        ]
+    }
 
     @Before
     void setup() throws IOException {
@@ -168,54 +188,15 @@ class MultipleGradleVersionTest {
     }
 
     @Test
-    void buildPluginUsingGradle_2_8() {
-        // Test is unreliable on Windows (https://github.com/rodm/gradle-teamcity-plugin/issues/23)
-        assumeThat(OperatingSystem.current(), not(OperatingSystem.forName('windows')))
+    void 'build plugin'() {
+        assumeThat(JavaVersion.current(), supportsGradle(version))
 
-        BuildResult result = executeBuild('2.8')
+        BuildResult result = executeBuild(version)
         checkBuild(result)
     }
 
-    @Test
-    void buildPluginUsingGradle_2_14_1() {
-        BuildResult result = executeBuild('2.14.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void buildPluginUsingGradle_3_0() {
-        BuildResult result = executeBuild('3.0')
-        checkBuild(result)
-    }
-
-    @Test
-    void buildPluginUsingGradle_3_1() {
-        BuildResult result = executeBuild('3.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void buildPluginUsingGradle_3_2() {
-        BuildResult result = executeBuild('3.2')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3.3'() {
-        BuildResult result = executeBuild('3.3')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3.4.1'() {
-        BuildResult result = executeBuild('3.4.1')
-        checkBuild(result)
-    }
-
-    @Test
-    void 'build plugin using Gradle 3.5'() {
-        BuildResult result = executeBuild('3.5')
-        checkBuild(result)
+    Matcher supportsGradle(String version) {
+        return version < '4.3' ? isOneOf(VERSION_1_7, VERSION_1_8) : anything()
     }
 
     private BuildResult executeBuild(String version) {
