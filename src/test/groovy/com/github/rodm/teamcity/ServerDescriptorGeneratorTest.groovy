@@ -40,6 +40,10 @@ class ServerDescriptorGeneratorTest {
 
     private TeamCityPluginExtension extension
 
+    private static ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
+        new ServerPluginDescriptorGenerator(descriptor, '9.0')
+    }
+
     @Before
     void setup() {
         project = ProjectBuilder.builder()
@@ -54,7 +58,7 @@ class ServerDescriptorGeneratorTest {
     @Test
     void writesTeamCityPluginRootNode() {
         ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -64,7 +68,7 @@ class ServerDescriptorGeneratorTest {
     @Test
     void 'descriptor schema location'() {
         ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -88,7 +92,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -101,7 +105,7 @@ class ServerDescriptorGeneratorTest {
     @Test
     void writesRequiredInfoPropertiesWhenNotSet() {
         ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -115,7 +119,7 @@ class ServerDescriptorGeneratorTest {
     void writesRequiredInfoPropertiesUsingDefaults() {
         project.version = '1.2.3'
         ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -138,7 +142,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -158,7 +162,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -179,7 +183,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -197,7 +201,7 @@ class ServerDescriptorGeneratorTest {
         }
 
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -213,7 +217,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -234,7 +238,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -255,7 +259,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -274,7 +278,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -292,7 +296,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -359,7 +363,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -377,7 +381,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -395,7 +399,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 
@@ -412,7 +416,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
 

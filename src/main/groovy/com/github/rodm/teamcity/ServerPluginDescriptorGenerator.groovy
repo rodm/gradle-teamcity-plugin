@@ -27,7 +27,7 @@ class ServerPluginDescriptorGenerator {
 
     private String version
 
-    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version = "9.0") {
+    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version) {
         this.descriptor = descriptor
         this.version = version
     }
