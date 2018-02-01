@@ -62,7 +62,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         if (majorVersion != null && majorVersion < 9 && getDescriptor().dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), majorVersion)
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 }

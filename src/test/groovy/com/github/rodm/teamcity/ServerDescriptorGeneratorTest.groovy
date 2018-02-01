@@ -41,7 +41,7 @@ class ServerDescriptorGeneratorTest {
     private TeamCityPluginExtension extension
 
     private static ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
-        new ServerPluginDescriptorGenerator(descriptor, '9.0')
+        new ServerPluginDescriptorGenerator(descriptor, 9)
     }
 
     @Before
@@ -316,7 +316,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getMajorVersion())
 
         generator.writeTo(writer)
 
@@ -345,7 +345,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getMajorVersion())
 
         generator.writeTo(writer)
 
