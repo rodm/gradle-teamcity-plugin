@@ -16,7 +16,9 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 
 /**
  * Agent-side plugin descriptor
@@ -24,7 +26,12 @@ import org.gradle.api.tasks.Nested
 class AgentPluginDescriptor {
 
     @Nested
-    def deployment
+    @Optional
+    PluginDeployment pluginDeployment
+
+    @Nested
+    @Optional
+    ToolDeployment toolDeployment
 
     /**
      * Configures the agent-side plugin for plugin deployment.
@@ -35,8 +42,10 @@ class AgentPluginDescriptor {
      * @return
      */
     def pluginDeployment(Action<PluginDeployment> configuration) {
-        deployment = extensions.create('deployment', PluginDeployment)
-        configuration.execute(deployment)
+        if (toolDeployment)
+            throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
+        pluginDeployment = extensions.create('deployment', PluginDeployment)
+        configuration.execute(pluginDeployment)
     }
 
     /**
@@ -48,8 +57,14 @@ class AgentPluginDescriptor {
      * @return
      */
     def toolDeployment(Action<ToolDeployment> configuration) {
-        deployment = extensions.create('deployment', ToolDeployment)
-        configuration.execute(deployment)
+        if (pluginDeployment)
+            throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
+        toolDeployment = extensions.create('deployment', ToolDeployment)
+        configuration.execute(toolDeployment)
+    }
+
+    def getDeployment() {
+        return (pluginDeployment != null) ? pluginDeployment : toolDeployment
     }
 
     @Nested

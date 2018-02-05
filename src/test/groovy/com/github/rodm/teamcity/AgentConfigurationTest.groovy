@@ -112,6 +112,40 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'cannot configure plugin for both pluginDeployment and toolDeployment'() {
+        try {
+            project.teamcity {
+                agent {
+                    descriptor {
+                        pluginDeployment {}
+                        toolDeployment {}
+                    }
+                }
+            }
+        }
+        catch (InvalidUserDataException expected) {
+            assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
+        }
+    }
+
+    @Test
+    void 'cannot configure plugin for both toolDeployment and pluginDeployment'() {
+        try {
+            project.teamcity {
+                agent {
+                    descriptor {
+                        toolDeployment {}
+                        pluginDeployment {}
+                    }
+                }
+            }
+        }
+        catch (InvalidUserDataException expected) {
+            assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
+        }
+    }
+
+    @Test
     void filePluginDescriptor() {
         project.teamcity {
             agent {
