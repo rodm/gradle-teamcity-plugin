@@ -18,8 +18,6 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import groovy.xml.XmlUtil
 
-import static groovy.transform.TypeCheckingMode.SKIP
-
 @CompileStatic
 class ServerPluginDescriptorGenerator {
 
