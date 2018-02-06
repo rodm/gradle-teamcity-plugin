@@ -17,9 +17,14 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
@@ -31,9 +36,13 @@ import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 
 class TeamCityAgentPlugin implements Plugin<Project> {
 
+    private static final Logger LOGGER = Logging.getLogger(TeamCityAgentPlugin)
+
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
 
     public static final String AGENT_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/agent'
+
+    static final String MISSING_EXECUTABLE_FILE_WARNING = "%s: Executable file %s is missing."
 
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
@@ -86,6 +95,9 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
         packagePlugin.with(extension.agent.files)
         packagePlugin.onlyIf { extension.agent.descriptor != null }
+        Set<FileCopyDetails> files = []
+        packagePlugin.filesMatching('**/*', new FileCollectorAction(files))
+        packagePlugin.doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
@@ -110,6 +122,48 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         project.afterEvaluate {
             Zip agentPlugin = (Zip) project.tasks.getByPath('agentPlugin')
             configurePluginArchiveTask(agentPlugin, extension.agent.archiveName)
+        }
+    }
+
+    static class FileCollectorAction implements Action<FileCopyDetails> {
+
+        private Set<FileCopyDetails> files
+
+        FileCollectorAction(Set<FileCopyDetails> files) {
+            this.files = files
+        }
+
+        @Override
+        void execute(FileCopyDetails fileCopyDetails) {
+            files << fileCopyDetails
+        }
+    }
+
+    static class PluginExecutableFilesValidationAction implements Action<Task> {
+
+        private File descriptor
+        private Set<FileCopyDetails> files
+
+        PluginExecutableFilesValidationAction(File descriptor, Set<FileCopyDetails> files) {
+            this.descriptor = descriptor
+            this.files = files
+        }
+
+        @Override
+        void execute(Task task) {
+            def paths = files.flatten { fileCopyDetails -> fileCopyDetails.path }
+            List<String> executableFiles = getExecutableFiles()
+            for (String executableFile : executableFiles) {
+                if (!paths.contains(executableFile)) {
+                    LOGGER.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
+                }
+            }
+        }
+
+        def getExecutableFiles() {
+            def parser = new XmlParser(false, true, true)
+            def descriptor = parser.parse(descriptor)
+            return descriptor.breadthFirst().findAll { node -> node.name() == 'include' }.flatten { node -> node['@name'] }
         }
     }
 }
