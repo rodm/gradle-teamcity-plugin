@@ -46,7 +46,7 @@ class TeamCityTask extends DefaultTask {
         }
     }
 
-    boolean isWindows() {
+    static boolean isWindows() {
         def os = System.getProperty("os.name").toLowerCase()
         return os.contains("windows")
     }

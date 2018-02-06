@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 
@@ -63,6 +64,7 @@ class AgentPluginDescriptor {
         configuration.execute(toolDeployment)
     }
 
+    @Internal
     def getDeployment() {
         return (pluginDeployment != null) ? pluginDeployment : toolDeployment
     }
