@@ -32,6 +32,7 @@ import static org.hamcrest.CoreMatchers.not
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
@@ -259,6 +260,86 @@ class ServerPluginFunctionalTest {
 
         assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
     }
+
+
+    @Test
+    void 'plugin archive is updated when descriptor property changes'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            ext {
+                pluginVersion = findProperty('plugin.version') ?: '1.2.3'
+            }
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = pluginVersion
+                        vendorName = 'vendor name'
+                    }
+                }
+            }
+        """
+        BuildResult result = executeBuild()
+        assertThat(result.task(':generateServerDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(SUCCESS))
+        result = executeBuild()
+        assertThat(result.task(':generateServerDescriptor').getOutcome(), is(UP_TO_DATE))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(UP_TO_DATE))
+
+        result = executeBuild('serverPlugin', '-Pplugin.version=2018.1.2')
+
+        assertThat(result.task(':generateServerDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(SUCCESS))
+    }
+
+    @Test
+    void 'plugin archive is updated when descriptor token changes'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            ext {
+                pluginVersion = findProperty('plugin.version') ?: '1.2.3'
+            }
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+                    tokens = [PLUGIN_VERSION: pluginVersion]
+                }
+            }
+        """
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
+            <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+                <info>
+                    <name>test-plugin</name>
+                    <display-name>test-plugin</display-name>
+                    <version>@PLUGIN_VERSION@</version>
+                </info>
+            </teamcity-plugin>
+        """
+
+        BuildResult result = executeBuild()
+        assertThat(result.task(':processServerDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(SUCCESS))
+        result = executeBuild()
+        assertThat(result.task(':processServerDescriptor').getOutcome(), is(UP_TO_DATE))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(UP_TO_DATE))
+
+        result = executeBuild('serverPlugin', '-Pplugin.version=2018.1.2')
+
+        assertThat(result.task(':processServerDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':serverPlugin').getOutcome(), is(SUCCESS))
+    }
+
 
     @Test
     void simulateBuildingPluginInTeamCity() {

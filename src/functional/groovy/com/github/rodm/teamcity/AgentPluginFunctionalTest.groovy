@@ -24,7 +24,10 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
-import static org.gradle.testkit.runner.TaskOutcome.*
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
 
@@ -243,5 +246,85 @@ class AgentPluginFunctionalTest {
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class example.ExampleBuildFeature was not found in the jar')))
+    }
+
+    @Test
+    void 'plugin archive is updated when descriptor property changes'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            ext {
+                executablePath = findProperty('exec.path') ?: 'file'
+            }
+            teamcity {
+                version = '8.1.5'
+                agent {
+                    descriptor {
+                        pluginDeployment {
+                            executableFiles {
+                                include executablePath
+                            }
+                        }
+                    }
+                }
+            }
+        """
+        BuildResult result = executeBuild()
+        assertThat(result.task(':generateAgentDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(SUCCESS))
+        result = executeBuild()
+        assertThat(result.task(':generateAgentDescriptor').getOutcome(), is(UP_TO_DATE))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(UP_TO_DATE))
+
+        result = executeBuild('agentPlugin', '-Pexec.path=file2')
+
+        assertThat(result.task(':generateAgentDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(SUCCESS))
+    }
+
+    @Test
+    void 'plugin archive is updated when descriptor token changes'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            ext {
+                executablePath = findProperty('exec.path') ?: 'file'
+            }
+            teamcity {
+                version = '8.1.5'
+                agent {
+                    descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+                    tokens = [PATH: executablePath]
+                }
+            }
+        """
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
+            <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                             xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-agent-plugin-v1-xml">
+                <plugin-deployment>
+                    <layout>
+                        <executable-files>
+                            <include name="@PATH@"/>
+                        </executable-files>
+                    </layout>
+                </plugin-deployment>                                    
+            </teamcity-agent-plugin>
+        """
+        BuildResult result = executeBuild()
+        assertThat(result.task(':processAgentDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(SUCCESS))
+        result = executeBuild()
+        assertThat(result.task(':processAgentDescriptor').getOutcome(), is(UP_TO_DATE))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(UP_TO_DATE))
+
+        result = executeBuild('agentPlugin', '-Pexec.path=file2')
+
+        assertThat(result.task(':processAgentDescriptor').getOutcome(), is(SUCCESS))
+        assertThat(result.task(':agentPlugin').getOutcome(), is(SUCCESS))
     }
 }
