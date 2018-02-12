@@ -132,6 +132,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor) {
             conventionMapping.version = { extension.version }
             conventionMapping.descriptor = { extension.server.descriptor instanceof ServerPluginDescriptor ? extension.server.descriptor : null }
+            conventionMapping.destination = { descriptorFile }
         }
         generateDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof ServerPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor

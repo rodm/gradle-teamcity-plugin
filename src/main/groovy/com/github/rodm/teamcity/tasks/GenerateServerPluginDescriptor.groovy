@@ -17,8 +17,6 @@ package com.github.rodm.teamcity.tasks
 
 import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
-import com.github.rodm.teamcity.TeamCityPlugin
-import com.github.rodm.teamcity.TeamCityServerPlugin
 import com.github.rodm.teamcity.TeamCityPluginExtension
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
@@ -48,9 +46,6 @@ class GenerateServerPluginDescriptor extends DefaultTask {
 
     @OutputFile
     File getDestination() {
-        if (destination == null) {
-            destination = new File(project.getBuildDir(), TeamCityServerPlugin.SERVER_PLUGIN_DESCRIPTOR_DIR + "/" + TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME)
-        }
         return destination
     }
 

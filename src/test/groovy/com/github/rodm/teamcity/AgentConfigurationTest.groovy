@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.bundling.Zip
@@ -181,6 +182,20 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
         assertNotNull(project.tasks.findByName('processAgentDescriptor'))
         assertNotNull(project.tasks.findByName('agentPlugin'))
+    }
+
+    @Test
+    void 'apply configures generate agent descriptor task'() {
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+        }
+        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+
+        assertThat(task.version, equalTo('9.0'))
+        assertThat(task.descriptor, isA(AgentPluginDescriptor))
+        assertThat(normalizePath(task.destination), endsWith('build/descriptor/agent/teamcity-plugin.xml'))
     }
 
     @Test

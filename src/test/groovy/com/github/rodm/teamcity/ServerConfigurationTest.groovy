@@ -15,12 +15,14 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.bundling.Zip
 import org.junit.Before
 import org.junit.Test
 
+import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
@@ -89,6 +91,20 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertNotNull(project.tasks.findByName('processServerDescriptor'))
         assertNotNull(project.tasks.findByName('generateServerDescriptor'))
         assertNotNull(project.tasks.findByName('serverPlugin'))
+    }
+
+    @Test
+    void 'apply configures generate server descriptor task'() {
+        project.teamcity {
+            server {
+                descriptor {}
+            }
+        }
+        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+
+        assertThat(task.version, equalTo('9.0'))
+        assertThat(task.descriptor, isA(ServerPluginDescriptor))
+        assertThat(normalizePath(task.destination), endsWith('build/descriptor/server/teamcity-plugin.xml'))
     }
 
     @Test
