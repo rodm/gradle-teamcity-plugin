@@ -63,8 +63,8 @@ class TeamCityPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
 
-        if (GradleVersion.current() < GradleVersion.version('3.0')) {
-            throw new GradleException('Gradle TeamCity plugin requires Gradle version 3.0 or later')
+        if (GradleVersion.current() < GradleVersion.version('4.0')) {
+            throw new GradleException('Gradle TeamCity plugin requires Gradle version 4.0 or later')
         }
 
         if (project.plugins.hasPlugin(JavaPlugin) &&
