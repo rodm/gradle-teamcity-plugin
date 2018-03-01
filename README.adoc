@@ -6,7 +6,7 @@
 :uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
-:plugin-version: 1.1-rc-1
+:plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2017.1
 
