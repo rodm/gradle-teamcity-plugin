@@ -49,34 +49,16 @@ gradlePlugin {
 task functionalTest(type: Test) {
     description = 'Runs the functional tests.'
     group = 'verification'
-    if (GradleVersion.current() < GradleVersion.version('4.0')) {
-        testClassesDir = sourceSets.functionalTest.output.classesDir
-    } else {
-        testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    }
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
     jvmArgs "-XX:MaxPermSize=512m"
-
-    reports {
-        html.destination = project.file("$html.destination/functional")
-        junitXml.destination = project.file("$junitXml.destination/functional")
-    }
 }
 
 task samplesTest(type: Test, dependsOn: 'publish') {
     description = 'Runs the sample builds.'
     group = 'verification'
-    if (GradleVersion.current() < GradleVersion.version('4.0')) {
-        testClassesDir = sourceSets.samples.output.classesDir
-    } else {
-        testClassesDirs = sourceSets.samples.output.classesDirs
-    }
+    testClassesDirs = sourceSets.samples.output.classesDirs
     classpath = sourceSets.samples.runtimeClasspath
-
-    reports {
-        html.destination = project.file("$html.destination/samples")
-        junitXml.destination = project.file("$junitXml.destination/samples")
-    }
 }
 
 publishing {
