@@ -37,6 +37,7 @@ import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
+import static org.hamcrest.Matchers.isA
 import static org.junit.Assert.assertThat
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -282,6 +283,7 @@ class EnvironmentsTest {
         def environment = extension.environments.getByName('test')
         assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
     }
+
     @Test
     void replaceDefaultAdentOptionsWithMultipleValues() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
@@ -662,5 +664,20 @@ class EnvironmentsTest {
         Unpack unpack = project.tasks.getByName('unpackTeamcity10') as Unpack
         assertThat(normalizePath(unpack.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(unpack.getTarget()), endsWith('servers/TeamCity-10.0.4'))
+    }
+
+    @Test
+    void 'extension has named child extensions'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity { }
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        def agent = extension.extensions.findByName('agent')
+        def server = extension.extensions.findByName('server')
+        def environments = extension.extensions.findByName('environments')
+
+        assertThat(agent, isA(AgentPluginConfiguration))
+        assertThat(server, isA(ServerPluginConfiguration))
+        assertThat(environments, isA(TeamCityEnvironments))
     }
 }

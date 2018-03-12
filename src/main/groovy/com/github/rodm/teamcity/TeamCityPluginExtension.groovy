@@ -38,7 +38,7 @@ class TeamCityPluginExtension {
 
     TeamCityPluginExtension(Project project) {
         this.project = project
-        this.environments = extensions.create('teamcity', TeamCityEnvironments, project)
+        this.environments = extensions.create('environments', TeamCityEnvironments, project)
         this.agent = extensions.create('agent', AgentPluginConfiguration, project)
         this.server = extensions.create('server', ServerPluginConfiguration, project, environments)
     }
