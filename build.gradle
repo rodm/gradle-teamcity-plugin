@@ -54,7 +54,7 @@ task functionalTest(type: Test) {
     jvmArgs "-XX:MaxPermSize=512m"
 }
 
-task samplesTest(type: Test, dependsOn: 'publish') {
+task samplesTest(type: Test) {
     description = 'Runs the sample builds.'
     group = 'verification'
     testClassesDirs = sourceSets.samples.output.classesDirs

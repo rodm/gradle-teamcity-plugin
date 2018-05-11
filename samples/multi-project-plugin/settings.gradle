@@ -4,3 +4,5 @@ rootProject.name = 'multi-project-plugin'
 include 'common'
 include 'agent'
 include 'server'
+
+includeBuild '../..'

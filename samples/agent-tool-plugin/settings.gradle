@@ -1,0 +1,4 @@
+
+rootProject.name = 'agent-tool-plugin'
+
+includeBuild '../..'
