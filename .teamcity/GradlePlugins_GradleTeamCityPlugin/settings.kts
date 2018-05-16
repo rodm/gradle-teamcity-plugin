@@ -26,11 +26,6 @@ project {
         id = vcsId
         name = "gradle-teamcity-plugin"
         url = "https://github.com/rodm/gradle-teamcity-plugin.git"
-        branchSpec = """
-            +:refs/heads/(master)
-            +:refs/tags/(*)
-        """.trimIndent()
-        useTagsAsBranches = true
         useMirrors = false
     })
     vcsRoot(vcs)
