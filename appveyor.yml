@@ -1,5 +1,9 @@
 version: "{build}"
 
+skip_commits:
+  files:
+    - .teamcity/
+
 environment:
   TERM: dumb
   matrix:
