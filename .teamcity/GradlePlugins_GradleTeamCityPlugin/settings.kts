@@ -32,7 +32,7 @@ project {
 
     features {
         versionedSettings {
-            id = "PROJECT_EXT_1"
+            id = "PROJECT_EXT_8"
             mode = VersionedSettings.Mode.ENABLED
             rootExtId = vcsId
             showChanges = true
