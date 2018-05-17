@@ -368,4 +368,48 @@ class AgentPluginFunctionalTest {
         assertThat(entries, not(hasItem('lib/agent-api-8.1.5.jar')))
         assertThat(entries.size(), equalTo(5))
     }
+
+    @Test
+    void 'plugin archive includes additional files'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            teamcity {
+                version = '8.1.5'
+                agent {
+                    descriptor {
+                        pluginDeployment {}
+                    }
+                    files {
+                        into('files') {
+                            from('srcdir')
+                        }
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        File srcdir = testProjectDir.newFolder('srcdir')
+        File file1 = new File(srcdir, 'file1')
+        file1 << "file1"
+        File file2 = new File(srcdir, 'file2')
+        file2 << "file2"
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
+
+        ZipFile pluginArchive = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
+        List<String> entries = pluginArchive.entries().collect { it.name }
+        assertThat(entries, hasItem('files/'))
+        assertThat(entries, hasItem('files/file1'))
+        assertThat(entries, hasItem('files/file2'))
+    }
 }
