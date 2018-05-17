@@ -114,7 +114,8 @@ class TeamCityPlugin implements Plugin<Project> {
             Configuration providedConfiguration = configurations.maybeCreate('provided')
                     .setVisible(false)
                     .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
-            configurations.getByName(JavaPlugin.COMPILE_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
+            configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
+            configurations.getByName(JavaPlugin.TEST_COMPILE_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
         }
     }
 

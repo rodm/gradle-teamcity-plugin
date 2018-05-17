@@ -78,7 +78,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
                     from(jar)
-                    from(project.configurations.runtime - project.configurations.provided)
+                    from(project.configurations.runtime)
                 }
                 from(project.configurations.agent)
             }
