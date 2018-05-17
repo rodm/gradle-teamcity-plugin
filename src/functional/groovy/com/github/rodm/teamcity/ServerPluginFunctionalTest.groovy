@@ -24,6 +24,7 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.containsString
@@ -340,6 +341,49 @@ class ServerPluginFunctionalTest {
         assertThat(result.task(':serverPlugin').getOutcome(), is(SUCCESS))
     }
 
+    @Test
+    void 'plugin archive contains 3rd party libraries but not TeamCity libraries'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            dependencies {
+                compile 'org.apache.commons:commons-lang3:3.7'
+                runtime 'org.apache.commons:commons-math:2.2'
+            }
+            teamcity {
+                version = '8.1.5'
+                server {
+                    descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+
+        ZipFile pluginArchive = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        List<String> entries = pluginArchive.entries().collect { it.name }
+        assertThat(entries, hasItem('teamcity-plugin.xml'))
+        assertThat(entries, hasItem('server/'))
+        assertThat(entries, hasItem('server/test-plugin.jar'))
+        assertThat(entries, hasItem('server/commons-lang3-3.7.jar'))
+        assertThat(entries, hasItem('server/commons-math-2.2.jar'))
+        assertThat(entries, not(hasItem('server/server-api-8.1.5.jar')))
+        assertThat(entries.size(), equalTo(5))
+    }
 
     @Test
     void simulateBuildingPluginInTeamCity() {

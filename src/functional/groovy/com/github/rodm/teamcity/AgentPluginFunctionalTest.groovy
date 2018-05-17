@@ -327,4 +327,45 @@ class AgentPluginFunctionalTest {
         assertThat(result.task(':processAgentDescriptor').getOutcome(), is(SUCCESS))
         assertThat(result.task(':agentPlugin').getOutcome(), is(SUCCESS))
     }
+
+    @Test
+    void 'plugin archive contains 3rd party libraries but not TeamCity libraries'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            dependencies {
+                compile 'org.apache.commons:commons-lang3:3.7'
+                runtime 'org.apache.commons:commons-math:2.2'
+            }
+            teamcity {
+                version = '8.1.5'
+                agent {
+                    descriptor {
+                        pluginDeployment {}
+                    }
+                }
+            }
+        """
+
+        File settingsFile = testProjectDir.newFile('settings.gradle')
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+        """
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
+
+        ZipFile pluginArchive = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
+        List<String> entries = pluginArchive.entries().collect { it.name }
+        assertThat(entries, hasItem('teamcity-plugin.xml'))
+        assertThat(entries, hasItem('lib/'))
+        assertThat(entries, hasItem('lib/test-plugin.jar'))
+        assertThat(entries, hasItem('lib/commons-lang3-3.7.jar'))
+        assertThat(entries, hasItem('lib/commons-math-2.2.jar'))
+        assertThat(entries, not(hasItem('lib/agent-api-8.1.5.jar')))
+        assertThat(entries.size(), equalTo(5))
+    }
 }
