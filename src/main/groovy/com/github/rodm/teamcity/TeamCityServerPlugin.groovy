@@ -16,15 +16,8 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
-import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
-import com.github.rodm.teamcity.tasks.StartAgent
-import com.github.rodm.teamcity.tasks.StartServer
-import com.github.rodm.teamcity.tasks.StopAgent
-import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.Unpack
-import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -33,8 +26,6 @@ import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.annotations.NotNull
 import org.xml.sax.SAXNotRecognizedException
@@ -146,7 +137,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     private static void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
+        project.afterEvaluate(new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension))
     }
 
     private static void configurePublishPluginTask(@NotNull Project project, TeamCityPluginExtension extension) {
@@ -209,97 +200,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 parser.setProperty(uri, value)
             }
             catch (SAXNotRecognizedException ignore) { }
-        }
-    }
-
-    static class ConfigureEnvironmentTasksAction implements Action<Project> {
-
-        private TeamCityPluginExtension extension
-
-        ConfigureEnvironmentTasksAction(TeamCityPluginExtension extension) {
-            this.extension = extension
-        }
-
-        @Override
-        void execute(Project project) {
-            ServerPluginConfiguration server = extension.server
-            def build = project.tasks.getByName('build')
-            server.environments.each { environment ->
-                defaultMissingProperties(project, server, environment)
-
-                String name = environment.name.capitalize()
-                def download = project.tasks.create(String.format("download%s", name), Download)
-                download.src { environment.downloadUrl }
-                download.dest { project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}") }
-
-                def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
-                    conventionMapping.map('source') {
-                        project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
-                    }
-                    conventionMapping.map('target') { environment.homeDir }
-                }
-                unpack.dependsOn download
-                def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
-                install.dependsOn unpack
-
-                def deployPlugin = project.tasks.create(String.format('deployTo%s', name), Copy) {
-                    from { environment.plugins }
-                    into { environment.pluginsDir }
-                }
-                deployPlugin.dependsOn build
-
-                def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
-                    delete {
-                        project.fileTree(dir: environment.pluginsDir,
-                                         includes: project.files(environment.plugins).collect { it.name })
-                    }
-                }
-
-                def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('dataDir') { environment.dataDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
-                    conventionMapping.map('serverOptions') { environment.serverOptions }
-                }
-                startServer.dependsOn deployPlugin
-
-                def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
-                }
-                stopServer.finalizedBy undeployPlugin
-
-                project.tasks.create(String.format('start%sAgent', name), StartAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
-                    conventionMapping.map('agentOptions') { environment.agentOptions }
-                }
-
-                project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
-                }
-            }
-        }
-
-        private static void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
-            environment.with {
-                downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
-                homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
-                dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
-                javaHome = javaHome ?: project.file(System.properties['java.home'])
-
-                if (plugins.isEmpty()) {
-                    def serverPlugin = project.tasks.getByName('serverPlugin')
-                    if (serverPlugin) {
-                        plugins serverPlugin.archivePath
-                    }
-                }
-            }
-        }
-
-        private static String toFilename(String url) {
-            return url[(url.lastIndexOf('/') + 1)..-1]
         }
     }
 }

@@ -409,7 +409,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -441,7 +441,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -471,7 +471,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -493,7 +493,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -524,7 +524,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -543,7 +543,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
@@ -573,7 +573,7 @@ class EnvironmentsTest {
             }
         }
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = new TeamCityServerPlugin.ConfigureEnvironmentTasksAction(extension)
+        Action<Project> configureEnvironmentTasks = new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
 
         configureEnvironmentTasks.execute(project)
 
