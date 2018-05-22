@@ -46,19 +46,19 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         @Override
         void execute(Project project) {
-            ServerPluginConfiguration server = extension.server
             def build = project.tasks.getByName('build')
-            server.environments.each { environment ->
-                defaultMissingProperties(project, server, environment)
+            TeamCityEnvironments environments = extension.environments
+            environments.environments.each { environment ->
+                defaultMissingProperties(project, environments, environment)
 
                 String name = environment.name.capitalize()
                 def download = project.tasks.create(String.format("download%s", name), Download)
                 download.src { environment.downloadUrl }
-                download.dest { project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}") }
+                download.dest { project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}") }
 
                 def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
                     conventionMapping.map('source') {
-                        project.file("${server.downloadsDir}/${toFilename(environment.downloadUrl)}")
+                        project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}")
                     }
                     conventionMapping.map('target') { environment.homeDir }
                 }
@@ -106,11 +106,11 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
-        private static void defaultMissingProperties(Project project, ServerPluginConfiguration server, TeamCityEnvironment environment) {
+        private static void defaultMissingProperties(Project project, TeamCityEnvironments environments, TeamCityEnvironment environment) {
             environment.with {
-                downloadUrl = downloadUrl ?: "${server.baseDownloadUrl}/TeamCity-${version}.tar.gz"
-                homeDir = homeDir ?: project.file("${server.baseHomeDir}/TeamCity-${version}")
-                dataDir = dataDir ?: project.file("${server.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
+                downloadUrl = downloadUrl ?: "${environments.baseDownloadUrl}/TeamCity-${version}.tar.gz"
+                homeDir = homeDir ?: project.file("${environments.baseHomeDir}/TeamCity-${version}")
+                dataDir = dataDir ?: project.file("${environments.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
                 javaHome = javaHome ?: project.file(System.properties['java.home'])
 
                 if (plugins.isEmpty()) {
