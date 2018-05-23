@@ -92,6 +92,10 @@ pluginBundle {
             id = 'com.github.rodm.teamcity-common'
             displayName = 'Gradle TeamCity Common API plugin'
         }
+        teamcityEnvironmentsPlugin {
+            id = 'com.github.rodm.teamcity-environments'
+            displayName = 'Gradle TeamCity Environments plugin'
+        }
     }
 
     mavenCoordinates {
