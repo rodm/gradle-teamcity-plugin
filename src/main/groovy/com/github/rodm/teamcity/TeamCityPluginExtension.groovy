@@ -139,6 +139,9 @@ class TeamCityPluginExtension {
      * @param configuration The action.
      */
     void environments(Action<TeamCityEnvironments> configuration) {
+        if (!project.plugins.hasPlugin(TeamCityEnvironmentsPlugin)) {
+            project.logger.warn('Configuring environments with the teamcity-server plugin is deprecated. Please use the teamcity-environments plugin.')
+        }
         configuration.execute(environments)
     }
 }

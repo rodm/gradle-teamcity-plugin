@@ -33,6 +33,8 @@ import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.normalizePath
+import static org.hamcrest.CoreMatchers.containsString
+import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
@@ -46,6 +48,11 @@ class EnvironmentsTest {
 
     @Rule
     public final TemporaryFolder projectDir = new TemporaryFolder()
+
+    private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
+
+    @Rule
+    public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private String defaultOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
 
@@ -397,6 +404,36 @@ class EnvironmentsTest {
         assertThat(environment.plugins, hasSize(2))
         assertThat(environment.plugins, hasItem('plugin1.zip'))
         assertThat(environment.plugins, hasItem('plugin2.zip'))
+    }
+
+    private String ENVIRONMENTS_WARNING = 'Configuring environments with the teamcity-server plugin is deprecated'
+
+    @Test
+    void 'configuring environment with teamcity-environments plugin does not output warning'() {
+        outputEventListener.reset()
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                }
+            }
+        }
+
+        assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
+    }
+
+    @Test
+    void 'configuring environment with teamcity-server plugin outputs warning'() {
+        outputEventListener.reset()
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                }
+            }
+        }
+
+        assertThat(outputEventListener.toString(), containsString(ENVIRONMENTS_WARNING))
     }
 
     @Test

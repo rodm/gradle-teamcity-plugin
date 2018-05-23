@@ -32,6 +32,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.plugins.apply(TeamCityPlugin)
+
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
     }
