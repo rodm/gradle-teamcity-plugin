@@ -69,7 +69,7 @@ class EnvironmentsTest {
 
     @Test
     void defaultProperties() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.environments.getDownloadsDir(), equalTo('downloads'))
@@ -80,7 +80,7 @@ class EnvironmentsTest {
 
     @Test
     void alternativeDownloadsDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -94,7 +94,7 @@ class EnvironmentsTest {
 
     @Test
     void alternativeDownloadBaseUrl() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -108,7 +108,7 @@ class EnvironmentsTest {
 
     @Test
     void alternativeBaseDataDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -122,7 +122,7 @@ class EnvironmentsTest {
 
     @Test
     void alternativeBaseHomeDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -136,7 +136,7 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override default shared properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         Project mockProject = mock(Project)
         configureGradleProjectProperties(mockProject)
@@ -152,7 +152,7 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override shared properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         Project mockProject = mock(Project)
         configureGradleProjectProperties(mockProject)
@@ -188,7 +188,7 @@ class EnvironmentsTest {
 
     @Test
     void defaultOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -206,7 +206,7 @@ class EnvironmentsTest {
 
     @Test
     void replaceDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -224,7 +224,7 @@ class EnvironmentsTest {
 
     @Test
     void replaceDefaultServerOptionsWithMultipleValues() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -242,7 +242,7 @@ class EnvironmentsTest {
 
     @Test
     void addToDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -260,7 +260,7 @@ class EnvironmentsTest {
 
     @Test
     void addMultipleValuesToDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -278,7 +278,7 @@ class EnvironmentsTest {
 
     @Test
     void replaceDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -297,7 +297,7 @@ class EnvironmentsTest {
 
     @Test
     void replaceDefaultAdentOptionsWithMultipleValues() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -315,7 +315,7 @@ class EnvironmentsTest {
 
     @Test
     void addToDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -335,7 +335,7 @@ class EnvironmentsTest {
 
     @Test
     void addMultipleValuesToDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         project.teamcity {
             environments {
@@ -353,7 +353,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configure multiple plugins for an environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 test {
@@ -372,7 +372,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configure plugin with assignment replaces'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 test {
@@ -390,7 +390,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configure multiple plugins for an environment with a list'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 test {
@@ -438,7 +438,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks configures environments with default properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 test1 {
@@ -467,7 +467,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks configures environments using shared properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 baseDownloadUrl = 'http://local-repository'
@@ -499,7 +499,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks configures environment using environment properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 test {
@@ -525,7 +525,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks adds tasks for an environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 teamcity9 {
@@ -553,7 +553,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks adds tasks for each separate environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 teamcity9 {
@@ -576,6 +576,7 @@ class EnvironmentsTest {
     @Test
     void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with project plugin'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 teamcity10 {
@@ -603,7 +604,7 @@ class EnvironmentsTest {
 
     @Test
     void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with environment plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
                 teamcity10 {
@@ -646,7 +647,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configures startServer task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
@@ -660,7 +661,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configures stopServer task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
@@ -672,7 +673,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configures startAgent task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
@@ -685,7 +686,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configures stopAgent task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
@@ -697,7 +698,7 @@ class EnvironmentsTest {
 
     @Test
     void 'configures unpack task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
@@ -709,7 +710,7 @@ class EnvironmentsTest {
 
     @Test
     void 'extension has named child extensions'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity { }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)

@@ -116,7 +116,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 javaHome = javaHome ?: project.file(System.properties['java.home'])
 
                 if (plugins.isEmpty()) {
-                    def serverPlugin = project.tasks.getByName('serverPlugin')
+                    def serverPlugin = project.tasks.findByName('serverPlugin')
                     if (serverPlugin) {
                         plugins serverPlugin.archivePath
                     }
