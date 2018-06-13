@@ -22,7 +22,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
@@ -229,6 +231,32 @@ class EnvironmentsPluginFunctionalTest {
         assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(SUCCESS))
         assertFalse('Plugin1 archive not undeployed', plugin1File.exists())
         assertFalse('Plugin2 archive not undeployed', plugin2File.exists())
+    }
+
+    @Test
+    void 'deploy and undeploy tasks are ignored when no plugins are configured'() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.github.rodm.teamcity-environments'
+            }
+            teamcity {
+                version = '9.1'
+                environments {
+                    baseDataDir = 'teamcity/data'
+                    teamcity {
+                        version = '9.1.6'
+                    }
+                }
+            }
+        """
+
+        BuildResult result = executeBuild('deployToTeamcity')
+
+        assertThat(result.task(":deployToTeamcity").getOutcome(), is(NO_SOURCE))
+
+        result = executeBuild('undeployFromTeamcity')
+        assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(UP_TO_DATE))
     }
 
     private File createFakeTeamCityInstall(String baseDir, String version) {
