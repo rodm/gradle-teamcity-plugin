@@ -137,7 +137,11 @@ class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     private static void configureEnvironmentTasks(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate(new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension))
+        project.afterEvaluate {
+            if (!project.plugins.hasPlugin(TeamCityEnvironmentsPlugin)) {
+                new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
+            }
+        }
     }
 
     private static void configurePublishPluginTask(@NotNull Project project, TeamCityPluginExtension extension) {

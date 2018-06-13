@@ -437,6 +437,21 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'configuring environment with teamcity-environments and teamcity-server plugins does not output warning'() {
+        outputEventListener.reset()
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                }
+            }
+        }
+
+        assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
+    }
+
+    @Test
     void 'ConfigureEnvironmentTasks configures environments with default properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -630,6 +645,38 @@ class EnvironmentsTest {
         assertThat(fileTree.patterns.includes, hasSize(2))
         assertThat(fileTree.patterns.includes, hasItem('plugin1.zip'))
         assertThat(fileTree.patterns.includes, hasItem('plugin2.zip'))
+    }
+
+    @Test
+    void 'applying teamcity-server and teamcity-environments does not duplicate tasks'() {
+        outputEventListener.reset()
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                }
+            }
+        }
+        project.evaluate();
+
+        assertThat(project.tasks, hasTask('downloadTest'))
+    }
+
+    @Test
+    void 'applying teamcity-environments before teamcity-server does not duplicate environment tasks'() {
+        outputEventListener.reset()
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            environments {
+                test {
+                }
+            }
+        }
+        project.evaluate();
+
+        assertThat(project.tasks, hasTask('downloadTest'))
     }
 
     private Closure TEAMCITY10_ENVIRONMENT = {
