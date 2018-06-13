@@ -20,17 +20,20 @@ image:https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-pl
 
 === Applying the plugins to a build
 
-The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains three plugins:
+The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains four plugins:
 
 * `com.github.rodm.teamcity-server` - Provides tasks to package a TeamCity plugin, deploy and undeploy the plugin to a
 TeamCity server, and tasks to start and stop the server and default agent.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent side of a TeamCity plugin.
 * `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project.
+* `com.github.rodm.teamcity-environments` - Adds tasks to download, install, start and stop a TeamCity Server and
+ Build Agent.
 
 Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server[server],
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-agent[agent] and
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-common[common] plugins.
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-agent[agent],
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-common[common] and
+{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations
 
@@ -66,7 +69,7 @@ provides only the tasks to package and publish the server side plugin archive if
 
 The server plugin can be combined with the agent plugin in the same project but not with the Java Plugin.
 
-=== TeamCity Server Plugin Configuration
+==== Configuration
 
 The following properties can be defined in the `server` configuration block.
 
@@ -80,7 +83,7 @@ Defaults to the name of the root project and the project version.
 The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
 {uri-server-descriptor}[Server-Side Plugin Descriptor]
 
-=== TeamCity Server Plugin Tasks
+==== Tasks
 
 * `serverPlugin` : Builds and packages a TeamCity plugin. The task performs validation of the plugin descriptor
 and outputs a warning if a required value is missing.
@@ -93,7 +96,7 @@ the file to the build directory. ('build/descriptor/server')
 The plugin enhances the `jar` task to perform validation of the bean definition file and outputs a warning if
 no beans are defined or if a class is missing from the jar file.
 
-=== Examples
+==== Examples
 
 Plugin descriptor defined in the build script.
 
@@ -215,7 +218,7 @@ The following example uses the Kotlin DSL.
     }
 ----
 
-=== Publishing a plugin
+==== Publishing a plugin
 
 The `publishPlugin` task is used to upload the plugin archive to the
 {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]. Before publishing a plugin you will need
@@ -266,9 +269,142 @@ teamcity {
 
 It is recommended that the credentials for the JetBrains Plugin Repository are stored in `$HOME/.gradle/gradle.properties`.
 
-=== TeamCity Environments Configuration
+=== TeamCity Agent Plugin
 
-The environments configuration is available by applying the `com.github.rodm.teamcity-server` plugin.
+The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity `agent-api` and
+`tests-support` dependencies to the `compile` and `testCompile` configurations. If the Java Plugin is not applied the plugin
+provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
+
+==== Configuration
+
+The following properties can be defined in the `agent` configuration block.
+
+* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
+* `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
+if the descriptor is referencing an external file.
+* `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
+* `archiveName` : The archiveName property defines the name of the plugin archive output by the `agentPlugin` task.
+Defaults to the name of the root project with '-agent' appended and the project version.
+
+The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
+{uri-agent-descriptor}[Agent-Side Plugin Descriptor]
+
+==== Tasks
+
+* `agentPlugin` : Builds and packages the agent side of a TeamCity plugin. The artifacts defined on the 'agent'
+ configuration are added to the lib directory of the agent plugin archive.  The task performs validation of the plugin
+ descriptor and outputs a warning if a required value is missing.
+* `generateAgentDescriptor` : If the descriptor is defined in the build script this task is enabled and will
+output the descriptor to the build directory.
+* `processAgentDescriptor` : If the descriptor is defined as an external file this task will copy the file to the build
+directory. ('build/descriptor/agent')
+
+The plugin enhances the `jar` task to perform validation of the bean definition file and outputs a warning if
+no beans are defined or if a class is missing from the jar file.
+
+==== Examples
+
+Agent side plugin descriptor
+
+[source,groovy]
+[subs="attributes"]
+----
+    teamcity {
+        version = teamcityVersion
+
+        agent {
+            descriptor {
+                pluginDeployment {
+                    useSeparateClassloader = false
+                    executableFiles {
+                        include 'file1'
+                        include 'file2'
+                    }
+                }
+                dependencies {
+                    plugin 'plugin-name'
+                    tool 'tool-name'
+                }
+            }
+        }
+    }
+----
+
+Agent tool descriptor
+
+[source,groovy]
+[subs="attributes"]
+----
+    teamcity {
+        version = teamcityVersion
+
+        agent {
+            descriptor {
+                toolDeployment {
+                    executableFiles {
+                        include 'tooldir/file1'
+                        include 'tooldir/file2'
+                    }
+                }
+                dependencies {
+                    plugin 'plugin-name'
+                    tool 'tool-name'
+                }
+            }
+
+            // Additional files can be included in the agent plugin archive using the files configuration block
+            files {
+                into('tooldir') {
+                    from('tooldir')
+                }
+            }
+        }
+    }
+----
+
+The following example uses the Kotlin DSL.
+
+[source,groovy]
+[subs="attributes"]
+.build.gradle.kts
+----
+    extra["teamcityVersion"] = findProperty("teamcity.version") ?: "10.0"
+
+    teamcity {
+        version = extra["teamcityVersion"] as String
+
+        agent {
+            descriptor {
+                pluginDeployment {
+                    useSeparateClassloader = false
+                    executableFiles {
+                        include("file1")
+                        include("file2")
+                    }
+                }
+                dependencies {
+                    plugin("plugin-name")
+                    tool("tool-name")
+                }
+            }
+
+            files {
+                into("tooldir") {
+                    from("tooldir")
+                }
+            }
+        }
+    }
+----
+
+=== TeamCity Environments Plugin
+
+Applying this plugin provides tasks to download, install, start and stop a TeamCity Server and Build Agent.
+This allows a plugin to be debugged or tested against multiple versions of TeamCity.
+
+==== Configuration
+
+The environments configuration is available by applying the `com.github.rodm.teamcity-environments` plugin.
 
 The following properties can be defined in the `environments` configuration block.
 
@@ -285,7 +421,8 @@ by setting a value in a gradle.properties file.
 * `teamcity.environments.baseDataDir`
 * `teamcity.environments.baseHomeDir`
 
-Within the `environments` configuration block multiple TeamCity environments can be defined, each environment supports the following properties
+Within the `environments` configuration block multiple TeamCity environments can be defined, each environment
+supports the following properties
 
 * `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '{default-api-version}'.
 * `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl}/TeamCity-${version}.tar.gz`.
@@ -296,7 +433,9 @@ Within the `environments` configuration block multiple TeamCity environments can
  these plugin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
 * `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
 * `plugins` : The collection of plugins to be deployed to the TeamCity server for this environment. Defaults to the
-plugin output by the `serverPlugin` task.
+plugin output by the `serverPlugin` task when the `com.github.rodm.teamcity-server` plugin is also applied.
+
+==== Tasks
 
 For each environment the following tasks are created based on the environment name:
 
@@ -308,7 +447,7 @@ For each environment the following tasks are created based on the environment na
 * `stop<environment>Agent` : Stops the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
 * `install<environment>` : Downloads and installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
 
-Environments allow a plugin to be tested against multiple versions for TeamCity.
+==== Examples
 
 [source,groovy]
 [subs="attributes"]
@@ -412,134 +551,6 @@ The following example shows environments being configured using the Kotlin DSL.
 
     fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
         configure(configuration)
-    }
-----
-
-=== TeamCity Agent Plugin
-
-The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity `agent-api` and
-`tests-support` dependencies to the `compile` and `testCompile` configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
-
-=== TeamCity Agent Plugin Configuration
-
-The following properties can be defined in the `agent` configuration block.
-
-* `descriptor` : The plugin descriptor, the descriptor can be defined within the build script or reference an external file.
-* `tokens` : The tokens property is a map of tokens to be replaced in the descriptor file with values. This only applies
-if the descriptor is referencing an external file.
-* `files` : The files property is a CopySpec that defines additional files to be included in the plugin archive.
-* `archiveName` : The archiveName property defines the name of the plugin archive output by the `agentPlugin` task.
-Defaults to the name of the root project with '-agent' appended and the project version.
-
-The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
-{uri-agent-descriptor}[Agent-Side Plugin Descriptor]
-
-=== TeamCity Agent Plugin Tasks
-
-* `agentPlugin` : Builds and packages the agent side of a TeamCity plugin. The artifacts defined on the 'agent'
- configuration are added to the lib directory of the agent plugin archive.  The task performs validation of the plugin
- descriptor and outputs a warning if a required value is missing.
-* `generateAgentDescriptor` : If the descriptor is defined in the build script this task is enabled and will
-output the descriptor to the build directory.
-* `processAgentDescriptor` : If the descriptor is defined as an external file this task will copy the file to the build
-directory. ('build/descriptor/agent')
-
-The plugin enhances the `jar` task to perform validation of the bean definition file and outputs a warning if
-no beans are defined or if a class is missing from the jar file.
-
-=== Examples
-
-Agent side plugin descriptor
-
-[source,groovy]
-[subs="attributes"]
-----
-    teamcity {
-        version = teamcityVersion
-
-        agent {
-            descriptor {
-                pluginDeployment {
-                    useSeparateClassloader = false
-                    executableFiles {
-                        include 'file1'
-                        include 'file2'
-                    }
-                }
-                dependencies {
-                    plugin 'plugin-name'
-                    tool 'tool-name'
-                }
-            }
-        }
-    }
-----
-
-Agent tool descriptor
-
-[source,groovy]
-[subs="attributes"]
-----
-    teamcity {
-        version = teamcityVersion
-
-        agent {
-            descriptor {
-                toolDeployment {
-                    executableFiles {
-                        include 'tooldir/file1'
-                        include 'tooldir/file2'
-                    }
-                }
-                dependencies {
-                    plugin 'plugin-name'
-                    tool 'tool-name'
-                }
-            }
-
-            // Additional files can be included in the agent plugin archive using the files configuration block
-            files {
-                into('tooldir') {
-                    from('tooldir')
-                }
-            }
-        }
-    }
-----
-
-The following example uses the Kotlin DSL.
-
-[source,groovy]
-[subs="attributes"]
-.build.gradle.kts
-----
-    extra["teamcityVersion"] = findProperty("teamcity.version") ?: "10.0"
-
-    teamcity {
-        version = extra["teamcityVersion"] as String
-
-        agent {
-            descriptor {
-                pluginDeployment {
-                    useSeparateClassloader = false
-                    executableFiles {
-                        include("file1")
-                        include("file2")
-                    }
-                }
-                dependencies {
-                    plugin("plugin-name")
-                    tool("tool-name")
-                }
-            }
-
-            files {
-                into("tooldir") {
-                    from("tooldir")
-                }
-            }
-        }
     }
 ----
 
