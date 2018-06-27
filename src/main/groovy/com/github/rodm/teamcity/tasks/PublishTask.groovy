@@ -107,7 +107,7 @@ class PublishTask extends DefaultTask {
             for (String channel : channels) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
-                    def repoClient = new PluginRepositoryInstance(host, username, password)
+                    def repoClient = new PluginRepositoryInstance(host, getUsername(), getPassword())
                     repoClient.uploadPlugin(pluginId, distributionFile, channel && 'default' != channel ? channel : '')
                     LOGGER.info("Uploaded successfully")
                 }
