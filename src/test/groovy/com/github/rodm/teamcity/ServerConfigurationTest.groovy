@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.nullValue
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertThat
@@ -285,5 +286,18 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
         assertThat(publishPlugin.username, equalTo('username'))
         assertThat(publishPlugin.password, equalTo('password'))
+    }
+
+    @Test
+    void 'publish task is only created with publish configuration'() {
+        project.teamcity {
+            server {
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin, is(nullValue()))
     }
 }
