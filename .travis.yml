@@ -8,9 +8,6 @@ matrix:
   include:
     - os: linux
       dist: precise
-      jdk: oraclejdk7
-    - os: linux
-      dist: precise
       jdk: oraclejdk8
     - os: linux
       dist: trusty
