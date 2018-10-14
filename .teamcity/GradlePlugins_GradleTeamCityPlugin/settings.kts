@@ -1,29 +1,29 @@
 package GradlePlugins_GradleTeamCityPlugin
 
-import jetbrains.buildServer.configs.kotlin.v2017_2.version
-import jetbrains.buildServer.configs.kotlin.v2017_2.project
-import jetbrains.buildServer.configs.kotlin.v2017_2.BuildType
-import jetbrains.buildServer.configs.kotlin.v2017_2.CheckoutMode
-import jetbrains.buildServer.configs.kotlin.v2017_2.Template
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2017_2.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.VersionedSettings
-import jetbrains.buildServer.configs.kotlin.v2017_2.projectFeatures.versionedSettings
-import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.VcsTrigger
-import jetbrains.buildServer.configs.kotlin.v2017_2.triggers.vcs
-import jetbrains.buildServer.configs.kotlin.v2017_2.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.v2018_1.version
+import jetbrains.buildServer.configs.kotlin.v2018_1.project
+import jetbrains.buildServer.configs.kotlin.v2018_1.BuildType
+import jetbrains.buildServer.configs.kotlin.v2018_1.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2018_1.Template
+import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2018_1.projectFeatures.VersionedSettings
+import jetbrains.buildServer.configs.kotlin.v2018_1.projectFeatures.versionedSettings
+import jetbrains.buildServer.configs.kotlin.v2018_1.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.v2018_1.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2018_1.vcs.GitVcsRoot
 
-version = "2017.2"
+version = "2018.1"
 project {
     uuid = "eb3a697d-cd54-4621-bb47-d9daf32fec9a"
-    id = "GradlePlugins_GradleTeamCityPlugin"
-    parentId = "GradlePlugins"
+    id("GradlePlugins_GradleTeamCityPlugin")
+    parentId("GradlePlugins")
     name = "Gradle TeamCity Plugin"
 
     val vcsId = "GradleTeamcityPlugin"
     val vcs = GitVcsRoot({
         uuid = "0d4c8f2d-6673-4f1d-a16d-c2924ea2f114"
-        id = vcsId
+        id(vcsId)
         name = "gradle-teamcity-plugin"
         url = "https://github.com/rodm/gradle-teamcity-plugin.git"
         branchSpec = """
@@ -57,7 +57,7 @@ project {
 
     val buildTemplate = Template({
         uuid = "2e01646d-6212-453d-8fae-61093898e266"
-        id = "GradlePlugins_GradleTeamCityPlugin_Build"
+        id("GradlePlugins_GradleTeamCityPlugin_Build")
         name = "build"
 
         params {
@@ -115,17 +115,17 @@ project {
     template(buildTemplate)
 
     val buildJava7 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "757ce893-53d8-41b8-92a4-bd1b5450d0a9"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildJava7"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildJava7")
         name = "Build - Java 7"
     })
     buildType(buildJava7)
 
     val buildFunctionalTestJava7 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "401cdb0c-9c4b-4f56-a17e-f7ddc0823c04"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava7"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava7")
         name = "Build - Functional Test - Java 7"
 
         params {
@@ -139,9 +139,9 @@ project {
     buildType(buildFunctionalTestJava7)
 
     val buildFunctionalTestJava8 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "c8fd1023-03a2-40cd-a226-abbc5086ee47"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava8"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava8")
         name = "Build - Functional Test - Java 8"
 
         params {
@@ -156,9 +156,9 @@ project {
     buildType(buildFunctionalTestJava8)
 
     val buildFunctionalTestJava9 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "332c8e0a-7e3f-4b0c-9443-3a4e46a22eea"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava9"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava9")
         name = "Build - Functional Test - Java 9"
 
         params {
@@ -187,9 +187,9 @@ project {
     buildType(buildFunctionalTestJava9)
 
     val buildFunctionalTestJava10 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "332c8e0a-7e3f-4b0c-9443-3a4e46a22eeb"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava10"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava10")
         name = "Build - Functional Test - Java 10"
 
         params {
@@ -218,9 +218,9 @@ project {
     buildType(buildFunctionalTestJava10)
 
     val buildFunctionalTestJava11 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "332c8e0a-7e3f-4b0c-9443-3a4e46a22eec"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava11"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava11")
         name = "Build - Functional Test - Java 11"
 
         params {
@@ -249,9 +249,9 @@ project {
     buildType(buildFunctionalTestJava11)
 
     val buildSamplesTestJava7 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "1bd1f032-62a6-4fc7-9d2a-ef4be7db82c6"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildSamplesTestJava7"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildSamplesTestJava7")
         name = "Build - Samples Test - Java 7"
 
         artifactRules = "samples/**/build/distributions/*.zip"
@@ -267,9 +267,9 @@ project {
     buildType(buildSamplesTestJava7)
 
     val buildSamplesTestJava8 = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "473f178e-494b-4dd1-95dc-3719ac685bcc"
-        id = "GradlePlugins_GradleTeamCityPlugin_BuildSamplesTestJava8"
+        id("GradlePlugins_GradleTeamCityPlugin_BuildSamplesTestJava8")
         name = "Build - Samples Test - Java 8"
 
         artifactRules = "samples/**/build/distributions/*.zip"
@@ -286,9 +286,9 @@ project {
     buildType(buildSamplesTestJava8)
 
     val reportCodeQuality = BuildType({
-        template(buildTemplate)
+        templates(buildTemplate)
         uuid = "cac4b0be-d3cf-4028-8e77-ba22555e525f"
-        id = "GradlePlugins_GradleTeamCityPlugin_ReportCodeQuality"
+        id("GradlePlugins_GradleTeamCityPlugin_ReportCodeQuality")
         name = "Report - Code Quality"
 
         params {
