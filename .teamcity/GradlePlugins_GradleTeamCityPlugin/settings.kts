@@ -217,6 +217,37 @@ project {
     })
     buildType(buildFunctionalTestJava10)
 
+    val buildFunctionalTestJava11 = BuildType({
+        template(buildTemplate)
+        uuid = "332c8e0a-7e3f-4b0c-9443-3a4e46a22eec"
+        id = "GradlePlugins_GradleTeamCityPlugin_BuildFunctionalTestJava11"
+        name = "Build - Functional Test - Java 11"
+
+        params {
+            param("gradle.tasks", "clean functionalTest")
+            param("gradle.version", "4.10.2")
+            param("java.home", "%java11.home%")
+        }
+
+        steps {
+            script {
+                id = "RUNNER_23"
+                scriptContent = """
+                #!/bin/sh
+
+                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
+                JAVA_HOME=%java.home% ./gradlew --version
+                """.trimIndent()
+            }
+            stepsOrder = arrayListOf("RUNNER_23", "RUNNER_38")
+        }
+
+        failureConditions {
+            executionTimeoutMin = 20
+        }
+    })
+    buildType(buildFunctionalTestJava11)
+
     val buildSamplesTestJava7 = BuildType({
         template(buildTemplate)
         uuid = "1bd1f032-62a6-4fc7-9d2a-ef4be7db82c6"
@@ -276,5 +307,5 @@ project {
     })
     buildType(reportCodeQuality)
 
-    buildTypesOrder = arrayListOf(buildJava7, buildFunctionalTestJava7, buildFunctionalTestJava8, buildFunctionalTestJava9, buildFunctionalTestJava10, buildSamplesTestJava7, buildSamplesTestJava8, reportCodeQuality)
+    buildTypesOrder = arrayListOf(buildJava7, buildFunctionalTestJava7, buildFunctionalTestJava8, buildFunctionalTestJava9, buildFunctionalTestJava10, buildFunctionalTestJava11, buildSamplesTestJava7, buildSamplesTestJava8, reportCodeQuality)
 }
