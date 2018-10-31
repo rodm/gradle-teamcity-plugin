@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -28,15 +29,12 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
-import static org.gradle.api.JavaVersion.VERSION_1_7
-import static org.gradle.api.JavaVersion.VERSION_1_8
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.anything
 import static org.hamcrest.Matchers.isOneOf
 import static org.junit.Assume.assumeThat
 
@@ -56,7 +54,8 @@ class MultipleGradleVersionTest {
     @Parameterized.Parameters(name = 'Gradle {0}')
     static List<String> data() {
         return [
-                '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5.1', '4.6', '4.7', '4.8.1', '4.9', '4.10.1'
+            '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5.1', '4.6', '4.7', '4.8.1', '4.9', '4.10.2',
+            '5.0-rc-1'
         ]
     }
 
@@ -191,14 +190,24 @@ class MultipleGradleVersionTest {
 
     @Test
     void 'build plugin'() {
-        assumeThat(JavaVersion.current(), supportsGradle(version))
+        assumeThat(JavaVersion.current().toString(), supportsGradle(version) as Matcher<String>)
 
         BuildResult result = executeBuild(version)
         checkBuild(result)
     }
 
     Matcher supportsGradle(String version) {
-        return version < '4.3' ? isOneOf(VERSION_1_7, VERSION_1_8) : anything()
+        def gradleVersion = GradleVersion.version(version)
+        if (gradleVersion < GradleVersion.version('4.3')) {
+            return isOneOf('1.7', '1.8')
+        }
+        if (gradleVersion < GradleVersion.version('4.7')) {
+            return isOneOf('1.7', '1.8', '1.9')
+        }
+        if (gradleVersion < GradleVersion.version('5.0-rc-1')) {
+            return isOneOf('1.7', '1.8', '1.9', '1.10')
+        }
+        return isOneOf('1.8', '1.9', '1.10', '11')
     }
 
     private BuildResult executeBuild(String version) {
