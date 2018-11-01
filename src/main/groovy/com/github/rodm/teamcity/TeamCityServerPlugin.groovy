@@ -27,7 +27,6 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
-import org.jetbrains.annotations.NotNull
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
@@ -144,7 +143,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
     }
 
-    private static void configurePublishPluginTask(@NotNull Project project, TeamCityPluginExtension extension) {
+    private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
                 def buildPluginTask = project.tasks.findByName('serverPlugin') as Zip
