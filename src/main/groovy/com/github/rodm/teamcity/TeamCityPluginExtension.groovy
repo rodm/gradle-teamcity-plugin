@@ -43,11 +43,6 @@ class TeamCityPluginExtension {
         this.server = extensions.create('server', ServerPluginConfiguration, project, environments)
     }
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Integer getMajorVersion() {
-        return (version ==~ /(\d+)\..*/) ? (version =~ /(\d+)\..*/)[0][1] as int : null
-    }
-
     def getAgent() {
         return agent
     }

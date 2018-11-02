@@ -18,6 +18,7 @@ package com.github.rodm.teamcity.tasks
 import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityPluginExtension
+import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
@@ -51,13 +52,10 @@ class GenerateServerPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension)
-
-        def majorVersion = extension.getMajorVersion()
-        if (majorVersion != null && majorVersion < 9 && getDescriptor().dependencies.hasDependencies()) {
+        if (TeamCityVersion.version(getVersion()) < TeamCityVersion.version('9.0') && getDescriptor().dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), majorVersion)
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
     }
 }

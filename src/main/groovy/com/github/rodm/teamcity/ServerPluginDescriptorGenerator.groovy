@@ -23,9 +23,9 @@ class ServerPluginDescriptorGenerator {
 
     private ServerPluginDescriptor descriptor
 
-    private Integer version
+    private String version
 
-    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, Integer version) {
+    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version) {
         this.descriptor = descriptor
         this.version = version
     }
@@ -94,7 +94,7 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (version == null || version >= 9) {
+        if (TeamCityVersion.version(version) >= TeamCityVersion.version('9.0')) {
             if (descriptor.getDependencies().hasDependencies()) {
                 Node dependencies = root.appendNode('dependencies')
                 descriptor.getDependencies().plugins.each { name ->
