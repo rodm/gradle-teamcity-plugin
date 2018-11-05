@@ -40,8 +40,8 @@ class ServerDescriptorGeneratorTest {
 
     private TeamCityPluginExtension extension
 
-    private static ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
-        new ServerPluginDescriptorGenerator(descriptor, '9.0')
+    private ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
+        new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
     }
 
     @Before
@@ -223,6 +223,43 @@ class ServerDescriptorGeneratorTest {
 
         assertThat(writer.toString(), not(hasXPath('//deployment')))
         assertThat(writer.toString(), not(hasXPath('//parameters')))
+    }
+
+    @Test
+    void 'writes optional allow-runtime-reload when set'() {
+        project.teamcity {
+            version = '2018.2'
+            server {
+                descriptor {
+                    allowRuntimeReload = true
+                }
+            }
+        }
+        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//deployment/@allow-runtime-reload', equalTo('true')))
+    }
+
+    @Test
+    void 'writes optional allow-runtime-reload when set to false'() {
+        project.teamcity {
+            version = '2018.2'
+            server {
+                descriptor {
+                    allowRuntimeReload = false
+                }
+            }
+        }
+
+        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
+        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//deployment/@allow-runtime-reload', equalTo('false')))
     }
 
     @Test

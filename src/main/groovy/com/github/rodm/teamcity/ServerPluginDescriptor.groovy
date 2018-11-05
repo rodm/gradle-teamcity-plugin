@@ -96,6 +96,13 @@ class ServerPluginDescriptor {
     @Optional
     Boolean useSeparateClassloader
 
+    /**
+     * Plugin supports being reloaded at runtime without restarting the TeamCity Server.
+     */
+    @Input
+    @Optional
+    Boolean allowRuntimeReload
+
     @Nested
     Parameters parameters
 

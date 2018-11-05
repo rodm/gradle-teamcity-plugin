@@ -80,8 +80,13 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDeploymentNode(Node root) {
+        Map<String, Boolean> attributes = [:]
         if (descriptor.getUseSeparateClassloader() != null)
-            root.appendNode('deployment', ['use-separate-classloader': descriptor.getUseSeparateClassloader()])
+            attributes << ['use-separate-classloader': descriptor.getUseSeparateClassloader()]
+        if (TeamCityVersion.version(version) >= TeamCityVersion.version('2018.2') && descriptor.getAllowRuntimeReload() != null)
+            attributes << ['allow-runtime-reload': descriptor.getAllowRuntimeReload()]
+        if (attributes.size() > 0)
+            root.appendNode('deployment', attributes)
     }
 
     private void buildParametersNode(Node root) {
