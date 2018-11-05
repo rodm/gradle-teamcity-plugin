@@ -103,8 +103,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
             }
         }
         def descriptorFile = new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
-        packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-server-plugin-descriptor.xsd', descriptorFile))
-        packagePlugin.doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
         packagePlugin.with(extension.server.files)
         packagePlugin.onlyIf { extension.server.descriptor != null }
 
@@ -132,6 +130,16 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.afterEvaluate {
             Zip serverPlugin = (Zip) project.tasks.getByPath('serverPlugin')
             configurePluginArchiveTask(serverPlugin, extension.server.archiveName)
+            serverPlugin.doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version), descriptorFile))
+            serverPlugin.doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
+        }
+    }
+
+    private static String getSchemaPath(String version) {
+        if (TeamCityVersion.version(version) >= TeamCityVersion.version('2018.2')) {
+            '2018.2/teamcity-server-plugin-descriptor.xsd'
+        } else {
+            'teamcity-server-plugin-descriptor.xsd'
         }
     }
 
