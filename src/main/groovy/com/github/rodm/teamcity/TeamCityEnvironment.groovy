@@ -52,7 +52,11 @@ class TeamCityEnvironment {
 
     private List<Object> plugins = []
 
-    private List<String> serverOptions = ['-Dteamcity.development.mode=true', '-Dteamcity.development.shadowCopyClasses=true']
+    private List<String> serverOptions = [
+        '-Dteamcity.development.mode=true',
+        '-Dteamcity.development.shadowCopyClasses=true',
+        '-Dteamcity.superUser.token.saveToFile=true'
+    ]
 
     private List<String> agentOptions = []
 

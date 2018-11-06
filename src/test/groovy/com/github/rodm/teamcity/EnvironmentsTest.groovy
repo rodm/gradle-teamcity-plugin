@@ -54,7 +54,11 @@ class EnvironmentsTest {
     @Rule
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
-    private String defaultOptions = '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+    private String defaultOptions = [
+        '-Dteamcity.development.mode=true',
+        '-Dteamcity.development.shadowCopyClasses=true',
+        '-Dteamcity.superUser.token.saveToFile=true'
+    ].join(' ')
 
     private Project project
 
@@ -703,7 +707,7 @@ class EnvironmentsTest {
         assertThat(normalizePath(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
         assertThat(normalizePath(startServer.getDataDir()), endsWith('data/10.0'))
         assertThat(normalizePath(startServer.javaHome), endsWith('/opt/jdk1.8.0'))
-        assertThat(startServer.serverOptions, endsWith('-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'))
+        assertThat(startServer.serverOptions, endsWith(defaultOptions))
     }
 
     @Test
