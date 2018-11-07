@@ -199,6 +199,27 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'generator task outputs warning about dependencies not being supported for versions before 9.0'() {
+        project.teamcity {
+            version = '8.1'
+            agent {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name'
+                    }
+                }
+            }
+        }
+        projectDir.newFolder('build', 'descriptor', 'agent')
+
+        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+        task.generateDescriptor()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString('Plugin descriptor does not support dependencies for version 8.1'))
+    }
+
+    @Test
     void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             agent {
