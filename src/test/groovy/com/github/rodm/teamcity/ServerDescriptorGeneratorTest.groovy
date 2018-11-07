@@ -40,6 +40,11 @@ class ServerDescriptorGeneratorTest {
 
     private TeamCityPluginExtension extension
 
+    private ServerPluginDescriptorGenerator createGenerator() {
+        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
+        createGenerator(descriptor)
+    }
+
     private ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
         new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
     }
@@ -91,8 +96,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -141,8 +145,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -161,8 +164,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -182,8 +184,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -200,8 +201,7 @@ class ServerDescriptorGeneratorTest {
             }
         }
 
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -216,8 +216,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -235,8 +234,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -253,9 +251,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -274,8 +270,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -295,8 +290,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -314,8 +308,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -332,8 +325,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -352,8 +344,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -381,8 +372,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -399,8 +389,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -417,8 +406,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -435,8 +423,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
@@ -452,8 +439,7 @@ class ServerDescriptorGeneratorTest {
                 }
             }
         }
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
+        ServerPluginDescriptorGenerator generator = createGenerator()
 
         generator.writeTo(writer)
 
