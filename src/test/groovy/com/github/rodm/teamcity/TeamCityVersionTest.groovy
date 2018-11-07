@@ -17,6 +17,8 @@ package com.github.rodm.teamcity
 
 import org.junit.Test
 
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.lessThan
@@ -52,6 +54,8 @@ class TeamCityVersionTest {
         assertThat(version('2018.1.2'), lessThan(version('2018.1.3')))
         assertThat(version('2018.1.2'), lessThan(version('SNAPSHOT')))
 
+        assertThat(version('9.0'), equalTo(VERSION_9_0))
+        assertThat(version('2018.2'), equalTo(VERSION_2018_2))
         assertThat(version('10.0.5'), equalTo(version('10.0.5')))
         assertThat(version('SNAPSHOT'), equalTo(version('SNAPSHOT')))
 

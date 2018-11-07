@@ -18,6 +18,9 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import groovy.xml.XmlUtil
 
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
+
 @CompileStatic
 class ServerPluginDescriptorGenerator {
 
@@ -83,7 +86,7 @@ class ServerPluginDescriptorGenerator {
         Map<String, Boolean> attributes = [:]
         if (descriptor.getUseSeparateClassloader() != null)
             attributes << ['use-separate-classloader': descriptor.getUseSeparateClassloader()]
-        if (TeamCityVersion.version(version) >= TeamCityVersion.version('2018.2') && descriptor.getAllowRuntimeReload() != null)
+        if (TeamCityVersion.version(version) >= VERSION_2018_2 && descriptor.getAllowRuntimeReload() != null)
             attributes << ['allow-runtime-reload': descriptor.getAllowRuntimeReload()]
         if (attributes.size() > 0)
             root.appendNode('deployment', attributes)
@@ -99,7 +102,7 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (TeamCityVersion.version(version) >= TeamCityVersion.version('9.0')) {
+        if (TeamCityVersion.version(version) >= VERSION_9_0) {
             if (descriptor.getDependencies().hasDependencies()) {
                 Node dependencies = root.appendNode('dependencies')
                 descriptor.getDependencies().plugins.each { name ->

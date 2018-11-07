@@ -23,6 +23,13 @@ import java.util.regex.Pattern
 @CompileStatic
 class TeamCityVersion implements Comparable<TeamCityVersion> {
 
+    public static final TeamCityVersion VERSION_9_0
+    public static final TeamCityVersion VERSION_2018_2
+    static {
+        VERSION_9_0 = version('9.0')
+        VERSION_2018_2 = version('2018.2')
+    }
+
     private static final Pattern VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)')
 
     private final String version

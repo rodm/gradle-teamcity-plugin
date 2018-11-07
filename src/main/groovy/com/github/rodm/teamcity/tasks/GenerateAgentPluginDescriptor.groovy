@@ -25,6 +25,8 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
+
 @CompileStatic
 class GenerateAgentPluginDescriptor extends DefaultTask {
 
@@ -51,7 +53,7 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        if (TeamCityVersion.version(getVersion()) < TeamCityVersion.version('9.0') && getDescriptor().dependencies.hasDependencies()) {
+        if (TeamCityVersion.version(getVersion()) < VERSION_9_0 && getDescriptor().dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
         AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor())
