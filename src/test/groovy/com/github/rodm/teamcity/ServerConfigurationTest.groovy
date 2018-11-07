@@ -130,6 +130,25 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'generator task outputs warning about allowRuntimeReload not being supported for versions before 2018.2'() {
+        project.teamcity {
+            version = '2018.1'
+            server {
+                descriptor {
+                    allowRuntimeReload = true
+                }
+            }
+        }
+        projectDir.newFolder('build', 'descriptor', 'server')
+
+        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        task.generateDescriptor()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString('Plugin descriptor does not support allowRuntimeReload for version 2018.1'))
+    }
+
+    @Test
     void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             server {

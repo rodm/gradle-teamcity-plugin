@@ -25,6 +25,7 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 @CompileStatic
@@ -53,8 +54,12 @@ class GenerateServerPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        if (TeamCityVersion.version(getVersion()) < VERSION_9_0 && getDescriptor().dependencies.hasDependencies()) {
+        TeamCityVersion teamcityVersion = TeamCityVersion.version(getVersion())
+        if (teamcityVersion < VERSION_9_0 && getDescriptor().dependencies.hasDependencies()) {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
+        }
+        if (teamcityVersion < VERSION_2018_2 && getDescriptor().allowRuntimeReload != null) {
+            project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${getVersion()}")
         }
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
         getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
