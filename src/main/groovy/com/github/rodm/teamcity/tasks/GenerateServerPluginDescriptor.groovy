@@ -17,7 +17,6 @@ package com.github.rodm.teamcity.tasks
 
 import com.github.rodm.teamcity.ServerPluginDescriptor
 import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
-import com.github.rodm.teamcity.TeamCityPluginExtension
 import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
