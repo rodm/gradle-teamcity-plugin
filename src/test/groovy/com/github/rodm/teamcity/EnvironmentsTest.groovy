@@ -571,6 +571,48 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'configures deploy task with actions to disable and enable plugin for version 2018_2 and later'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '2018.2'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
+        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
+        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name))
+    }
+
+    @Test
+    void 'configures deploy task without actions to disable and enable plugin for version 2018_1 and earlier'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '2018.1'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
+        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
+        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name)))
+    }
+
+    @Test
     void 'ConfigureEnvironmentTasks adds tasks for each separate environment'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {

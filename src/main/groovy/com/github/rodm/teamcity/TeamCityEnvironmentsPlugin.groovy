@@ -25,8 +25,11 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
+
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 
 class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
@@ -73,6 +76,10 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     into { environment.pluginsDir }
                 }
                 deployPlugin.dependsOn build
+                if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
+                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir))
+                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir))
+                }
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
                     delete {
@@ -126,6 +133,136 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         private static String toFilename(String url) {
             return url[(url.lastIndexOf('/') + 1)..-1]
+        }
+    }
+
+    static abstract class AbstractPluginAction implements Action<Copy> {
+
+        private static final String SUPER_USER_TOKEN_PATH = 'system/pluginData/superUser/token.txt'
+
+        private Logger logger
+        private File dataDir
+        private boolean enable
+        private String path
+
+        private String host = 'localhost'
+        private int port = 8111
+
+        AbstractPluginAction(Logger logger, File dataDir, boolean enable) {
+            this.logger = logger
+            this.dataDir = dataDir
+            this.enable = enable
+        }
+
+        Logger getLogger() {
+            return logger
+        }
+
+        String getPath() {
+            return path
+        }
+
+        @Override
+        void execute(Copy copy) {
+            path = copy.path
+            copy.inputs.sourceFiles.files.each { file ->
+                processPlugin(file.name)
+            }
+        }
+
+        abstract void sendRequest(HttpURLConnection request);
+
+        void processPlugin(String pluginName) {
+            if (!isServerAvailable()) {
+                logger.info("${path}: Cannot connect to the server on http://${host}:${port}.")
+                return
+            }
+            def password
+            def tokenFile = new File(dataDir, SUPER_USER_TOKEN_PATH)
+            if (!tokenFile.isFile()) {
+                logger.warn("${path}: Maintenance token file does not exist. Cannot reload plugin.")
+                logger.warn("${path}: Check the server was started with '-Dteamcity.superUser.token.saveToFile=true' property.")
+                return
+            } else {
+                try {
+                    password = tokenFile.text.toLong().toString()
+                    logger.debug("${path}: Using ${password} maintenance token to authenticate")
+                }
+                catch (NumberFormatException ignored) {
+                    logger.warn("${path}: Malformed maintenance token")
+                    return
+                }
+            }
+
+            byte[] bytes = Base64.getEncoder().encode(":${password}".getBytes('UTF-8'))
+            String authToken = "Basic " + new String(bytes)
+
+            def actionURL = getPluginActionURL(pluginName)
+            logger.debug("${path}: Sending " + actionURL.toString())
+
+            HttpURLConnection request = actionURL.openConnection() as HttpURLConnection
+            request.requestMethod = "POST"
+            request.setRequestProperty ("Authorization", authToken)
+            try {
+                sendRequest(request)
+            }
+            catch (IOException ex) {
+                if (request.responseCode == 401) {
+                    logger.warn("${path}: Cannot authenticate with server on http://${host}:${port} with maintenance token ${password}.")
+                    logger.warn("${path}: Check the server was started with '-Dteamcity.superUser.token.saveToFile=true' property.")
+                }
+                logger.warn("${path}: Cannot connect to the server on http://${host}:${port}: ${request.responseCode}", ex)
+            }
+        }
+
+        private boolean isServerAvailable() {
+            try {
+                def socket = new Socket(host, port)
+                return socket.connected
+            }
+            catch (ConnectException ignored) {
+                return false
+            }
+        }
+
+        private URL getPluginActionURL(String pluginName) {
+            "http://${host}:${port}/httpAuth/admin/plugins.html?action=setEnabled&enabled=${enable}&pluginPath=%3CTeamCity%20Data%20Directory%3E/plugins/${pluginName}".toURL()
+        }
+    }
+
+    static class DisablePluginAction extends AbstractPluginAction {
+
+        DisablePluginAction(Logger logger, File dataDir) {
+            super(logger, dataDir, false)
+        }
+
+        void sendRequest(HttpURLConnection request) {
+            def result = request.inputStream.text
+            if (!result.contains("Plugin unloaded successfully")) {
+                if (result.contains("Plugin unloaded partially")) {
+                    logger.warn("${path}: Plugin partially unloaded - some parts could still be running. Server restart could be needed.")
+                } else {
+                    logger.warn(result)
+                }
+            } else {
+                logger.info("${path}: Plugin successfully unloaded")
+            }
+        }
+    }
+
+    static class EnablePluginAction extends AbstractPluginAction {
+
+        EnablePluginAction(Logger logger, File dataDir) {
+            super(logger, dataDir, true)
+        }
+
+        void sendRequest(HttpURLConnection request) {
+            def result = request.inputStream.text
+            if (!result.contains("Plugin loaded successfully")) {
+                logger.warn(result)
+            } else {
+                logger.info("${path}: Plugin successfully loaded")
+            }
         }
     }
 }
