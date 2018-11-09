@@ -122,7 +122,9 @@ Plugin descriptor defined in the build script.
                 email = 'me@example.com'
                 vendorUrl = 'vendor url'
                 vendorLogo = 'vendor logo'
+
                 useSeparateClassloader = true
+                allowRuntimeReload = true
 
                 minimumBuild = '10'
                 maximumBuild = '20'
@@ -191,7 +193,9 @@ The following example uses the Kotlin DSL.
                 email = "me@example.com"
                 vendorUrl = "vendor url"
                 vendorLogo = "vendor logo"
+
                 useSeparateClassloader = true
+                allowRuntimeReload = true
 
                 minimumBuild = "10"
                 maximumBuild = "20"
@@ -439,7 +443,10 @@ plugin output by the `serverPlugin` task when the `com.github.rodm.teamcity-serv
 
 For each environment the following tasks are created based on the environment name:
 
-* `deployTo<environment>` : Deploys one or more plugin archives to the TeamCity server for the environment, requires the environment `dataDir` property.
+* `deployTo<environment>` : Deploys one or more plugin archives to the TeamCity server for the environment, requires
+ the environment `dataDir` property. If the environment is using TeamCity version 2018.2 or later and the server is
+ running, the deploy task will disable and enable the plugin, if the descriptor property, `allowRuntimeReload`,
+ is set to true.
 * `undeployFrom<environment>` : Un-deploys one or more plugin archives from the TeamCity server for the environment, requires the environment `dataDir` property.
 * `start<environment>Sever` : Starts the TeamCity Server for the environment, requires the environment `homeDir` and `dataDir` properties to be defined.
 * `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
