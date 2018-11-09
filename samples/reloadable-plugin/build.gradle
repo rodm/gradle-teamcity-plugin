@@ -1,0 +1,57 @@
+
+plugins {
+    id 'java'
+    id 'com.github.rodm.teamcity-server' version '1.2-beta-1'
+    id 'com.github.rodm.teamcity-environments' version '1.2-beta-1'
+}
+
+group = 'com.github.rodm.teamcity'
+version = '1.0-SNAPSHOT'
+
+ext {
+    downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
+    serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
+    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
+}
+
+test {
+    useTestNG()
+}
+
+teamcity {
+    version = '2018.2-SNAPSHOT'
+
+    server {
+        descriptor {
+            name = project.name
+            displayName = project.name
+            version = project.version
+            vendorName = 'rodm'
+            vendorUrl = 'http://example.com'
+            description = 'TeamCity Example Server Plugin'
+
+            downloadUrl = 'https://github.com/rodm/gradle-teamcity-plugin/'
+            email = 'rod.n.mackenzie@gmail.com'
+
+            useSeparateClassloader = true
+            allowRuntimeReload = true
+
+            parameters {
+                parameter 'param', 'value'
+            }
+        }
+    }
+
+    environments {
+        downloadsDir = project.downloadsDir
+        baseHomeDir = project.serversDir
+        baseDataDir = 'data'
+
+        'teamcity2018.2' {
+            version = '2018.2'
+            homeDir = file("${baseHomeDir}/TeamCity-2018.2-EAP2")
+            javaHome = file(java8Home)
+//            serverOptions = [] // uncomment to disable super user token
+        }
+    }
+}
