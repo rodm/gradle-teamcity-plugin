@@ -199,7 +199,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'generator task outputs warning about dependencies not being supported for versions before 9.0'() {
+    void 'generator task outputs warning about dependencies not being supported for versions before 9_0'() {
         project.teamcity {
             version = '8.1'
             agent {

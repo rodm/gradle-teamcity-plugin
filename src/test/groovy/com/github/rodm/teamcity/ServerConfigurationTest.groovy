@@ -109,7 +109,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'generator task outputs warning about dependencies not being supported for versions before 9.0'() {
+    void 'generator task outputs warning about dependencies not being supported for versions before 9_0'() {
         project.teamcity {
             version = '8.1'
             server {
@@ -130,7 +130,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'generator task outputs warning about allowRuntimeReload not being supported for versions before 2018.2'() {
+    void 'generator task outputs warning about allowRuntimeReload not being supported for versions before 2018_2'() {
         project.teamcity {
             version = '2018.1'
             server {

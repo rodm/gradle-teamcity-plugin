@@ -70,7 +70,7 @@ class ValidateDescriptorSchemaActionTest {
     }
 
     @Test
-    void 'warn about allow-reload-plugin attribute when using schema for TeamCity 2018.1 and earlier'() {
+    void 'warn about allow-reload-plugin attribute when using schema for TeamCity 2018_1 and earlier'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
         Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
 
@@ -80,7 +80,7 @@ class ValidateDescriptorSchemaActionTest {
     }
 
     @Test
-    void 'no warnings when using schema for TeamCity 2018.2 and later'() {
+    void 'no warnings when using schema for TeamCity 2018_2 and later'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
         Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
 
