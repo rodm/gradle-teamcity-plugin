@@ -27,12 +27,12 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertThat
 import static org.junit.Assert.fail
 
 class ServerConfigurationTest extends ConfigurationTestCase {
@@ -146,6 +146,26 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         String output = outputEventListener.toString()
         assertThat(output, containsString('Plugin descriptor does not support allowRuntimeReload for version 2018.1'))
+    }
+
+    @Test
+    void 'generator task outputs descriptor encoded in UTF-8'() {
+        project.teamcity {
+            version = '2018.1'
+            server {
+                descriptor {
+                    description = 'àéîöū'
+                }
+            }
+        }
+        File outputDir = projectDir.newFolder('build', 'descriptor', 'server')
+
+        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        task.generateDescriptor()
+
+        File descriptorFile = new File(outputDir, 'teamcity-plugin.xml')
+        String contents = new String(descriptorFile.bytes, 'UTF-8')
+        assertThat(contents, containsString('àéîöū'))
     }
 
     @Test

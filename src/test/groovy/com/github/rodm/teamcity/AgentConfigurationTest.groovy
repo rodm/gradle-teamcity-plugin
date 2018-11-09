@@ -220,6 +220,28 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'generator task outputs descriptor encoded in UTF-8'() {
+        project.teamcity {
+            version = '2018.1'
+            agent {
+                descriptor {
+                    dependencies {
+                        plugin 'plugin-name-àéîöū'
+                    }
+                }
+            }
+        }
+        File outputDir = projectDir.newFolder('build', 'descriptor', 'agent')
+
+        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+        task.generateDescriptor()
+
+        File descriptorFile = new File(outputDir, 'teamcity-plugin.xml')
+        String contents = new String(descriptorFile.bytes, 'UTF-8')
+        assertThat(contents, containsString('plugin-name-àéîöū'))
+    }
+
+    @Test
     void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             agent {

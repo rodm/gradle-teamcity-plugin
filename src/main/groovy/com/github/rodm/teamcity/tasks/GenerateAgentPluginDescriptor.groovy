@@ -57,6 +57,6 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
             project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
         }
         AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor())
-        getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
+        getDestination().withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }

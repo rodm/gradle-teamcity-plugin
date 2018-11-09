@@ -62,6 +62,6 @@ class GenerateServerPluginDescriptor extends DefaultTask {
             project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${getVersion()}")
         }
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
-        getDestination().withPrintWriter { writer -> generator.writeTo(writer) }
+        getDestination().withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }
