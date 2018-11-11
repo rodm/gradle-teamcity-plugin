@@ -49,6 +49,7 @@ teamcity {
 
         'teamcity2018.2' {
             version = '2018.2'
+            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-60663.tar.gz'
             homeDir = file("${baseHomeDir}/TeamCity-2018.2-EAP2")
             javaHome = file(java8Home)
 //            serverOptions = [] // uncomment to disable super user token
