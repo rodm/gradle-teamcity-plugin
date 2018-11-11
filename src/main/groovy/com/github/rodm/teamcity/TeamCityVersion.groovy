@@ -41,6 +41,7 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     private TeamCityVersion(String version) {
         this.version = version
         Matcher matcher = VERSION_PATTERN.matcher(version)
+        if ('2018.2-SNAPSHOT' == version) return
         if (!matcher.matches() && 'SNAPSHOT' != version) {
             throw new IllegalArgumentException("'${version}' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')")
         }
@@ -51,6 +52,14 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     }
 
     int compareTo(TeamCityVersion teamcityVersion) {
+        if (version == '2018.2-SNAPSHOT' && teamcityVersion.version != '2018.2-SNAPSHOT') {
+            return 1
+        } else if (teamcityVersion.version == '2018.2-SNAPSHOT' && version != '2018.2-SNAPSHOT') {
+            return -1
+        } else if (version == teamcityVersion.version) {
+            return 0
+        }
+
         if (version == 'SNAPSHOT' && teamcityVersion.version != 'SNAPSHOT') {
             return 1
         } else if (teamcityVersion.version == 'SNAPSHOT' && version != 'SNAPSHOT') {

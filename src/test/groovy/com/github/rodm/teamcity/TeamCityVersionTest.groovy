@@ -42,7 +42,7 @@ class TeamCityVersionTest {
         assertInvalidVersion('10')
         assertInvalidVersion('10-SNAPSHOT')
         assertInvalidVersion('2018')
-        assertInvalidVersion('2018.2-SNAPSHOT')
+//        assertInvalidVersion('2018.2-SNAPSHOT')
         assertInvalidVersion('2018.2.1-SNAPSHOT')
     }
 
