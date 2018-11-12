@@ -21,6 +21,6 @@ public class ExampleServerPlugin extends BuildServerAdapter {
     public void register() {
         server.addListener(this);
         logger.info(String.format("ExampleServerPlugin: Plugin name: %s, version: %s", descriptor.getPluginName(), descriptor.getPluginVersion()));
-        logger.info(String.format("ExampleServerPlugin: Plugin parameter: param=%s", descriptor.getParameterValue("param")));
+        logger.info(String.format("ExampleServerPlugin: Plugin build time: %s", descriptor.getParameterValue("build-time")));
     }
 }

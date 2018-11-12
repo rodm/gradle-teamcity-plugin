@@ -1,3 +1,4 @@
+import java.time.LocalDateTime
 
 plugins {
     id 'java'
@@ -37,7 +38,7 @@ teamcity {
             allowRuntimeReload = true
 
             parameters {
-                parameter 'param', 'value'
+                parameter 'build-time', LocalDateTime.now()
             }
         }
     }
