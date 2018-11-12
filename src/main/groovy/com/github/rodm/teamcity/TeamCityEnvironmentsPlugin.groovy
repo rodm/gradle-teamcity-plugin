@@ -179,11 +179,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
             def password
             def tokenFile = new File(dataDir, SUPER_USER_TOKEN_PATH)
-            if (!tokenFile.isFile()) {
-                logger.warn("${path}: Maintenance token file does not exist. Cannot reload plugin.")
-                logger.warn("${path}: Check the server was started with '-Dteamcity.superUser.token.saveToFile=true' property.")
-                return
-            } else {
+            if (tokenFile.isFile()) {
                 try {
                     password = tokenFile.text.toLong().toString()
                     logger.debug("${path}: Using ${password} maintenance token to authenticate")
@@ -192,6 +188,10 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     logger.warn("${path}: Malformed maintenance token")
                     return
                 }
+            } else {
+                logger.warn("${path}: Maintenance token file does not exist. Cannot reload plugin.")
+                logger.warn("${path}: Check the server was started with '-Dteamcity.superUser.token.saveToFile=true' property.")
+                return
             }
 
             byte[] bytes = Base64.getEncoder().encode(":${password}".getBytes('UTF-8'))
@@ -238,14 +238,14 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         void sendRequest(HttpURLConnection request) {
             def result = request.inputStream.text
-            if (!result.contains("Plugin unloaded successfully")) {
+            if (result.contains("Plugin unloaded successfully")) {
+                logger.info("${path}: Plugin successfully unloaded")
+            } else {
                 if (result.contains("Plugin unloaded partially")) {
                     logger.warn("${path}: Plugin partially unloaded - some parts could still be running. Server restart could be needed.")
                 } else {
                     logger.warn(result)
                 }
-            } else {
-                logger.info("${path}: Plugin successfully unloaded")
             }
         }
     }
@@ -258,10 +258,10 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         void sendRequest(HttpURLConnection request) {
             def result = request.inputStream.text
-            if (!result.contains("Plugin loaded successfully")) {
-                logger.warn(result)
-            } else {
+            if (result.contains("Plugin loaded successfully")) {
                 logger.info("${path}: Plugin successfully loaded")
+            } else {
+                logger.warn(result)
             }
         }
     }
