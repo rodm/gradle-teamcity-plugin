@@ -66,3 +66,7 @@ are started, search for `Example1ServerPlugin` and `Example2ServerPlugin`.
 The `agent-tool-plugin` sample creates a tool that can be used in a Maven build step. Create a build configuration
 and add a Maven build step, set the Maven selection to `Custom` and the `Custom path` to `%teamcity.tool.maven3_5%`.
 Running the build will show the version of Maven used in the `Maven Build Info` tab.
+
+The `reloadable-plugin` outputs a log message with a descriptor parameter, `build-time`, when it starts, check
+the `teamcity-server.log` for entries from the `ExampleServerPlugin`. Executing the Gradle `deploy` task updates
+the plugin descriptor and reloads the plugin without restarting the TeamCity server.
