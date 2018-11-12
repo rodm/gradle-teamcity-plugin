@@ -24,7 +24,7 @@ import org.gradle.api.Project
  */
 class TeamCityPluginExtension {
 
-    String version = '9.0'
+    private String version = '9.0'
 
     boolean defaultRepositories = true
 
@@ -41,6 +41,20 @@ class TeamCityPluginExtension {
         this.environments = extensions.create('environments', TeamCityEnvironments, project)
         this.agent = extensions.create('agent', AgentPluginConfiguration, project)
         this.server = extensions.create('server', ServerPluginConfiguration, project, environments)
+    }
+
+    /**
+     * The version of the TeamCity API.
+     *
+     * @param configuration The action.
+     */
+     def setVersion(String version) {
+        this.version = version
+        TeamCityVersion.version(version)
+    }
+
+    def getVersion() {
+        return version
     }
 
     def getAgent() {

@@ -25,10 +25,7 @@ class TeamCityEnvironment {
      */
     final String name
 
-    /**
-     * The version of TeamCity this environment uses. Defaults to version '9.0'
-     */
-    String version = '9.0'
+    private String version = '9.0'
 
     /**
      * The download URL used to download the TeamCity distribution for this environment.
@@ -66,6 +63,18 @@ class TeamCityEnvironment {
 
     File getPluginsDir() {
         return new File(dataDir, 'plugins')
+    }
+
+    /**
+     * The version of TeamCity this environment uses. Defaults to version '9.0'
+     */
+    def getVersion() {
+        return version
+    }
+
+    def setVersion(String version) {
+        this.version = version
+        TeamCityVersion.version(version)
     }
 
     /**

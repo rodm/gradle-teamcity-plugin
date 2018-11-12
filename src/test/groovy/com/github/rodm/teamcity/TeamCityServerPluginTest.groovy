@@ -34,10 +34,11 @@ import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.Matchers.hasSize
+import static org.hamcrest.Matchers.startsWith
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertTrue
+import static org.junit.Assert.fail
 
 class TeamCityServerPluginTest {
 
@@ -80,6 +81,21 @@ class TeamCityServerPluginTest {
             version = '8.1.5'
         }
         assertEquals('8.1.5', project.extensions.getByName('teamcity').version)
+    }
+
+    @Test
+    void 'reject invalid version'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        try {
+            project.teamcity {
+                version = '123'
+            }
+            fail('Invalid version not rejected')
+        }
+        catch (IllegalArgumentException expected) {
+            assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
+        }
     }
 
     @Test

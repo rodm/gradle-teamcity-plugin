@@ -40,7 +40,9 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
+import static org.hamcrest.Matchers.startsWith
 import static org.junit.Assert.assertThat
+import static org.junit.Assert.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -206,6 +208,25 @@ class EnvironmentsTest {
         def environment = extension.environments.getByName('test')
         assertThat(environment.serverOptions, equalTo(defaultOptions))
         assertThat(environment.agentOptions, equalTo(''))
+    }
+
+    @Test
+    void 'reject invalid version'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+
+        try {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '123'
+                    }
+                }
+            }
+            fail('Invalid version not rejected')
+        }
+        catch (IllegalArgumentException expected ) {
+            assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
+        }
     }
 
     @Test
