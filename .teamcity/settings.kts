@@ -154,18 +154,7 @@ project {
             param("java.home", "%java9.home%")
         }
 
-        steps {
-            script {
-                id = "RUNNER_23"
-                scriptContent = """
-                #!/bin/sh
-
-                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
-                JAVA_HOME=%java.home% ./gradlew --version
-                """.trimIndent()
-            }
-            stepsOrder = arrayListOf("RUNNER_23", "RUNNER_38")
-        }
+        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
@@ -184,18 +173,7 @@ project {
             param("java.home", "%java10.home%")
         }
 
-        steps {
-            script {
-                id = "RUNNER_23"
-                scriptContent = """
-                #!/bin/sh
-
-                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
-                JAVA_HOME=%java.home% ./gradlew --version
-                """.trimIndent()
-            }
-            stepsOrder = arrayListOf("RUNNER_23", "RUNNER_38")
-        }
+        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
@@ -214,18 +192,7 @@ project {
             param("java.home", "%java11.home%")
         }
 
-        steps {
-            script {
-                id = "RUNNER_23"
-                scriptContent = """
-                #!/bin/sh
-
-                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
-                JAVA_HOME=%java.home% ./gradlew --version
-                """.trimIndent()
-            }
-            stepsOrder = arrayListOf("RUNNER_23", "RUNNER_38")
-        }
+        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
@@ -300,4 +267,19 @@ project {
         buildSamplesTestJava8,
         reportCodeQuality
     )
+}
+
+fun BuildType.addSwitchGradleStep() {
+    steps {
+        script {
+            id = "SWITCH_GRADLE"
+            scriptContent = """
+                #!/bin/sh
+
+                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
+                JAVA_HOME=%java.home% ./gradlew --version
+                """.trimIndent()
+        }
+        stepsOrder = arrayListOf("SWITCH_GRADLE", "RUNNER_38")
+    }
 }
