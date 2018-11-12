@@ -27,26 +27,6 @@ project {
     }
     vcsRoot(vcs)
 
-    features {
-//        versionedSettings {
-//            id = "PROJECT_EXT_8"
-//            mode = VersionedSettings.Mode.ENABLED
-//            rootExtId = vcsId
-//            showChanges = true
-//            settingsFormat = VersionedSettings.Format.KOTLIN
-//            buildSettingsMode = VersionedSettings.BuildSettingsMode.PREFER_SETTINGS_FROM_VCS
-//        }
-        feature {
-            id = "PROJECT_EXT_2"
-            type = "JetBrains.SharedResources"
-            param("quota", "1")
-            param("name", "GradlePluginBuildLimit")
-            param("id", "PROJECT_EXT_2")
-            param("type", "quoted")
-            param("enabled", "true")
-        }
-    }
-
     val buildTemplate = Template {
         id("Build")
         name = "build"
@@ -92,15 +72,6 @@ project {
                 id = "perfmon"
                 type = "perfmon"
             }
-            feature {
-                id = "BUILD_EXT_1"
-                type = "JetBrains.SharedResources"
-                param("locks-param", "GradlePluginBuildLimit readLock")
-            }
-        }
-
-        requirements {
-            doesNotEqual("teamcity.agent.jvm.os.name", "Linux", "RQ_15")
         }
     }
     template(buildTemplate)
