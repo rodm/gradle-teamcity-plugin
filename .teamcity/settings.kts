@@ -14,7 +14,7 @@ version = "2018.1"
 project {
 
     val vcsId = "GradleTeamcityPlugin"
-    val vcs = GitVcsRoot({
+    val vcs = GitVcsRoot {
         id(vcsId)
         name = "gradle-teamcity-plugin"
         url = "https://github.com/rodm/gradle-teamcity-plugin.git"
@@ -24,7 +24,7 @@ project {
         """.trimIndent()
         useTagsAsBranches = true
         useMirrors = false
-    })
+    }
     vcsRoot(vcs)
 
     features {
@@ -47,7 +47,7 @@ project {
         }
     }
 
-    val buildTemplate = Template({
+    val buildTemplate = Template {
         id("Build")
         name = "build"
 
@@ -102,17 +102,17 @@ project {
         requirements {
             doesNotEqual("teamcity.agent.jvm.os.name", "Linux", "RQ_15")
         }
-    })
+    }
     template(buildTemplate)
 
-    val buildJava7 = BuildType({
+    val buildJava7 = BuildType {
         templates(buildTemplate)
         id("BuildJava7")
         name = "Build - Java 7"
-    })
+    }
     buildType(buildJava7)
 
-    val buildFunctionalTestJava7 = BuildType({
+    val buildFunctionalTestJava7 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava7")
         name = "Build - Functional Test - Java 7"
@@ -124,10 +124,10 @@ project {
         failureConditions {
             executionTimeoutMin = 20
         }
-    })
+    }
     buildType(buildFunctionalTestJava7)
 
-    val buildFunctionalTestJava8 = BuildType({
+    val buildFunctionalTestJava8 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava8")
         name = "Build - Functional Test - Java 8"
@@ -140,10 +140,10 @@ project {
         failureConditions {
             executionTimeoutMin = 20
         }
-    })
+    }
     buildType(buildFunctionalTestJava8)
 
-    val buildFunctionalTestJava9 = BuildType({
+    val buildFunctionalTestJava9 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava9")
         name = "Build - Functional Test - Java 9"
@@ -170,10 +170,10 @@ project {
         failureConditions {
             executionTimeoutMin = 20
         }
-    })
+    }
     buildType(buildFunctionalTestJava9)
 
-    val buildFunctionalTestJava10 = BuildType({
+    val buildFunctionalTestJava10 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava10")
         name = "Build - Functional Test - Java 10"
@@ -200,10 +200,10 @@ project {
         failureConditions {
             executionTimeoutMin = 20
         }
-    })
+    }
     buildType(buildFunctionalTestJava10)
 
-    val buildFunctionalTestJava11 = BuildType({
+    val buildFunctionalTestJava11 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava11")
         name = "Build - Functional Test - Java 11"
@@ -230,10 +230,10 @@ project {
         failureConditions {
             executionTimeoutMin = 20
         }
-    })
+    }
     buildType(buildFunctionalTestJava11)
 
-    val buildSamplesTestJava7 = BuildType({
+    val buildSamplesTestJava7 = BuildType {
         templates(buildTemplate)
         id("BuildSamplesTestJava7")
         name = "Build - Samples Test - Java 7"
@@ -247,10 +247,10 @@ project {
         failureConditions {
             executionTimeoutMin = 15
         }
-    })
+    }
     buildType(buildSamplesTestJava7)
 
-    val buildSamplesTestJava8 = BuildType({
+    val buildSamplesTestJava8 = BuildType {
         templates(buildTemplate)
         id("BuildSamplesTestJava8")
         name = "Build - Samples Test - Java 8"
@@ -265,10 +265,10 @@ project {
         failureConditions {
             executionTimeoutMin = 15
         }
-    })
+    }
     buildType(buildSamplesTestJava8)
 
-    val reportCodeQuality = BuildType({
+    val reportCodeQuality = BuildType {
         templates(buildTemplate)
         id("ReportCodeQuality")
         name = "Report - Code Quality"
@@ -286,8 +286,18 @@ project {
                 param("initScriptName", "sonarqube.gradle")
             }
         }
-    })
+    }
     buildType(reportCodeQuality)
 
-    buildTypesOrder = arrayListOf(buildJava7, buildFunctionalTestJava7, buildFunctionalTestJava8, buildFunctionalTestJava9, buildFunctionalTestJava10, buildFunctionalTestJava11, buildSamplesTestJava7, buildSamplesTestJava8, reportCodeQuality)
+    buildTypesOrder = arrayListOf(
+        buildJava7,
+        buildFunctionalTestJava7,
+        buildFunctionalTestJava8,
+        buildFunctionalTestJava9,
+        buildFunctionalTestJava10,
+        buildFunctionalTestJava11,
+        buildSamplesTestJava7,
+        buildSamplesTestJava8,
+        reportCodeQuality
+    )
 }
