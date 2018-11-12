@@ -159,7 +159,7 @@ project {
 
         params {
             param("gradle.tasks", "clean functionalTest")
-            param("gradle.version", "5.0-rc-1")
+            param("gradle.version", "5.0-rc-2")
             param("java.home", "%java11.home%")
         }
 

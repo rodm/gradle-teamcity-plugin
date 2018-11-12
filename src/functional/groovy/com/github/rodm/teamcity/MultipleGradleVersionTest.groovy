@@ -55,7 +55,7 @@ class MultipleGradleVersionTest {
     static List<String> data() {
         return [
             '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5.1', '4.6', '4.7', '4.8.1', '4.9', '4.10.2',
-            '5.0-rc-1'
+            '5.0-rc-2'
         ]
     }
 
