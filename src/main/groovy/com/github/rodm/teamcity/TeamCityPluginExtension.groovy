@@ -48,7 +48,7 @@ class TeamCityPluginExtension {
      *
      * @param configuration The action.
      */
-     def setVersion(String version) {
+     void setVersion(String version) {
         this.version = version
         TeamCityVersion.version(version)
     }

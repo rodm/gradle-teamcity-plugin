@@ -72,7 +72,7 @@ class TeamCityEnvironment {
         return version
     }
 
-    def setVersion(String version) {
+    void setVersion(String version) {
         this.version = version
         TeamCityVersion.version(version)
     }
