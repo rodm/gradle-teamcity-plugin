@@ -23,4 +23,10 @@ public class ExampleServerPlugin extends BuildServerAdapter {
         logger.info(String.format("ExampleServerPlugin: Plugin name: %s, version: %s", descriptor.getPluginName(), descriptor.getPluginVersion()));
         logger.info(String.format("ExampleServerPlugin: Plugin build time: %s", descriptor.getParameterValue("build-time")));
     }
+
+    @Override
+    public void serverShutdown() {
+        server.removeListener(this);
+        logger.info(String.format("ExampleServerPlugin: Unregistered plugin %s", descriptor.getPluginName()));
+    }
 }
