@@ -68,7 +68,7 @@ class TeamCityEnvironment {
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
      */
-    def getVersion() {
+    String getVersion() {
         return version
     }
 

@@ -53,7 +53,7 @@ class TeamCityPluginExtension {
         TeamCityVersion.version(version)
     }
 
-    def getVersion() {
+    String getVersion() {
         return version
     }
 
