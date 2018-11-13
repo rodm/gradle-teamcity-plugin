@@ -10,7 +10,7 @@ apply {
 }
 
 dependencies {
-    compile(project(":common"))
+    implementation (project(":common"))
 }
 
 configure<TeamCityPluginExtension> {

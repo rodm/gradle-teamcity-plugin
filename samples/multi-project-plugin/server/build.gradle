@@ -10,7 +10,7 @@ ext {
 }
 
 dependencies {
-    compile project(':common')
+    implementation project(':common')
     agent project(path: ':agent', configuration: 'plugin')
 }
 

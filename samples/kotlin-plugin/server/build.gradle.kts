@@ -18,8 +18,8 @@ extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92"
 val agent = configurations.getByName("agent")
 
 dependencies {
-    compile(project(":common"))
-    agent(project(path = ":agent", configuration = "plugin"))
+    implementation (project(":common"))
+    agent (project(path = ":agent", configuration = "plugin"))
 }
 
 teamcity {

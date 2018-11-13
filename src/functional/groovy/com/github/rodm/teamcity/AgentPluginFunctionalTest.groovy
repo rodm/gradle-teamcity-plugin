@@ -336,8 +336,8 @@ class AgentPluginFunctionalTest {
                 id 'com.github.rodm.teamcity-agent'
             }
             dependencies {
-                compile 'org.apache.commons:commons-lang3:3.7'
-                runtime 'org.apache.commons:commons-math:2.2'
+                implementation 'org.apache.commons:commons-lang3:3.7'
+                runtimeOnly 'org.apache.commons:commons-math:2.2'
             }
             teamcity {
                 version = '8.1.5'

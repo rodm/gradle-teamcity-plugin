@@ -83,7 +83,7 @@ class MultipleGradleVersionTest {
                 apply plugin: 'com.github.rodm.teamcity-agent'
 
                 dependencies {
-                    compile project(':common')
+                    implementation project(':common')
                 }
 
                 teamcity {
@@ -100,7 +100,7 @@ class MultipleGradleVersionTest {
             }
 
             dependencies {
-                compile project(':common')
+                implementation project(':common')
                 agent project(path: ':agent', configuration: 'plugin')
             }
 

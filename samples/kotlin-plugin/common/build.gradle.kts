@@ -10,7 +10,7 @@ apply {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
+    implementation (kotlin("stdlib"))
 }
 
 configure<TeamCityPluginExtension> {

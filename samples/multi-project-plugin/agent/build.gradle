@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'com.github.rodm.teamcity-agent'
 
 dependencies {
-    compile project(':common')
+    implementation project(':common')
 }
 
 teamcity {

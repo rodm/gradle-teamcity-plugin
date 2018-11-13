@@ -116,14 +116,14 @@ class AgentAndServerPluginFunctionalTest {
             }
             project(':agent') {
                 dependencies {
-                    compile project(':common')
-                    compile files("\$rootDir/lib/agent-lib.jar")
+                    implementation project(':common')
+                    implementation files("\$rootDir/lib/agent-lib.jar")
                 }
             }
             project(':server') {
                 dependencies {
-                    compile project(':common')
-                    compile files("\$rootDir/lib/server-lib.jar")
+                    implementation project(':common')
+                    implementation files("\$rootDir/lib/server-lib.jar")
                 }
             }
 
