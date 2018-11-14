@@ -20,7 +20,7 @@ To build a sample plugin change into the plugin's directory the execute the foll
 The `server-plugin` sample contains an alternative build file the demonstrates using an external descriptor file.
 The plugin can be built by executing the following command
 
-    ../../gradlew -b build-alt.gradle clean build
+    ../../gradlew --include-build=../.. -b build-alt.gradle clean build
 
 To download and install a TeamCity distribution to test the plugin execute the following Gradle task
 

@@ -8,6 +8,7 @@ plugins {
 
 apply {
     plugin("com.github.rodm.teamcity-server")
+    plugin("com.github.rodm.teamcity-environments")
 }
 
 extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"

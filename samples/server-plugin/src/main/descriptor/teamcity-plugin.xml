@@ -10,6 +10,7 @@
         <email>rod.n.mackenzie@gmail.com</email>
         <vendor>
             <name>@VENDOR_NAME@</name>
+            <url>http://example.com</url>
         </vendor>
     </info>
     <deployment use-separate-classloader="false"/>
