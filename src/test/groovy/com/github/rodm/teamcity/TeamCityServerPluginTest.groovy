@@ -208,6 +208,31 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    void 'apply adds server-web-api to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'server-web-api', '9.0'))
+    }
+
+    @Test
+    void 'apply does not add server-web-api to the provided configuration for versions before 9_0'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            version = '8.1'
+        }
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, not(hasDependency('org.jetbrains.teamcity', 'server-web-api', '8.1')))
+    }
+
+    @Test
     void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-server'

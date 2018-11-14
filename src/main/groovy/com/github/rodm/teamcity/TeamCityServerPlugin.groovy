@@ -37,6 +37,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 class TeamCityServerPlugin implements Plugin<Project> {
 
@@ -63,6 +64,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
             project.afterEvaluate {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:server-api:${extension.version}"
+                    if (TeamCityVersion.version(extension.version) >= VERSION_9_0) {
+                        provided "org.jetbrains.teamcity:server-web-api:${extension.version}"
+                    }
 
                     testImplementation "org.jetbrains.teamcity:tests-support:${extension.version}"
                 }
