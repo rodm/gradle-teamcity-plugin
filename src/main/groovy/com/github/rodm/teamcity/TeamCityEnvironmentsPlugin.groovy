@@ -29,6 +29,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 
+import static com.github.rodm.teamcity.TeamCityPlugin.GROUP_NAME
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 
 class TeamCityEnvironmentsPlugin implements Plugin<Project> {
@@ -115,13 +116,13 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 project.tasks.create("start${name}") {
                     dependsOn = [startServer, startAgent]
-                    group = 'TeamCity'
+                    group = GROUP_NAME
                     description = 'Starts the TeamCity Server and Build Agent'
 
                 }
                 project.tasks.create("stop${name}") {
                     dependsOn = [stopServer, stopAgent]
-                    group = 'TeamCity'
+                    group = GROUP_NAME
                     description = 'Stops the TeamCity Server and Build Agent'
                 }
             }
