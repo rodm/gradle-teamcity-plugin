@@ -208,13 +208,13 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'apply adds tests-support to the testCompile configuration'() {
+    void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 
-        Configuration configuration = project.configurations.getByName('testCompile')
+        Configuration configuration = project.configurations.getByName('testImplementation')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'tests-support', '9.0'))
     }
 

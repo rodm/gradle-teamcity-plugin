@@ -64,7 +64,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:server-api:${extension.version}"
 
-                    testCompile "org.jetbrains.teamcity:tests-support:${extension.version}"
+                    testImplementation "org.jetbrains.teamcity:tests-support:${extension.version}"
                 }
             }
         }
