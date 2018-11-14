@@ -589,6 +589,8 @@ class EnvironmentsTest {
         assertThat(project.tasks, hasTask('stopTeamcity9Server'))
         assertThat(project.tasks, hasTask('startTeamcity9Agent'))
         assertThat(project.tasks, hasTask('stopTeamcity9Agent'))
+        assertThat(project.tasks, hasTask('startTeamcity9'))
+        assertThat(project.tasks, hasTask('stopTeamcity9'))
     }
 
     @Test

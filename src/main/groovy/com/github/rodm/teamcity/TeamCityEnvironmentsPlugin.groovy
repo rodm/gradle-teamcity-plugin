@@ -102,15 +102,27 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
                 stopServer.finalizedBy undeployPlugin
 
-                project.tasks.create(String.format('start%sAgent', name), StartAgent) {
+                def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
                     conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
 
-                project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
+                def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
                     conventionMapping.map('homeDir') { environment.homeDir }
                     conventionMapping.map('javaHome') { environment.javaHome }
+                }
+
+                project.tasks.create("start${name}") {
+                    dependsOn = [startServer, startAgent]
+                    group = 'TeamCity'
+                    description = 'Starts the TeamCity Server and Build Agent'
+
+                }
+                project.tasks.create("stop${name}") {
+                    dependsOn = [stopServer, stopAgent]
+                    group = 'TeamCity'
+                    description = 'Stops the TeamCity Server and Build Agent'
                 }
             }
         }
