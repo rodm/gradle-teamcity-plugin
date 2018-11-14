@@ -4,7 +4,7 @@ plugins {
 }
 
 ext {
-    teamcityVersion = '8.1.5'
+    teamcityVersion = '2017.1'
 }
 
 subprojects {
