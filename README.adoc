@@ -52,9 +52,9 @@ server plugin archives.
 
 === Extension Properties
 
-The following properties are defined in the `teamcity` configuration block. The version property controls the version of
-the TeamCity `server-api` added to the `compile` configuration and the version downloaded and installed. The plugin
-descriptor can be specified as a path to a file or by a configuration block within the build script.
+The following properties are defined in the `teamcity` configuration block. The version property controls the version
+of the TeamCity API dependencies added to the `provided` configuration. The plugin descriptor can be specified as a
+path to a file or by a configuration block within the build script.
 
 * `version` : The version of the TeamCity API to build against. Defaults to '{default-api-version}'.
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
@@ -63,9 +63,10 @@ and the TeamCity repository, https://download.jetbrains.com/teamcity-repository,
 
 === TeamCity Server Plugin
 
-The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity `server-api` and
-`tests-support` dependencies to the `compile` and `testCompile` configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package and publish the server side plugin archive if a plugin descriptor is defined.
+The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity `server-api`,
+`server-web-api` and `tests-support` dependencies to the `provided` and `testImplementation` configurations. If the
+Java Plugin is not applied the plugin provides only the tasks to package and publish the server side plugin archive
+if a plugin descriptor is defined.
 
 The server plugin can be combined with the agent plugin in the same project but not with the Java Plugin.
 
@@ -276,8 +277,8 @@ It is recommended that the credentials for the JetBrains Plugin Repository are s
 === TeamCity Agent Plugin
 
 The plugin when applied with the Java Plugin, adds the JetBrains Maven repository and adds the TeamCity `agent-api` and
-`tests-support` dependencies to the `compile` and `testCompile` configurations. If the Java Plugin is not applied the plugin
-provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
+`tests-support` dependencies to the `provided` and `testImplementation` configurations. If the Java Plugin is not
+applied the plugin provides only the tasks to package the agent side plugin archive if a plugin descriptor is defined.
 
 ==== Configuration
 
