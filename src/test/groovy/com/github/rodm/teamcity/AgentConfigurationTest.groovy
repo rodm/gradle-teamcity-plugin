@@ -345,6 +345,17 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'apply adds tests-support to the testImplementation configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('testImplementation')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'tests-support', '9.0'))
+    }
+
+    @Test
     void 'agent-side plugin artifact is published to the plugin configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-agent'

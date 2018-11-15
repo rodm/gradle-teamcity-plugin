@@ -61,6 +61,8 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             project.afterEvaluate {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:agent-api:${extension.version}"
+
+                    testImplementation "org.jetbrains.teamcity:tests-support:${extension.version}"
                 }
             }
         }
