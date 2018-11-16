@@ -48,7 +48,7 @@ class SamplesTest {
     @Test
     void serverPluginWithAlternativeBuildFile() {
         File projectDir = new File(samplesDir, 'server-plugin')
-        BuildResult result = executeBuild(projectDir, '-b', 'build-alt.gradle', 'clean', 'build')
+        BuildResult result = executeBuild(projectDir, '--include-build', '../..', '-b', 'build-alt.gradle', 'clean', 'build')
 
         assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
