@@ -29,7 +29,7 @@ import static org.junit.Assert.fail
 class TeamCityVersionTest {
 
     @Test
-    public void 'valid TeamCity versions'() {
+    void 'valid TeamCity versions'() {
         version('10.0')
         version('10.0.5')
         version('2017.1.2')
@@ -59,6 +59,7 @@ class TeamCityVersionTest {
         assertThat(version('10.0.5'), equalTo(version('10.0.5')))
         assertThat(version('SNAPSHOT'), equalTo(version('SNAPSHOT')))
 
+        assertThat(version('9.0.1'), greaterThan(version('9.0')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
     }
 
