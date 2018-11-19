@@ -27,15 +27,13 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
-import org.xml.sax.SAXNotRecognizedException
-
-import javax.xml.XMLConstants
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
+import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
@@ -189,10 +187,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         @Override
         void execute(Task task) {
-            def parser = new XmlParser()
-            parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
-            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
+            def parser = createXmlParser()
             def descriptor = parser.parse(descriptorFile)
 
             if (descriptor.info.name.text().trim().isEmpty()) {
@@ -213,13 +208,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
             if (descriptor.info.vendor.url.text().trim().isEmpty()) {
                 LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor url'))
             }
-        }
-
-        private static void setParserProperty(XmlParser parser, String uri, Object value) {
-            try {
-                parser.setProperty(uri, value)
-            }
-            catch (SAXNotRecognizedException ignore) { }
         }
     }
 }

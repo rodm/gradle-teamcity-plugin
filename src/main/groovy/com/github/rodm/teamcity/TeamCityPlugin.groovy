@@ -140,6 +140,27 @@ class TeamCityPlugin implements Plugin<Project> {
         }
     }
 
+    static XmlParser createXmlParser() {
+        return createXmlParser(false)
+    }
+
+    static XmlParser createXmlParser(boolean offline) {
+        def parser = new XmlParser(false, true, true)
+        if (offline) {
+            parser.setFeature('http://apache.org/xml/features/nonvalidating/load-external-dtd', false)
+        }
+        setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
+        setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
+        return parser
+    }
+
+    private static void setParserProperty(XmlParser parser, String uri, Object value) {
+        try {
+            parser.setProperty(uri, value)
+        }
+        catch (SAXNotRecognizedException ignore) { }
+    }
+
     static class ConfigureRepositories implements Action<Project> {
 
         private TeamCityPluginExtension extension
@@ -247,25 +268,12 @@ class TeamCityPlugin implements Plugin<Project> {
 
         def getBeans(boolean offline) {
             List<PluginBean> pluginBeans = []
-            def parser = new XmlParser()
-            if (offline) {
-                parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            }
-            parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
-            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
-            setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
+            def parser = createXmlParser(offline)
             def beans = parser.parse(definitionFile)
             beans.bean.each { bean ->
                 pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
             }
             return pluginBeans
-        }
-
-        private static void setParserProperty(XmlParser parser, String uri, Object value) {
-            try {
-                parser.setProperty(uri, value)
-            }
-            catch (SAXNotRecognizedException ignore) { }
         }
     }
 

@@ -33,6 +33,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
+import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 
 class TeamCityAgentPlugin implements Plugin<Project> {
 
@@ -164,7 +165,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         }
 
         def getExecutableFiles() {
-            def parser = new XmlParser(false, true, true)
+            def parser = createXmlParser()
             def descriptor = parser.parse(descriptor)
             return descriptor.breadthFirst().findAll { node -> node.name() == 'include' }.flatten { node -> node['@name'] }
         }
