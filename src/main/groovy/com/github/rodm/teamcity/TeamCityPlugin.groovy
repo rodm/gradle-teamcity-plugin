@@ -237,7 +237,8 @@ class TeamCityPlugin implements Plugin<Project> {
             List<PluginBean> beans
             try {
                 beans = definition.getBeans(offline)
-            } catch (Exception e) {
+            }
+            catch (IOException e) {
                 LOGGER.warn(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
                 return
             }
