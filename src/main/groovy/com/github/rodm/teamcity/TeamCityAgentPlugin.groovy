@@ -48,8 +48,10 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
 
-        if (project.plugins.hasPlugin(JavaPlugin) && project.plugins.hasPlugin(TeamCityServerPlugin)) {
-            throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
+        project.plugins.withType(JavaPlugin) {
+            if (project.plugins.hasPlugin(TeamCityServerPlugin)) {
+                throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin")
+            }
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)

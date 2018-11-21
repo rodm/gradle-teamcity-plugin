@@ -43,7 +43,7 @@ class AgentServerConfigurationTest {
     }
 
     @Test
-    void cannotApplyServerPluginWithAgentAndJavaPlugin() {
+    void 'cannot apply server plugin with java and agent plugins'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-agent'
 
@@ -53,13 +53,53 @@ class AgentServerConfigurationTest {
     }
 
     @Test
-    void cannotApplyAgentPluginWithServerAndavaPlugin() {
+    void 'cannot apply server plugin with agent and java plugins'() {
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'java'
+
+        thrown.expect(GradleException)
+        thrown.expectMessage('Failed to apply plugin')
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+    }
+
+    @Test
+    void 'cannot apply agent plugin with java and sever plugins'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         thrown.expect(GradleException)
         thrown.expectMessage('Failed to apply plugin')
         project.apply plugin: 'com.github.rodm.teamcity-agent'
+    }
+
+    @Test
+    void 'cannot apply agent plugin with server and java plugins'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'java'
+
+        thrown.expect(GradleException)
+        thrown.expectMessage('Failed to apply plugin')
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+    }
+
+    @Test
+    void 'cannot apply java plugin with agent and server plugins'() {
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        thrown.expect(GradleException)
+        thrown.expectMessage('Failed to apply plugin')
+        project.apply plugin: 'java'
+    }
+
+    @Test
+    void 'cannot apply java plugin with server and agent plugins'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+
+        thrown.expect(GradleException)
+        thrown.expectMessage('Failed to apply plugin')
+        project.apply plugin: 'java'
     }
 
     @Test
