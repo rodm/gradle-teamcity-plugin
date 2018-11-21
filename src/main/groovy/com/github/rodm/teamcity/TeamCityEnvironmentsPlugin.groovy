@@ -183,7 +183,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
-        abstract void sendRequest(HttpURLConnection request);
+        abstract void sendRequest(HttpURLConnection request, String pluginName);
 
         void processPlugin(String pluginName) {
             if (!isServerAvailable()) {
@@ -217,7 +217,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             request.requestMethod = "POST"
             request.setRequestProperty ("Authorization", authToken)
             try {
-                sendRequest(request)
+                sendRequest(request, pluginName)
             }
             catch (IOException ex) {
                 if (request.responseCode == 401) {
@@ -249,15 +249,16 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             super(logger, dataDir, false)
         }
 
-        void sendRequest(HttpURLConnection request) {
+        void sendRequest(HttpURLConnection request, String pluginName) {
             def result = request.inputStream.text
             if (result.contains("Plugin unloaded successfully")) {
-                logger.info("${path}: Plugin successfully unloaded")
+                logger.info("${path}: Plugin '${pluginName}' successfully unloaded")
             } else {
                 if (result.contains("Plugin unloaded partially")) {
-                    logger.warn("${path}: Plugin partially unloaded - some parts could still be running. Server restart could be needed.")
+                    logger.warn("${path}: Plugin '${pluginName}' partially unloaded - some parts could still be running. Server restart could be needed.")
                 } else {
-                    logger.warn(result)
+                    def message = result.replace('<response>', '').replace('</response>', '')
+                    logger.warn("${path}: Disabling plugin '${pluginName}' failed: ${message}")
                 }
             }
         }
@@ -269,12 +270,13 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             super(logger, dataDir, true)
         }
 
-        void sendRequest(HttpURLConnection request) {
+        void sendRequest(HttpURLConnection request, String pluginName) {
             def result = request.inputStream.text
             if (result.contains("Plugin loaded successfully")) {
-                logger.info("${path}: Plugin successfully loaded")
+                logger.info("${path}: Plugin '${pluginName}' successfully loaded")
             } else {
-                logger.warn(result)
+                def message = result.replace('<response>', '').replace('</response>', '')
+                logger.warn("${path}: Enabling plugin '${pluginName}' failed: ${message}")
             }
         }
     }
