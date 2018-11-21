@@ -120,13 +120,15 @@ class TeamCityPlugin implements Plugin<Project> {
     }
 
     static void configureJarTask(Project project, String pattern) {
-        Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
-        if (jarTask) {
-            List<PluginDefinition> pluginDefinitions = []
-            Set<String> classes = []
-            jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
-            jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
-            jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+        project.afterEvaluate {
+            Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
+            if (jarTask) {
+                List<PluginDefinition> pluginDefinitions = []
+                Set<String> classes = []
+                jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
+                jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
+                jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+            }
         }
     }
 

@@ -153,6 +153,7 @@ class ValidateDefinitionActionTest {
         Jar mockJarTask = mockJar(project)
 
         project.pluginManager.apply(TeamCityServerPlugin)
+        project.evaluate()
 
         verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
         verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
@@ -164,8 +165,20 @@ class ValidateDefinitionActionTest {
         Jar mockJarTask = mockJar(project)
 
         project.pluginManager.apply(TeamCityServerPlugin)
+        project.evaluate()
 
         verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+    }
+
+    @Test
+    void 'applying java plugin after server plugin configures jar task'() {
+        project.pluginManager.apply(TeamCityServerPlugin)
+        project.pluginManager.apply(JavaPlugin)
+        project.evaluate()
+
+        Jar jar = project.tasks.getByName('jar') as Jar
+        List<String> taskActionClassNames = jar.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -174,6 +187,7 @@ class ValidateDefinitionActionTest {
         Jar mockJarTask = mockJar(project)
 
         project.pluginManager.apply(TeamCityAgentPlugin)
+        project.evaluate()
 
         verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
         verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
@@ -185,8 +199,20 @@ class ValidateDefinitionActionTest {
         Jar mockJarTask = mockJar(project)
 
         project.pluginManager.apply(TeamCityAgentPlugin)
+        project.evaluate()
 
         verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+    }
+
+    @Test
+    void 'applying java plugin after agent plugin configures jar task'() {
+        project.pluginManager.apply(TeamCityAgentPlugin)
+        project.pluginManager.apply(JavaPlugin)
+        project.evaluate()
+
+        Jar jar = project.tasks.getByName('jar') as Jar
+        List<String> taskActionClassNames = jar.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
     @Test
