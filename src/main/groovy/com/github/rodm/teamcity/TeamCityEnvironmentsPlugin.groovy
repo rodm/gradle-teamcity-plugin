@@ -207,8 +207,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 return
             }
 
-            byte[] bytes = Base64.getEncoder().encode(":${password}".getBytes('UTF-8'))
-            String authToken = "Basic " + new String(bytes)
+            String authToken = "Basic " + ":${password}".bytes.encodeBase64().toString()
 
             def actionURL = getPluginActionURL(pluginName)
             logger.debug("${path}: Sending " + actionURL.toString())
@@ -228,7 +227,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
-        private boolean isServerAvailable() {
+        boolean isServerAvailable() {
             try {
                 def socket = new Socket(host, port)
                 return socket.connected

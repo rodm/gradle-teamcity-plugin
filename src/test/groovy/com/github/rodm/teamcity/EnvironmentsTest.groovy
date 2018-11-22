@@ -23,6 +23,7 @@ import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.testfixtures.ProjectBuilder
@@ -35,13 +36,13 @@ import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.startsWith
-import static org.junit.Assert.assertThat
 import static org.junit.Assert.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -837,5 +838,101 @@ class EnvironmentsTest {
         assertThat(agent, isA(AgentPluginConfiguration))
         assertThat(server, isA(ServerPluginConfiguration))
         assertThat(environments, isA(TeamCityEnvironments))
+    }
+
+    static class TestPluginAction extends TeamCityEnvironmentsPlugin.AbstractPluginAction {
+
+        HttpURLConnection request
+        String pluginName
+
+        TestPluginAction(Logger logger, File dataDir, boolean enable) {
+            super(logger, dataDir, enable)
+        }
+
+        @Override
+        void sendRequest(HttpURLConnection request, String pluginName) {
+            this.request = request
+            this.pluginName = pluginName
+        }
+
+        boolean isServerAvailable() {
+            return true
+        }
+    }
+
+    private void createMaintenanceTokenFile() {
+        File pluginDir = projectDir.newFolder('system', 'pluginData', 'superUser')
+        File maintenanceTokenFile = new File(pluginDir, 'token.txt')
+        maintenanceTokenFile << '0123456789012345'
+    }
+
+    @Test
+    void 'does not send plugin action request when maintenance token file is not available'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, false) {
+            @Override
+            void sendRequest(HttpURLConnection request, String pluginName) {
+                fail('Should not send request when maintenance token file not available')
+            }
+        }
+
+        action.processPlugin('test-plugin.zip')
+
+        assertThat(outputEventListener.toString(), containsString('Maintenance token file does not exist'))
+        assertThat(outputEventListener.toString(), containsString('Cannot reload plugin.'))
+    }
+
+    @Test
+    void 'sends plugin action to correct path'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, false)
+        createMaintenanceTokenFile()
+
+        action.processPlugin('test-plugin.zip')
+
+        def url = action.request.URL
+        assertThat(url.path, equalTo('/httpAuth/admin/plugins.html') )
+    }
+
+    @Test
+    void 'sends plugin action with authorization token from maintenance file'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        createMaintenanceTokenFile()
+
+        action.processPlugin('test-plugin.zip')
+
+        def authToken = action.request.requests.findValue('Authorization')
+        assertThat(authToken, containsString('Basic OjEyMzQ1Njc4OTAxMjM0NQ==') )
+    }
+
+    @Test
+    void 'sends plugin action request with plugin name'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, false)
+        createMaintenanceTokenFile()
+
+        action.processPlugin('test-plugin.zip')
+
+        def url = action.request.URL
+        assertThat(url.query, containsString('plugins/test-plugin.zip') )
+    }
+
+    @Test
+    void 'sends plugin action with settings to disable plugin'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, false)
+        createMaintenanceTokenFile()
+
+        action.processPlugin('test-plugin.zip')
+
+        def url = action.request.URL
+        assertThat(url.query, containsString('action=setEnabled&enabled=false') )
+    }
+
+    @Test
+    void 'sends plugin action with settings to enable plugin'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        createMaintenanceTokenFile()
+
+        action.processPlugin('test-plugin.zip')
+
+        def url = action.request.URL
+        assertThat(url.query, containsString('action=setEnabled&enabled=true') )
     }
 }
