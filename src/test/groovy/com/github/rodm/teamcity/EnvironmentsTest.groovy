@@ -935,4 +935,58 @@ class EnvironmentsTest {
         def url = action.request.URL
         assertThat(url.query, containsString('action=setEnabled&enabled=true') )
     }
+
+    @Test
+    void 'disabling plugin unload response logs success'() {
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root)
+        createMaintenanceTokenFile()
+
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin unloaded successfully".bytes))
+
+        action.sendRequest(request, 'plugin-name.zip')
+
+        assertThat(outputEventListener.toString(), containsString("Plugin 'plugin-name.zip' successfully unloaded"))
+        assertThat(outputEventListener.toString(), not(containsString('partially unloaded')))
+        assertThat(outputEventListener.toString(), not(containsString('Disabling plugin')))
+    }
+
+    @Test
+    void 'disabling plugin unexpected response logs failure'() {
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root)
+        createMaintenanceTokenFile()
+
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Unexpected response".bytes))
+
+        action.sendRequest(request, 'plugin-name.zip')
+
+        assertThat(outputEventListener.toString(), containsString("Disabling plugin 'plugin-name.zip' failed:"))
+    }
+
+    @Test
+    void 'enabling plugin loaded response logs success'() {
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root)
+        createMaintenanceTokenFile()
+
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin loaded successfully".bytes))
+
+        action.sendRequest(request, 'plugin-name.zip')
+
+        assertThat(outputEventListener.toString(), containsString("Plugin 'plugin-name.zip' successfully loaded"))
+    }
+
+    @Test
+    void 'enabling plugin unexpected response logs failure'() {
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root)
+        createMaintenanceTokenFile()
+
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Unexpected response".bytes))
+
+        action.sendRequest(request, 'plugin-name.zip')
+
+        assertThat(outputEventListener.toString(), containsString("Enabling plugin 'plugin-name.zip' failed:"))
+    }
 }
