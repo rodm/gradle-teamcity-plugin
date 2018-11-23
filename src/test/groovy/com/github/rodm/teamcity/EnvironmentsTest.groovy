@@ -43,6 +43,8 @@ import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.startsWith
+import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
 import static org.junit.Assert.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -840,13 +842,18 @@ class EnvironmentsTest {
         assertThat(environments, isA(TeamCityEnvironments))
     }
 
-    static class TestPluginAction extends TeamCityEnvironmentsPlugin.AbstractPluginAction {
+    static class TestPluginAction extends TeamCityEnvironmentsPlugin.PluginAction {
 
         HttpURLConnection request
         String pluginName
 
         TestPluginAction(Logger logger, File dataDir, boolean enable) {
-            super(logger, dataDir, enable)
+            super(logger, dataDir, [], enable)
+        }
+
+        @Override
+        boolean canExecuteAction(Copy copy, String pluginName) {
+            return false
         }
 
         @Override
@@ -875,7 +882,7 @@ class EnvironmentsTest {
             }
         }
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         assertThat(outputEventListener.toString(), containsString('Maintenance token file does not exist'))
         assertThat(outputEventListener.toString(), containsString('Cannot reload plugin.'))
@@ -886,7 +893,7 @@ class EnvironmentsTest {
         def action = new TestPluginAction(project.logger, projectDir.root, false)
         createMaintenanceTokenFile()
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         def url = action.request.URL
         assertThat(url.path, equalTo('/httpAuth/admin/plugins.html') )
@@ -897,7 +904,7 @@ class EnvironmentsTest {
         def action = new TestPluginAction(project.logger, projectDir.root, true)
         createMaintenanceTokenFile()
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         def authToken = action.request.requests.findValue('Authorization')
         assertThat(authToken, containsString('Basic OjEyMzQ1Njc4OTAxMjM0NQ==') )
@@ -908,7 +915,7 @@ class EnvironmentsTest {
         def action = new TestPluginAction(project.logger, projectDir.root, false)
         createMaintenanceTokenFile()
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         def url = action.request.URL
         assertThat(url.query, containsString('plugins/test-plugin.zip') )
@@ -919,7 +926,7 @@ class EnvironmentsTest {
         def action = new TestPluginAction(project.logger, projectDir.root, false)
         createMaintenanceTokenFile()
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         def url = action.request.URL
         assertThat(url.query, containsString('action=setEnabled&enabled=false') )
@@ -930,7 +937,7 @@ class EnvironmentsTest {
         def action = new TestPluginAction(project.logger, projectDir.root, true)
         createMaintenanceTokenFile()
 
-        action.processPlugin('test-plugin.zip')
+        action.executeAction('test-plugin.zip')
 
         def url = action.request.URL
         assertThat(url.query, containsString('action=setEnabled&enabled=true') )
@@ -938,7 +945,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unload response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root)
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -953,7 +960,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root)
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -966,7 +973,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin loaded response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root)
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -979,7 +986,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root)
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -988,5 +995,103 @@ class EnvironmentsTest {
         action.sendRequest(request, 'plugin-name.zip')
 
         assertThat(outputEventListener.toString(), containsString("Enabling plugin 'plugin-name.zip' failed:"))
+    }
+
+    boolean wasRequestSent = false
+
+    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins) {
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin unloaded successfully".bytes))
+        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, plugins) {
+            void executeAction(String pluginName) {
+                sendRequest(request, pluginName)
+                wasRequestSent = true
+            }
+        }
+    }
+
+    private TeamCityEnvironmentsPlugin.EnablePluginAction createEnablePluginAction(def plugins) {
+        def request = mock(HttpURLConnection)
+        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin loaded successfully".bytes))
+        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, plugins) {
+            void executeAction(String pluginName) {
+                sendRequest(request, pluginName)
+                wasRequestSent = true
+            }
+        }
+    }
+
+    @Test
+    void 'disable plugin request not sent for a new plugin'() {
+        def pluginName = 'test-plugin.zip'
+        File pluginDir = projectDir.newFolder('plugins')
+        File pluginFile = projectDir.newFile(pluginName)
+        def deploy = project.tasks.create('deploy', Copy) {
+            from { "${pluginFile.name}" }
+            into { pluginDir }
+        }
+
+        List<String> plugins = []
+        def action = createDisablePluginAction(plugins)
+
+        action.execute(deploy)
+
+        assertFalse(wasRequestSent)
+        assertThat('new plugin requires enabling', plugins, hasItem(pluginName))
+    }
+
+    @Test
+    void 'disable plugin request sent for an existing plugin'() {
+        def pluginName = 'test-plugin.zip'
+        File pluginDir = projectDir.newFolder('plugins')
+        projectDir.newFile("plugins/${pluginName}")
+        File pluginFile = projectDir.newFile(pluginName)
+        def deploy = project.tasks.create('deploy', Copy) {
+            from { "${pluginFile.name}" }
+            into { pluginDir }
+        }
+
+        List<String> plugins = []
+        def action = createDisablePluginAction(plugins)
+
+        action.execute(deploy)
+
+        assertTrue(wasRequestSent)
+        assertThat('existing plugin requires re-enabling', plugins, hasItem(pluginName))
+    }
+
+    @Test
+    void 'enable plugin request not sent if plugin was not disabled'() {
+        def pluginName = 'test-plugin.zip'
+        File pluginDir = projectDir.newFolder('plugins')
+        File pluginFile = projectDir.newFile(pluginName)
+        def deploy = project.tasks.create('deploy', Copy) {
+            from { "${pluginFile.name}" }
+            into { pluginDir }
+        }
+        List<String> plugins = []
+        def action = createEnablePluginAction(plugins)
+
+        action.execute(deploy)
+
+        assertFalse(wasRequestSent)
+    }
+
+    @Test
+    void 'enable plugin request sent if plugin was disabled'() {
+        def pluginName = 'test-plugin.zip'
+        File pluginDir = projectDir.newFolder('plugins')
+        File pluginFile = projectDir.newFile(pluginName)
+        def deploy = project.tasks.create('deploy', Copy) {
+            from { "${pluginFile.name}" }
+            into { pluginDir }
+        }
+        // disabled and new plugins are added to list by disable action
+        List<String> plugins = [pluginName]
+        def action = createEnablePluginAction(plugins)
+
+        action.execute(deploy)
+
+        assertTrue(wasRequestSent)
     }
 }

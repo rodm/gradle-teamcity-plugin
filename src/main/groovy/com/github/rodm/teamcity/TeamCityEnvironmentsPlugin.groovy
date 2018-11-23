@@ -78,8 +78,9 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
                 deployPlugin.dependsOn build
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
-                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir))
-                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir))
+                    def plugins = []
+                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins))
+                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins))
                 }
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
@@ -149,21 +150,23 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
-    static abstract class AbstractPluginAction implements Action<Copy> {
+    static abstract class PluginAction implements Action<Copy> {
 
         private static final String SUPER_USER_TOKEN_PATH = 'system/pluginData/superUser/token.txt'
 
         private Logger logger
         private File dataDir
+        protected List<String> plugins
         private boolean enable
         private String path
 
         private String host = 'localhost'
         private int port = 8111
 
-        AbstractPluginAction(Logger logger, File dataDir, boolean enable) {
+        PluginAction(Logger logger, File dataDir, List<String> plugins, boolean enable) {
             this.logger = logger
             this.dataDir = dataDir
+            this.plugins = plugins
             this.enable = enable
         }
 
@@ -179,13 +182,19 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         void execute(Copy copy) {
             path = copy.path
             copy.inputs.sourceFiles.files.each { file ->
-                processPlugin(file.name)
+                if (canExecuteAction(copy, file.name)) {
+                    executeAction(file.name)
+                } else {
+                    skipAction(file.name)
+                }
             }
         }
 
-        abstract void sendRequest(HttpURLConnection request, String pluginName);
+        abstract boolean canExecuteAction(Copy copy, String pluginName)
 
-        void processPlugin(String pluginName) {
+        abstract void sendRequest(HttpURLConnection request, String pluginName)
+
+        void executeAction(String pluginName) {
             if (!isServerAvailable()) {
                 logger.info("${path}: Cannot connect to the server on http://${host}:${port}.")
                 return
@@ -227,6 +236,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
+        void skipAction(String pluginName) {}
+
         boolean isServerAvailable() {
             try {
                 def socket = new Socket(host, port)
@@ -242,16 +253,27 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
-    static class DisablePluginAction extends AbstractPluginAction {
+    static class DisablePluginAction extends PluginAction {
 
-        DisablePluginAction(Logger logger, File dataDir) {
-            super(logger, dataDir, false)
+        DisablePluginAction(Logger logger, File dataDir, List<String> plugins) {
+            super(logger, dataDir, plugins, false)
+        }
+
+        @Override
+        boolean canExecuteAction(Copy copy, String pluginName) {
+            new File(copy.destinationDir, pluginName).exists()
+        }
+
+        @Override
+        void skipAction(String pluginName) {
+            plugins.add(pluginName)
         }
 
         void sendRequest(HttpURLConnection request, String pluginName) {
             def result = request.inputStream.text
             if (result.contains("Plugin unloaded successfully")) {
                 logger.info("${path}: Plugin '${pluginName}' successfully unloaded")
+                plugins.add(pluginName)
             } else {
                 if (result.contains("Plugin unloaded partially")) {
                     logger.warn("${path}: Plugin '${pluginName}' partially unloaded - some parts could still be running. Server restart could be needed.")
@@ -263,10 +285,15 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
-    static class EnablePluginAction extends AbstractPluginAction {
+    static class EnablePluginAction extends PluginAction {
 
-        EnablePluginAction(Logger logger, File dataDir) {
-            super(logger, dataDir, true)
+        EnablePluginAction(Logger logger, File dataDir, List<String> plugins) {
+            super(logger, dataDir, plugins, true)
+        }
+
+        @Override
+        boolean canExecuteAction(Copy copy, String pluginName) {
+            plugins.contains(pluginName)
         }
 
         void sendRequest(HttpURLConnection request, String pluginName) {
