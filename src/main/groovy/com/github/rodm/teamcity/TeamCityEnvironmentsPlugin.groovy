@@ -238,7 +238,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
-        @SuppressWarnings("GroovyUnusedDeclaration")
+        @SuppressWarnings('UnusedMethodParameter')
         void skipAction(String pluginName) {}
 
         boolean isServerAvailable() {
