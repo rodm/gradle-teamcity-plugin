@@ -81,12 +81,12 @@ class ValidateDescriptorSchemaActionTest {
 
     @Test
     void 'no warnings when using schema for TeamCity 2018_2 and later'() {
-        def schema = 'teamcity-server-plugin-descriptor.xsd'
+        def schema = '2018.2/teamcity-server-plugin-descriptor.xsd'
         Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
 
         validationAction.execute(stubTask)
 
-        assertThat(outputEventListener.toString(), not(containsString(warningFor('allow', 'deployment'))))
+        assertThat(outputEventListener.toString(), not(containsString(warningFor('allow-runtime-reload', 'deployment'))))
     }
 
     private static String warningFor(String attribute, String element) {
