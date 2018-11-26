@@ -22,6 +22,7 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Unpack
 import de.undercouch.gradle.tasks.download.Download
+import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -150,6 +151,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
+    @CompileStatic
     static abstract class PluginAction implements Action<Copy> {
 
         private static final String SUPER_USER_TOKEN_PATH = 'system/pluginData/superUser/token.txt'
@@ -236,6 +238,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
+        @SuppressWarnings("GroovyUnusedDeclaration")
         void skipAction(String pluginName) {}
 
         boolean isServerAvailable() {
@@ -253,6 +256,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
+    @CompileStatic
     static class DisablePluginAction extends PluginAction {
 
         DisablePluginAction(Logger logger, File dataDir, List<String> plugins) {
@@ -285,6 +289,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
     }
 
+    @CompileStatic
     static class EnablePluginAction extends PluginAction {
 
         EnablePluginAction(Logger logger, File dataDir, List<String> plugins) {
