@@ -59,7 +59,7 @@ project {
             vcs {
                 id = "vcsTrigger"
                 quietPeriodMode = VcsTrigger.QuietPeriodMode.USE_DEFAULT
-                branchFilter = "+:<default>"
+                branchFilter = "+:*"
             }
         }
 
