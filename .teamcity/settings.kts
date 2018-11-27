@@ -86,11 +86,11 @@ project {
     val buildJava11 = BuildType {
         templates(buildTemplate)
         id("BuildJava11")
-        name = "Build - Java 11 - Gradle 5.0"
+        name = "Build - Java 10 - Gradle 4.10"
 
         params {
-            param("gradle.version", "5.0")
-            param("java.home", "%java11.home%")
+            param("gradle.version", "4.10.2")
+            param("java.home", "%java10.home%")
         }
 
         addSwitchGradleStep()
