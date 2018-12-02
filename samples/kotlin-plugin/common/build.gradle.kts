@@ -1,18 +1,13 @@
 
-import com.github.rodm.teamcity.TeamCityPluginExtension
-
 plugins {
     kotlin("jvm")
-}
-
-apply {
-    plugin("com.github.rodm.teamcity-common")
+    id ("com.github.rodm.teamcity-common")
 }
 
 dependencies {
     implementation (kotlin("stdlib"))
 }
 
-configure<TeamCityPluginExtension> {
+teamcity {
     version = rootProject.extra["teamcityVersion"] as String
 }

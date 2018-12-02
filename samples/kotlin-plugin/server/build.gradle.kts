@@ -1,14 +1,10 @@
 
 import com.github.rodm.teamcity.TeamCityEnvironment
-import com.github.rodm.teamcity.TeamCityPluginExtension
 
 plugins {
     kotlin("jvm")
-}
-
-apply {
-    plugin("com.github.rodm.teamcity-server")
-    plugin("com.github.rodm.teamcity-environments")
+    id ("com.github.rodm.teamcity-server")
+    id ("com.github.rodm.teamcity-environments")
 }
 
 extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
@@ -59,9 +55,4 @@ teamcity {
             javaHome = file(extra["java8Home"] as String)
         }
     }
-}
-
-// Extension function to allow cleaner configuration
-fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
-    configure(configuration)
 }
