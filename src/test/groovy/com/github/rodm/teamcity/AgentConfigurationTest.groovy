@@ -471,4 +471,19 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
         assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
     }
+
+    @Test
+    void 'archive name configured using archivesBaseName property'() {
+        project.archivesBaseName = 'my-plugin'
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
+        assertThat(agentPlugin.archiveName, equalTo('my-plugin-agent.zip'))
+    }
 }

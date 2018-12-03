@@ -352,6 +352,21 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'archive name configured using archivesBaseName property'() {
+        project.archivesBaseName = 'my-plugin'
+        project.teamcity {
+            server {
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        assertThat(serverPlugin.archiveName, equalTo('my-plugin.zip'))
+    }
+
+    @Test
     void 'publish task is configured with username and password'() {
         project.teamcity {
             server {

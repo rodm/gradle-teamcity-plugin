@@ -78,7 +78,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         packagePlugin.description = 'Package TeamCity Agent plugin'
         packagePlugin.group = 'TeamCity'
         packagePlugin.with {
-            baseName = "${project.rootProject.name}-agent"
+            appendix = 'agent'
             into("lib") {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]

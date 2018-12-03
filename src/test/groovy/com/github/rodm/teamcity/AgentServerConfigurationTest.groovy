@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Rule
@@ -24,8 +25,10 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import org.junit.rules.TemporaryFolder
 
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
-import static org.junit.Assert.assertThat
+import static org.hamcrest.CoreMatchers.not
+import static org.hamcrest.MatcherAssert.assertThat
 
 class AgentServerConfigurationTest {
 
@@ -125,5 +128,27 @@ class AgentServerConfigurationTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
         assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
+    }
+
+    @Test
+    void 'agent and server archive names do not clash'() {
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.archivesBaseName = 'my-plugin'
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+            server {
+                descriptor {}
+            }
+        }
+
+        project.evaluate()
+
+        Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        assertThat(agentPlugin.archiveName, not(equalTo(serverPlugin.archiveName)))
     }
 }

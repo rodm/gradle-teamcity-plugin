@@ -81,7 +81,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
         packagePlugin.description = 'Package TeamCity plugin'
         packagePlugin.group = 'TeamCity'
         packagePlugin.with {
-            baseName = "${project.rootProject.name}"
             into('server') {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
