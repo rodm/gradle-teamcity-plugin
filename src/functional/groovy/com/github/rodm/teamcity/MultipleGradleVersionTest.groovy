@@ -90,6 +90,7 @@ class MultipleGradleVersionTest {
                     version = '8.1.5'
 
                     agent {
+                        archiveName = 'test-plugin-agent'
                         descriptor {
                             pluginDeployment {
                                 useSeparateClassloader = false
@@ -108,6 +109,7 @@ class MultipleGradleVersionTest {
                 version = '8.1.5'
 
                 server {
+                    archiveName = 'test-plugin'
                     descriptor {
                         name = 'test-plugin'
                         displayName = 'Test plugin'
