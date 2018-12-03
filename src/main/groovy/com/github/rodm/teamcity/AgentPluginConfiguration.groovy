@@ -35,7 +35,9 @@ class AgentPluginConfiguration extends PluginConfiguration {
      * @param configuration The action.
      */
     def descriptor(Action<AgentPluginDescriptor> configuration) {
-        descriptor = extensions.create('descriptor', AgentPluginDescriptor)
+        if (!descriptor) {
+            descriptor = extensions.create('descriptor', AgentPluginDescriptor)
+        }
         configuration.execute(descriptor)
     }
 }

@@ -113,6 +113,64 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'allow agent descriptor and plugin deployment to be created from multiple configuration blocks'() {
+        project.teamcity {
+            agent {
+                descriptor {
+                    pluginDeployment {
+                        useSeparateClassloader = true
+                    }
+                }
+            }
+        }
+        project.teamcity {
+            agent {
+                descriptor {
+                    pluginDeployment {
+                        executableFiles {
+                            include 'file1'
+                            include 'file2'
+                        }
+                    }
+                }
+            }
+        }
+
+        PluginDeployment deployment = extension.agent.descriptor.deployment
+        assertThat(deployment.useSeparateClassloader, equalTo(Boolean.TRUE))
+        assertThat(deployment.executableFiles.includes, hasSize(2))
+    }
+
+    @Test
+    void 'allow agent descriptor and tool deployment to be created from multiple configuration blocks'() {
+        project.teamcity {
+            agent {
+                descriptor {
+                    toolDeployment {
+                        executableFiles {
+                            include 'file1'
+                        }
+                    }
+                }
+            }
+        }
+        project.teamcity {
+            agent {
+                descriptor {
+                    toolDeployment {
+                        executableFiles {
+                            include 'file2'
+                        }
+                    }
+                }
+            }
+        }
+
+        ToolDeployment deployment = extension.agent.descriptor.deployment
+        assertThat(deployment.executableFiles.includes, hasSize(2))
+    }
+
+    @Test
     void 'cannot configure plugin for both pluginDeployment and toolDeployment'() {
         try {
             project.teamcity {

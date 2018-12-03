@@ -169,6 +169,27 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'allow server descriptor configuration to be created from multiple configuration blocks'() {
+        project.teamcity {
+            server {
+                descriptor {
+                    name = 'plugin-name'
+                }
+            }
+        }
+        project.teamcity {
+            server {
+                descriptor {
+                    description = 'plugin description'
+                }
+            }
+        }
+
+        assertThat(extension.server.descriptor.getName(), equalTo('plugin-name'))
+        assertThat(extension.server.descriptor.getDescription(), equalTo('plugin description'))
+    }
+
+    @Test
     void agentPluginDescriptorReplacementTokens() {
         project.teamcity {
             server {
@@ -336,6 +357,30 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             server {
                 publish {
                     username = 'username'
+                    password = 'password'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.username, equalTo('username'))
+        assertThat(publishPlugin.password, equalTo('password'))
+    }
+
+    @Test
+    void 'allow server publish configuration to be created from multiple configuration blocks'() {
+        project.teamcity {
+            server {
+                publish {
+                    username = 'username'
+                }
+            }
+        }
+        project.teamcity {
+            server {
+                publish {
                     password = 'password'
                 }
             }

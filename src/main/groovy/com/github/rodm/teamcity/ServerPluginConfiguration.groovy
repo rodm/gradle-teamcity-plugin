@@ -50,7 +50,9 @@ class ServerPluginConfiguration extends PluginConfiguration {
      */
     @CompileStatic(SKIP)
     def descriptor(Action<ServerPluginDescriptor> configuration) {
-        descriptor = extensions.create('descriptor', ServerPluginDescriptor, project)
+        if (!descriptor) {
+            descriptor = extensions.create('descriptor', ServerPluginDescriptor, project)
+        }
         configuration.execute(descriptor)
     }
 
@@ -63,7 +65,9 @@ class ServerPluginConfiguration extends PluginConfiguration {
      */
     @CompileStatic(SKIP)
     def publish(Action<PublishConfiguration> configuration) {
-        publish = extensions.create('publish', PublishConfiguration)
+        if (!publish) {
+            publish = extensions.create('publish', PublishConfiguration)
+        }
         configuration.execute(publish)
     }
 

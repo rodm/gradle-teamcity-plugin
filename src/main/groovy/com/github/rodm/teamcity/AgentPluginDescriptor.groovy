@@ -45,7 +45,9 @@ class AgentPluginDescriptor {
     def pluginDeployment(Action<PluginDeployment> configuration) {
         if (toolDeployment)
             throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
-        pluginDeployment = extensions.create('deployment', PluginDeployment)
+        if (!pluginDeployment) {
+            pluginDeployment = extensions.create('deployment', PluginDeployment)
+        }
         configuration.execute(pluginDeployment)
     }
 
@@ -60,7 +62,9 @@ class AgentPluginDescriptor {
     def toolDeployment(Action<ToolDeployment> configuration) {
         if (pluginDeployment)
             throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
-        toolDeployment = extensions.create('deployment', ToolDeployment)
+        if (!toolDeployment) {
+            toolDeployment = extensions.create('deployment', ToolDeployment)
+        }
         configuration.execute(toolDeployment)
     }
 
