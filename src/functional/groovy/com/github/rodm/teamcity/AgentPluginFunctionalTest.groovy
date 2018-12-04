@@ -104,7 +104,7 @@ class AgentPluginFunctionalTest {
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SKIPPED))
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
+        ZipFile pluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
         List<String> entries = pluginFile.entries().collect { it.name }
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('lib/test-plugin.jar'))
@@ -342,6 +342,7 @@ class AgentPluginFunctionalTest {
             teamcity {
                 version = '8.1.5'
                 agent {
+                    archiveName = 'test-plugin-agent.zip'
                     descriptor {
                         pluginDeployment {}
                     }
@@ -379,6 +380,7 @@ class AgentPluginFunctionalTest {
             teamcity {
                 version = '8.1.5'
                 agent {
+                    archiveName = 'test-plugin-agent.zip'
                     descriptor {
                         pluginDeployment {}
                     }
