@@ -218,6 +218,7 @@ class MultipleGradleVersionTest {
                 .withArguments('build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
+                .forwardOutput()
                 .build()
         return result
     }

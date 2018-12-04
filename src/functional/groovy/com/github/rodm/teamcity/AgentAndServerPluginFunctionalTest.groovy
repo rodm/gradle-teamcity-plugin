@@ -204,6 +204,7 @@ class AgentAndServerPluginFunctionalTest {
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments("assemble")
                 .withPluginClasspath()
+                .forwardOutput()
                 .buildAndFail()
 
         assertThat(result.getOutput(), containsString("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin"))

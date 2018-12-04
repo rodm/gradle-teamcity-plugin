@@ -86,6 +86,7 @@ class AgentPluginFunctionalTest {
                 .withProjectDir(testProjectDir.getRoot())
                 .withArguments(args)
                 .withPluginClasspath()
+                .forwardOutput()
                 .build()
     }
 

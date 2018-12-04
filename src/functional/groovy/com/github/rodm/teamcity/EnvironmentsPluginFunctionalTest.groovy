@@ -49,6 +49,7 @@ class EnvironmentsPluginFunctionalTest {
             .withProjectDir(testProjectDir.getRoot())
             .withArguments(args)
             .withPluginClasspath()
+            .forwardOutput()
             .build()
     }
 
