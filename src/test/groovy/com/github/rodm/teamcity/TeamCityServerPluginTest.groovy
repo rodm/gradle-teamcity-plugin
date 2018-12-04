@@ -120,12 +120,12 @@ class TeamCityServerPluginTest {
         def configuration = project.configurations.getByName('agent')
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))
-        assertThat(configuration.transitive, is(false))
+        assertThat(configuration.transitive, is(true))
 
         configuration = project.configurations.getByName('server')
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))
-        assertThat(configuration.transitive, is(false))
+        assertThat(configuration.transitive, is(true))
 
         configuration = project.configurations.getByName('plugin')
         assertThat(configuration, notNullValue())
