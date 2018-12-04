@@ -78,7 +78,6 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         packagePlugin.description = 'Package TeamCity Agent plugin'
         packagePlugin.group = 'TeamCity'
         packagePlugin.with {
-            appendix = 'agent'
             into("lib") {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
@@ -103,6 +102,10 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         Set<FileCopyDetails> files = []
         packagePlugin.filesMatching('**/*', new FileCollectorAction(files))
         packagePlugin.doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
+
+        project.plugins.withType(TeamCityServerPlugin) {
+            packagePlugin.appendix = 'agent'
+        }
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin

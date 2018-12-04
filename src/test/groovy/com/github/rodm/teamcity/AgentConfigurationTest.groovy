@@ -422,7 +422,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
         Configuration configuration = project.configurations.getByName('plugin')
         assertThat(configuration.artifacts, hasSize(1))
-        assertThat(normalizePath(configuration.artifacts[0].file), endsWith('/build/distributions/test-agent.zip'))
+        assertThat(normalizePath(configuration.artifacts[0].file), endsWith('/build/distributions/test.zip'))
     }
 
     @Test
@@ -437,7 +437,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('test-agent-1.2.3.zip'))
+        assertThat(agentPlugin.archiveName, equalTo('test-1.2.3.zip'))
     }
 
     @Test
@@ -484,6 +484,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('my-plugin-agent.zip'))
+        assertThat(agentPlugin.archiveName, equalTo('my-plugin.zip'))
     }
 }
