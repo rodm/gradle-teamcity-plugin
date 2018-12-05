@@ -44,11 +44,13 @@ class ServerPluginFunctionalTest {
         }
         teamcity {
             version = '8.1.5'
-            descriptor {
-                name = 'test-plugin'
-                displayName = 'Test plugin'
-                version = '1.0'
-                vendorName = 'vendor name'
+            server {
+                descriptor {
+                    name = 'test-plugin'
+                    displayName = 'Test plugin'
+                    version = '1.0'
+                    vendorName = 'vendor name'
+                }
             }
         }
     """
@@ -60,7 +62,9 @@ class ServerPluginFunctionalTest {
         }
         teamcity {
             version = '8.1.5'
-            descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+            server {
+                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+            }
         }
     """
 

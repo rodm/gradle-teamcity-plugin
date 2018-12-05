@@ -40,8 +40,10 @@ class AgentPluginFunctionalTest {
         }
         teamcity {
             version = '8.1.5'
-            descriptor {
-                pluginDeployment {}
+            agent {
+                descriptor {
+                    pluginDeployment {}
+                }
             }
         }
     """
@@ -53,7 +55,9 @@ class AgentPluginFunctionalTest {
         }
         teamcity {
             version = '8.1.5'
-            descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+            agent {
+                descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
+            }
         }
     """
 
