@@ -56,8 +56,6 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
             return 1
         } else if (teamcityVersion.version == '2018.2-SNAPSHOT' && version != '2018.2-SNAPSHOT') {
             return -1
-        } else if (version == teamcityVersion.version) {
-            return 0
         }
 
         if (version == 'SNAPSHOT' && teamcityVersion.version != 'SNAPSHOT') {
@@ -90,14 +88,7 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     }
 
     boolean equals(Object o) {
-        if (o == this) {
-            return true
-        } else if (o != null && o.getClass() == this.getClass()) {
-            TeamCityVersion other = (TeamCityVersion) o
-            return version == other.version
-        } else {
-            return false
-        }
+        return o == this
     }
 
     int hashCode() {

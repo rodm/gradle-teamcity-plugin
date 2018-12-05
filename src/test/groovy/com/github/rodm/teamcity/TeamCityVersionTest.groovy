@@ -60,6 +60,7 @@ class TeamCityVersionTest {
         assertThat(version('SNAPSHOT'), equalTo(version('SNAPSHOT')))
 
         assertThat(version('9.0.1'), greaterThan(version('9.0')))
+        assertThat(version('10.0'), greaterThan(version('9.0')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
     }
 
