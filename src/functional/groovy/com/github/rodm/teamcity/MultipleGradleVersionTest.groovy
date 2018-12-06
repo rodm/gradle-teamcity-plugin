@@ -54,7 +54,7 @@ class MultipleGradleVersionTest {
     @Parameterized.Parameters(name = 'Gradle {0}')
     static List<String> data() {
         return [
-            '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5.1', '4.6', '4.7', '4.8.1', '4.9', '4.10.2',
+            '4.0.2', '4.1', '4.2.1', '4.3.1', '4.4.1', '4.5.1', '4.6', '4.7', '4.8.1', '4.9', '4.10.3',
             '5.0'
         ]
     }
@@ -113,8 +113,10 @@ class MultipleGradleVersionTest {
                     descriptor {
                         name = 'test-plugin'
                         displayName = 'Test plugin'
+                        description = 'Test plugin description'
                         version = '1.0'
                         vendorName = 'vendor name'
+                        vendorUrl = 'http://www.example.org'
                     }
                 }
             }
@@ -192,13 +194,14 @@ class MultipleGradleVersionTest {
 
     @Test
     void 'build plugin'() {
-        assumeThat(JavaVersion.current().toString(), supportsGradle(version) as Matcher<String>)
+        def javaVersion = JavaVersion.current().toString()
+        assumeThat(javaVersion, is(supportedByGradle(version) as Matcher<String>))
 
         BuildResult result = executeBuild(version)
         checkBuild(result)
     }
 
-    Matcher supportsGradle(String version) {
+    Matcher supportedByGradle(String version) {
         def gradleVersion = GradleVersion.version(version)
         if (gradleVersion < GradleVersion.version('4.3')) {
             return isOneOf('1.7', '1.8')
