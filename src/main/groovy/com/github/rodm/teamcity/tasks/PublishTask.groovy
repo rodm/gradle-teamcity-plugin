@@ -22,12 +22,12 @@ import com.jetbrains.plugin.structure.base.plugin.PluginProblem
 import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.TaskExecutionException
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
 
 class PublishTask extends DefaultTask {
@@ -96,11 +96,11 @@ class PublishTask extends DefaultTask {
     @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     protected void publishPlugin() {
-        def distributionFile = getDistributionFile()
         if (!channels) {
-            throw new TaskExecutionException(this, new GradleException("Channels list can't be empty"))
+            throw new InvalidUserDataException("Channels list can't be empty")
         }
 
+        def distributionFile = getDistributionFile()
         def creationResult = TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
@@ -112,14 +112,14 @@ class PublishTask extends DefaultTask {
                     LOGGER.info("Uploaded successfully")
                 }
                 catch (exception) {
-                    throw new TaskExecutionException(this, new RuntimeException("Failed to upload plugin", exception))
+                    throw new GradleException('Failed to upload plugin', exception)
                 }
             }
         } else if (creationResult instanceof PluginCreationFail) {
             def problems = creationResult.errorsAndWarnings.findAll { it.level == PluginProblem.Level.ERROR }.join(", ")
-            throw new TaskExecutionException(this, new GradleException("Cannot upload plugin. $problems"))
+            throw new GradleException("Cannot upload plugin. $problems")
         } else {
-            throw new TaskExecutionException(this, new GradleException("Cannot upload plugin."))
+            throw new GradleException("Cannot upload plugin.")
         }
     }
 }
