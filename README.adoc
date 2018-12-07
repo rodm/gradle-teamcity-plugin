@@ -447,7 +447,9 @@ For each environment the following tasks are created based on the environment na
 
 * `deployTo<environment>` : Deploys one or more plugin archives to the TeamCity server for the environment, requires
  the environment `dataDir` property. If the environment is using TeamCity version 2018.2 or later and the server is
- running, the deploy task will disable and enable the plugin.
+ running, the deploy task will send unload and load requests to the server. This allows changes to be made to the
+ plugin without having to restart the server. Note that this feature currently relies on the file name of
+ the plugin not changing between deploys.
 * `undeployFrom<environment>` : Un-deploys one or more plugin archives from the TeamCity server for the environment, requires the environment `dataDir` property.
 * `start<environment>Sever` : Starts the TeamCity Server for the environment, requires the environment `homeDir` and `dataDir` properties to be defined.
 * `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
