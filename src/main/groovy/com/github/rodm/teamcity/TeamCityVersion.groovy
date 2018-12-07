@@ -78,13 +78,7 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
                 return -1
             }
         }
-
-        if (versionParts.length > otherVersionParts.length) {
-            return 1
-        } else if (versionParts.length < otherVersionParts.length) {
-            return -1
-        }
-        return 0
+        return (versionParts.length > otherVersionParts.length) ? 1 : -1
     }
 
     boolean equals(Object o) {
