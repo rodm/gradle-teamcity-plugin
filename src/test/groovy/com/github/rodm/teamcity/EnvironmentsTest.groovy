@@ -911,17 +911,6 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'sends plugin action request with plugin name'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, false)
-        createMaintenanceTokenFile()
-
-        action.executeAction('test-plugin.zip')
-
-        def url = action.request.URL
-        assertThat(url.query, containsString('plugins/test-plugin.zip') )
-    }
-
-    @Test
     void 'sends plugin action with settings to disable plugin'() {
         def action = new TestPluginAction(project.logger, projectDir.root, false)
         createMaintenanceTokenFile()
@@ -941,6 +930,17 @@ class EnvironmentsTest {
 
         def url = action.request.URL
         assertThat(url.query, containsString('action=setEnabled&enabled=true') )
+    }
+
+    @Test
+    void 'sends plugin action with encoded plugin path'() {
+        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        createMaintenanceTokenFile()
+
+        action.executeAction('plugin-1.0.0+test.zip')
+
+        def url = action.request.URL
+        assertThat(url.query, containsString('pluginPath=%3CTeamCity+Data+Directory%3E%2Fplugins%2Fplugin-1.0.0%2Btest.zip'))
     }
 
     @Test

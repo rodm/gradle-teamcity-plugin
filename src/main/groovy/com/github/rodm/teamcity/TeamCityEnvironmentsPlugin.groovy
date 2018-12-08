@@ -252,7 +252,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
 
         private URL getPluginActionURL(String pluginName) {
-            "http://${host}:${port}/httpAuth/admin/plugins.html?action=setEnabled&enabled=${enable}&pluginPath=%3CTeamCity%20Data%20Directory%3E/plugins/${pluginName}".toURL()
+            def pluginPath = URLEncoder.encode("<TeamCity Data Directory>/plugins/${pluginName}", 'UTF-8')
+            "http://${host}:${port}/httpAuth/admin/plugins.html?action=setEnabled&enabled=${enable}&pluginPath=${pluginPath}".toURL()
         }
     }
 
