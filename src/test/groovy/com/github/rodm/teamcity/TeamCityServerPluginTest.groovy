@@ -99,7 +99,7 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void subprojectInheritsVersion() {
+    void 'sub-project inherits version from root poject'() {
         Project rootProject = project
 
         rootProject.apply plugin: 'com.github.rodm.teamcity-server'
@@ -109,6 +109,21 @@ class TeamCityServerPluginTest {
 
         Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
         subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+        assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
+    }
+
+    @Test
+    void 'sub-project lazily inherits version '() {
+        Project rootProject = project
+
+        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
+        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+        rootProject.teamcity {
+            version = '8.1.5'
+        }
 
         assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
     }

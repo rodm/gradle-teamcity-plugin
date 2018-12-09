@@ -77,19 +77,9 @@ class TeamCityPlugin implements Plugin<Project> {
             extension = project.extensions.getByType(TeamCityPluginExtension)
         } else {
             extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
-            if (!isRootProject(project)) {
-                def rootExtension = project.rootProject.extensions.findByType(TeamCityPluginExtension)
-                if (rootExtension) {
-                    extension.version = rootExtension.version
-                }
-            }
         }
         configureRepositories(project, extension)
         configureConfigurations(project)
-    }
-
-    private static boolean isRootProject(Project project) {
-        project.rootProject == project
     }
 
     private static configureRepositories(Project project, TeamCityPluginExtension extension) {

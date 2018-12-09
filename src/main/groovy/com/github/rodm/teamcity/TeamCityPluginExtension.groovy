@@ -24,7 +24,7 @@ import org.gradle.api.Project
  */
 class TeamCityPluginExtension {
 
-    private String version = '9.0'
+    private String version
 
     boolean defaultRepositories = true
 
@@ -54,7 +54,15 @@ class TeamCityPluginExtension {
     }
 
     String getVersion() {
-        return version
+        if (!version) {
+            if (!isRootProject(project)) {
+                def rootExtension = project.rootProject.extensions.findByType(TeamCityPluginExtension)
+                if (rootExtension) {
+                    version = rootExtension.version
+                }
+            }
+        }
+        (version) ? version : '9.0'
     }
 
     def getAgent() {
@@ -152,5 +160,9 @@ class TeamCityPluginExtension {
             project.logger.warn('Configuring environments with the teamcity-server plugin is deprecated. Please use the teamcity-environments plugin.')
         }
         configuration.execute(environments)
+    }
+
+    private static boolean isRootProject(Project project) {
+        project.rootProject == project
     }
 }
