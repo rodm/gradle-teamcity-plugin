@@ -288,6 +288,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             } else {
                 if (result.contains("Plugin unloaded partially")) {
                     logger.warn("${path}: Plugin '${pluginName}' partially unloaded - some parts could still be running. Server restart could be needed.")
+                    unloadedPlugins.add(pluginName)
                 } else {
                     def message = result.replace('<response>', '').replace('</response>', '')
                     logger.warn("${path}: Disabling plugin '${pluginName}' failed: ${message}")

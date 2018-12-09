@@ -1041,8 +1041,12 @@ class EnvironmentsTest {
     boolean wasRequestSent = false
 
     private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded) {
+        createDisablePluginAction(plugins, unloaded, 'Plugin unloaded successfully')
+    }
+
+    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded, String response) {
         def request = mock(HttpURLConnection)
-        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin unloaded successfully".bytes))
+        when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
         new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, plugins , unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
@@ -1053,7 +1057,8 @@ class EnvironmentsTest {
 
     private TeamCityEnvironmentsPlugin.EnablePluginAction createEnablePluginAction(def plugins, def unloaded) {
         def request = mock(HttpURLConnection)
-        when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin loaded successfully".bytes))
+        def response = 'Plugin loaded successfully'
+        when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
         new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, plugins, unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
@@ -1101,6 +1106,27 @@ class EnvironmentsTest {
 
         assertTrue(wasRequestSent)
         assertThat('existing plugin requires re-enabling', unloaded, hasItem(pluginName))
+    }
+
+    @Test
+    void 'disable plugin request partially unloads existing plugin'() {
+        def pluginName = 'test-plugin.zip'
+        File pluginDir = projectDir.newFolder('plugins')
+        projectDir.newFile("plugins/${pluginName}")
+        File pluginFile = projectDir.newFile(pluginName)
+        def deploy = project.tasks.create('deploy', Copy) {
+            from { "${pluginFile.name}" }
+            into { pluginDir }
+        }
+
+        Set<File> plugins = [pluginFile] as Set
+        List<String> unloaded = []
+        def action = createDisablePluginAction(plugins, unloaded, 'Plugin unloaded partially')
+
+        action.execute(deploy)
+
+        assertTrue(wasRequestSent)
+        assertThat('partially unloaded plugin should be in reload list', unloaded, hasItem(pluginName))
     }
 
     @Test
