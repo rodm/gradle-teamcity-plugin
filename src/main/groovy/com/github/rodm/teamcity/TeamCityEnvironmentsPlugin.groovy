@@ -26,6 +26,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
@@ -78,17 +79,19 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     into { environment.pluginsDir }
                 }
                 deployPlugin.dependsOn build
-                if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
-                    def plugins = []
-                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins))
-                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins))
-                }
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
                     delete {
                         project.fileTree(dir: environment.pluginsDir,
                             includes: project.files(environment.plugins).collect { it.name })
                     }
+                }
+                if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
+                    def plugins = project.files(environment.plugins).files
+                    def disabledPlugins = []
+                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
+                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
+                    undeployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, []))
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
@@ -152,23 +155,25 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     }
 
     @CompileStatic
-    static abstract class PluginAction implements Action<Copy> {
+    static abstract class PluginAction implements Action<Task> {
 
         private static final String SUPER_USER_TOKEN_PATH = 'system/pluginData/superUser/token.txt'
 
         private Logger logger
-        private File dataDir
-        protected List<String> plugins
+        protected File dataDir
+        protected Set<File> plugins
+        protected List<String> unloadedPlugins
         private boolean enable
         private String path
 
         private String host = 'localhost'
         private int port = 8111
 
-        PluginAction(Logger logger, File dataDir, List<String> plugins, boolean enable) {
+        PluginAction(Logger logger, File dataDir, Set<File> plugins, List<String> unloadedPlugins, boolean enable) {
             this.logger = logger
             this.dataDir = dataDir
             this.plugins = plugins
+            this.unloadedPlugins = unloadedPlugins
             this.enable = enable
         }
 
@@ -181,10 +186,10 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         }
 
         @Override
-        void execute(Copy copy) {
-            path = copy.path
-            copy.inputs.sourceFiles.files.each { file ->
-                if (canExecuteAction(copy, file.name)) {
+        void execute(Task task) {
+            path = task.path
+            plugins.each { file ->
+                if (canExecuteAction(task, file.name)) {
                     executeAction(file.name)
                 } else {
                     skipAction(file.name)
@@ -192,7 +197,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             }
         }
 
-        abstract boolean canExecuteAction(Copy copy, String pluginName)
+        abstract boolean canExecuteAction(Task task, String pluginName)
 
         abstract void sendRequest(HttpURLConnection request, String pluginName)
 
@@ -260,25 +265,26 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     @CompileStatic
     static class DisablePluginAction extends PluginAction {
 
-        DisablePluginAction(Logger logger, File dataDir, List<String> plugins) {
-            super(logger, dataDir, plugins, false)
+        DisablePluginAction(Logger logger, File dataDir, Set<File> plugins, List<String> disabledPlugins) {
+            super(logger, dataDir, plugins, disabledPlugins, false)
         }
 
         @Override
-        boolean canExecuteAction(Copy copy, String pluginName) {
-            new File(copy.destinationDir, pluginName).exists()
+        boolean canExecuteAction(Task task, String pluginName) {
+            def pluginDir = new File(dataDir, 'plugins')
+            new File(pluginDir, pluginName).exists()
         }
 
         @Override
         void skipAction(String pluginName) {
-            plugins.add(pluginName)
+            unloadedPlugins.add(pluginName)
         }
 
         void sendRequest(HttpURLConnection request, String pluginName) {
             def result = request.inputStream.text
             if (result.contains("Plugin unloaded successfully")) {
                 logger.info("${path}: Plugin '${pluginName}' successfully unloaded")
-                plugins.add(pluginName)
+                unloadedPlugins.add(pluginName)
             } else {
                 if (result.contains("Plugin unloaded partially")) {
                     logger.warn("${path}: Plugin '${pluginName}' partially unloaded - some parts could still be running. Server restart could be needed.")
@@ -293,13 +299,13 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     @CompileStatic
     static class EnablePluginAction extends PluginAction {
 
-        EnablePluginAction(Logger logger, File dataDir, List<String> plugins) {
-            super(logger, dataDir, plugins, true)
+        EnablePluginAction(Logger logger, File dataDir, Set<File> plugins, List<String> disabledPlugins) {
+            super(logger, dataDir, plugins, disabledPlugins, true)
         }
 
         @Override
-        boolean canExecuteAction(Copy copy, String pluginName) {
-            plugins.contains(pluginName)
+        boolean canExecuteAction(Task task, String pluginName) {
+            unloadedPlugins.contains(pluginName)
         }
 
         void sendRequest(HttpURLConnection request, String pluginName) {

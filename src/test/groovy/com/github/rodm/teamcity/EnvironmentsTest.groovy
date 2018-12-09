@@ -22,6 +22,7 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
@@ -639,6 +640,46 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'configures undeploy task with action to disable the plugin for version 2018_2 and later'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '2018.2'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
+        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
+    }
+
+    @Test
+    void 'configures undeploy task without action to disable the plugin for version 2018_1 and earlier'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '2018.1'
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
+        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.actionClassName }
+        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
+    }
+
+    @Test
     void 'ConfigureEnvironmentTasks adds tasks for each separate environment'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -848,11 +889,11 @@ class EnvironmentsTest {
         String pluginName
 
         TestPluginAction(Logger logger, File dataDir, boolean enable) {
-            super(logger, dataDir, [], enable)
+            super(logger, dataDir, [] as Set, [], enable)
         }
 
         @Override
-        boolean canExecuteAction(Copy copy, String pluginName) {
+        boolean canExecuteAction(Task task, String pluginName) {
             return false
         }
 
@@ -945,7 +986,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unload response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [])
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -960,7 +1001,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [])
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -973,7 +1014,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin loaded response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [])
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -986,7 +1027,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [])
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -999,10 +1040,10 @@ class EnvironmentsTest {
 
     boolean wasRequestSent = false
 
-    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins) {
+    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded) {
         def request = mock(HttpURLConnection)
         when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin unloaded successfully".bytes))
-        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, plugins) {
+        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, plugins , unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 wasRequestSent = true
@@ -1010,10 +1051,10 @@ class EnvironmentsTest {
         }
     }
 
-    private TeamCityEnvironmentsPlugin.EnablePluginAction createEnablePluginAction(def plugins) {
+    private TeamCityEnvironmentsPlugin.EnablePluginAction createEnablePluginAction(def plugins, def unloaded) {
         def request = mock(HttpURLConnection)
         when(request.inputStream).thenReturn(new ByteArrayInputStream("Plugin loaded successfully".bytes))
-        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, plugins) {
+        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, plugins, unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 wasRequestSent = true
@@ -1031,13 +1072,14 @@ class EnvironmentsTest {
             into { pluginDir }
         }
 
-        List<String> plugins = []
-        def action = createDisablePluginAction(plugins)
+        Set<File> plugins = [pluginFile] as Set
+        List<String> unloaded = []
+        def action = createDisablePluginAction(plugins, unloaded)
 
         action.execute(deploy)
 
         assertFalse(wasRequestSent)
-        assertThat('new plugin requires enabling', plugins, hasItem(pluginName))
+        assertThat('new plugin requires enabling', unloaded, hasItem(pluginName))
     }
 
     @Test
@@ -1051,13 +1093,14 @@ class EnvironmentsTest {
             into { pluginDir }
         }
 
-        List<String> plugins = []
-        def action = createDisablePluginAction(plugins)
+        Set<File> plugins = [pluginFile] as Set
+        List<String> unloaded = []
+        def action = createDisablePluginAction(plugins, unloaded)
 
         action.execute(deploy)
 
         assertTrue(wasRequestSent)
-        assertThat('existing plugin requires re-enabling', plugins, hasItem(pluginName))
+        assertThat('existing plugin requires re-enabling', unloaded, hasItem(pluginName))
     }
 
     @Test
@@ -1069,8 +1112,9 @@ class EnvironmentsTest {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
-        List<String> plugins = []
-        def action = createEnablePluginAction(plugins)
+        Set<File> plugins = [pluginFile] as Set
+        List<String> unloaded = []
+        def action = createEnablePluginAction(plugins, unloaded)
 
         action.execute(deploy)
 
@@ -1086,9 +1130,10 @@ class EnvironmentsTest {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
+        Set<File> plugins = [pluginFile] as Set
         // disabled and new plugins are added to list by disable action
-        List<String> plugins = [pluginName]
-        def action = createEnablePluginAction(plugins)
+        List<String> unloaded = [pluginName]
+        def action = createEnablePluginAction(plugins, unloaded)
 
         action.execute(deploy)
 
