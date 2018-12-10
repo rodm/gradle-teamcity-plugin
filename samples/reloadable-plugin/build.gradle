@@ -20,7 +20,7 @@ test {
 }
 
 teamcity {
-    version = '2018.2-SNAPSHOT'
+    version = '2018.2'
 
     server {
         descriptor {
@@ -50,8 +50,6 @@ teamcity {
 
         'teamcity2018.2' {
             version = '2018.2'
-            downloadUrl = 'https://download.jetbrains.com/teamcity/eap/TeamCity-60863.tar.gz'
-            homeDir = file("${baseHomeDir}/TeamCity-2018.2-RC")
             javaHome = file(java8Home)
 //            serverOptions = [] // uncomment to disable super user token
         }
