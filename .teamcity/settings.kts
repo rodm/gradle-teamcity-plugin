@@ -3,6 +3,8 @@ import jetbrains.buildServer.configs.kotlin.v2018_1.version
 import jetbrains.buildServer.configs.kotlin.v2018_1.project
 import jetbrains.buildServer.configs.kotlin.v2018_1.BuildType
 import jetbrains.buildServer.configs.kotlin.v2018_1.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2018_1.ProjectFeature
+import jetbrains.buildServer.configs.kotlin.v2018_1.ProjectFeatures
 import jetbrains.buildServer.configs.kotlin.v2018_1.Template
 import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.script
@@ -26,6 +28,14 @@ project {
         useMirrors = false
     }
     vcsRoot(vcs)
+
+    features {
+        githubIssueTracker {
+            displayName = "GradleTeamCityPlugin"
+            repository = "https://github.com/rodm/gradle-teamcity-plugin"
+            pattern = """#(\d+)"""
+        }
+    }
 
     val buildTemplate = Template {
         id("Build")
@@ -268,4 +278,29 @@ fun BuildType.addSwitchGradleStep() {
         }
         stepsOrder = arrayListOf("SWITCH_GRADLE", "RUNNER_38")
     }
+}
+
+fun ProjectFeatures.githubIssueTracker(init: GitHubIssueTracker.() -> Unit): GitHubIssueTracker {
+    val result = GitHubIssueTracker(init)
+    feature(result)
+    return result
+}
+
+class GitHubIssueTracker() : ProjectFeature() {
+
+    init {
+        type = "IssueTracker"
+        param("type", "GithubIssues")
+        param("authType", "anonymous")
+    }
+
+    constructor(init: GitHubIssueTracker.() -> Unit): this() {
+        init()
+    }
+
+    var displayName by stringParameter("name")
+
+    var repository by stringParameter()
+
+    var pattern by stringParameter()
 }
