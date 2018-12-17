@@ -64,10 +64,6 @@ task samplesTest(type: Test) {
 }
 
 publishing {
-    repositories {
-        mavenLocal()
-    }
-
     publications {
         plugin(MavenPublication) {
             from components.java
