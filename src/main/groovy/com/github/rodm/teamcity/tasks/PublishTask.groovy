@@ -40,6 +40,11 @@ class PublishTask extends DefaultTask {
     public String host = DEFAULT_HOST
 
     /**
+     * The list of channel names that the plugin will be published to on the plugin repository
+     */
+    private List<String> channels
+
+    /**
      * The username for uploading the plugin to the plugin repository
      */
     private String username
@@ -49,13 +54,19 @@ class PublishTask extends DefaultTask {
      */
     private String password
 
+    public File distributionFile
+
     /**
-     * The list of channel names that the plugin will be published to on the plugin repository
+     * @return the list of channels the plugin will be published to on the plugin repository
      */
     @Input
-    public List<String> channels = ['default']
+    List<String> getChannels() {
+        return channels
+    }
 
-    public File distributionFile
+    void setChannels(List<String> channels) {
+        this.channels = channels
+    }
 
     /**
      * @return the username used for uploading the plugin to the plugin repository
@@ -96,7 +107,7 @@ class PublishTask extends DefaultTask {
     @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     protected void publishPlugin() {
-        if (!channels) {
+        if (!getChannels()) {
             throw new InvalidUserDataException("Channels list can't be empty")
         }
 
@@ -104,7 +115,7 @@ class PublishTask extends DefaultTask {
         def creationResult = TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
-            for (String channel : channels) {
+            for (String channel : getChannels()) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
                     def repoClient = new PluginRepositoryInstance(host, getUsername(), getPassword())

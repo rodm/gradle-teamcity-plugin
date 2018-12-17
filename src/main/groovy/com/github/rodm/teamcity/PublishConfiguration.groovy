@@ -20,9 +20,24 @@ package com.github.rodm.teamcity
  */
 class PublishConfiguration {
 
+    public static final List<String> DEFAULT_CHANNELS = ['default'].asImmutable()
+
+    private List<String> channels = DEFAULT_CHANNELS
+
     private String username
 
     private String password
+
+    /**
+     * The list of channel names that the plugin will be published to on the plugin repository
+     */
+    List<String> getChannels() {
+        return channels
+    }
+
+    void setChannels(List<String> channels) {
+        this.channels = channels
+    }
 
     /**
      * The username for uploading the plugin to the plugin repository

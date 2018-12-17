@@ -409,6 +409,36 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'publish task is configured to publish to default channel'() {
+        project.teamcity {
+            server {
+                publish {}
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.channels, equalTo(['default']))
+    }
+
+    @Test
+    void 'publish task is configured to publish to a list of channels'() {
+        project.teamcity {
+            server {
+                publish {
+                    channels = ['Beta', 'Test']
+                }
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.channels, equalTo(['Beta', 'Test']))
+    }
+
+    @Test
     void 'publish task is only created with publish configuration'() {
         project.teamcity {
             server {
