@@ -54,6 +54,37 @@ class EnvironmentsPluginFunctionalTest {
     }
 
     @Test
+    void 'startServer creates data directory'() {
+        File homeDir = createFakeTeamCityInstall('teamcity', '9.1.6')
+        File dataDir = new File(testProjectDir.root, 'data')
+        File javaHome = testProjectDir.newFolder('jdk')
+
+        buildFile << """
+            plugins {
+                id 'com.github.rodm.teamcity-environments'
+            }
+            teamcity {
+                environments {
+                    teamcity {
+                        homeDir = file('${windowsCompatiblePath(homeDir)}')
+                        dataDir = file('${windowsCompatiblePath(dataDir)}')
+                        javaHome = file('${windowsCompatiblePath(javaHome)}')
+                    }
+                }
+            }
+        """
+
+        assertFalse('Data directory should not exist', dataDir.exists())
+
+        BuildResult result = executeBuild('--info', 'startTeamcityServer')
+
+        assertTrue('Data directory was not created by startServer task', dataDir.exists())
+        assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
+        assertThat(result.output, not(containsString('property is deprecated')))
+        assertThat(result.output, not(containsString('server configuration is deprecated')))
+    }
+
+    @Test
     void startServerAfterDeployingPlugin() {
         File homeDir = createFakeTeamCityInstall('teamcity', '9.1.6')
         File dataDir = testProjectDir.newFolder('data')

@@ -100,6 +100,9 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     conventionMapping.map('javaHome') { environment.javaHome }
                     conventionMapping.map('serverOptions') { environment.serverOptions }
                 }
+                startServer.doFirst {
+                    project.mkdir(getDataDir())
+                }
                 startServer.dependsOn deployPlugin
 
                 def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
