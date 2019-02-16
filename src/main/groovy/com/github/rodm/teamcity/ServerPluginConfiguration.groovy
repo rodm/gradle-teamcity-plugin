@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.util.ConfigureUtil
 
 import static groovy.transform.TypeCheckingMode.SKIP
@@ -51,7 +52,8 @@ class ServerPluginConfiguration extends PluginConfiguration {
     @CompileStatic(SKIP)
     def descriptor(Action<ServerPluginDescriptor> configuration) {
         if (!descriptor) {
-            descriptor = extensions.create('descriptor', ServerPluginDescriptor, project)
+            descriptor = (this as ExtensionAware).extensions.create('descriptor', ServerPluginDescriptor, project)
+            descriptor.init()
         }
         configuration.execute(descriptor)
     }
@@ -66,7 +68,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
     @CompileStatic(SKIP)
     def publish(Action<PublishConfiguration> configuration) {
         if (!publish) {
-            publish = extensions.create('publish', PublishConfiguration)
+            publish = (this as ExtensionAware).extensions.create('publish', PublishConfiguration)
         }
         configuration.execute(publish)
     }

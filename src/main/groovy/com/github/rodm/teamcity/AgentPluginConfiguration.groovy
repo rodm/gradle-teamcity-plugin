@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 
 /**
  * Agent-side plugin configuration
@@ -36,7 +37,8 @@ class AgentPluginConfiguration extends PluginConfiguration {
      */
     def descriptor(Action<AgentPluginDescriptor> configuration) {
         if (!descriptor) {
-            descriptor = extensions.create('descriptor', AgentPluginDescriptor)
+            descriptor = (this as ExtensionAware).extensions.create('descriptor', AgentPluginDescriptor)
+            descriptor.init()
         }
         configuration.execute(descriptor)
     }

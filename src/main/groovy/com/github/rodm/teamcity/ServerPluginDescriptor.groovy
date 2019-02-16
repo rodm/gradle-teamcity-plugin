@@ -18,11 +18,10 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
-
-import static groovy.transform.TypeCheckingMode.SKIP
 
 /**
  * Server-side plugin descriptor
@@ -111,11 +110,13 @@ class ServerPluginDescriptor {
 
     private Project project
 
-    @CompileStatic(SKIP)
     ServerPluginDescriptor(Project project) {
         this.project = project
-        this.parameters = extensions.create('parameters', Parameters)
-        this.dependencies = extensions.create('dependencies', Dependencies)
+    }
+
+    void init() {
+        parameters = (this as ExtensionAware).extensions.create('parameters', Parameters)
+        dependencies = (this as ExtensionAware).extensions.create('dependencies', Dependencies)
     }
 
     /**

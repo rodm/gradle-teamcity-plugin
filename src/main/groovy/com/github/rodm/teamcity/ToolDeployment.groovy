@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Nested
 
 /**
@@ -24,7 +25,11 @@ import org.gradle.api.tasks.Nested
 class ToolDeployment {
 
     @Nested
-    ExecutableFiles executableFiles = extensions.create('executableFiles', ExecutableFiles)
+    ExecutableFiles executableFiles
+
+    void init () {
+        executableFiles = (this as ExtensionAware).extensions.create('executableFiles', ExecutableFiles)
+    }
 
     /**
      * Configures the executable files for the agent-side tool plugin.

@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -39,9 +40,8 @@ class PluginDeployment {
     @Nested
     ExecutableFiles executableFiles
 
-    @CompileStatic(SKIP)
-    PluginDeployment() {
-        executableFiles = extensions.create('executableFiles', ExecutableFiles)
+    void init() {
+        executableFiles = (this as ExtensionAware).extensions.create('executableFiles', ExecutableFiles)
     }
 
     /**

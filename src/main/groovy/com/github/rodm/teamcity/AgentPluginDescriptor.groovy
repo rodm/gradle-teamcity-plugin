@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
@@ -46,7 +47,8 @@ class AgentPluginDescriptor {
         if (toolDeployment)
             throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
         if (!pluginDeployment) {
-            pluginDeployment = extensions.create('deployment', PluginDeployment)
+            pluginDeployment = (this as ExtensionAware).extensions.create('deployment', PluginDeployment)
+            pluginDeployment.init()
         }
         configuration.execute(pluginDeployment)
     }
@@ -63,7 +65,8 @@ class AgentPluginDescriptor {
         if (pluginDeployment)
             throw new InvalidUserDataException('Agent plugin cannot be configured for plugin deployment and tool deployment')
         if (!toolDeployment) {
-            toolDeployment = extensions.create('deployment', ToolDeployment)
+            toolDeployment = (this as ExtensionAware).extensions.create('deployment', ToolDeployment)
+            toolDeployment.init()
         }
         configuration.execute(toolDeployment)
     }
@@ -74,7 +77,11 @@ class AgentPluginDescriptor {
     }
 
     @Nested
-    Dependencies dependencies = extensions.create('dependencies', Dependencies)
+    Dependencies dependencies
+
+    void init() {
+        dependencies = (this as ExtensionAware).extensions.create('dependencies', Dependencies)
+    }
 
     /**
      * Configures the dependencies for the plugin.

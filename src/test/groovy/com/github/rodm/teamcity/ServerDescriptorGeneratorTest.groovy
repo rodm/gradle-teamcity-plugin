@@ -40,6 +40,12 @@ class ServerDescriptorGeneratorTest {
 
     private TeamCityPluginExtension extension
 
+    private ServerPluginDescriptor createDescriptor() {
+        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        descriptor.init()
+        return descriptor
+    }
+
     private ServerPluginDescriptorGenerator createGenerator() {
         ServerPluginDescriptor descriptor = extension.server.getDescriptor()
         createGenerator(descriptor)
@@ -62,7 +68,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesTeamCityPluginRootNode() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        ServerPluginDescriptor descriptor = createDescriptor()
         ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -72,7 +78,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void 'descriptor schema location'() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        ServerPluginDescriptor descriptor = createDescriptor()
         ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -108,7 +114,7 @@ class ServerDescriptorGeneratorTest {
 
     @Test
     void writesRequiredInfoPropertiesWhenNotSet() {
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        ServerPluginDescriptor descriptor = createDescriptor()
         ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)
@@ -122,7 +128,7 @@ class ServerDescriptorGeneratorTest {
     @Test
     void writesRequiredInfoPropertiesUsingDefaults() {
         project.version = '1.2.3'
-        ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor, project)
+        ServerPluginDescriptor descriptor = createDescriptor()
         ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
 
         generator.writeTo(writer)

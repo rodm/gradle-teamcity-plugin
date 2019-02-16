@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 
 /**
  * TeamCity Plugin extension.
@@ -38,6 +39,10 @@ class TeamCityPluginExtension {
 
     TeamCityPluginExtension(Project project) {
         this.project = project
+    }
+
+    void init() {
+        def extensions = (this as ExtensionAware).extensions
         this.environments = extensions.create('environments', TeamCityEnvironments, project)
         this.agent = extensions.create('agent', AgentPluginConfiguration, project)
         this.server = extensions.create('server', ServerPluginConfiguration, project, environments)

@@ -77,6 +77,7 @@ class TeamCityPlugin implements Plugin<Project> {
             extension = project.extensions.getByType(TeamCityPluginExtension)
         } else {
             extension = project.extensions.create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension, project)
+            extension.init()
         }
         configureRepositories(project, extension)
         configureConfigurations(project)

@@ -51,6 +51,7 @@ class AgentDescriptorGeneratorTest {
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         writer = new StringWriter()
         descriptor = project.extensions.create('descriptor', AgentPluginDescriptor)
+        descriptor.init()
         generator = new AgentPluginDescriptorGenerator(descriptor)
     }
 
