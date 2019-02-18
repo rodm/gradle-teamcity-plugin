@@ -93,20 +93,6 @@ project {
     }
     buildType(buildJava7)
 
-    val buildJava11 = BuildType {
-        templates(buildTemplate)
-        id("BuildJava11")
-        name = "Build - Java 10 - Gradle 4.10"
-
-        params {
-            param("gradle.version", "4.10.2")
-            param("java.home", "%java10.home%")
-        }
-
-        addSwitchGradleStep()
-    }
-    buildType(buildJava11)
-
     val buildFunctionalTestJava7 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava7")
@@ -253,7 +239,6 @@ project {
 
     buildTypesOrder = arrayListOf(
         buildJava7,
-        buildJava11,
         buildFunctionalTestJava7,
         buildFunctionalTestJava8,
         buildFunctionalTestJava9,
