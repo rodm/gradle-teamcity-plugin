@@ -6,6 +6,7 @@
 :uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
+:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2017.1
@@ -15,6 +16,38 @@ installing a TeamCity server and tasks to deploy, start and stop the server and 
 
 image:https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/rodm/gradle-teamcity-plugin"]
 image:https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true["Build Status", link="https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin"]
+
+== Supported Gradle and Java versions
+
+|===
+|Plugin version |Gradle version |Java version |Documentation
+|v1.2
+|4.0+
+|Java 7 & later
+|{uri-github-project}/blob/v1.2/README.adoc#using-the-plugin[README]
+|v1.1
+|3.0+
+|Java 7 & 8
+|{uri-github-project}/blob/v1.1/README.adoc#using-the-plugin[README]
+|v1.0
+|2.8+
+|Java 7 & 8
+|{uri-github-project}/blob/v1.0/README.adoc#using-the-plugin[README]
+|===
+
+== Building the plugin
+
+To build the plugin and run the unit tests run
+
+    ./gradlew -s check
+
+To run the functional tests run
+
+    ./gradlew -s functionalTest
+
+To test the samples run
+
+    ./gradlew -s samplesTest
 
 == Using the plugin
 
@@ -254,7 +287,8 @@ tasks.withType<PublishTask> {
 ----
 
 The username and password can also be configured in the `publish` section of the `server` configuration as shown in
-the following example.
+the following example. Optionally one or more channels can be specified using the `channels` property, by default
+the plugin is published to the 'Stable' channel.
 
 [source,groovy]
 .build.gradle
@@ -267,6 +301,7 @@ teamcity {
         publish {
             username = findProperty('jetbrains.username')
             password = findProperty('jetbrains.password')
+            channels = ['Beta']
         }
     }
 }
@@ -490,19 +525,19 @@ For each environment the following tasks are created based on the environment na
                 serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500'
             }
 
-            teamcity20171 {
-                version = '2017.1.5'
-                downloadUrl = 'http://repository/teamcity/TeamCity-2017.1.5.tar.gz'
-                homeDir = file("$rootDir/teamcity/servers/TeamCity-2017.1.5")
-                dataDir = file("$rootDir/teamcity/data/2017.1")
-                javaHome = file('/opt/jdk1.8.0_162')
+            teamcity20172 {
+                version = '2017.2.4'
+                downloadUrl = 'http://repository/teamcity/TeamCity-2017.2.4.tar.gz'
+                homeDir = file("$rootDir/teamcity/servers/TeamCity-2017.2.4")
+                dataDir = file("$rootDir/teamcity/data/2017.2")
+                javaHome = file('/opt/jdk1.8.0_202')
                 // Replace the default server options
                 serverOptions = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500'
             }
 
-            'teamcity2017.2' {
-                version = '2017.2.2'
-                javaHome = file('/opt/jdk1.8.0_162')
+            'teamcity2018.2' {
+                version = '2018.2.2'
+                javaHome = file('/opt/jdk1.8.0_202')
             }
         }
     }
@@ -516,7 +551,7 @@ The following example shows environments being configured using the Kotlin DSL.
 ----
     extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
     extra["java7Home"] = project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80"
-    extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_162"
+    extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_202"
 
 
     teamcity {
@@ -545,16 +580,16 @@ The following example shows environments being configured using the Kotlin DSL.
                 serverOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            "teamcity2017.1" {
-                version = "2017.1.5"
+            "teamcity2017.2" {
+                version = "2017.2.4"
                 javaHome = file(extra["java8Home"] as String)
 
                 // Replace the default server options
                 setServerOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            "teamcity2017.2" {
-                version = "2017.2.2"
+            "teamcity2018.2" {
+                version = "2018.2.2"
             }
         }
     }
