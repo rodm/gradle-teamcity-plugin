@@ -44,7 +44,7 @@ project {
         params {
             param("gradle.opts", "")
             param("gradle.tasks", "clean build")
-            param("java.home", "%java7.home%")
+            param("java.home", "%java8.home%")
         }
 
         vcs {
@@ -86,27 +86,12 @@ project {
     }
     template(buildTemplate)
 
-    val buildJava7 = BuildType {
+    val buildJava = BuildType {
         templates(buildTemplate)
         id("BuildJava7")
-        name = "Build - Java 7"
+        name = "Build - Java 8"
     }
-    buildType(buildJava7)
-
-    val buildFunctionalTestJava7 = BuildType {
-        templates(buildTemplate)
-        id("BuildFunctionalTestJava7")
-        name = "Build - Functional Test - Java 7"
-
-        params {
-            param("gradle.tasks", "clean functionalTest")
-        }
-
-        failureConditions {
-            executionTimeoutMin = 20
-        }
-    }
-    buildType(buildFunctionalTestJava7)
+    buildType(buildJava)
 
     val buildFunctionalTestJava8 = BuildType {
         templates(buildTemplate)
@@ -115,7 +100,6 @@ project {
 
         params {
             param("gradle.tasks", "clean functionalTest")
-            param("java.home", "%java8.home%")
         }
 
         failureConditions {
@@ -181,40 +165,22 @@ project {
     }
     buildType(buildFunctionalTestJava11)
 
-    val buildSamplesTestJava7 = BuildType {
+    val buildSamplesTest = BuildType {
         templates(buildTemplate)
         id("BuildSamplesTestJava7")
-        name = "Build - Samples Test - Java 7"
-
-        artifactRules = "samples/**/build/distributions/*.zip"
-
-        params {
-            param("gradle.tasks", "clean samplesTest")
-        }
-
-        failureConditions {
-            executionTimeoutMin = 15
-        }
-    }
-    buildType(buildSamplesTestJava7)
-
-    val buildSamplesTestJava8 = BuildType {
-        templates(buildTemplate)
-        id("BuildSamplesTestJava8")
         name = "Build - Samples Test - Java 8"
 
         artifactRules = "samples/**/build/distributions/*.zip"
 
         params {
             param("gradle.tasks", "clean samplesTest")
-            param("java.home", "%java8.home%")
         }
 
         failureConditions {
             executionTimeoutMin = 15
         }
     }
-    buildType(buildSamplesTestJava8)
+    buildType(buildSamplesTest)
 
     val reportCodeQuality = BuildType {
         templates(buildTemplate)
@@ -224,7 +190,6 @@ project {
         params {
             param("gradle.opts", "%sonar.opts%")
             param("gradle.tasks", "clean build sonarqube")
-            param("java.home", "%java8.home%")
         }
 
         features {
@@ -238,14 +203,12 @@ project {
     buildType(reportCodeQuality)
 
     buildTypesOrder = arrayListOf(
-        buildJava7,
-        buildFunctionalTestJava7,
+        buildJava,
         buildFunctionalTestJava8,
         buildFunctionalTestJava9,
         buildFunctionalTestJava10,
         buildFunctionalTestJava11,
-        buildSamplesTestJava7,
-        buildSamplesTestJava8,
+        buildSamplesTest,
         reportCodeQuality
     )
 }
