@@ -1,7 +1,7 @@
 
 plugins {
     kotlin("jvm") version "1.2.0" apply false
-    id ("com.github.rodm.teamcity-server") version "1.2-rc-1" apply false
+    id ("com.github.rodm.teamcity-server") version "1.2" apply false
 }
 
 group = "com.github.rodm.teamcity"
