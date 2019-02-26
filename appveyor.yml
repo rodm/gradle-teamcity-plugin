@@ -14,10 +14,10 @@ install:
   - gradlew.bat --version
 
 build_script:
-  - gradlew.bat -u -i -S --no-daemon clean assemble
+  - gradlew.bat -i -S --no-daemon clean assemble
 
 test_script:
-  - gradlew.bat -u -i -S --no-daemon test functionalTest
+  - gradlew.bat -i -S --no-daemon test functionalTest
 
 cache:
   - .gradle
