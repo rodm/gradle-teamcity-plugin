@@ -613,7 +613,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
         assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name))
     }
@@ -634,7 +634,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
         assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name)))
     }
@@ -655,7 +655,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
     }
 
@@ -675,7 +675,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
     }
 
@@ -883,7 +883,7 @@ class EnvironmentsTest {
         assertThat(environments, isA(TeamCityEnvironments))
     }
 
-    static class TestPluginAction extends TeamCityEnvironmentsPlugin.PluginAction {
+    class TestPluginAction extends TeamCityEnvironmentsPlugin.PluginAction {
 
         HttpURLConnection request
         String pluginName

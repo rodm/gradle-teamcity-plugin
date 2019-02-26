@@ -177,7 +177,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
@@ -211,7 +211,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.actionClassName }
+        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
         assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
