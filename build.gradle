@@ -4,7 +4,7 @@ plugins {
     id 'org.gradle.java-gradle-plugin'
     id 'org.gradle.jacoco'
     id 'org.gradle.maven-publish'
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
 repositories {
