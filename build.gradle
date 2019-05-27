@@ -16,7 +16,7 @@ dependencies {
     implementation 'de.undercouch:gradle-download-task:3.4.3'
     implementation 'org.jetbrains.intellij.plugins:structure-base:3.45'
     implementation 'org.jetbrains.intellij.plugins:structure-teamcity:3.45'
-    implementation 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.30'
+    implementation 'org.jetbrains.intellij:plugin-repository-rest-client:0.4.32'
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.6.2'

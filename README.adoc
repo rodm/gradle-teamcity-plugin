@@ -261,6 +261,8 @@ The following example uses the Kotlin DSL.
 The `publishPlugin` task is used to upload the plugin archive to the
 {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]. Before publishing a plugin you will need
 to create a JetBrains Account, follow the 'Sign In' link at the top of the plugin repository page.
+The `publishPlugin` task *cannot* be used to publish new plugins, the first upload must be completed using the
+Upload plugin link on the plugin repository website.
 
 The `publishPlugin` task requires a username and password to publish a plugin to the repository as shown in
 the following example.
