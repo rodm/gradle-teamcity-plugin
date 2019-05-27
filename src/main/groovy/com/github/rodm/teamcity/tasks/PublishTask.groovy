@@ -27,6 +27,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
 
@@ -43,6 +44,11 @@ class PublishTask extends DefaultTask {
      * The list of channel names that the plugin will be published to on the plugin repository
      */
     private List<String> channels
+
+    /**
+     * The JetBrains Hub token for uploading the plugin to the plugin repository
+     */
+    private String token
 
     /**
      * The username for uploading the plugin to the plugin repository
@@ -69,9 +75,23 @@ class PublishTask extends DefaultTask {
     }
 
     /**
+     * @return the token used for uploading the plugin to the plugin repository
+     */
+    @Input
+    @Optional
+    String getToken() {
+        return token
+    }
+
+    void setToken(String token) {
+        this.token = token
+    }
+
+    /**
      * @return the username used for uploading the plugin to the plugin repository
      */
     @Input
+    @Optional
     String getUsername() {
         return username
     }
@@ -84,6 +104,7 @@ class PublishTask extends DefaultTask {
      * @return the password used for uploading the plugin to the plugin repository
      */
     @Input
+    @Optional
     String getPassword() {
         return password
     }
@@ -118,7 +139,7 @@ class PublishTask extends DefaultTask {
             for (String channel : getChannels()) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
-                    def repoClient = new PluginRepositoryInstance(host, getUsername(), getPassword())
+                    def repoClient = new PluginRepositoryInstance(host, getToken(), getUsername(), getPassword())
                     repoClient.uploadPlugin(pluginId, distributionFile, channel && 'default' != channel ? channel : '')
                     LOGGER.info("Uploaded successfully")
                 }

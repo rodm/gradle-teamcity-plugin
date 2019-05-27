@@ -24,6 +24,8 @@ class PublishConfiguration {
 
     private List<String> channels = DEFAULT_CHANNELS
 
+    private String token
+
     private String username
 
     private String password
@@ -37,6 +39,17 @@ class PublishConfiguration {
 
     void setChannels(List<String> channels) {
         this.channels = channels
+    }
+
+    /**
+     * The token for uploading the plugin to the plugin repository
+     */
+    String getToken() {
+        return token
+    }
+
+    void setToken(String token) {
+        this.token = token
     }
 
     /**
