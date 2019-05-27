@@ -165,6 +165,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
                     conventionMapping.username = { extension.server.publish.username }
                     conventionMapping.password = { extension.server.publish.password }
                     conventionMapping.channels = { extension.server.publish.channels }
+                    conventionMapping.token = { extension.server.publish.token }
                     conventionMapping.distributionFile = {
                         def distributionFile = buildPluginTask?.archivePath
                         return distributionFile?.exists() ? distributionFile : null

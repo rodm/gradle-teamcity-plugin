@@ -382,6 +382,25 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
         assertThat(publishPlugin.username, equalTo('username'))
         assertThat(publishPlugin.password, equalTo('password'))
+        assertThat(publishPlugin.token, is(nullValue()))
+    }
+
+    @Test
+    void 'publish task is configured with a Hub token'() {
+        project.teamcity {
+            server {
+                publish {
+                    token = 'token'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.token, equalTo('token'))
+        assertThat(publishPlugin.username, is(nullValue()))
+        assertThat(publishPlugin.password, is(nullValue()))
     }
 
     @Test

@@ -7,6 +7,7 @@
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
+:uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2017.1
@@ -264,8 +265,10 @@ to create a JetBrains Account, follow the 'Sign In' link at the top of the plugi
 The `publishPlugin` task *cannot* be used to publish new plugins, the first upload must be completed using the
 Upload plugin link on the plugin repository website.
 
-The `publishPlugin` task requires a username and password to publish a plugin to the repository as shown in
-the following example.
+The `publishPlugin` task requires a username and password or a {uri-jetbrains-hub-token}[JetBrains Hub token] to
+publish a plugin to the repository as shown in the following examples.
+
+The following example configures the publish task.
 
 [source,groovy]
 [subs="attributes"]
@@ -288,9 +291,20 @@ tasks.withType<PublishTask> {
 }
 ----
 
-The username and password can also be configured in the `publish` section of the `server` configuration as shown in
-the following example. Optionally one or more channels can be specified using the `channels` property, by default
-the plugin is published to the 'Stable' channel.
+The following example uses a Hub token.
+
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+publishPlugin {
+    token = findProperty('jetbrains.token')
+}
+----
+
+The username and password or token can also be configured in the `publish` section of the `server` configuration as
+shown in the following example. Optionally one or more channels can be specified using the `channels` property,
+by default the plugin is published to the 'Stable' channel.
 
 [source,groovy]
 .build.gradle
@@ -301,9 +315,14 @@ teamcity {
             ...
         }
         publish {
+            channels = ['Beta']
+
+            // either
             username = findProperty('jetbrains.username')
             password = findProperty('jetbrains.password')
-            channels = ['Beta']
+
+            // or
+            token = findProperty('jetbrains.token')
         }
     }
 }
