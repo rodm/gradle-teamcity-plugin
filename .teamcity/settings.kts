@@ -115,11 +115,8 @@ project {
 
         params {
             param("gradle.tasks", "clean functionalTest")
-            param("gradle.version", "4.6")
             param("java.home", "%java9.home%")
         }
-
-        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
@@ -134,11 +131,8 @@ project {
 
         params {
             param("gradle.tasks", "clean functionalTest")
-            param("gradle.version", "4.7")
             param("java.home", "%java10.home%")
         }
-
-        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
@@ -153,11 +147,8 @@ project {
 
         params {
             param("gradle.tasks", "clean functionalTest")
-            param("gradle.version", "5.0")
             param("java.home", "%java11.home%")
         }
-
-        addSwitchGradleStep()
 
         failureConditions {
             executionTimeoutMin = 20
