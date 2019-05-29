@@ -12,7 +12,6 @@ matrix:
     - os: linux
       dist: trusty
       jdk: oraclejdk9
-      install: jdk_switcher use oraclejdk8 && ./gradlew wrapper --gradle-version=4.5 && jdk_switcher use oraclejdk9
 
 script:
   - ./gradlew --version
