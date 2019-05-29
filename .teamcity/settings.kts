@@ -156,6 +156,25 @@ project {
     }
     buildType(buildFunctionalTestJava11)
 
+    val buildFunctionalTestJava12 = BuildType {
+        templates(buildTemplate)
+        id("BuildFunctionalTestJava12")
+        name = "Build - Functional Test - Java 12"
+
+        params {
+            param("gradle.tasks", "clean functionalTest")
+            param("gradle.version", "5.4")
+            param("java.home", "%java12.home%")
+        }
+
+        addSwitchGradleStep()
+
+        failureConditions {
+            executionTimeoutMin = 20
+        }
+    }
+    buildType(buildFunctionalTestJava12)
+
     val buildSamplesTest = BuildType {
         templates(buildTemplate)
         id("BuildSamplesTestJava7")
@@ -199,6 +218,7 @@ project {
         buildFunctionalTestJava9,
         buildFunctionalTestJava10,
         buildFunctionalTestJava11,
+        buildFunctionalTestJava12,
         buildSamplesTest,
         reportCodeQuality
     )
