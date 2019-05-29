@@ -60,11 +60,13 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF"
 
+    private final String MINIMUM_SUPPORTED_VERSION = '5.0'
+
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
 
-        if (GradleVersion.current() < GradleVersion.version('4.0')) {
-            throw new GradleException('Gradle TeamCity plugin requires Gradle version 4.0 or later')
+        if (GradleVersion.current() < GradleVersion.version(MINIMUM_SUPPORTED_VERSION)) {
+            throw new GradleException("Gradle TeamCity plugin requires Gradle version ${MINIMUM_SUPPORTED_VERSION} or later")
         }
 
         if (project.plugins.hasPlugin(JavaPlugin) &&
