@@ -15,18 +15,14 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Before
 import org.junit.Test
 
-import static org.gradle.api.JavaVersion.VERSION_1_7
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.is
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import static org.hamcrest.Matchers.not
-import static org.junit.Assume.assumeThat
 
 class SamplesTest {
 
@@ -79,11 +75,8 @@ class SamplesTest {
 
     @Test
     void 'build kotlin plugin'() {
-        // Kotlin DSL in Gradle 4.5 requires Java 8 or later
-        assumeThat(JavaVersion.current(), not(VERSION_1_7))
-
         File projectDir = new File(samplesDir, 'kotlin-plugin')
-        BuildResult result = executeBuildWithVersion(projectDir, '4.5')
+        BuildResult result = executeBuild(projectDir)
 
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
@@ -102,17 +95,6 @@ class SamplesTest {
                 .withProjectDir(projectDir)
                 .withArguments(args)
                 .withPluginClasspath()
-                .forwardOutput()
-                .build()
-        return result
-    }
-
-    private static BuildResult executeBuildWithVersion(File projectDir, String version, String... args = ['clean', 'build']) {
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(args)
-                .withPluginClasspath()
-                .withGradleVersion(version)
                 .forwardOutput()
                 .build()
         return result
