@@ -93,6 +93,16 @@ project {
     }
     buildType(buildJava)
 
+    val buildJava11 = buildType {
+        templates(buildTemplate)
+        id("BuildJava11")
+        name = "Build - Java 11"
+
+        params {
+            param("java.home", "%java11.home%")
+        }
+    }
+
     val buildFunctionalTestJava8 = BuildType {
         templates(buildTemplate)
         id("BuildFunctionalTestJava8")
@@ -214,6 +224,7 @@ project {
 
     buildTypesOrder = arrayListOf(
         buildJava,
+        buildJava11,
         buildFunctionalTestJava8,
         buildFunctionalTestJava9,
         buildFunctionalTestJava10,
