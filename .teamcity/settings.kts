@@ -1,18 +1,19 @@
 
-import jetbrains.buildServer.configs.kotlin.v2018_1.version
-import jetbrains.buildServer.configs.kotlin.v2018_1.project
-import jetbrains.buildServer.configs.kotlin.v2018_1.BuildType
-import jetbrains.buildServer.configs.kotlin.v2018_1.CheckoutMode
-import jetbrains.buildServer.configs.kotlin.v2018_1.ProjectFeature
-import jetbrains.buildServer.configs.kotlin.v2018_1.ProjectFeatures
-import jetbrains.buildServer.configs.kotlin.v2018_1.Template
-import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2018_1.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.v2018_1.triggers.VcsTrigger
-import jetbrains.buildServer.configs.kotlin.v2018_1.triggers.vcs
-import jetbrains.buildServer.configs.kotlin.v2018_1.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.v2018_2.version
+import jetbrains.buildServer.configs.kotlin.v2018_2.project
+import jetbrains.buildServer.configs.kotlin.v2018_2.BuildType
+import jetbrains.buildServer.configs.kotlin.v2018_2.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2018_2.ProjectFeature
+import jetbrains.buildServer.configs.kotlin.v2018_2.ProjectFeatures
+import jetbrains.buildServer.configs.kotlin.v2018_2.Template
+import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2018_2.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
+import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
 
-version = "2018.1"
+version = "2018.2"
+
 project {
 
     val vcsId = "GradleTeamcityPlugin"
