@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Project
+
 /**
  * Configuration for publishing a plugin to a plugin repository.
  */
@@ -29,6 +31,12 @@ class PublishConfiguration {
     private String username
 
     private String password
+
+    private Project project
+
+    PublishConfiguration(Project project) {
+        this.project = project
+    }
 
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
@@ -60,6 +68,7 @@ class PublishConfiguration {
     }
 
     void setUsername(String username) {
+        project.logger.warn('username property in publish configuration is deprecated')
         this.username = username
     }
 
@@ -71,6 +80,7 @@ class PublishConfiguration {
     }
 
     void setPassword(String password) {
+        project.logger.warn('password property in publish configuration is deprecated')
         this.password = password
     }
 }

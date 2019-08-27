@@ -68,7 +68,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
     @CompileStatic(SKIP)
     def publish(Action<PublishConfiguration> configuration) {
         if (!publish) {
-            publish = (this as ExtensionAware).extensions.create('publish', PublishConfiguration)
+            publish = (this as ExtensionAware).extensions.create('publish', PublishConfiguration, project)
         }
         configuration.execute(publish)
     }

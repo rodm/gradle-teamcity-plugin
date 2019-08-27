@@ -97,6 +97,7 @@ class PublishTask extends DefaultTask {
     }
 
     void setUsername(String username) {
+        project.logger.warn('username property is deprecated')
         this.username = username
     }
 
@@ -110,6 +111,7 @@ class PublishTask extends DefaultTask {
     }
 
     void setPassword(String password) {
+        project.logger.warn('password property is deprecated')
         this.password = password
     }
 
