@@ -386,6 +386,24 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'publish task configured with username and password is deprecated'() {
+        project.teamcity {
+            server {
+                publish {
+                    username = 'username'
+                    password = 'password'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString('username property in publish configuration is deprecated'))
+        assertThat(output, containsString('password property in publish configuration is deprecated'))
+    }
+
+    @Test
     void 'publish task is configured with a Hub token'() {
         project.teamcity {
             server {

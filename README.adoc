@@ -266,7 +266,9 @@ The `publishPlugin` task *cannot* be used to publish new plugins, the first uplo
 Upload plugin link on the plugin repository website.
 
 The `publishPlugin` task requires a username and password or a {uri-jetbrains-hub-token}[JetBrains Hub token] to
-publish a plugin to the repository as shown in the following examples.
+publish a plugin to the repository as shown in the following examples. As of August 2019 the use of `username` and
+`password` for publishing is deprecated and no longer supported by the
+{uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository].
 
 The following example configures the publish task.
 
