@@ -215,7 +215,10 @@ class MultipleGradleVersionTest {
         if (gradleVersion < GradleVersion.version('5.4')) {
             return isOneOf('1.8', '1.9', '1.10', '11')
         }
-        return isOneOf('1.8', '1.9', '1.10', '11', '12')
+        if (gradleVersion < GradleVersion.version('6.0')) {
+            return isOneOf('1.8', '1.9', '1.10', '11', '12')
+        }
+        return isOneOf('1.8', '1.9', '1.10', '11', '12', '13')
     }
 
     private BuildResult executeBuild(String version) {
