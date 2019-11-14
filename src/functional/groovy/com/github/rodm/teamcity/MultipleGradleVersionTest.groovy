@@ -203,22 +203,17 @@ class MultipleGradleVersionTest {
 
     Matcher supportedByGradle(String version) {
         def gradleVersion = GradleVersion.version(version)
-        if (gradleVersion < GradleVersion.version('4.3')) {
-            return isOneOf('1.8')
+        def javaVersions = ['1.8', '1.9', '1.10']
+        if (gradleVersion >= GradleVersion.version('5.0-rc-1')) {
+            javaVersions << '11'
         }
-        if (gradleVersion < GradleVersion.version('4.7')) {
-            return isOneOf('1.8', '1.9')
+        if (gradleVersion >= GradleVersion.version('5.4')) {
+            javaVersions << '12'
         }
-        if (gradleVersion < GradleVersion.version('5.0-rc-1')) {
-            return isOneOf('1.8', '1.9', '1.10')
+        if (gradleVersion >= GradleVersion.version('6.0')) {
+            javaVersions << '13'
         }
-        if (gradleVersion < GradleVersion.version('5.4')) {
-            return isOneOf('1.8', '1.9', '1.10', '11')
-        }
-        if (gradleVersion < GradleVersion.version('6.0')) {
-            return isOneOf('1.8', '1.9', '1.10', '11', '12')
-        }
-        return isOneOf('1.8', '1.9', '1.10', '11', '12', '13')
+        return isOneOf(*javaVersions)
     }
 
     private BuildResult executeBuild(String version) {
