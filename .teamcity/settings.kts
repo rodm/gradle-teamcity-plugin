@@ -12,7 +12,7 @@ import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2018_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2018_2.vcs.GitVcsRoot
 
-version = "2018.2"
+version = "2019.1"
 
 project {
 
