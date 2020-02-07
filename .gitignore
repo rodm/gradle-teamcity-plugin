@@ -1,7 +1,13 @@
 
+# Gradle
 .gradle
 build
 gradle.properties
 
+# IDEA
 .idea
 *.iml
+out/
+
+# TeamCity SDK Maven plugin
+.teamcity/target/
