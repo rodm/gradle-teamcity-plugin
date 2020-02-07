@@ -162,8 +162,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 project.tasks.create("publishPlugin", PublishTask) {
                     group = TeamCityPlugin.GROUP_NAME
                     description = "Publish plugin distribution on plugins.jetbrains.com."
-                    conventionMapping.username = { extension.server.publish.username }
-                    conventionMapping.password = { extension.server.publish.password }
                     conventionMapping.channels = { extension.server.publish.channels }
                     conventionMapping.token = { extension.server.publish.token }
                     conventionMapping.distributionFile = {

@@ -28,10 +28,6 @@ class PublishConfiguration {
 
     private String token
 
-    private String username
-
-    private String password
-
     private Project project
 
     PublishConfiguration(Project project) {
@@ -58,29 +54,5 @@ class PublishConfiguration {
 
     void setToken(String token) {
         this.token = token
-    }
-
-    /**
-     * The username for uploading the plugin to the plugin repository
-     */
-    String getUsername() {
-        return username
-    }
-
-    void setUsername(String username) {
-        project.logger.warn('username property in publish configuration is deprecated')
-        this.username = username
-    }
-
-    /**
-     * The password for uploading the plugin to the plugin repository
-     */
-    String getPassword() {
-        return password
-    }
-
-    void setPassword(String password) {
-        project.logger.warn('password property in publish configuration is deprecated')
-        this.password = password
     }
 }

@@ -367,43 +367,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'publish task is configured with username and password'() {
-        project.teamcity {
-            server {
-                publish {
-                    username = 'username'
-                    password = 'password'
-                }
-            }
-        }
-
-        project.evaluate()
-
-        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.username, equalTo('username'))
-        assertThat(publishPlugin.password, equalTo('password'))
-        assertThat(publishPlugin.token, is(nullValue()))
-    }
-
-    @Test
-    void 'publish task configured with username and password is deprecated'() {
-        project.teamcity {
-            server {
-                publish {
-                    username = 'username'
-                    password = 'password'
-                }
-            }
-        }
-
-        project.evaluate()
-
-        String output = outputEventListener.toString()
-        assertThat(output, containsString('username property in publish configuration is deprecated'))
-        assertThat(output, containsString('password property in publish configuration is deprecated'))
-    }
-
-    @Test
     void 'publish task is configured with a Hub token'() {
         project.teamcity {
             server {
@@ -417,8 +380,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
         assertThat(publishPlugin.token, equalTo('token'))
-        assertThat(publishPlugin.username, is(nullValue()))
-        assertThat(publishPlugin.password, is(nullValue()))
     }
 
     @Test
@@ -426,14 +387,14 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.teamcity {
             server {
                 publish {
-                    username = 'username'
+                    channels = ['Beta', 'Test']
                 }
             }
         }
         project.teamcity {
             server {
                 publish {
-                    password = 'password'
+                    token = 'token'
                 }
             }
         }
@@ -441,8 +402,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.username, equalTo('username'))
-        assertThat(publishPlugin.password, equalTo('password'))
+        assertThat(publishPlugin.channels, equalTo(['Beta', 'Test']))
+        assertThat(publishPlugin.token, equalTo('token'))
     }
 
     @Test

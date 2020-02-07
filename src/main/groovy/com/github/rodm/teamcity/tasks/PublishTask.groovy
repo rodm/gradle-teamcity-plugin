@@ -50,16 +50,6 @@ class PublishTask extends DefaultTask {
      */
     private String token
 
-    /**
-     * The username for uploading the plugin to the plugin repository
-     */
-    private String username
-
-    /**
-     * The password for uploading the plugin to the plugin repository
-     */
-    private String password
-
     public File distributionFile
 
     /**
@@ -88,34 +78,6 @@ class PublishTask extends DefaultTask {
     }
 
     /**
-     * @return the username used for uploading the plugin to the plugin repository
-     */
-    @Input
-    @Optional
-    String getUsername() {
-        return username
-    }
-
-    void setUsername(String username) {
-        project.logger.warn('username property is deprecated')
-        this.username = username
-    }
-
-    /**
-     * @return the password used for uploading the plugin to the plugin repository
-     */
-    @Input
-    @Optional
-    String getPassword() {
-        return password
-    }
-
-    void setPassword(String password) {
-        project.logger.warn('password property is deprecated')
-        this.password = password
-    }
-
-    /**
      * @return the plugin distribution file
      */
     @InputFile
@@ -141,7 +103,7 @@ class PublishTask extends DefaultTask {
             for (String channel : getChannels()) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
-                    def repoClient = new PluginRepositoryInstance(host, getToken(), getUsername(), getPassword())
+                    def repoClient = new PluginRepositoryInstance(host, getToken())
                     repoClient.uploadPlugin(pluginId, distributionFile, channel && 'default' != channel ? channel : '')
                     LOGGER.info("Uploaded successfully")
                 }

@@ -265,35 +265,10 @@ to create a JetBrains Account, follow the 'Sign In' link at the top of the plugi
 The `publishPlugin` task *cannot* be used to publish new plugins, the first upload must be completed using the
 Upload plugin link on the plugin repository website.
 
-The `publishPlugin` task requires a username and password or a {uri-jetbrains-hub-token}[JetBrains Hub token] to
-publish a plugin to the repository as shown in the following examples. As of August 2019 the use of `username` and
-`password` for publishing is deprecated and no longer supported by the
-{uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository].
+The `publishPlugin` task requires a {uri-jetbrains-hub-token}[JetBrains Hub token] to publish a plugin to the
+repository as shown in the following examples.
 
 The following example configures the publish task.
-
-[source,groovy]
-[subs="attributes"]
-.build.gradle
-----
-publishPlugin {
-    username = findProperty('jetbrains.username')
-    password = findProperty('jetbrains.password')
-}
-----
-
-The following example uses the Kotlin DSL.
-
-[source,groovy]
-.build.gradle.kts
-----
-tasks.withType<PublishTask> {
-    username = findProperty("jetbrains.username") as String?
-    password = findProperty("jetbrains.password") as String?
-}
-----
-
-The following example uses a Hub token.
 
 [source,groovy]
 [subs="attributes"]
@@ -304,7 +279,18 @@ publishPlugin {
 }
 ----
 
-The username and password or token can also be configured in the `publish` section of the `server` configuration as
+The following example uses the Kotlin DSL.
+
+[source,groovy]
+.build.gradle.kts
+----
+tasks.withType<PublishTask> {
+    token = findProperty("jetbrains.token") as String?
+}
+----
+
+
+The token can also be configured in the `publish` section of the `server` configuration as
 shown in the following example. Optionally one or more channels can be specified using the `channels` property,
 by default the plugin is published to the 'Stable' channel.
 
@@ -319,11 +305,6 @@ teamcity {
         publish {
             channels = ['Beta']
 
-            // either
-            username = findProperty('jetbrains.username')
-            password = findProperty('jetbrains.password')
-
-            // or
             token = findProperty('jetbrains.token')
         }
     }
