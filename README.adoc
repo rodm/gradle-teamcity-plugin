@@ -289,10 +289,11 @@ tasks.withType<PublishTask> {
 }
 ----
 
-
-The token can also be configured in the `publish` section of the `server` configuration as
+The token and other properties can also be configured in the `publish` section of the `server` configuration as
 shown in the following example. Optionally one or more channels can be specified using the `channels` property,
-by default the plugin is published to the 'Stable' channel.
+by default the plugin is published to the 'Stable' channel. Also a `notes` property can be set with the changes
+made to the version of the plugin to be uploaded. The change or update notes text is shown on the plugin repository
+next to each plugin version.
 
 [source,groovy]
 .build.gradle
@@ -304,8 +305,8 @@ teamcity {
         }
         publish {
             channels = ['Beta']
-
             token = findProperty('jetbrains.token')
+            notes = 'change notes'
         }
     }
 }

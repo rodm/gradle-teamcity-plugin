@@ -164,6 +164,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
                     description = "Publish plugin distribution on plugins.jetbrains.com."
                     conventionMapping.channels = { extension.server.publish.channels }
                     conventionMapping.token = { extension.server.publish.token }
+                    conventionMapping.notes = { extension.server.publish.notes }
                     conventionMapping.distributionFile = {
                         def distributionFile = buildPluginTask?.archivePath
                         return distributionFile?.exists() ? distributionFile : null

@@ -28,6 +28,8 @@ class PublishConfiguration {
 
     private String token
 
+    private String notes
+
     private Project project
 
     PublishConfiguration(Project project) {
@@ -54,5 +56,16 @@ class PublishConfiguration {
 
     void setToken(String token) {
         this.token = token
+    }
+
+    /**
+     * The notes describing the changes made to the plugin
+     */
+    String getNotes() {
+        return notes
+    }
+
+    void setNotes(String notes) {
+        this.notes = notes
     }
 }

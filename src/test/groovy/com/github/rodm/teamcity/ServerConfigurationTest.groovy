@@ -383,6 +383,22 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'publish task is configured with change notes'() {
+        project.teamcity {
+            server {
+                publish {
+                    notes = 'change notes'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.notes, equalTo('change notes'))
+    }
+
+    @Test
     void 'allow server publish configuration to be created from multiple configuration blocks'() {
         project.teamcity {
             server {

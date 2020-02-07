@@ -50,6 +50,11 @@ class PublishTask extends DefaultTask {
      */
     private String token
 
+    /**
+     * The notes describing the changes made to the plugin
+     */
+    private String notes
+
     public File distributionFile
 
     /**
@@ -78,6 +83,19 @@ class PublishTask extends DefaultTask {
     }
 
     /**
+     * @return the notes describing the changes made to the plugin
+     */
+    @Input
+    @Optional
+    String getNotes() {
+        return notes
+    }
+
+    void setNotes(String notes) {
+        this.notes = notes
+    }
+
+    /**
      * @return the plugin distribution file
      */
     @InputFile
@@ -103,8 +121,9 @@ class PublishTask extends DefaultTask {
             for (String channel : getChannels()) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
+                    def uploadChannel = channel && 'default' != channel ? channel : ''
                     def repoClient = new PluginRepositoryInstance(host, getToken())
-                    repoClient.uploadPlugin(pluginId, distributionFile, channel && 'default' != channel ? channel : '')
+                    repoClient.uploadPlugin(pluginId, distributionFile, uploadChannel, getNotes())
                     LOGGER.info("Uploaded successfully")
                 }
                 catch (exception) {
