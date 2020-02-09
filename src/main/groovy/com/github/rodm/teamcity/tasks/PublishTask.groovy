@@ -29,7 +29,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.intellij.pluginRepository.PluginRepositoryInstance
+import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
 
 class PublishTask extends DefaultTask {
 
@@ -122,8 +122,8 @@ class PublishTask extends DefaultTask {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
                     def uploadChannel = channel && 'default' != channel ? channel : ''
-                    def repoClient = new PluginRepositoryInstance(host, getToken())
-                    repoClient.uploadPlugin(pluginId, distributionFile, uploadChannel, getNotes())
+                    def repoClient = PluginRepositoryFactory.create(host, getToken())
+                    repoClient.uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, getNotes())
                     LOGGER.info("Uploaded successfully")
                 }
                 catch (exception) {
