@@ -1,13 +1,13 @@
 
+import com.github.rodm.teamcity.gradle.switchGradleBuildStep
+import com.github.rodm.teamcity.project.githubIssueTracker
+
 import jetbrains.buildServer.configs.kotlin.v2019_2.version
 import jetbrains.buildServer.configs.kotlin.v2019_2.project
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
-import jetbrains.buildServer.configs.kotlin.v2019_2.ProjectFeature
-import jetbrains.buildServer.configs.kotlin.v2019_2.ProjectFeatures
 import jetbrains.buildServer.configs.kotlin.v2019_2.Template
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
@@ -60,7 +60,7 @@ project {
 
         steps {
             gradle {
-                id = "RUNNER_38"
+                id = "GRADLE_BUILD"
                 tasks = "%gradle.tasks%"
                 buildFile = ""
                 gradleParams = "%gradle.opts%"
@@ -182,7 +182,10 @@ project {
             param("java.home", "%java12.home%")
         }
 
-        addSwitchGradleStep()
+        steps {
+            switchGradleBuildStep()
+            stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+        }
 
         failureConditions {
             executionTimeoutMin = 20
@@ -201,7 +204,10 @@ project {
             param("java.home", "%java13.home%")
         }
 
-        addSwitchGradleStep()
+        steps {
+            switchGradleBuildStep()
+            stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+        }
 
         failureConditions {
             executionTimeoutMin = 20
@@ -250,44 +256,4 @@ project {
         buildSamplesTest,
         reportCodeQuality
     )
-}
-
-fun BuildType.addSwitchGradleStep() {
-    steps {
-        script {
-            id = "SWITCH_GRADLE"
-            scriptContent = """
-                #!/bin/sh
-
-                JAVA_HOME=%java8.home% ./gradlew wrapper --gradle-version=%gradle.version%
-                JAVA_HOME=%java.home% ./gradlew --version
-                """.trimIndent()
-        }
-        stepsOrder = arrayListOf("SWITCH_GRADLE", "RUNNER_38")
-    }
-}
-
-fun ProjectFeatures.githubIssueTracker(init: GitHubIssueTracker.() -> Unit): GitHubIssueTracker {
-    val result = GitHubIssueTracker(init)
-    feature(result)
-    return result
-}
-
-class GitHubIssueTracker() : ProjectFeature() {
-
-    init {
-        type = "IssueTracker"
-        param("type", "GithubIssues")
-        param("authType", "anonymous")
-    }
-
-    constructor(init: GitHubIssueTracker.() -> Unit): this() {
-        init()
-    }
-
-    var displayName by stringParameter("name")
-
-    var repository by stringParameter()
-
-    var pattern by stringParameter()
 }
