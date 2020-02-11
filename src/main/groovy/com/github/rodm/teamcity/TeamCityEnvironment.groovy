@@ -100,44 +100,45 @@ class TeamCityEnvironment {
 
     /**
      * The Java command line options to be used when starting the TeamCity Server.
-     * Defaults to '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+     * Defaults to
+     *      '-Dteamcity.development.mode=true'
+     *      '-Dteamcity.development.shadowCopyClasses=true'
+     *      '-Dteamcity.superUser.token.saveToFile=true'
      */
-    def getServerOptions() {
+    Object getServerOptions() {
         return serverOptions.join(' ')
     }
 
-    def setServerOptions(String options) {
+    def setServerOptions(Object options) {
         this.serverOptions.clear()
-        this.serverOptions.addAll(options)
+        if (options instanceof List) {
+            this.serverOptions.addAll(options)
+        } else {
+            this.serverOptions.add(options.toString())
+        }
     }
 
-    def setServerOptions(List<String> options) {
-        this.serverOptions.clear()
-        this.serverOptions.addAll(options)
-    }
-
-    def serverOptions(String... options) {
+    void serverOptions(String... options) {
         this.serverOptions.addAll(options)
     }
 
     /**
      * The Java command line options to be used when starting the TeamCity Agent.
      */
-    def getAgentOptions() {
+    Object getAgentOptions() {
         return agentOptions.join(' ')
     }
 
-    def setAgentOptions(String options) {
+    void setAgentOptions(Object options) {
         this.agentOptions.clear()
-        this.agentOptions.add(options)
+        if (options instanceof List) {
+            this.agentOptions.addAll(options)
+        } else {
+            this.agentOptions.add(options.toString())
+        }
     }
 
-    def setAgentOptions(List<String> options) {
-        this.agentOptions.clear()
-        this.agentOptions.addAll(options)
-    }
-
-    def agentOptions(String... options) {
+    void agentOptions(String... options) {
         this.agentOptions.addAll(options)
     }
 }
