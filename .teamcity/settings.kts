@@ -220,6 +220,12 @@ project {
                 id("TriggerSnapshotBuilds")
                 name = "Trigger builds"
 
+                vcs {
+                    root(vcs)
+                    checkoutMode = CheckoutMode.ON_SERVER
+                    cleanCheckout = true
+                }
+
                 triggers {
                     vcs {
                         id = "vcsTrigger"
