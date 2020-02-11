@@ -203,8 +203,6 @@ project {
                 id("BuildSamplesTestJava7")
                 name = "Build - Samples Test - Java 8"
 
-                artifactRules = "samples/**/build/distributions/*.zip"
-
                 params {
                     param("gradle.tasks", "clean samplesTest")
                 }
