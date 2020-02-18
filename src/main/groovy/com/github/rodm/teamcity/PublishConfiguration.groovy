@@ -16,6 +16,8 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 
 /**
  * Configuration for publishing a plugin to a plugin repository.
@@ -24,48 +26,52 @@ class PublishConfiguration {
 
     public static final List<String> DEFAULT_CHANNELS = ['default'].asImmutable()
 
-    private List<String> channels = DEFAULT_CHANNELS
+    private ListProperty<String> channels
 
-    private String token
+    private Property<String> token
 
-    private String notes
+    private Property<String> notes
 
     private Project project
 
     PublishConfiguration(Project project) {
         this.project = project
+        this.channels = project.objects.listProperty(String)
+        this.channels.set(DEFAULT_CHANNELS)
+        this.token = project.objects.property(String)
+        this.notes = project.objects.property(String)
     }
 
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
      */
-    List<String> getChannels() {
+    ListProperty<String> getChannels() {
         return channels
     }
 
     void setChannels(List<String> channels) {
-        this.channels = channels
+        this.channels.set(channels)
     }
 
     /**
      * The token for uploading the plugin to the plugin repository
      */
-    String getToken() {
+    Property<String> getToken() {
         return token
     }
 
     void setToken(String token) {
-        this.token = token
+        this.token.set(token)
     }
 
     /**
      * The notes describing the changes made to the plugin
      */
-    String getNotes() {
+    Property<String> getNotes() {
         return notes
     }
 
     void setNotes(String notes) {
-        this.notes = notes
+        this.notes.set(notes)
     }
 }

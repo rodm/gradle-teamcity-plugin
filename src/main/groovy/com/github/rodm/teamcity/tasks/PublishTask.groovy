@@ -23,8 +23,11 @@ import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
@@ -43,30 +46,38 @@ class PublishTask extends DefaultTask {
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
      */
-    private List<String> channels
+    private ListProperty<String> channels
 
     /**
      * The JetBrains Hub token for uploading the plugin to the plugin repository
      */
-    private String token
+    private Property<String> token
 
     /**
      * The notes describing the changes made to the plugin
      */
-    private String notes
+    private Property<String> notes
 
-    public File distributionFile
+    private RegularFileProperty distributionFile
+
+    PublishTask() {
+        enabled = !project.gradle.startParameter.offline
+        channels = project.objects.listProperty(String)
+        token = project.objects.property(String)
+        notes = project.objects.property(String)
+        distributionFile = project.objects.fileProperty()
+    }
 
     /**
      * @return the list of channels the plugin will be published to on the plugin repository
      */
     @Input
-    List<String> getChannels() {
+    ListProperty<String> getChannels() {
         return channels
     }
 
-    void setChannels(List<String> channels) {
-        this.channels = channels
+    void setChannels(ListProperty<String> channels) {
+        this.channels.set(channels)
     }
 
     /**
@@ -74,12 +85,12 @@ class PublishTask extends DefaultTask {
      */
     @Input
     @Optional
-    String getToken() {
+    Property<String> getToken() {
         return token
     }
 
-    void setToken(String token) {
-        this.token = token
+    void setToken(Property<String> token) {
+        this.token.set(token)
     }
 
     /**
@@ -87,24 +98,24 @@ class PublishTask extends DefaultTask {
      */
     @Input
     @Optional
-    String getNotes() {
+    Property<String> getNotes() {
         return notes
     }
 
     void setNotes(String notes) {
-        this.notes = notes
+        this.notes.set(notes)
     }
 
     /**
      * @return the plugin distribution file
      */
     @InputFile
-    File getDistributionFile() {
+    RegularFileProperty getDistributionFile() {
         return distributionFile
     }
 
-    PublishTask() {
-        enabled = !project.gradle.startParameter.offline
+    void setDistributionFile(RegularFileProperty distributionFile) {
+        this.distributionFile.set(distributionFile)
     }
 
     @SuppressWarnings("GroovyUnusedDeclaration")
@@ -114,16 +125,16 @@ class PublishTask extends DefaultTask {
             throw new InvalidUserDataException("Channels list can't be empty")
         }
 
-        def distributionFile = getDistributionFile()
+        def distributionFile = getDistributionFile().get().asFile
         def creationResult = TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
-            for (String channel : getChannels()) {
+            for (String channel : getChannels().get()) {
                 LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
                 try {
                     def uploadChannel = channel && 'default' != channel ? channel : ''
-                    def repoClient = PluginRepositoryFactory.create(host, getToken())
-                    repoClient.uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, getNotes())
+                    def repoClient = PluginRepositoryFactory.create(host, token.orNull)
+                    repoClient.uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, notes.orNull)
                     LOGGER.info("Uploaded successfully")
                 }
                 catch (exception) {

@@ -379,7 +379,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.token, equalTo('token'))
+        assertThat(publishPlugin.token.get(), equalTo('token'))
     }
 
     @Test
@@ -395,7 +395,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.notes, equalTo('change notes'))
+        assertThat(publishPlugin.notes.get(), equalTo('change notes'))
     }
 
     @Test
@@ -418,8 +418,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.channels, equalTo(['Beta', 'Test']))
-        assertThat(publishPlugin.token, equalTo('token'))
+        assertThat(publishPlugin.channels.get(), equalTo(['Beta', 'Test']))
+        assertThat(publishPlugin.token.get(), equalTo('token'))
     }
 
     @Test
@@ -433,7 +433,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.channels, equalTo(['default']))
+        assertThat(publishPlugin.channels.get(), equalTo(['default']))
     }
 
     @Test
@@ -449,7 +449,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
-        assertThat(publishPlugin.channels, equalTo(['Beta', 'Test']))
+        assertThat(publishPlugin.channels.get(), equalTo(['Beta', 'Test']))
     }
 
     @Test
