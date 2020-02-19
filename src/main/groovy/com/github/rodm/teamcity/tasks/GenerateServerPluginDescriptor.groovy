@@ -20,6 +20,8 @@ import com.github.rodm.teamcity.ServerPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
@@ -31,37 +33,43 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 @CompileStatic
 class GenerateServerPluginDescriptor extends DefaultTask {
 
-    private String version
+    private Property<String> version
 
-    private ServerPluginDescriptor descriptor
+    private Property<ServerPluginDescriptor> descriptor
 
-    private File destination
+    private RegularFileProperty destination
+
+    GenerateServerPluginDescriptor() {
+        version = project.objects.property(String)
+        descriptor = project.objects.property(ServerPluginDescriptor)
+        destination = project.objects.fileProperty()
+    }
 
     @Input
-    String getVersion() {
+    Property<String> getVersion() {
         return version
     }
 
     @Nested
-    ServerPluginDescriptor getDescriptor() {
+    Property<ServerPluginDescriptor> getDescriptor() {
         return descriptor
     }
 
     @OutputFile
-    File getDestination() {
+    RegularFileProperty getDestination() {
         return destination
     }
 
     @TaskAction
     void generateDescriptor() {
-        TeamCityVersion teamcityVersion = TeamCityVersion.version(getVersion())
-        if (teamcityVersion < VERSION_9_0 && getDescriptor().dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
+        TeamCityVersion teamcityVersion = TeamCityVersion.version(version.get())
+        if (teamcityVersion < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
+            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
-        if (teamcityVersion < VERSION_2018_2 && getDescriptor().allowRuntimeReload != null) {
-            project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${getVersion()}")
+        if (teamcityVersion < VERSION_2018_2 && descriptor.get().allowRuntimeReload != null) {
+            project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${version.get()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(getDescriptor(), getVersion())
-        getDestination().withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get())
+        destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }

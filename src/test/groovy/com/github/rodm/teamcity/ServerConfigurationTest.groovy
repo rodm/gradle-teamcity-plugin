@@ -103,8 +103,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
 
-        assertThat(task.version, equalTo('9.0'))
-        assertThat(task.descriptor, isA(ServerPluginDescriptor))
+        assertThat(task.version.get(), equalTo('9.0'))
+        assertThat(task.descriptor.get(), isA(ServerPluginDescriptor))
         assertThat(normalizePath(task.destination), endsWith('build/descriptor/server/teamcity-plugin.xml'))
     }
 
