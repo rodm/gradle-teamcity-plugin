@@ -251,8 +251,8 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         }
         GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
 
-        assertThat(task.version, equalTo('9.0'))
-        assertThat(task.descriptor, isA(AgentPluginDescriptor))
+        assertThat(task.version.get(), equalTo('9.0'))
+        assertThat(task.descriptor.get(), isA(AgentPluginDescriptor))
         assertThat(normalizePath(task.destination), endsWith('build/descriptor/agent/teamcity-plugin.xml'))
     }
 

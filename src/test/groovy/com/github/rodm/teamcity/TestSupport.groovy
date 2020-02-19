@@ -16,7 +16,13 @@
 
 package com.github.rodm.teamcity
 
+import org.gradle.api.file.RegularFileProperty
+
 class TestSupport {
+    static String normalizePath(RegularFileProperty fileProperty) {
+        normalizePath(fileProperty.get().asFile)
+    }
+
     static String normalizePath(File path) {
         path.canonicalPath.replace('\\', '/')
     }

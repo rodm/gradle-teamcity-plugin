@@ -20,6 +20,8 @@ import com.github.rodm.teamcity.AgentPluginDescriptorGenerator
 import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
@@ -30,33 +32,39 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 @CompileStatic
 class GenerateAgentPluginDescriptor extends DefaultTask {
 
-    private String version
+    private Property<String> version
 
-    private AgentPluginDescriptor descriptor
+    private Property<AgentPluginDescriptor> descriptor
 
-    private File destination
+    private RegularFileProperty destination
+
+    GenerateAgentPluginDescriptor() {
+        version = project.objects.property(String)
+        descriptor = project.objects.property(AgentPluginDescriptor)
+        destination = project.objects.fileProperty()
+    }
 
     @Input
-    String getVersion() {
+    Property<String> getVersion() {
         return version
     }
 
     @Nested
-    AgentPluginDescriptor getDescriptor() {
+    Property<AgentPluginDescriptor> getDescriptor() {
         return descriptor
     }
 
     @OutputFile
-    File getDestination() {
+    RegularFileProperty getDestination() {
         return destination
     }
 
     @TaskAction
     void generateDescriptor() {
-        if (TeamCityVersion.version(getVersion()) < VERSION_9_0 && getDescriptor().dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${getVersion()}")
+        if (TeamCityVersion.version(version.get()) < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
+            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
-        AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor())
-        getDestination().withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
+        AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor.get())
+        destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }
