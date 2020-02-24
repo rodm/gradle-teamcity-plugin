@@ -37,7 +37,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
     private Project project
 
     ServerPluginConfiguration(Project project, TeamCityEnvironments environments) {
-        super(project.copySpec())
+        super(project)
         this.project = project
         this.environments = environments
     }

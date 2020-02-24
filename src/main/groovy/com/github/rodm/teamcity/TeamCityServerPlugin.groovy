@@ -108,17 +108,17 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
         def descriptorFile = new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         packagePlugin.with(extension.server.files)
-        packagePlugin.onlyIf { extension.server.descriptor != null }
+        packagePlugin.onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
         def processDescriptor = project.tasks.create('processServerDescriptor', ProcessDescriptor) {
-            conventionMapping.descriptor = { extension.server.descriptor instanceof File ? extension.server.descriptor : null }
-            conventionMapping.tokens = { extension.server.tokens }
+            descriptor.set(extension.server.descriptorFile)
+            tokens.set(project.providers.provider({ extension.server.tokens }))
         }
         processDescriptor.destinationDir = new File(project.buildDir, SERVER_PLUGIN_DESCRIPTOR_DIR)
-        processDescriptor.onlyIf { extension.server.descriptor != null && extension.server.descriptor instanceof File }
+        processDescriptor.onlyIf { extension.server.descriptorFile.isPresent() }
         packagePlugin.dependsOn processDescriptor
 
         def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor) {

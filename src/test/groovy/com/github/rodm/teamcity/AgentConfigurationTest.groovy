@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.nullValue
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.fail
@@ -205,6 +206,18 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'build script plugin descriptor'() {
+        project.teamcity {
+            agent {
+                descriptor {}
+            }
+        }
+
+        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(false))
+    }
+
+    @Test
     void filePluginDescriptor() {
         project.teamcity {
             agent {
@@ -212,8 +225,9 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.agent.descriptor, isA(File))
-        assertThat(extension.agent.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
+        assertThat(extension.agent.descriptor, is(nullValue()))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(true))
+        assertThat(extension.agent.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
 
     @Test
@@ -334,6 +348,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         }
 
         assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(false))
         assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
     }
 
@@ -343,7 +358,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             descriptor = project.file('teamcity-plugin.xml')
         }
 
-        assertThat(extension.agent.descriptor, isA(File))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(true))
         assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
     }
 

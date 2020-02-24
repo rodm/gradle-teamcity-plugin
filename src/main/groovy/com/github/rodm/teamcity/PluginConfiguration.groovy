@@ -16,7 +16,9 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
+import org.gradle.api.file.RegularFileProperty
 
 /**
  * Base class for plugin configuration.
@@ -25,14 +27,29 @@ abstract class PluginConfiguration {
 
     def descriptor
 
+    private RegularFileProperty descriptorFile
+
     private CopySpec files
 
     private Map<String, Object> tokens = [:]
 
     String archiveName
 
-    PluginConfiguration(CopySpec copySpec) {
-        this.files = copySpec
+    PluginConfiguration(Project project) {
+        this.descriptorFile = project.objects.fileProperty()
+        this.files = project.copySpec()
+    }
+
+    void setDescriptor(Object descriptor) {
+        if (descriptor instanceof File) {
+            this.descriptorFile.set(descriptor)
+        } else {
+            this.@descriptor = descriptor
+        }
+    }
+
+    RegularFileProperty getDescriptorFile() {
+        return descriptorFile
     }
 
     /**

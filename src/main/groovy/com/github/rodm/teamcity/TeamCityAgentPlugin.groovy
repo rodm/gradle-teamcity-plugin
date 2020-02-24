@@ -98,7 +98,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         def descriptorFile = new File(project.getBuildDir(), AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
         packagePlugin.with(extension.agent.files)
-        packagePlugin.onlyIf { extension.agent.descriptor != null }
+        packagePlugin.onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
         Set<FileCopyDetails> files = []
         packagePlugin.filesMatching('**/*', new FileCollectorAction(files))
         packagePlugin.doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
@@ -111,11 +111,11 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         assemble.dependsOn packagePlugin
 
         def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessDescriptor) {
-            conventionMapping.descriptor = { extension.agent.descriptor instanceof File ? extension.agent.descriptor : null }
-            conventionMapping.tokens = { extension.agent.tokens }
+            descriptor.set(extension.agent.descriptorFile)
+            tokens.set(project.providers.provider({ extension.agent.tokens }))
         }
         processDescriptor.destinationDir = new File(project.buildDir, AGENT_PLUGIN_DESCRIPTOR_DIR)
-        processDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof File}
+        processDescriptor.onlyIf { extension.agent.descriptorFile.isPresent() }
         packagePlugin.dependsOn processDescriptor
 
         def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor) {

@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
+import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.bundling.Zip
@@ -31,6 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
+import static org.hamcrest.Matchers.not
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.fail
@@ -53,7 +55,9 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
+        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
         assertThat(extension.server.descriptor.getName(), equalTo('test plugin'))
+        assertThat(extension.server.descriptorFile.isPresent(), is(false))
     }
 
     @Test
@@ -64,8 +68,9 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.server.descriptor, isA(File))
-        assertThat(extension.server.descriptor.getPath(), endsWith("test-teamcity-plugin.xml"))
+        assertThat(extension.server.descriptor, is(nullValue()))
+        assertThat(extension.server.descriptorFile.isPresent(), is(true))
+        assertThat(extension.server.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
     }
 
     @Test
@@ -205,6 +210,44 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'process descriptor replaces tokens in descriptor file'() {
+        project.teamcity {
+            server {
+                descriptor = project.file('teamcity-plugin.xml')
+                tokens VERSION: '1.2.3', VENDOR_NAME: 'rodm'
+                tokens BUILD_NUMBER: '456'
+            }
+        }
+        File descriptorFile = projectDir.newFile('teamcity-plugin.xml')
+        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
+            <teamcity-plugin>
+                <info>
+                    <name>test-plugin</name>
+                    <display-name>test-plugin</display-name>
+                    <description>plugin description. Build: @BUILD_NUMBER@ </description>
+                    <version>@VERSION@</version>
+                    <vendor>
+                        <name>@VENDOR_NAME@</name>
+                        <url>http://example.com</url>
+                    </vendor>
+                </info>
+                <deployment use-separate-classloader="false"/>
+            </teamcity-plugin>
+        """
+
+        File outputDir = projectDir.newFolder('build', 'descriptor', 'server')
+        ProcessDescriptor task = (ProcessDescriptor) project.tasks.findByName('processServerDescriptor')
+        task.process()
+
+        File outputFile = new File(outputDir, 'teamcity-plugin.xml')
+        String contents = new String(outputFile.bytes, 'UTF-8')
+        assertThat(contents, not(containsString('@')))
+        assertThat(contents, containsString('1.2.3'))
+        assertThat(contents, containsString('rodm'))
+        assertThat(contents, containsString('456'))
+    }
+
+    @Test
     void serverPluginWithAdditionalFiles() {
         project.teamcity {
             server {
@@ -257,7 +300,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             descriptor = project.file('teamcity-plugin.xml')
         }
 
-        assertThat(extension.server.descriptor, isA(File))
+        assertThat(extension.server.descriptorFile.isPresent(), is(true))
         assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
     }
 

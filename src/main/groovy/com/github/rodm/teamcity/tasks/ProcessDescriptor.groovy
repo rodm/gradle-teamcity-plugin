@@ -18,46 +18,61 @@ package com.github.rodm.teamcity.tasks
 import com.github.rodm.teamcity.TeamCityPlugin
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.util.GradleVersion
 
 class ProcessDescriptor extends DefaultTask {
 
-    private File descriptor
+    private RegularFileProperty descriptor
 
-    private File destinationDir
+    private DirectoryProperty destinationDir
 
-    private Map<String, Object> tokens = [:]
+    private Provider tokens
+
+    ProcessDescriptor() {
+        descriptor = project.objects.fileProperty()
+        destinationDir = project.objects.directoryProperty()
+        if (GradleVersion.current() < GradleVersion.version("6.0")) {
+            tokens = project.objects.property(Map)
+        } else {
+            tokens = project.objects.mapProperty(String, Object)
+        }
+        tokens.set([:])
+    }
 
     @InputFile
-    File getDescriptor() {
+    RegularFileProperty getDescriptor() {
         return descriptor
     }
 
     @OutputDirectory
-    File getDestinationDir() {
+    DirectoryProperty getDestinationDir() {
         return destinationDir
     }
 
     void setDestinationDir(File dir) {
-        destinationDir = dir
+        destinationDir.set(dir)
     }
 
     @Input
-    Map<String, Object> getTokens() {
+    Provider<Map<String, Object>> getTokens() {
         return tokens
     }
 
     @TaskAction
     public void process() {
         project.copy {
-            into getDestinationDir()
-            from getDescriptor()
+            into destinationDir.get().asFile
+            from descriptor.get().asFile
             rename { TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME }
-            if (!tokens.empty) {
-                filter(ReplaceTokens, tokens: tokens)
+            if (!tokens.get().isEmpty()) {
+                filter(ReplaceTokens, tokens: tokens.get())
             }
         }
     }

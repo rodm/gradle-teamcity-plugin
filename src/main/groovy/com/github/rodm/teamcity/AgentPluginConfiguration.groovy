@@ -25,7 +25,7 @@ import org.gradle.api.plugins.ExtensionAware
 class AgentPluginConfiguration extends PluginConfiguration {
 
     AgentPluginConfiguration(Project project) {
-        super(project.copySpec())
+        super(project)
     }
 
     /**
