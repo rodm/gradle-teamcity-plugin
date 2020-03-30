@@ -200,6 +200,23 @@ project {
 
             build {
                 templates(buildTemplate)
+                id("BuildFunctionalTestJava14")
+                name = "Build - Functional Test - Java 14"
+
+                params {
+                    param("gradle.tasks", "clean functionalTest")
+                    param("gradle.version", "6.3")
+                    param("java.home", "%java14.home%")
+                }
+
+                steps {
+                    switchGradleBuildStep()
+                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                }
+            }
+
+            build {
+                templates(buildTemplate)
                 id("BuildSamplesTestJava7")
                 name = "Build - Samples Test - Java 8"
 
