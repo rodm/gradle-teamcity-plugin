@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -146,13 +146,13 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override default shared properties'() {
+        project.ext['teamcity.environments.downloadsDir'] = '/alt/downloads'
+        project.ext['teamcity.environments.baseDownloadUrl'] = 'http://alt-repository'
+        project.ext['teamcity.environments.baseHomeDir'] = '/alt/servers'
+        project.ext['teamcity.environments.baseDataDir'] = '/alt/data'
+
         project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        Project mockProject = mock(Project)
-        configureGradleProjectProperties(mockProject)
-
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        extension.environments.project = mockProject
 
         assertThat(extension.environments.getDownloadsDir(), equalTo('/alt/downloads'))
         assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://alt-repository'))
@@ -162,11 +162,12 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override shared properties'() {
+        project.ext['teamcity.environments.downloadsDir'] = '/alt/downloads'
+        project.ext['teamcity.environments.baseDownloadUrl'] = 'http://alt-repository'
+        project.ext['teamcity.environments.baseHomeDir'] = '/alt/servers'
+        project.ext['teamcity.environments.baseDataDir'] = '/alt/data'
+
         project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        Project mockProject = mock(Project)
-        configureGradleProjectProperties(mockProject)
-
         project.teamcity {
             environments {
                 downloadsDir = '/tmp/downloads'
@@ -177,23 +178,11 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        extension.environments.project = mockProject
 
         assertThat(extension.environments.getDownloadsDir(), equalTo('/alt/downloads'))
         assertThat(extension.environments.getBaseDownloadUrl(), equalTo('http://alt-repository'))
         assertThat(extension.environments.getBaseHomeDir(), equalTo('/alt/servers'))
         assertThat(extension.environments.getBaseDataDir(), equalTo('/alt/data'))
-    }
-
-    private static void configureGradleProjectProperties(Project mockProject) {
-        when(mockProject.hasProperty('teamcity.environments.downloadsDir')).thenReturn(true)
-        when(mockProject.property('teamcity.environments.downloadsDir')).thenReturn('/alt/downloads')
-        when(mockProject.hasProperty('teamcity.environments.baseDownloadUrl')).thenReturn(true)
-        when(mockProject.property('teamcity.environments.baseDownloadUrl')).thenReturn('http://alt-repository')
-        when(mockProject.hasProperty('teamcity.environments.baseHomeDir')).thenReturn(true)
-        when(mockProject.property('teamcity.environments.baseHomeDir')).thenReturn('/alt/servers')
-        when(mockProject.hasProperty('teamcity.environments.baseDataDir')).thenReturn(true)
-        when(mockProject.property('teamcity.environments.baseDataDir')).thenReturn('/alt/data')
     }
 
     @Test
@@ -502,11 +491,13 @@ class EnvironmentsTest {
         assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('/data/9.1'))
+        assertThat(normalizePath(environment1.javaHome), endsWith(System.getProperty('java.home')))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/data/10.0'))
+        assertThat(normalizePath(environment2.javaHome), endsWith(System.getProperty('java.home')))
     }
 
     @Test
