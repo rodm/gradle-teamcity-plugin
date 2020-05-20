@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -64,7 +64,7 @@ class ValidateDescriptorSchemaActionTest {
                     <url>http://example.com</url>
                 </vendor>
             </info>
-            <deployment allow-runtime-reload='true'/>
+            <deployment allow-runtime-reload='true' node-responsibilities-aware='true'/>
         </teamcity-plugin>
         '''
     }
@@ -87,6 +87,26 @@ class ValidateDescriptorSchemaActionTest {
         validationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), not(containsString(warningFor('allow-runtime-reload', 'deployment'))))
+    }
+
+    @Test
+    void 'warn about node-responsibilities-aware attribute when using schema for TeamCity 2019_2 and earlier'() {
+        def schema = 'teamcity-server-plugin-descriptor.xsd'
+        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+
+        validationAction.execute(stubTask)
+
+        assertThat(outputEventListener.toString(), containsString(warningFor('node-responsibilities-aware', 'deployment')))
+    }
+
+    @Test
+    void 'no warning about node-responsibilities-aware when using schema for TeamCity 2020_1 and later'() {
+        def schema = '2020.1/teamcity-server-plugin-descriptor.xsd'
+        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+
+        validationAction.execute(stubTask)
+
+        assertThat(outputEventListener.toString(), not(containsString(warningFor('node-responsibilities-aware', 'deployment'))))
     }
 
     private static String warningFor(String attribute, String element) {

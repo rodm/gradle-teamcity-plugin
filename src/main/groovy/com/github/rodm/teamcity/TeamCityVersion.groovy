@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,9 +25,11 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
 
     public static final TeamCityVersion VERSION_9_0
     public static final TeamCityVersion VERSION_2018_2
+    public static final TeamCityVersion VERSION_2020_1
     static {
         VERSION_9_0 = version('9.0')
         VERSION_2018_2 = version('2018.2')
+        VERSION_2020_1 = version('2020.1')
     }
 
     private static final Pattern VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)')

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,7 @@ import groovy.transform.CompileStatic
 import groovy.xml.XmlUtil
 
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 @CompileStatic
@@ -88,6 +89,8 @@ class ServerPluginDescriptorGenerator {
             attributes << ['use-separate-classloader': descriptor.getUseSeparateClassloader()]
         if (TeamCityVersion.version(version) >= VERSION_2018_2 && descriptor.getAllowRuntimeReload() != null)
             attributes << ['allow-runtime-reload': descriptor.getAllowRuntimeReload()]
+        if (TeamCityVersion.version(version) >= VERSION_2020_1 && descriptor.getNodeResponsibilitiesAware() != null)
+            attributes << ['node-responsibilities-aware': descriptor.getNodeResponsibilitiesAware()]
         if (attributes.size() > 0)
             root.appendNode('deployment', attributes)
     }

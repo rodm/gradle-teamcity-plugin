@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 class TeamCityServerPlugin implements Plugin<Project> {
@@ -140,7 +141,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     private static String getSchemaPath(String version) {
-        if (TeamCityVersion.version(version) >= VERSION_2018_2) {
+        if (TeamCityVersion.version(version) >= VERSION_2020_1) {
+            '2020.1/teamcity-server-plugin-descriptor.xsd'
+        } else if (TeamCityVersion.version(version) >= VERSION_2018_2) {
             '2018.2/teamcity-server-plugin-descriptor.xsd'
         } else {
             'teamcity-server-plugin-descriptor.xsd'

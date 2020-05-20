@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -262,6 +262,40 @@ class ServerDescriptorGeneratorTest {
         generator.writeTo(writer)
 
         assertThat(writer.toString(), hasXPath('//deployment/@allow-runtime-reload', equalTo('false')))
+    }
+
+    @Test
+    void 'writes optional node-responsibilities-aware when set'() {
+        project.teamcity {
+            version = '2020.1'
+            server {
+                descriptor {
+                    nodeResponsibilitiesAware = true
+                }
+            }
+        }
+        ServerPluginDescriptorGenerator generator = createGenerator()
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//deployment/@node-responsibilities-aware', equalTo('true')))
+    }
+
+    @Test
+    void 'writes optional node-responsibilities-aware when set to false'() {
+        project.teamcity {
+            version = '2020.1'
+            server {
+                descriptor {
+                    nodeResponsibilitiesAware = false
+                }
+            }
+        }
+        ServerPluginDescriptorGenerator generator = createGenerator()
+
+        generator.writeTo(writer)
+
+        assertThat(writer.toString(), hasXPath('//deployment/@node-responsibilities-aware', equalTo('false')))
     }
 
     @Test
