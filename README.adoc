@@ -115,7 +115,7 @@ if the descriptor is referencing an external file.
 * `archiveName` : The archiveName property defines the name of the plugin archive output by the `serverPlugin` task.
 Defaults to the name of the project and the project version.
 
-The plugin descriptor properties are shown in the examples below and described in the TeamCity documentation for
+The plugin descriptor properties shown in the examples below and described in the TeamCity documentation for
 {uri-server-descriptor}[Server-Side Plugin Descriptor]
 
 ==== Tasks
@@ -158,9 +158,12 @@ Plugin descriptor defined in the build script.
                 vendorUrl = 'vendor url'
                 vendorLogo = 'vendor logo'
 
+                // deployment properties
                 useSeparateClassloader = true
                 allowRuntimeReload = true
+                nodeResponsibilitiesAware = true
 
+                // requirements properties
                 minimumBuild = '10'
                 maximumBuild = '20'
 
@@ -229,9 +232,12 @@ The following example uses the Kotlin DSL.
                 vendorUrl = "vendor url"
                 vendorLogo = "vendor logo"
 
+                // deployment properties
                 useSeparateClassloader = true
                 allowRuntimeReload = true
+                nodeResponsibilitiesAware = true
 
+                // requirements properties
                 minimumBuild = "10"
                 maximumBuild = "20"
 
