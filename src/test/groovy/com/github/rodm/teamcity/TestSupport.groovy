@@ -24,6 +24,10 @@ class TestSupport {
     }
 
     static String normalizePath(File path) {
-        path.absolutePath.replace('\\', '/')
+        normalize(path.absolutePath)
+    }
+
+    static String normalize(String path) {
+        path.replace('\\', '/')
     }
 }

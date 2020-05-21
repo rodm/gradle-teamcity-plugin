@@ -34,6 +34,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
+import static com.github.rodm.teamcity.TestSupport.normalize
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
@@ -491,13 +492,13 @@ class EnvironmentsTest {
         assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('/data/9.1'))
-        assertThat(normalizePath(environment1.javaHome), endsWith(System.getProperty('java.home')))
+        assertThat(normalizePath(environment1.javaHome), equalTo(normalize(System.getProperty('java.home'))))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/data/10.0'))
-        assertThat(normalizePath(environment2.javaHome), endsWith(System.getProperty('java.home')))
+        assertThat(normalizePath(environment2.javaHome), equalTo(normalize(System.getProperty('java.home'))))
     }
 
     @Test
