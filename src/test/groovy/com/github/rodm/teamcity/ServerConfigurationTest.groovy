@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -151,6 +151,25 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         String output = outputEventListener.toString()
         assertThat(output, containsString('Plugin descriptor does not support allowRuntimeReload for version 2018.1'))
+    }
+
+    @Test
+    void 'generator task outputs warning about nodeResponsibilitiesAware not being supported for versions before 2020_1'() {
+        project.teamcity {
+            version = '2019.2'
+            server {
+                descriptor {
+                    nodeResponsibilitiesAware = true
+                }
+            }
+        }
+        projectDir.newFolder('build', 'descriptor', 'server')
+
+        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        task.generateDescriptor()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString('Plugin descriptor does not support nodeResponsibilitiesAware for version 2019.2'))
     }
 
     @Test

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 @CompileStatic
@@ -68,6 +69,9 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         }
         if (teamcityVersion < VERSION_2018_2 && descriptor.get().allowRuntimeReload != null) {
             project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${version.get()}")
+        }
+        if (teamcityVersion < VERSION_2020_1 && descriptor.get().nodeResponsibilitiesAware != null) {
+            project.logger.warn("${path}: Plugin descriptor does not support nodeResponsibilitiesAware for version ${version.get()}")
         }
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get())
         destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
