@@ -18,8 +18,14 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
+import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
+import com.jetbrains.plugin.structure.base.plugin.PluginCreationResult
+import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
+import com.jetbrains.plugin.structure.teamcity.TeamcityPlugin
+import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.bundling.Zip
+import org.jetbrains.intellij.pluginRepository.PluginUploader
 import org.junit.Before
 import org.junit.Test
 
@@ -36,6 +42,11 @@ import static org.hamcrest.Matchers.not
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.fail
+import static org.mockito.ArgumentMatchers.eq
+import static org.mockito.ArgumentMatchers.isNull
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 class ServerConfigurationTest extends ConfigurationTestCase {
 
@@ -525,5 +536,130 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
         assertThat(publishPlugin, is(nullValue()))
+    }
+
+    @Test
+    void 'publish task logs successful uploaded to default channel'() {
+        def pluginFile = project.file('test-plugin.zip')
+        PublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['default'])
+        }
+        task.publishPlugin()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString("Uploading plugin TestPluginId from ${pluginFile.absolutePath} to https://plugins.jetbrains.com"))
+        assertThat(output, containsString('Uploading plugin to default channel'))
+        assertThat(output, containsString('Uploaded successfully'))
+    }
+
+    @Test
+    void 'publish task uploads plugin to default channel'() {
+        def pluginFile = project.file('test-plugin.zip')
+        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['default'])
+        }
+        task.publishPlugin()
+
+        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), isNull(String))
+    }
+
+    @Test
+    void 'publish task uploads plugin to custom channel'() {
+        def pluginFile = project.file('test-plugin.zip')
+        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['Beta'])
+        }
+        task.publishPlugin()
+
+        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq('Beta'), isNull(String))
+    }
+
+    @Test
+    void 'publish task uploads plugin with change notes'() {
+        def pluginFile = project.file('test-plugin.zip')
+        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['default'])
+            notes.set('change notes')
+        }
+        task.publishPlugin()
+
+        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), eq('change notes'))
+    }
+
+    @Test
+    void 'publish task throws exception if channels list is empty'() {
+        PublishTask task = project.tasks.create('publish', MockPublishTask) {
+            channels.set([])
+        }
+        try {
+            task.publishPlugin()
+            fail('Should fail when channels list is empty')
+        }
+        catch (GradleException expected) {
+            assertThat(expected.message, equalTo('Channels list can\'t be empty'))
+        }
+    }
+
+    @Test
+    void 'publish task logs upload to multiple channels'() {
+        def pluginFile = project.file('test-plugin.zip')
+        PublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['Beta', 'Test'])
+        }
+        task.publishPlugin()
+
+        String output = outputEventListener.toString()
+        assertThat(output, containsString('Uploading plugin to Beta channel'))
+        assertThat(output, containsString('Uploading plugin to Test channel'))
+    }
+
+    @Test
+    void 'publish task throws exception for invalid plugin'() {
+        def pluginFile = project.file('test-plugin.zip')
+        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
+            distributionFile.set(pluginFile)
+            channels.set(['default'])
+        }
+        task.result = mock(PluginCreationFail)
+        try {
+            task.publishPlugin()
+            fail('Should throw exception on plugin creation failure')
+        }
+        catch (GradleException expected) {
+            assertThat(expected.message, containsString('Cannot upload plugin.'))
+        }
+    }
+
+    static class MockPublishTask extends PublishTask {
+        PluginCreationResult result
+        PluginUploader uploader
+
+        MockPublishTask() {
+            TeamcityPlugin plugin = mock(TeamcityPlugin)
+            when(plugin.getPluginId()).thenReturn('TestPluginId')
+            result = mock(PluginCreationSuccess)
+            when(result.getPlugin()).thenReturn(plugin)
+            uploader = mock(PluginUploader)
+        }
+
+        @Override
+        protected void publishPlugin() {
+            super.publishPlugin()
+        }
+
+        @Override
+        PluginCreationResult<TeamcityPlugin> createPlugin(File distributionFile) {
+            return result
+        }
+
+        @Override
+        PluginUploader createRepositoryUploader() {
+            return uploader
+        }
     }
 }

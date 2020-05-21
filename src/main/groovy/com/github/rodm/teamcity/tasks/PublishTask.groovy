@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,10 @@
 package com.github.rodm.teamcity.tasks
 
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
+import com.jetbrains.plugin.structure.base.plugin.PluginCreationResult
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
 import com.jetbrains.plugin.structure.base.plugin.PluginProblem
+import com.jetbrains.plugin.structure.teamcity.TeamcityPlugin
 import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -33,6 +35,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
+import org.jetbrains.intellij.pluginRepository.PluginUploader
 
 class PublishTask extends DefaultTask {
 
@@ -121,20 +124,21 @@ class PublishTask extends DefaultTask {
     @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     protected void publishPlugin() {
-        if (!getChannels()) {
+        if (!getChannels().get()) {
             throw new InvalidUserDataException("Channels list can't be empty")
         }
 
         def distributionFile = getDistributionFile().get().asFile
-        def creationResult = TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
+        def creationResult = createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
+            LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host")
             for (String channel : getChannels().get()) {
-                LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host, channel: $channel")
+                LOGGER.info("Uploading plugin to ${channel} channel")
                 try {
                     def uploadChannel = channel && 'default' != channel ? channel : ''
-                    def repoClient = PluginRepositoryFactory.create(host, token.orNull)
-                    repoClient.uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, notes.orNull)
+                    def uploader = createRepositoryUploader()
+                    uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, notes.orNull)
                     LOGGER.info("Uploaded successfully")
                 }
                 catch (exception) {
@@ -147,5 +151,13 @@ class PublishTask extends DefaultTask {
         } else {
             throw new GradleException("Cannot upload plugin.")
         }
+    }
+
+    PluginCreationResult<TeamcityPlugin> createPlugin(File distributionFile) {
+        TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
+    }
+
+    PluginUploader createRepositoryUploader() {
+        PluginRepositoryFactory.create(host, token.orNull).uploader
     }
 }
