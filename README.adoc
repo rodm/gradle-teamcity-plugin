@@ -1,22 +1,25 @@
 = Gradle TeamCity plugin
-:uri-teamcity-documentation: https://confluence.jetbrains.com/display/TCD10
-:uri-teamcity-environment: {uri-teamcity-documentation}/Development+Environment
-:uri-teamcity-extending: {uri-teamcity-documentation}/Extending+TeamCity
-:uri-server-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor
-:uri-agent-descriptor: {uri-teamcity-documentation}/Plugins+Packaging#PluginsPackaging-PluginDescriptor.1
+:uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity/
+:uri-teamcity-environment: {uri-teamcity-sdk-docs}/development-environment.html
+:uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor
+:uri-agent-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor2
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
+:uri-travis-project: https://travis-ci.org/rodm/gradle-teamcity-plugin
+:uri-travis-status: https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master
+:uri-appveyor-project: https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin
+:uri-appveyor-status: https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2017.1
 
-The plugin provides support to {uri-teamcity-extending}[develop TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
+The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
-image:https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master["Build Status", link="https://travis-ci.org/rodm/gradle-teamcity-plugin"]
-image:https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true["Build Status", link="https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin"]
+image:{uri-travis-status}["Build Status", link="{uri-travis-project}}"]
+image:{uri-appveyor-status}["Build Status", link="{uri-appveyor-project}"]
 
 == Supported Gradle and Java versions
 
@@ -420,7 +423,7 @@ The following example uses the Kotlin DSL.
 [subs="attributes"]
 .build.gradle.kts
 ----
-    extra["teamcityVersion"] = findProperty("teamcity.version") ?: "10.0"
+    extra["teamcityVersion"] = findProperty("teamcity.version") ?: "{example-api-version}"
 
     teamcity {
         version = extra["teamcityVersion"] as String
@@ -591,7 +594,7 @@ The following example shows environments being configured using the Kotlin DSL.
                 serverOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            "teamcity2017.2" {
+            create("teamcity2017.2") {
                 version = "2017.2.4"
                 javaHome = file(extra["java8Home"] as String)
 
@@ -599,7 +602,7 @@ The following example shows environments being configured using the Kotlin DSL.
                 setServerOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            "teamcity2018.2" {
+            register("teamcity2018.2") {
                 version = "2018.2.2"
             }
         }
@@ -633,3 +636,4 @@ The following projects use the plugin.
 * https://github.com/dmitry-zhuravlev/kobalt-runner-teamcity-plugin[Kobalt Runner]
 * https://github.com/cprieto/tsqlt-teamcity[TeamCity test runner for the tSQLt testing framework]
 * https://github.com/etiennestuder/teamcity-build-scan-plugin[Gradle Build Scan Integration]
+* https://github.com/Vampire/teamcity-ssh-tunnel[TeamCity SSH Tunnel]
