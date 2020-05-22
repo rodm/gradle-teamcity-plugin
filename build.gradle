@@ -15,27 +15,24 @@ repositories {
 }
 
 dependencies {
-    implementation 'de.undercouch:gradle-download-task:3.4.3'
-    implementation 'org.jetbrains.intellij.plugins:structure-base:3.91'
-    implementation 'org.jetbrains.intellij.plugins:structure-teamcity:3.91'
-    implementation 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.0'
-    implementation(platform('org.junit:junit-bom:5.6.0')) {
+    implementation 'de.undercouch:gradle-download-task:4.0.4'
+    implementation 'org.jetbrains.intellij.plugins:structure-base:3.112'
+    implementation 'org.jetbrains.intellij.plugins:structure-teamcity:3.112'
+    implementation 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.11'
+    implementation(platform('org.junit:junit-bom:5.6.2')) {
         because('Platform, Jupiter, and Vintage versions should match')
     }
 
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.6.2'
-    testImplementation 'org.hamcrest:hamcrest-library:1.3'
-    testImplementation 'org.mockito:mockito-core:2.23.4'
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
 
     testRuntimeOnly ('org.junit.vintage:junit-vintage-engine') {
         because('allows JUnit 3 and JUnit 4 tests to run')
     }
 }
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 version = '1.3-SNAPSHOT'
 group = 'com.github.rodm'
@@ -52,6 +49,11 @@ sourceSets {
         compileClasspath += main.output + configurations.testRuntimeClasspath
         runtimeClasspath += main.output + configurations.testRuntimeClasspath
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 test {
