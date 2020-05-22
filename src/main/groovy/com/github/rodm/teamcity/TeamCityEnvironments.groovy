@@ -16,8 +16,12 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.Action
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
+import org.gradle.api.UnknownDomainObjectException
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
@@ -53,6 +57,10 @@ class TeamCityEnvironments {
 
     TeamCityEnvironment getByName(String name) {
         return environments.getByName(name)
+    }
+
+    NamedDomainObjectProvider<TeamCityEnvironment> named(String name) throws UnknownDomainObjectException {
+        return environments.named(name)
     }
 
     /**
@@ -104,6 +112,14 @@ class TeamCityEnvironments {
             return project.property(name)
         }
         return value ? value : defaultValue
+    }
+
+    TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
+        return environments.create(name, action)
+    }
+
+    NamedDomainObjectProvider<TeamCityEnvironment> register(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
+        return environments.register(name, action)
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")

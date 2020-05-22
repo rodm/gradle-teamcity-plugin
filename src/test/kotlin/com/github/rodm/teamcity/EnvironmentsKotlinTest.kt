@@ -122,4 +122,32 @@ class EnvironmentsKotlinTest {
         val environment = teamcity.environments.getByName("test")
         assertThat(environment.serverOptions as String, equalTo("-Doption1=value1 -Doption2=value2"))
     }
+
+    @Test
+    fun `improve kotlin dsl by supporting create method`() {
+        teamcity {
+            environments {
+                it.create("test") {
+                    it.version = "2020.1"
+                }
+            }
+        }
+
+        val environment = teamcity.environments.named("test")
+        assertThat(environment.get().version as String, equalTo("2020.1"))
+    }
+
+    @Test
+    fun `improve kotlin dsl by supporting register method`() {
+        teamcity {
+            environments {
+                it.register("test") {
+                    it.version = "2020.1"
+                }
+            }
+        }
+
+        val environment = teamcity.environments.named("test")
+        assertThat(environment.get().version as String, equalTo("2020.1"))
+    }
 }
