@@ -15,6 +15,7 @@ val agent = configurations.getByName("agent")
 
 dependencies {
     implementation (project(":common"))
+    implementation (kotlin("stdlib"))
     agent (project(path = ":agent", configuration = "plugin"))
 }
 

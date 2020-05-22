@@ -10,7 +10,7 @@ version = '1.0-SNAPSHOT'
 
 ext {
     vendorName = 'rodm'
-    teamcityVersion = '2017.1'
+    teamcityVersion = '2019.1'
 
     downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
     serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
@@ -49,15 +49,15 @@ teamcity {
         baseHomeDir = project.serversDir
         baseDataDir = 'data'
 
-        'teamcity2017.1' {
-            version = '2017.1.5'
+        'teamcity2019.1' {
+            version = '2019.1.5'
             javaHome = file(java8Home)
             serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
             agentOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
         }
 
-        'teamcity2018.1' {
-            version = '2018.1.3'
+        'teamcity2020.1' {
+            version = '2020.1'
             javaHome = file(java8Home)
         }
     }

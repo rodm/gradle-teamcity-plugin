@@ -1,5 +1,6 @@
 = Sample TeamCity plugins using the Gradle TeamCity plugin.
-:uri-gradle-kotlin: https://github.com/gradle/kotlin-dsl
+:uri-gradle-kotlin: https://docs.gradle.org/current/userguide/kotlin_dsl.html
+:uri-teamcity-version: 2019.1
 
 The following projects demonstrate the features of the Gradle TeamCity plugin.
 
@@ -9,22 +10,23 @@ The following projects demonstrate the features of the Gradle TeamCity plugin.
 * `agent-tool-plugin` : A simple tool plugin that repackages Apache Maven.
 * `kotlin-plugin` : A simple plugin with an agent-side and a server-side component written in Kotlin and built
 with scripts written in Kotlin using {uri-gradle-kotlin}[Gradle Kotlin DSL].
-* `multiple-plugins` : A sample that demonstrates building and deploying multiple plugins to a TeamCity environment.
+* `multiple-plugins` : A sample demonstrating building and deploying multiple plugins to a TeamCity environment.
+* `reloadable-plugin` : A sample demonstrating reloading of a modified plugin without restarting the TeamCity environment.
 
 == To build the plugins
 
-To build a sample plugin change into the plugin's directory the execute the following Gradle task
+To build a sample plugin change into the plugin's directory then execute the following Gradle task
 
     ../../gradlew build
 
 The `server-plugin` sample contains an alternative build file the demonstrates using an external descriptor file.
-The plugin can be built by executing the following command
+The plugin can be built by executing the following command.
 
     ../../gradlew --include-build=../.. -b build-alt.gradle clean build
 
 To download and install a TeamCity distribution to test the plugin execute the following Gradle task
 
-    ../../gradlew installTeamCity10
+    ../../gradlew installTeamCity{uri-teamcity-version}
 
 This command will take some time but only needs to be executed once. To have the samples use the same TeamCity
 installation set the `teamcity.environments.baseHomeDir` Gradle property in a `gradle.properties` file for each
@@ -32,20 +34,28 @@ project.
 
 To deploy the plugin to TeamCity execute the following task
 
-    ../../gradlew deployToTeamCity10
+    ../../gradlew deployToTeamCity{uri-teamcity-version}
 
 To start the TeamCity Server and Build Agent execute the following tasks
 
-    ../../gradlew startTeamcity10Server
-    ../../gradlew startTeamcity10Agent
+    ../../gradlew startTeamcity{uri-teamcity-version}Server
+    ../../gradlew startTeamcity{uri-teamcity-version}Agent
+
+or you can start both with the following task
+
+    ../../gradlew startTeamcity{uri-teamcity-version}
 
 To stop the TeamCity Server and Build Agent execute the following tasks
 
-    ../../gradlew stopTeamcity10Agent
-    ../../gradlew stopTeamcity10Server
+    ../../gradlew stopTeamcity{uri-teamcity-version}Agent
+    ../../gradlew stopTeamcity{uri-teamcity-version}Server
 
-There are also tasks for TeamCity 8.1 and TeamCity 9.1, to use these versions replace the number `10` in the tasks
-above with `81` for TeamCity 8.1 and `91` for TeamCity 9.1.
+or you can stop both with the following task
+
+    ../../gradlew stopTeamcity{uri-teamcity-version}
+
+There are also tasks for TeamCity 2020.1, to use these versions replace the number `{uri-teamcity-version}` in the tasks
+above with `2020.1`.
 
 == To try the plugins
 
