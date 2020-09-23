@@ -632,6 +632,7 @@ The following projects use the plugin.
 * https://github.com/JetBrains/teamcity-nuget-support[NuGet Support]
 * https://github.com/JetBrains/teamcity-github-auth[TeamCity GitHub Auth]
 * https://github.com/JetBrains/teamcity-commit-hooks[TeamCity Commit Hooks]
+* https://github.com/JetBrains/teamcity-slack-notifier[TeamCity Slack Notifier]
 * https://github.com/pwielgolaski/teamcity-oauth[TeamCity oAuth authentication]
 * https://github.com/codeamatic/teamcity-docker-runner[Docker Deploy]
 * https://github.com/grundic/teamcity-web-parameters[Teamcity web parameters]
