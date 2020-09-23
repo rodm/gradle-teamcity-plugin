@@ -125,10 +125,11 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static void configurePluginArchiveTask(Zip task, String archiveName) {
         if (archiveName) {
-            if (archiveName.endsWith('.zip')) {
-                task.archiveName = archiveName
+            def archiveFileName = archiveName.endsWith('.zip') ? archiveName : archiveName + '.zip'
+            if (GradleVersion.current() < GradleVersion.version("6.0")) {
+                task.archiveName = archiveFileName
             } else {
-                task.archiveName = archiveName + '.zip'
+                task.archiveFileName = archiveFileName
             }
         }
     }

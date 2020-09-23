@@ -222,7 +222,7 @@ class MultipleGradleVersionTest {
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.getRoot())
-                .withArguments('build')
+                .withArguments('--warning-mode', 'all', 'build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
                 .forwardOutput()
@@ -236,6 +236,7 @@ class MultipleGradleVersionTest {
 
         assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
         assertThat(result.getOutput(), not(containsString('but the implementation class')))
+        assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
 
         ZipFile agentPluginFile = new ZipFile(new File(projectDir.root, 'agent/build/distributions/test-plugin-agent.zip'))
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
