@@ -133,28 +133,6 @@ project {
 
             build {
                 templates(buildTemplate)
-                id("BuildFunctionalTestJava9")
-                name = "Build - Functional Test - Java 9"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("java.home", "%java9.home%")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava10")
-                name = "Build - Functional Test - Java 10"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("java.home", "%java10.home%")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
                 id("BuildFunctionalTestJava11")
                 name = "Build - Functional Test - Java 11"
 
