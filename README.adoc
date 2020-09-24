@@ -18,7 +18,7 @@
 The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
-image:{uri-travis-status}["Build Status", link="{uri-travis-project}}"]
+image:{uri-travis-status}["Build Status", link="{uri-travis-project}"]
 image:{uri-appveyor-status}["Build Status", link="{uri-appveyor-project}"]
 
 == Supported Gradle and Java versions
