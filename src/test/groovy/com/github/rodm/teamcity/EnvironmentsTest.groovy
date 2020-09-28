@@ -763,7 +763,7 @@ class EnvironmentsTest {
                 }
             }
         }
-        project.evaluate();
+        project.evaluate()
 
         assertThat(project.tasks, hasTask('downloadTest'))
     }
@@ -779,7 +779,7 @@ class EnvironmentsTest {
                 }
             }
         }
-        project.evaluate();
+        project.evaluate()
 
         assertThat(project.tasks, hasTask('downloadTest'))
     }
