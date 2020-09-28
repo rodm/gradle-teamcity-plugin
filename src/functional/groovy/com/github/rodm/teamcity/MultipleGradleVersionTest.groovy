@@ -216,6 +216,9 @@ class MultipleGradleVersionTest {
         if (gradleVersion >= GradleVersion.version('6.3')) {
             javaVersions << '14'
         }
+        if (gradleVersion >= GradleVersion.version('6.7-rc-1')) {
+            javaVersions << '15'
+        }
         return isOneOf(*javaVersions)
     }
 
