@@ -38,11 +38,7 @@ class ProcessDescriptor extends DefaultTask {
     ProcessDescriptor() {
         descriptor = project.objects.fileProperty()
         destinationDir = project.objects.directoryProperty()
-        if (GradleVersion.current() < GradleVersion.version("6.0")) {
-            tokens = project.objects.property(Map)
-        } else {
-            tokens = project.objects.mapProperty(String, Object)
-        }
+        tokens = project.objects.mapProperty(String, Object)
         tokens.set([:])
     }
 

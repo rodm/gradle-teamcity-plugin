@@ -60,7 +60,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF"
 
-    private final String MINIMUM_SUPPORTED_VERSION = '5.0'
+    private final String MINIMUM_SUPPORTED_VERSION = '6.0'
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
@@ -125,12 +125,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static void configurePluginArchiveTask(Zip task, String archiveName) {
         if (archiveName) {
-            def archiveFileName = archiveName.endsWith('.zip') ? archiveName : archiveName + '.zip'
-            if (GradleVersion.current() < GradleVersion.version("6.0")) {
-                task.archiveName = archiveFileName
-            } else {
-                task.archiveFileName = archiveFileName
-            }
+            task.archiveFileName = archiveName.endsWith('.zip') ? archiveName : archiveName + '.zip'
         }
     }
 
