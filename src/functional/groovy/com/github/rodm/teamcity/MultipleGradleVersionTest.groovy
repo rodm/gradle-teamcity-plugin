@@ -35,7 +35,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.isOneOf
+import static org.hamcrest.Matchers.oneOf
 import static org.junit.Assume.assumeThat
 
 @RunWith(Parameterized)
@@ -219,7 +219,7 @@ class MultipleGradleVersionTest {
         if (gradleVersion >= GradleVersion.version('6.7-rc-1')) {
             javaVersions << '15'
         }
-        return isOneOf(*javaVersions)
+        return is(oneOf(*javaVersions))
     }
 
     private BuildResult executeBuild(String version) {
