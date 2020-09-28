@@ -64,6 +64,8 @@ gradlePlugin {
     testSourceSets sourceSets.functionalTest, sourceSets.samples
 }
 
+validatePlugins.enabled = false
+
 task functionalTest(type: Test) {
     description = 'Runs the functional tests.'
     group = 'verification'
