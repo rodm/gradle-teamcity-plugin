@@ -149,13 +149,7 @@ project {
 
                 params {
                     param("gradle.tasks", "clean functionalTest")
-                    param("gradle.version", "5.4")
                     param("java.home", "%java12.home%")
-                }
-
-                steps {
-                    switchGradleBuildStep()
-                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
                 }
             }
 
@@ -166,13 +160,7 @@ project {
 
                 params {
                     param("gradle.tasks", "clean functionalTest")
-                    param("gradle.version", "6.0")
                     param("java.home", "%java13.home%")
-                }
-
-                steps {
-                    switchGradleBuildStep()
-                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
                 }
             }
 
