@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,12 +21,11 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.file.RelativePath
-import org.gradle.api.internal.ConventionMapping
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -36,11 +35,9 @@ import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.eq
+import static org.hamcrest.Matchers.hasKey
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
-import static org.mockito.Mockito.verify
 
 class ValidateDefinitionActionTest {
 
@@ -148,27 +145,31 @@ class ValidateDefinitionActionTest {
         assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
     }
 
-    @Test @Ignore
+    @Test
     void 'server plugin apply configures filesMatching actions on jar spec'() {
         project.pluginManager.apply(JavaPlugin)
-        Jar mockJarTask = mockJar(project)
+        Jar jar = replaceJar(project)
 
         project.pluginManager.apply(TeamCityServerPlugin)
         project.evaluate()
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-server-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
+        def descriptorPattern = 'META-INF/build-server-plugin*.xml'
+        assertThat(jar.filesMatching, hasKey(descriptorPattern))
+        assertThat(jar.filesMatching.get(descriptorPattern).getClass().name, equalTo(TeamCityPlugin.PluginDefinitionCollectorAction.name))
+        def classPattern = '**/*.class'
+        assertThat(jar.filesMatching, hasKey(classPattern))
+        assertThat(jar.filesMatching.get(classPattern).getClass().name, equalTo(TeamCityPlugin.ClassCollectorAction.name))
     }
 
-    @Test @Ignore
+    @Test
     void 'server plugin apply configures doLast action on jar task'() {
         project.pluginManager.apply(JavaPlugin)
-        Jar mockJarTask = mockJar(project)
-
         project.pluginManager.apply(TeamCityServerPlugin)
         project.evaluate()
 
-        verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+        Jar jar = project.tasks.getByName('jar') as Jar
+        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -182,27 +183,31 @@ class ValidateDefinitionActionTest {
         assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
-    @Test @Ignore
+    @Test
     void 'agent plugin apply configures filesMatching actions on jar spec'() {
         project.pluginManager.apply(JavaPlugin)
-        Jar mockJarTask = mockJar(project)
+        SpyJar mockJarTask = replaceJar(project)
 
         project.pluginManager.apply(TeamCityAgentPlugin)
         project.evaluate()
 
-        verify(mockJarTask).filesMatching(eq('META-INF/build-agent-plugin*.xml') as String, any(TeamCityPlugin.PluginDefinitionCollectorAction))
-        verify(mockJarTask).filesMatching(eq('**/*.class') as String, any(TeamCityPlugin.ClassCollectorAction))
+        def descriptorPattern = 'META-INF/build-agent-plugin*.xml'
+        assertThat(mockJarTask.filesMatching, hasKey(descriptorPattern))
+        assertThat(mockJarTask.filesMatching.get(descriptorPattern).getClass().name, equalTo(TeamCityPlugin.PluginDefinitionCollectorAction.name))
+        def classPattern = '**/*.class'
+        assertThat(mockJarTask.filesMatching, hasKey(classPattern))
+        assertThat(mockJarTask.filesMatching.get(classPattern).getClass().name, equalTo(TeamCityPlugin.ClassCollectorAction.name))
     }
 
-    @Test @Ignore
+    @Test
     void 'agent plugin apply configures doLast action on jar task'() {
         project.pluginManager.apply(JavaPlugin)
-        Jar mockJarTask = mockJar(project)
-
         project.pluginManager.apply(TeamCityAgentPlugin)
         project.evaluate()
 
-        verify(mockJarTask).doLast(any(TeamCityPlugin.PluginDefinitionValidationAction))
+        Jar jar = project.tasks.getByName('jar') as Jar
+        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -243,12 +248,19 @@ class ValidateDefinitionActionTest {
         assertThat(classList, hasItem('com/example/Plugin.class'))
     }
 
-    private static Jar mockJar(Project project) {
-        Jar mockJar = mock(Jar)
-        when(mockJar.getName()).thenReturn(JavaPlugin.JAR_TASK_NAME)
-        when(mockJar.getConventionMapping()).thenReturn(mock(ConventionMapping))
-        project.tasks.remove(project.tasks.getByName(JavaPlugin.JAR_TASK_NAME))
-        project.tasks.add(mockJar)
-        return mockJar
+    private static SpyJar replaceJar(Project project) {
+        SpyJar task = project.tasks.replace(JavaPlugin.JAR_TASK_NAME, SpyJar.class)
+        return task
+    }
+
+    private static class SpyJar extends Jar {
+
+        Map<String, Action> filesMatching = new HashMap()
+
+        @Override
+        AbstractCopyTask filesMatching(String pattern, Action<? super FileCopyDetails> action) {
+            filesMatching.put(pattern, action)
+            return super.filesMatching(pattern, action)
+        }
     }
 }
