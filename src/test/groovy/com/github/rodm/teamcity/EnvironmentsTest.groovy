@@ -805,9 +805,9 @@ class EnvironmentsTest {
         project.evaluate()
 
         StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
-        assertThat(startServer.getHomeDir(), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(startServer.getDataDir(), endsWith('data/10.0'))
-        assertThat(startServer.javaHome, endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalize(startServer.getDataDir()), endsWith('data/10.0'))
+        assertThat(normalize(startServer.javaHome), endsWith('/opt/jdk1.8.0'))
         assertThat(startServer.serverOptions, endsWith(defaultOptions))
     }
 
@@ -819,8 +819,8 @@ class EnvironmentsTest {
         project.evaluate()
 
         StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
-        assertThat(stopServer.getHomeDir(), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(stopServer.javaHome, endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(stopServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalize(stopServer.javaHome), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test
@@ -831,8 +831,8 @@ class EnvironmentsTest {
         project.evaluate()
 
         StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
-        assertThat(startAgent.getHomeDir(), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(startAgent.javaHome, endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(startAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalize(startAgent.javaHome), endsWith('/opt/jdk1.8.0'))
         assertThat(startAgent.agentOptions, endsWith('-DagentOption=agentValue'))
     }
 
@@ -844,8 +844,8 @@ class EnvironmentsTest {
         project.evaluate()
 
         StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
-        assertThat(stopAgent.getHomeDir(), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(stopAgent.javaHome, endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(stopAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
+        assertThat(normalize(stopAgent.javaHome), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test
