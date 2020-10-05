@@ -168,7 +168,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
                     notes.set(extension.server.publish.notes)
-                    distributionFile.set(buildPluginTask.archivePath)
+                    distributionFile.set(buildPluginTask.archiveFile)
                     dependsOn(buildPluginTask)
                 }
             }

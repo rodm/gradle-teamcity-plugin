@@ -390,7 +390,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
-        assertThat(serverPlugin.archiveName, equalTo('test-1.2.3.zip'))
+        assertThat(serverPlugin.archiveFileName.get(), equalTo('test-1.2.3.zip'))
     }
 
     @Test
@@ -406,7 +406,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
-        assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
+        assertThat(serverPlugin.archiveFileName.get(), equalTo('server-plugin.zip'))
     }
 
     @Test
@@ -421,7 +421,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
-        assertThat(serverPlugin.archiveName, equalTo('server-plugin.zip'))
+        assertThat(serverPlugin.archiveFileName.get(), equalTo('server-plugin.zip'))
     }
 
     @Test
@@ -436,7 +436,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
-        assertThat(serverPlugin.archiveName, equalTo('my-plugin.zip'))
+        assertThat(serverPlugin.archiveFileName.get(), equalTo('my-plugin.zip'))
     }
 
     @Test
@@ -562,7 +562,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         task.publishPlugin()
 
-        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), isNull(String))
+        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), isNull() as String)
     }
 
     @Test
@@ -574,7 +574,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         task.publishPlugin()
 
-        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq('Beta'), isNull(String))
+        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq('Beta'), isNull() as String)
     }
 
     @Test

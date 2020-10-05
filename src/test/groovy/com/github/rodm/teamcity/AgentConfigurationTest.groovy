@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -452,7 +452,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('test-1.2.3.zip'))
+        assertThat(agentPlugin.archiveFileName.get(), equalTo('test-1.2.3.zip'))
     }
 
     @Test
@@ -468,7 +468,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
+        assertThat(agentPlugin.archiveFileName.get(), equalTo('agent-plugin.zip'))
     }
 
     @Test
@@ -484,7 +484,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('agent-plugin.zip'))
+        assertThat(agentPlugin.archiveFileName.get(), equalTo('agent-plugin.zip'))
     }
 
     @Test
@@ -499,6 +499,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
-        assertThat(agentPlugin.archiveName, equalTo('my-plugin.zip'))
+        assertThat(agentPlugin.archiveFileName.get(), equalTo('my-plugin.zip'))
     }
 }
