@@ -19,30 +19,26 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.ExpectedException
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
+import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 class AgentServerConfigurationTest {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none()
-
+    private File projectDir
     private Project project
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        this.projectDir = projectDir
+        this.project = ProjectBuilder.builder().withProjectDir(projectDir).build()
     }
 
     @Test
@@ -50,9 +46,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-agent'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'com.github.rodm.teamcity-server'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
@@ -60,9 +57,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         project.apply plugin: 'java'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'com.github.rodm.teamcity-server'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
@@ -70,9 +68,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'com.github.rodm.teamcity-agent'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
@@ -80,9 +79,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         project.apply plugin: 'java'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'com.github.rodm.teamcity-agent'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
@@ -90,9 +90,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'java'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'java'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
@@ -100,9 +101,10 @@ class AgentServerConfigurationTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         project.apply plugin: 'com.github.rodm.teamcity-agent'
 
-        thrown.expect(GradleException)
-        thrown.expectMessage('Failed to apply plugin')
-        project.apply plugin: 'java'
+        def e = assertThrows(GradleException.class) {
+            project.apply plugin: 'java'
+        }
+        assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
