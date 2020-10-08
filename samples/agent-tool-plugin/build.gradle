@@ -29,13 +29,13 @@ dependencies {
 }
 
 agentPlugin {
-    baseName = 'maven3_5'
-    version = ''
+    archiveBaseName = 'maven3_5'
+    archiveVersion = ''
 }
 
 serverPlugin {
-    baseName = 'maven3_5-tool'
-    version = ''
+    archiveBaseName = 'maven3_5-tool'
+    archiveVersion = ''
 }
 
 teamcity {
