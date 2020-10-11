@@ -21,6 +21,7 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
@@ -36,16 +37,17 @@ import org.junit.rules.TemporaryFolder
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.normalize
 import static com.github.rodm.teamcity.TestSupport.normalizePath
-import static org.hamcrest.CoreMatchers.containsString
-import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
+import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.startsWith
 import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertThrows
 import static org.junit.Assert.assertTrue
 import static org.junit.Assert.fail
 import static org.mockito.Mockito.mock
@@ -846,6 +848,65 @@ class EnvironmentsTest {
         StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
         assertThat(normalize(stopAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
         assertThat(normalize(stopAgent.javaHome), endsWith('/opt/jdk1.8.0'))
+    }
+
+    @Test
+    void 'teamcity task validates home directory'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.1' {
+                    version = '2020.1'
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+        assertThat(e.message, containsString('/servers/TeamCity-2020.1'))
+        assertThat(e.message, containsString("specified for property 'homeDir' does not exist."))
+    }
+
+    @Test
+    void 'teamcity task validates Java home directory'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.1' {
+                    version = '2020.1'
+                    javaHome = project.file('/tmp/opt/jdk1.8.0')
+                }
+            }
+        }
+
+        project.evaluate()
+        projectDir.newFolder('servers', 'TeamCity-2020.1')
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+        assertThat(e.message, containsString('/tmp/opt/jdk1.8.0'))
+        assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
+    }
+
+    @Test
+    void 'teamcity task validates home directory not a file'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.1' {
+                    version = '2020.1'
+                }
+            }
+        }
+        project.evaluate()
+        def serverDir = projectDir.newFolder('servers')
+        new File(serverDir, 'TeamCity-2020.1').createNewFile()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+        assertThat(e.message, containsString('/servers/TeamCity-2020.1'))
+        assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
     }
 
     @Test
