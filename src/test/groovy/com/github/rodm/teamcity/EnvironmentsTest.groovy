@@ -864,7 +864,7 @@ class EnvironmentsTest {
 
         StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(e.message, containsString('/servers/TeamCity-2020.1'))
+        assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
         assertThat(e.message, containsString("specified for property 'homeDir' does not exist."))
     }
 
@@ -885,7 +885,7 @@ class EnvironmentsTest {
 
         StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(e.message, containsString('/tmp/opt/jdk1.8.0'))
+        assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
         assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
     }
 
@@ -905,7 +905,7 @@ class EnvironmentsTest {
 
         StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(e.message, containsString('/servers/TeamCity-2020.1'))
+        assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
         assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
     }
 
