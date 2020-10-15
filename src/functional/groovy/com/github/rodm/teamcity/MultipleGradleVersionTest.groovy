@@ -54,7 +54,7 @@ class MultipleGradleVersionTest {
     @Parameterized.Parameters(name = 'Gradle {0}')
     static List<String> data() {
         return [
-            '6.0.1', '6.1.1', '6.2.2', '6.3', '6.4.1', '6.5.1', '6.6.1', '6.7-rc-1'
+            '6.0.1', '6.1.1', '6.2.2', '6.3', '6.4.1', '6.5.1', '6.6.1', '6.7'
         ]
     }
 
