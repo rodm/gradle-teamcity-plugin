@@ -32,20 +32,9 @@ class TeamCityEnvironment {
      */
     String downloadUrl
 
-    /**
-     * The home directory for this environment's TeamCity installation.
-     */
-    File homeDir
-
-    /**
-     * The data directory for this environment's TeamCity configuration.
-     */
-    File dataDir
-
-    /**
-     * The Java home directory used to start the server and agent for this environment.
-     */
-    File javaHome
+    private String homeDir
+    private String dataDir
+    private String javaHome
 
     private List<Object> plugins = []
 
@@ -75,6 +64,48 @@ class TeamCityEnvironment {
     void setVersion(String version) {
         this.version = version
         TeamCityVersion.version(version)
+    }
+
+    /**
+     * The home directory for this environment's TeamCity installation.
+     */
+    String getHomeDir() {
+        return homeDir
+    }
+
+    void setHomeDir(File homeDir) {
+        setHomeDir(homeDir.absolutePath)
+    }
+    void setHomeDir(String homeDir) {
+        this.homeDir = homeDir
+    }
+
+    /**
+     * The data directory for this environment's TeamCity configuration.
+     */
+    String getDataDir() {
+        return dataDir
+    }
+
+    void setDataDir(File dataDir) {
+        setDataDir(dataDir.absolutePath)
+    }
+    void setDataDir(String dataDir) {
+        this.dataDir = dataDir
+    }
+
+    /**
+     * The Java home directory used to start the server and agent for this environment.
+     */
+    String getJavaHome() {
+        return javaHome
+    }
+
+    void setJavaHome(File javaHome) {
+        setJavaHome(javaHome.absolutePath)
+    }
+    void setJavaHome(String javaHome) {
+        this.javaHome = javaHome
     }
 
     /**

@@ -68,7 +68,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     conventionMapping.map('source') {
                         project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}")
                     }
-                    conventionMapping.map('target') { environment.homeDir }
+                    conventionMapping.map('target') { project.file(environment.homeDir) }
                 }
                 unpack.dependsOn download
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
@@ -87,17 +87,18 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     }
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
+                    def dataDir = new File(environment.dataDir)
                     def plugins = project.files(environment.plugins).files
                     def disabledPlugins = []
-                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
-                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
-                    undeployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, []))
+                    deployPlugin.doFirst(new DisablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
+                    deployPlugin.doLast(new EnablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
+                    undeployPlugin.doFirst(new DisablePluginAction(project.logger, dataDir, plugins, []))
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('dataDir') { environment.dataDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
                     conventionMapping.map('serverOptions') { environment.serverOptions }
                 }
                 startServer.doFirst {
@@ -106,20 +107,20 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 startServer.dependsOn deployPlugin
 
                 def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
                 }
                 stopServer.finalizedBy undeployPlugin
 
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
                     conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
 
                 def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    conventionMapping.map('homeDir') { environment.homeDir }
+                    conventionMapping.map('javaHome') { environment.javaHome }
                 }
 
                 project.tasks.create("start${name}") {
