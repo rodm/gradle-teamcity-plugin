@@ -1,4 +1,5 @@
 
+import com.github.rodm.teamcity.gradle.gradleInitScript
 import com.github.rodm.teamcity.pipeline
 import com.github.rodm.teamcity.gradle.switchGradleBuildStep
 import com.github.rodm.teamcity.project.githubIssueTracker
@@ -109,6 +110,19 @@ project {
                     param("gradle.opts", "%sonar.opts%")
                     param("gradle.tasks", "clean build sonarqube")
                 }
+            }
+
+            build {
+                templates(buildTemplate)
+                id("BuildScan")
+                name = "Build - Java 8 - Build Scan"
+
+                features {
+                    gradleInitScript {
+                        scriptName = "scans-init.gradle"
+                    }
+                }
+                paused = true
             }
         }
 
