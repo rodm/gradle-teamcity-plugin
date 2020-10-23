@@ -81,7 +81,7 @@ project {
         }
 
         requirements {
-            doesNotContain("teamcity.agent.jvm.os.name", "Windows")
+            doesNotContain("teamcity.agent.jvm.os.name", "Windows", "RQ_Not_Windows")
         }
     }
     template(buildTemplate)
@@ -116,6 +116,7 @@ project {
                 requirements {
                     contains("teamcity.agent.jvm.os.name", "Windows")
                 }
+                disableSettings("RQ_Not_Windows")
             }
 
             build {
