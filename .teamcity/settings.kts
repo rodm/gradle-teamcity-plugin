@@ -79,6 +79,10 @@ project {
                 type = "perfmon"
             }
         }
+
+        requirements {
+            doesNotContain("teamcity.agent.jvm.os.name", "Windows")
+        }
     }
     template(buildTemplate)
 
@@ -89,6 +93,16 @@ project {
                 templates(buildTemplate)
                 id("BuildJava7")
                 name = "Build - Java 8"
+            }
+
+            build {
+                templates(buildTemplate)
+                id("BuildJava8Windows")
+                name = "Build - Java 8 - Windows"
+
+                requirements {
+                    contains("teamcity.agent.jvm.os.name", "Windows")
+                }
             }
 
             build {
