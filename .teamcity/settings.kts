@@ -97,21 +97,24 @@ project {
 
             build {
                 templates(buildTemplate)
-                id("BuildJava8Windows")
-                name = "Build - Java 8 - Windows"
-
-                requirements {
-                    contains("teamcity.agent.jvm.os.name", "Windows")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
                 id("BuildJava11")
                 name = "Build - Java 11"
 
                 params {
                     param("java.home", "%java11.home%")
+                }
+            }
+
+            build {
+                templates(buildTemplate)
+                id("BuildJava11Windows")
+                name = "Build - Java 11 - Windows"
+
+                params {
+                    param("java.home", "%java11.home%")
+                }
+                requirements {
+                    contains("teamcity.agent.jvm.os.name", "Windows")
                 }
             }
 
