@@ -91,7 +91,7 @@ project {
 
             build {
                 templates(buildTemplate)
-                id("BuildJava7")
+                id("BuildJava8")
                 name = "Build - Java 8"
             }
 
