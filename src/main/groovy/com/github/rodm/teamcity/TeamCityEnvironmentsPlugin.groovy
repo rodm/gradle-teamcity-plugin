@@ -61,6 +61,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 String name = environment.name.capitalize()
                 def download = project.tasks.create(String.format("download%s", name), Download)
+                download.group = GROUP_NAME
                 download.src { environment.downloadUrl }
                 download.dest { project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}") }
 
@@ -70,6 +71,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     }
                     conventionMapping.map('target') { environment.homeDir }
                 }
+                unpack.group = GROUP_NAME
                 unpack.dependsOn download
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
                 install.dependsOn unpack
@@ -78,6 +80,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     from { environment.plugins }
                     into { environment.pluginsDir }
                 }
+                deployPlugin.group = GROUP_NAME
                 deployPlugin.dependsOn build
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
@@ -86,6 +89,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                             includes: project.files(environment.plugins).collect { it.name })
                     }
                 }
+                undeployPlugin.group = GROUP_NAME
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
                     def plugins = project.files(environment.plugins).files
                     def disabledPlugins = []
