@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -100,9 +100,9 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('dataDir') { environment.dataDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
+                    conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
+                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                     conventionMapping.map('serverOptions') { environment.serverOptions }
                 }
                 startServer.doFirst {
@@ -111,20 +111,20 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 startServer.dependsOn deployPlugin
 
                 def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
+                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                 }
                 stopServer.finalizedBy undeployPlugin
 
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
+                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                     conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
 
                 def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
-                    conventionMapping.map('homeDir') { environment.homeDir }
-                    conventionMapping.map('javaHome') { environment.javaHome }
+                    conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
+                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                 }
 
                 project.tasks.create("start${name}") {

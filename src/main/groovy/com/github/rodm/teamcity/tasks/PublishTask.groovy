@@ -43,8 +43,7 @@ class PublishTask extends DefaultTask {
 
     private static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
 
-    @Input
-    public String host = DEFAULT_HOST
+    private String host = DEFAULT_HOST
 
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
@@ -71,6 +70,11 @@ class PublishTask extends DefaultTask {
         distributionFile = project.objects.fileProperty()
     }
 
+    @Input
+    String getHost() {
+        return host
+    }
+
     /**
      * @return the list of channels the plugin will be published to on the plugin repository
      */
@@ -92,10 +96,6 @@ class PublishTask extends DefaultTask {
         return token
     }
 
-    void setToken(Property<String> token) {
-        this.token.set(token)
-    }
-
     /**
      * @return the notes describing the changes made to the plugin
      */
@@ -115,10 +115,6 @@ class PublishTask extends DefaultTask {
     @InputFile
     RegularFileProperty getDistributionFile() {
         return distributionFile
-    }
-
-    void setDistributionFile(RegularFileProperty distributionFile) {
-        this.distributionFile.set(distributionFile)
     }
 
     @SuppressWarnings("GroovyUnusedDeclaration")

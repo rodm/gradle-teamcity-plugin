@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,13 +22,13 @@ import org.gradle.api.tasks.Input
 class TeamCityTask extends DefaultTask {
 
     @Input
-    File homeDir
+    String homeDir
 
     @Input
-    File javaHome
+    String javaHome
 
     TeamCityTask() {
-        group 'TeamCity'
+        group = 'TeamCity'
     }
 
     void validate() {
@@ -36,13 +36,15 @@ class TeamCityTask extends DefaultTask {
         validDirectory('javaHome', getJavaHome())
     }
 
-    void validDirectory(String propertyName, File value) {
+    static void validDirectory(String propertyName, String value) {
         if (value == null) {
-            throw new InvalidUserDataException(String.format("Property '%s' not set.", propertyName));
-        } else if (!value.exists()) {
-            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' does not exist.", value, propertyName));
-        } else if (!value.isDirectory()) {
-            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' is not a directory.", value, propertyName));
+            throw new InvalidUserDataException(String.format("Property '%s' not set.", propertyName))
+        }
+        File path = new File(value)
+        if (!path.exists()) {
+            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' does not exist.", value, propertyName))
+        } else if (!path.isDirectory()) {
+            throw new InvalidUserDataException(String.format("Directory '%s' specified for property '%s' is not a directory.", value, propertyName))
         }
     }
 
