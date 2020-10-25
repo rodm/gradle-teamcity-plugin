@@ -62,6 +62,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 String name = environment.name.capitalize()
                 def download = project.tasks.create(String.format("download%s", name), Download)
                 download.group = GROUP_NAME
+                download.onlyIfModified(true)
                 download.src { environment.downloadUrl }
                 download.dest { project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}") }
 
