@@ -15,11 +15,12 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.DownloadTeamCity
+import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.Unpack
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
@@ -577,7 +578,6 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         assertThat(project.tasks, hasTask('downloadTeamcity9'))
-        assertThat(project.tasks, hasTask('unpackTeamcity9'))
         assertThat(project.tasks, hasTask('installTeamcity9'))
 
         assertThat(project.tasks, hasTask('deployToTeamcity9'))
@@ -910,15 +910,27 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'configures unpack task'() {
+    void 'configures install task'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity TEAMCITY10_ENVIRONMENT
 
         project.evaluate()
 
-        Unpack unpack = project.tasks.getByName('unpackTeamcity10') as Unpack
-        assertThat(normalizePath(unpack.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalizePath(unpack.getTarget()), endsWith('servers/TeamCity-10.0.4'))
+        InstallTeamCity install = project.tasks.getByName('installTeamcity10') as InstallTeamCity
+        assertThat(normalizePath(install.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
+        assertThat(normalizePath(install.getTarget()), endsWith('servers/TeamCity-10.0.4'))
+    }
+
+    @Test
+    void 'configures download task'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity TEAMCITY10_ENVIRONMENT
+
+        project.evaluate()
+
+        DownloadTeamCity download = project.tasks.getByName('downloadTeamcity10') as DownloadTeamCity
+        assertThat(download.getSrc().toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+        assertThat(normalizePath(download.getDest()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
     }
 
     @Test

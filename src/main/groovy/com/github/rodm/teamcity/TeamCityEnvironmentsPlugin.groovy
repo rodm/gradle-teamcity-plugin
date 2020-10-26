@@ -15,13 +15,12 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
-import com.github.rodm.teamcity.tasks.Unpack
-import de.undercouch.gradle.tasks.download.Download
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -60,22 +59,19 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 defaultMissingProperties(project, environments, environment)
 
                 String name = environment.name.capitalize()
-                def download = project.tasks.create(String.format("download%s", name), Download)
+                def downloadFile = "${environments.downloadsDir}/${toFilename(environment.downloadUrl)}"
+                def download = project.tasks.create(String.format("download%s", name), DownloadTeamCity) {
+                    src { environment.downloadUrl }
+                    dest { project.file(downloadFile) }
+                }
                 download.group = GROUP_NAME
-                download.onlyIfModified(true)
-                download.src { environment.downloadUrl }
-                download.dest { project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}") }
 
-                def unpack = project.tasks.create(String.format("unpack%s", name), Unpack) {
-                    conventionMapping.map('source') {
-                        project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}")
-                    }
+                def install = project.tasks.create(String.format("install%s", name), InstallTeamCity) {
+                    conventionMapping.map('source') { project.file(downloadFile) }
                     conventionMapping.map('target') { environment.homeDir }
                 }
-                unpack.group = GROUP_NAME
-                unpack.dependsOn download
-                def install = project.tasks.create(String.format("install%s", name), InstallTeamCity)
-                install.dependsOn unpack
+                install.group = GROUP_NAME
+                install.dependsOn download
 
                 def deployPlugin = project.tasks.create(String.format('deployTo%s', name), Copy) {
                     from { environment.plugins }
