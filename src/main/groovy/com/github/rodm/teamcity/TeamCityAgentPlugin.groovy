@@ -31,6 +31,7 @@ import org.gradle.api.tasks.bundling.Zip
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
+import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
@@ -76,7 +77,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.create('agentPlugin', Zip)
         packagePlugin.description = 'Package TeamCity Agent plugin'
-        packagePlugin.group = 'TeamCity'
+        packagePlugin.group = TEAMCITY_GROUP
         packagePlugin.with {
             into("lib") {
                 project.plugins.withType(JavaPlugin) {

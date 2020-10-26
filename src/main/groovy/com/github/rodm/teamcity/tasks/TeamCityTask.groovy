@@ -27,10 +27,6 @@ class TeamCityTask extends DefaultTask {
     @Input
     String javaHome
 
-    TeamCityTask() {
-        group = 'TeamCity'
-    }
-
     void validate() {
         validDirectory('homeDir', getHomeDir())
         validDirectory('javaHome', getJavaHome())

@@ -46,7 +46,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static final String TEAMCITY_EXTENSION_NAME = 'teamcity'
 
-    static final String GROUP_NAME = 'TeamCity'
+    static final String TEAMCITY_GROUP = 'TeamCity'
 
     static final String JETBRAINS_MAVEN_REPOSITORY = 'https://download.jetbrains.com/teamcity-repository'
 

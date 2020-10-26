@@ -30,7 +30,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 
-import static com.github.rodm.teamcity.TeamCityPlugin.GROUP_NAME
+import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 
 class TeamCityEnvironmentsPlugin implements Plugin<Project> {
@@ -61,32 +61,32 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 String name = environment.name.capitalize()
                 def downloadFile = "${environments.downloadsDir}/${toFilename(environment.downloadUrl)}"
                 def download = project.tasks.create(String.format("download%s", name), DownloadTeamCity) {
+                    group = TEAMCITY_GROUP
                     src { environment.downloadUrl }
                     dest { project.file(downloadFile) }
                 }
-                download.group = GROUP_NAME
 
                 def install = project.tasks.create(String.format("install%s", name), InstallTeamCity) {
+                    group = TEAMCITY_GROUP
                     conventionMapping.map('source') { project.file(downloadFile) }
                     conventionMapping.map('target') { environment.homeDir }
                 }
-                install.group = GROUP_NAME
                 install.dependsOn download
 
                 def deployPlugin = project.tasks.create(String.format('deployTo%s', name), Copy) {
+                    group = TEAMCITY_GROUP
                     from { environment.plugins }
                     into { environment.pluginsDir }
                 }
-                deployPlugin.group = GROUP_NAME
                 deployPlugin.dependsOn build
 
                 def undeployPlugin = project.tasks.create(String.format('undeployFrom%s', name), Delete) {
+                    group = TEAMCITY_GROUP
                     delete {
                         project.fileTree(dir: environment.pluginsDir,
                             includes: project.files(environment.plugins).collect { it.name })
                     }
                 }
-                undeployPlugin.group = GROUP_NAME
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
                     def plugins = project.files(environment.plugins).files
                     def disabledPlugins = []
@@ -96,6 +96,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
+                    group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
@@ -107,32 +108,34 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 startServer.dependsOn deployPlugin
 
                 def stopServer = project.tasks.create(String.format('stop%sServer', name), StopServer) {
+                    group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                 }
                 stopServer.finalizedBy undeployPlugin
 
                 def startAgent = project.tasks.create(String.format('start%sAgent', name), StartAgent) {
+                    group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                     conventionMapping.map('agentOptions') { environment.agentOptions }
                 }
 
                 def stopAgent = project.tasks.create(String.format('stop%sAgent', name), StopAgent) {
+                    group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
                 }
 
                 project.tasks.create("start${name}") {
-                    dependsOn = [startServer, startAgent]
-                    group = GROUP_NAME
+                    group = TEAMCITY_GROUP
                     description = 'Starts the TeamCity Server and Build Agent'
-
+                    dependsOn = [startServer, startAgent]
                 }
                 project.tasks.create("stop${name}") {
-                    dependsOn = [stopServer, stopAgent]
-                    group = GROUP_NAME
+                    group = TEAMCITY_GROUP
                     description = 'Stops the TeamCity Server and Build Agent'
+                    dependsOn = [stopServer, stopAgent]
                 }
             }
         }

@@ -30,6 +30,7 @@ import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
+import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
@@ -80,7 +81,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.create('serverPlugin', Zip)
         packagePlugin.description = 'Package TeamCity plugin'
-        packagePlugin.group = 'TeamCity'
+        packagePlugin.group = TEAMCITY_GROUP
         packagePlugin.with {
             into('server') {
                 project.plugins.withType(JavaPlugin) {
@@ -163,7 +164,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
             if (extension.server.publish) {
                 Zip buildPluginTask = project.tasks.findByName('serverPlugin') as Zip
                 project.tasks.create("publishPlugin", PublishTask) {
-                    group = TeamCityPlugin.GROUP_NAME
+                    group = TEAMCITY_GROUP
                     description = "Publish plugin distribution on plugins.jetbrains.com."
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
