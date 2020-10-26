@@ -70,7 +70,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     conventionMapping.map('source') {
                         project.file("${environments.downloadsDir}/${toFilename(environment.downloadUrl)}")
                     }
-                    conventionMapping.map('target') { project.file(environment.homeDir) }
+                    conventionMapping.map('target') { environment.homeDir }
                 }
                 unpack.group = GROUP_NAME
                 unpack.dependsOn download
@@ -92,12 +92,11 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
                 undeployPlugin.group = GROUP_NAME
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
-                    def dataDir = new File(environment.dataDir)
                     def plugins = project.files(environment.plugins).files
                     def disabledPlugins = []
-                    deployPlugin.doFirst(new DisablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
-                    deployPlugin.doLast(new EnablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
-                    undeployPlugin.doFirst(new DisablePluginAction(project.logger, dataDir, plugins, []))
+                    deployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
+                    deployPlugin.doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
+                    undeployPlugin.doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, []))
                 }
 
                 def startServer = project.tasks.create(String.format('start%sServer', name), StartServer) {
