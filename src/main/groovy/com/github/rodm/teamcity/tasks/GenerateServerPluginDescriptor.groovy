@@ -44,6 +44,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         version = project.objects.property(String)
         descriptor = project.objects.property(ServerPluginDescriptor)
         destination = project.objects.fileProperty()
+        onlyIf { descriptor.isPresent() }
     }
 
     @Input

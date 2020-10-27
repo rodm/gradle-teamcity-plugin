@@ -121,10 +121,9 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor) {
             version.set(project.providers.provider({ extension.version }))
-            descriptor.set(project.providers.provider({ extension.agent.descriptor instanceof AgentPluginDescriptor ? extension.agent.descriptor : null }))
+            descriptor.set(project.providers.provider({ extension.agent.descriptor }))
             destination.set(descriptorFile)
         }
-        generateDescriptor.onlyIf { extension.agent.descriptor != null && extension.agent.descriptor instanceof AgentPluginDescriptor }
         packagePlugin.dependsOn generateDescriptor
 
         project.artifacts.add('plugin', packagePlugin)
