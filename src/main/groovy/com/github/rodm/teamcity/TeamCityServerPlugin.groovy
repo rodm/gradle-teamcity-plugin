@@ -118,9 +118,8 @@ class TeamCityServerPlugin implements Plugin<Project> {
         def processDescriptor = project.tasks.create('processServerDescriptor', ProcessDescriptor) {
             descriptor.set(extension.server.descriptorFile)
             tokens.set(project.providers.provider({ extension.server.tokens }))
+            destination.set(project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
         }
-        processDescriptor.destinationDir = new File(project.buildDir, SERVER_PLUGIN_DESCRIPTOR_DIR)
-        processDescriptor.onlyIf { extension.server.descriptorFile.isPresent() }
         packagePlugin.dependsOn processDescriptor
 
         def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor) {

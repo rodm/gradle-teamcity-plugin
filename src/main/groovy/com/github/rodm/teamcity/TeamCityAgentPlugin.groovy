@@ -111,12 +111,12 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
+        def layout = project.layout
         def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessDescriptor) {
             descriptor.set(extension.agent.descriptorFile)
             tokens.set(project.providers.provider({ extension.agent.tokens }))
+            destination.set(layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
         }
-        processDescriptor.destinationDir = new File(project.buildDir, AGENT_PLUGIN_DESCRIPTOR_DIR)
-        processDescriptor.onlyIf { extension.agent.descriptorFile.isPresent() }
         packagePlugin.dependsOn processDescriptor
 
         def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor) {
