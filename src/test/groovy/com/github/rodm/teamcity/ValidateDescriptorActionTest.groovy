@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,6 +54,11 @@ class ValidateDescriptorActionTest {
         when(stubTask.getProject()).thenReturn(project)
     }
 
+    private TeamCityServerPlugin.PluginDescriptorContentsValidationAction validationAction(File descriptorFile) {
+        def file = project.objects.fileProperty().fileValue(descriptorFile)
+        new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(file)
+    }
+
     @Test
     void 'warn about required descriptor values being empty'() {
         File descriptorFile = project.file('teamcity-plugin.xml')
@@ -69,7 +74,7 @@ class ValidateDescriptorActionTest {
             </info>
         </teamcity-plugin>
         '''
-        Action<Task> validationAction = new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(descriptorFile)
+        Action<Task> validationAction = validationAction(descriptorFile)
 
         validationAction.execute(stubTask)
 
@@ -97,7 +102,7 @@ class ValidateDescriptorActionTest {
         </teamcity-plugin>
         '''
 
-        Action<Task> validationAction = new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(descriptorFile)
+        Action<Task> validationAction = validationAction(descriptorFile)
         validationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), containsString(warningFor('description')))
@@ -121,7 +126,7 @@ class ValidateDescriptorActionTest {
             </info>
         </teamcity-plugin>
         '''
-        Action<Task> validationAction = new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(descriptorFile)
+        Action<Task> validationAction = validationAction(descriptorFile)
         outputEventListener.reset()
 
         validationAction.execute(stubTask)

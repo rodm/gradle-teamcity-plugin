@@ -69,10 +69,15 @@ class ValidateDescriptorSchemaActionTest {
         '''
     }
 
+    private validationAction(String schema, File descriptorFile) {
+        def file = project.objects.fileProperty().fileValue(descriptorFile)
+        new TeamCityPlugin.PluginDescriptorValidationAction(schema, file)
+    }
+
     @Test
     void 'warn about allow-reload-plugin attribute when using schema for TeamCity 2018_1 and earlier'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema, descriptorFile)
 
         validationAction.execute(stubTask)
 
@@ -82,7 +87,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'no warnings when using schema for TeamCity 2018_2 and later'() {
         def schema = '2018.2/teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema, descriptorFile)
 
         validationAction.execute(stubTask)
 
@@ -92,7 +97,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'warn about node-responsibilities-aware attribute when using schema for TeamCity 2019_2 and earlier'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema, descriptorFile)
 
         validationAction.execute(stubTask)
 
@@ -102,7 +107,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'no warning about node-responsibilities-aware when using schema for TeamCity 2020_1 and later'() {
         def schema = '2020.1/teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = new TeamCityPlugin.PluginDescriptorValidationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema, descriptorFile)
 
         validationAction.execute(stubTask)
 

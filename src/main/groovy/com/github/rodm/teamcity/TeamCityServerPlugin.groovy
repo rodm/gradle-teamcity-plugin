@@ -23,9 +23,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
@@ -79,6 +81,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
+        def descriptorFile = project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         def packagePlugin = project.tasks.create('serverPlugin', Zip)
         packagePlugin.description = 'Package TeamCity plugin'
         packagePlugin.group = TEAMCITY_GROUP
@@ -101,14 +104,13 @@ class TeamCityServerPlugin implements Plugin<Project> {
             }
             into('') {
                 from {
-                    new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                    descriptorFile
                 }
                 rename {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
         }
-        def descriptorFile = new File(project.getBuildDir(), SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         packagePlugin.with(extension.server.files)
         packagePlugin.onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
 
@@ -180,16 +182,16 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty."
 
-        private File descriptorFile
+        private Provider<RegularFile> descriptorFile
 
-        PluginDescriptorContentsValidationAction(File descriptorFile) {
+        PluginDescriptorContentsValidationAction(Provider<RegularFile> descriptorFile) {
             this.descriptorFile = descriptorFile
         }
 
         @Override
         void execute(Task task) {
             def parser = createXmlParser()
-            def descriptor = parser.parse(descriptorFile)
+            def descriptor = parser.parse(descriptorFile.get().asFile)
 
             if (descriptor.info.name.text().trim().isEmpty()) {
                 LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))

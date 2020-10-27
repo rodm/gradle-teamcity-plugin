@@ -23,9 +23,11 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
@@ -75,6 +77,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
+        def descriptorFile = project.layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         def packagePlugin = project.tasks.create('agentPlugin', Zip)
         packagePlugin.description = 'Package TeamCity Agent plugin'
         packagePlugin.group = TEAMCITY_GROUP
@@ -89,14 +92,13 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             }
             into('') {
                 from {
-                    new File(project.getBuildDir(), AGENT_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME)
+                    descriptorFile
                 }
                 rename {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
         }
-        def descriptorFile = new File(project.getBuildDir(), AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
         packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
         packagePlugin.with(extension.agent.files)
         packagePlugin.onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
@@ -150,10 +152,10 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
     static class PluginExecutableFilesValidationAction implements Action<Task> {
 
-        private File descriptor
+        private Provider<RegularFile> descriptor
         private Set<FileCopyDetails> files
 
-        PluginExecutableFilesValidationAction(File descriptor, Set<FileCopyDetails> files) {
+        PluginExecutableFilesValidationAction(Provider<RegularFile> descriptor, Set<FileCopyDetails> files) {
             this.descriptor = descriptor
             this.files = files
         }
@@ -171,7 +173,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         def getExecutableFiles() {
             def parser = createXmlParser()
-            def descriptor = parser.parse(descriptor)
+            def descriptor = parser.parse(descriptor.get().asFile)
             return descriptor.breadthFirst().findAll { node -> node.name() == 'include' }.flatten { node -> node['@name'] }
         }
     }

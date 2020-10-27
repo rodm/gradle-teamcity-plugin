@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,10 +23,12 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.util.GradleVersion
@@ -275,9 +277,9 @@ class TeamCityPlugin implements Plugin<Project> {
     static class PluginDescriptorValidationAction implements Action<Task> {
 
         private String schema
-        private File descriptor
+        private Provider<RegularFile> descriptor
 
-        PluginDescriptorValidationAction(String schema, File descriptor) {
+        PluginDescriptorValidationAction(String schema, Provider<RegularFile> descriptor) {
             this.schema = schema
             this.descriptor = descriptor
         }
@@ -291,7 +293,7 @@ class TeamCityPlugin implements Plugin<Project> {
             def validator = schema.newValidator()
             def errorHandler = new PluginDescriptorErrorHandler(project, task.getPath())
             validator.setErrorHandler(errorHandler)
-            validator.validate(new StreamSource(new FileReader(descriptor)))
+            validator.validate(new StreamSource(new FileReader(descriptor.get().asFile)))
         }
     }
 }

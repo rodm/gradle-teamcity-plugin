@@ -72,12 +72,17 @@ class ValidateExecutableFileActionTest {
         return fileCopyDetails
     }
 
+    private validationAction(File descriptorFile, Set<FileCopyDetails> files) {
+        def file = project.objects.fileProperty().fileValue(descriptorFile)
+        new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(file, files)
+    }
+
     @Test
     void 'output warning when executable file is missing'() {
         File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << AGENT_PLUGIN_DESCRIPTOR
         Set<FileCopyDetails> files = [fileCopyDetails('test1')]
-        Action<Task> validationAction = new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(descriptorFile, files)
+        Action<Task> validationAction = validationAction(descriptorFile, files)
         outputEventListener.reset()
 
         validationAction.execute(stubTask)
@@ -91,7 +96,7 @@ class ValidateExecutableFileActionTest {
         File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << AGENT_PLUGIN_DESCRIPTOR
         Set<FileCopyDetails> files = [fileCopyDetails('test1'), fileCopyDetails('bin/test2')]
-        Action<Task> validationAction = new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(descriptorFile, files)
+        Action<Task> validationAction =  validationAction(descriptorFile, files)
         outputEventListener.reset()
 
         validationAction.execute(stubTask)
