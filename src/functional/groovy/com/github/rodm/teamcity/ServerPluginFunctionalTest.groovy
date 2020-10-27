@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder
 import java.util.zip.ZipFile
 
 import static org.hamcrest.CoreMatchers.equalTo
+import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.containsString
@@ -68,6 +69,10 @@ class ServerPluginFunctionalTest {
         }
     """
 
+    static final String SETTINGS_SCRIPT_DEFAULT = """
+        rootProject.name = 'test-plugin'
+    """
+
     static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
         <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns="http://www.springframework.org/schema/beans"
@@ -86,10 +91,12 @@ class ServerPluginFunctionalTest {
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
 
     private File buildFile
+    private File settingsFile
 
     @Before
     void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
+        settingsFile = testProjectDir.newFile('settings.gradle')
     }
 
     private BuildResult executeBuild(String... args = ['serverPlugin']) {
@@ -104,11 +111,7 @@ class ServerPluginFunctionalTest {
     @Test
     void serverPluginBuildAndPackage() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         BuildResult result = executeBuild()
 
@@ -345,6 +348,27 @@ class ServerPluginFunctionalTest {
     }
 
     @Test
+    void 'generate server descriptor task should be cacheable'() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+
+            buildCache {
+                local(DirectoryBuildCache) {
+                    directory = new File('$testProjectDir.root', 'build-cache')
+                }
+            }
+        """
+
+        BuildResult result
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":generateServerDescriptor").getOutcome(), is(SUCCESS))
+
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":generateServerDescriptor").getOutcome(), is(FROM_CACHE))
+    }
+
+    @Test
     void 'plugin archive contains 3rd party libraries but not TeamCity libraries'() {
         buildFile << """
             plugins {
@@ -367,11 +391,7 @@ class ServerPluginFunctionalTest {
                 }
             }
         """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         BuildResult result = executeBuild()
 
@@ -411,11 +431,7 @@ class ServerPluginFunctionalTest {
                 }
             }
         """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         File srcdir = testProjectDir.newFolder('srcdir')
         File file1 = new File(srcdir, 'file1')
@@ -460,5 +476,4 @@ class ServerPluginFunctionalTest {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
     }
-
 }

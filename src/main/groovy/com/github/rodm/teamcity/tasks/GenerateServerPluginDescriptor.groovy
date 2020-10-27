@@ -22,6 +22,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputFile
@@ -32,6 +33,7 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 
 @CompileStatic
+@CacheableTask
 class GenerateServerPluginDescriptor extends DefaultTask {
 
     private Property<String> version

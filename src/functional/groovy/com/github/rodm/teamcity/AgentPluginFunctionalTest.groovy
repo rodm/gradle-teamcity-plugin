@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
 import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
@@ -61,6 +62,10 @@ class AgentPluginFunctionalTest {
         }
     """
 
+    static final String SETTINGS_SCRIPT_DEFAULT = """
+        rootProject.name = 'test-plugin'
+    """
+
     static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
         <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns="http://www.springframework.org/schema/beans"
@@ -79,10 +84,12 @@ class AgentPluginFunctionalTest {
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
 
     private File buildFile
+    private File settingsFile
 
     @Before
     void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
+        settingsFile = testProjectDir.newFile('settings.gradle')
     }
 
     private BuildResult executeBuild(String... args = ['agentPlugin']) {
@@ -97,11 +104,7 @@ class AgentPluginFunctionalTest {
     @Test
     void agentPluginBuildAndPackage() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         BuildResult result = executeBuild()
 
@@ -317,7 +320,7 @@ class AgentPluginFunctionalTest {
                             <include name="@PATH@"/>
                         </executable-files>
                     </layout>
-                </plugin-deployment>                                    
+                </plugin-deployment>
             </teamcity-agent-plugin>
         """
         BuildResult result = executeBuild()
@@ -354,11 +357,7 @@ class AgentPluginFunctionalTest {
                 }
             }
         """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         BuildResult result = executeBuild()
 
@@ -397,11 +396,7 @@ class AgentPluginFunctionalTest {
                 }
             }
         """
-
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         File srcdir = testProjectDir.newFolder('srcdir')
         File file1 = new File(srcdir, 'file1')
@@ -418,5 +413,26 @@ class AgentPluginFunctionalTest {
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1'))
         assertThat(entries, hasItem('files/file2'))
+    }
+
+    @Test
+    void 'generate agent descriptor task should be cacheable'() {
+        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+
+            buildCache {
+                local(DirectoryBuildCache) {
+                    directory = new File('$testProjectDir.root', 'build-cache')
+                }
+            }
+        """
+
+        BuildResult result
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SUCCESS))
+
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(FROM_CACHE))
     }
 }
