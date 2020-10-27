@@ -31,12 +31,12 @@ class StartServer extends TeamCityTask {
     }
 
     @TaskAction
-    public void start() {
+    void start() {
         validate()
         validDirectory('dataDir', getDataDir())
 
         def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
-        project.ant.exec(executable: "$homeDir/bin/$name") {
+        ant.exec(executable: "$homeDir/bin/$name") {
             env key: 'JAVA_HOME', path: getJavaHome()
             env key: 'TEAMCITY_DATA_PATH', path: getDataDir()
             env key: 'TEAMCITY_SERVER_OPTS', value: getServerOptions()

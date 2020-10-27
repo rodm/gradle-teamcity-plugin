@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,10 +24,10 @@ class StopAgent extends TeamCityTask {
     }
 
     @TaskAction
-    public void stop() {
+    void stop() {
         validate()
         def name = isWindows() ? 'agent.bat' : 'agent.sh'
-        project.ant.exec(executable: "$homeDir/buildAgent/bin/$name") {
+        ant.exec(executable: "$homeDir/buildAgent/bin/$name") {
             env key: 'JAVA_HOME', path: getJavaHome()
             arg value: 'stop'
         }
