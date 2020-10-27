@@ -357,7 +357,6 @@ class ServerPluginFunctionalTest {
 
             buildCache {
                 local(DirectoryBuildCache) {
-                    directory = new File('$testProjectDir.root', 'build-cache')
                     directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
