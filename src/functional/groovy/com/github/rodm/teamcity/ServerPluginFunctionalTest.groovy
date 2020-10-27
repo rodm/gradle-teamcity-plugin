@@ -358,6 +358,7 @@ class ServerPluginFunctionalTest {
             buildCache {
                 local(DirectoryBuildCache) {
                     directory = new File('$testProjectDir.root', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
         """
@@ -378,7 +379,7 @@ class ServerPluginFunctionalTest {
 
             buildCache {
                 local(DirectoryBuildCache) {
-                    directory = new File('$testProjectDir.root', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
         """
@@ -500,5 +501,9 @@ class ServerPluginFunctionalTest {
         BuildResult result = executeBuild('--init-script', 'init.gradle', '--refresh-dependencies', 'serverPlugin')
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+    }
+
+    private static String windowsCompatiblePath(File path) {
+        path.canonicalPath.replace('\\', '\\\\')
     }
 }

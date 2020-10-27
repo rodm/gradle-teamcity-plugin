@@ -424,7 +424,7 @@ class AgentPluginFunctionalTest {
 
             buildCache {
                 local(DirectoryBuildCache) {
-                    directory = new File('$testProjectDir.root', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
         """
@@ -445,7 +445,7 @@ class AgentPluginFunctionalTest {
 
             buildCache {
                 local(DirectoryBuildCache) {
-                    directory = new File('$testProjectDir.root', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
         """
@@ -458,5 +458,9 @@ class AgentPluginFunctionalTest {
 
         result = executeBuild('--build-cache', 'clean', 'assemble')
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
+    }
+
+    private static String windowsCompatiblePath(File path) {
+        path.canonicalPath.replace('\\', '\\\\')
     }
 }
