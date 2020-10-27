@@ -66,6 +66,13 @@ class AgentPluginFunctionalTest {
         rootProject.name = 'test-plugin'
     """
 
+    static final String AGENT_DESCRIPTOR_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                               xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+            <plugin-deployment use-separate-classloader="true"/>
+        </teamcity-agent-plugin>
+    """
+
     static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
         <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns="http://www.springframework.org/schema/beans"
@@ -121,14 +128,8 @@ class AgentPluginFunctionalTest {
     @Test
     void agentPluginWithDescriptorFile() {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
-
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
-        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
-            <teamcity-agent-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                   xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
-                <plugin-deployment use-separate-classloader="true"/>
-            </teamcity-agent-plugin>
-        """
+        descriptorFile << AGENT_DESCRIPTOR_FILE
 
         BuildResult result = executeBuild()
 
@@ -434,5 +435,28 @@ class AgentPluginFunctionalTest {
 
         result = executeBuild('--build-cache', 'clean', 'assemble')
         assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(FROM_CACHE))
+    }
+
+    @Test
+    void 'process agent descriptor task should be cacheable'() {
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+
+            buildCache {
+                local(DirectoryBuildCache) {
+                    directory = new File('$testProjectDir.root', 'build-cache')
+                }
+            }
+        """
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        descriptorFile << AGENT_DESCRIPTOR_FILE
+
+        BuildResult result
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SUCCESS))
+
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
     }
 }

@@ -73,6 +73,17 @@ class ServerPluginFunctionalTest {
         rootProject.name = 'test-plugin'
     """
 
+    static final String SERVER_DESCRIPTOR_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+            <info>
+                <name>test-plugin</name>
+                <display-name>test-plugin</display-name>
+                <version>1.0</version>
+            </info>
+        </teamcity-plugin>
+    """
+
     static final String PLUGIN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
         <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns="http://www.springframework.org/schema/beans"
@@ -130,16 +141,7 @@ class ServerPluginFunctionalTest {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
-        descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
-            <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
-                <info>
-                    <name>test-plugin</name>
-                    <display-name>test-plugin</display-name>
-                    <version>1.0</version>
-                </info>
-            </teamcity-plugin>
-        """
+        descriptorFile << SERVER_DESCRIPTOR_FILE
 
         BuildResult result = executeBuild()
 
@@ -366,6 +368,29 @@ class ServerPluginFunctionalTest {
 
         result = executeBuild('--build-cache', 'clean', 'assemble')
         assertThat(result.task(":generateServerDescriptor").getOutcome(), is(FROM_CACHE))
+    }
+
+    @Test
+    void 'process server descriptor task should be cacheable'() {
+        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+        settingsFile << """
+            rootProject.name = 'test-plugin'
+
+            buildCache {
+                local(DirectoryBuildCache) {
+                    directory = new File('$testProjectDir.root', 'build-cache')
+                }
+            }
+        """
+        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        descriptorFile << SERVER_DESCRIPTOR_FILE
+
+        BuildResult result
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":processServerDescriptor").getOutcome(), is(SUCCESS))
+
+        result = executeBuild('--build-cache', 'clean', 'assemble')
+        assertThat(result.task(":processServerDescriptor").getOutcome(), is(FROM_CACHE))
     }
 
     @Test
