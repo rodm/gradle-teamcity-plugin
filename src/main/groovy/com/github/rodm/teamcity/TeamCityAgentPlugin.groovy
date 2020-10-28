@@ -77,11 +77,24 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
-        def descriptorFile = project.layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
-        def packagePlugin = project.tasks.create('agentPlugin', Zip)
-        packagePlugin.description = 'Package TeamCity Agent plugin'
-        packagePlugin.group = TEAMCITY_GROUP
-        packagePlugin.with {
+        def layout = project.layout
+        def descriptorFile = layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
+
+        def processDescriptor = project.tasks.register('processAgentDescriptor', ProcessDescriptor) {
+            descriptor.set(extension.agent.descriptorFile)
+            tokens.set(project.providers.provider({ extension.agent.tokens }))
+            destination.set(layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
+        }
+
+        def generateDescriptor = project.tasks.register('generateAgentDescriptor', GenerateAgentPluginDescriptor) {
+            version.set(project.providers.provider({ extension.version }))
+            descriptor.set(project.providers.provider({ extension.agent.descriptor }))
+            destination.set(descriptorFile)
+        }
+
+        def packagePlugin = project.tasks.register('agentPlugin', Zip) {
+            description = 'Package TeamCity Agent plugin'
+            group = TEAMCITY_GROUP
             into("lib") {
                 project.plugins.withType(JavaPlugin) {
                     def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
@@ -98,41 +111,28 @@ class TeamCityAgentPlugin implements Plugin<Project> {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
+            doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
+            with(extension.agent.files)
+            onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
+            Set<FileCopyDetails> files = []
+            filesMatching('**/*', new FileCollectorAction(files))
+            doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
+            dependsOn processDescriptor, generateDescriptor
         }
-        packagePlugin.doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
-        packagePlugin.with(extension.agent.files)
-        packagePlugin.onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
-        Set<FileCopyDetails> files = []
-        packagePlugin.filesMatching('**/*', new FileCollectorAction(files))
-        packagePlugin.doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
 
         project.plugins.withType(TeamCityServerPlugin) {
-            packagePlugin.archiveAppendix.convention('agent')
+            packagePlugin.configure {archiveAppendix.convention('agent') }
         }
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        def layout = project.layout
-        def processDescriptor = project.tasks.create('processAgentDescriptor', ProcessDescriptor) {
-            descriptor.set(extension.agent.descriptorFile)
-            tokens.set(project.providers.provider({ extension.agent.tokens }))
-            destination.set(layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
-        }
-        packagePlugin.dependsOn processDescriptor
-
-        def generateDescriptor = project.tasks.create('generateAgentDescriptor', GenerateAgentPluginDescriptor) {
-            version.set(project.providers.provider({ extension.version }))
-            descriptor.set(project.providers.provider({ extension.agent.descriptor }))
-            destination.set(descriptorFile)
-        }
-        packagePlugin.dependsOn generateDescriptor
-
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            Zip agentPlugin = (Zip) project.tasks.getByPath('agentPlugin')
-            configurePluginArchiveTask(agentPlugin, extension.agent.archiveName)
+            project.tasks.named('agentPlugin').configure { Zip task ->
+                configurePluginArchiveTask(task, extension.agent.archiveName)
+            }
         }
     }
 

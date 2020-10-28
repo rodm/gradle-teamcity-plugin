@@ -82,22 +82,32 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
         def descriptorFile = project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
-        def packagePlugin = project.tasks.create('serverPlugin', Zip)
-        packagePlugin.description = 'Package TeamCity plugin'
-        packagePlugin.group = TEAMCITY_GROUP
-        packagePlugin.with {
+
+        def processDescriptor = project.tasks.register('processServerDescriptor', ProcessDescriptor) {
+            descriptor.set(extension.server.descriptorFile)
+            tokens.set(project.providers.provider({ extension.server.tokens }))
+            destination.set(descriptorFile)
+        }
+
+        def generateDescriptor = project.tasks.register('generateServerDescriptor', GenerateServerPluginDescriptor) {
+            version.set(project.providers.provider({ extension.version }))
+            descriptor.set(project.providers.provider({ extension.server.descriptor }))
+            destination.set(descriptorFile)
+        }
+
+        def packagePlugin = project.tasks.register('serverPlugin', Zip) {
+            description = 'Package TeamCity plugin'
+            group = TEAMCITY_GROUP
             into('server') {
                 project.plugins.withType(JavaPlugin) {
-                    def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-                    from(jar)
+                    from(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
                     from(project.configurations.runtimeClasspath)
                 }
                 from(project.configurations.server)
             }
             into('agent') {
                 if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
-                    def agentPlugin = project.tasks['agentPlugin']
-                    from(agentPlugin)
+                    from(project.tasks.named('agentPlugin'))
                 } else {
                     from(project.configurations.agent)
                 }
@@ -110,34 +120,22 @@ class TeamCityServerPlugin implements Plugin<Project> {
                     PLUGIN_DESCRIPTOR_FILENAME
                 }
             }
+            with(extension.server.files)
+            onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
+            dependsOn processDescriptor, generateDescriptor
         }
-        packagePlugin.with(extension.server.files)
-        packagePlugin.onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
 
         def assemble = project.tasks['assemble']
         assemble.dependsOn packagePlugin
 
-        def processDescriptor = project.tasks.create('processServerDescriptor', ProcessDescriptor) {
-            descriptor.set(extension.server.descriptorFile)
-            tokens.set(project.providers.provider({ extension.server.tokens }))
-            destination.set(project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
-        }
-        packagePlugin.dependsOn processDescriptor
-
-        def generateDescriptor = project.tasks.create('generateServerDescriptor', GenerateServerPluginDescriptor) {
-            version.set(project.providers.provider({ extension.version }))
-            descriptor.set(project.providers.provider({ extension.server.descriptor }))
-            destination.set(descriptorFile)
-        }
-        packagePlugin.dependsOn generateDescriptor
-
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            Zip serverPlugin = (Zip) project.tasks.getByPath('serverPlugin')
-            configurePluginArchiveTask(serverPlugin, extension.server.archiveName)
-            serverPlugin.doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version), descriptorFile))
-            serverPlugin.doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
+            project.tasks.named('serverPlugin').configure { Zip task ->
+                configurePluginArchiveTask(task, extension.server.archiveName)
+                doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version), descriptorFile))
+                doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
+            }
         }
     }
 
