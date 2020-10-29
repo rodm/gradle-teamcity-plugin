@@ -456,6 +456,23 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'publish task is configured with output of serverPlugin task'() {
+        project.teamcity {
+            server {
+                publish {
+                    token = 'token'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
+        PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+        assertThat(publishPlugin.distributionFile.get(), equalTo(serverPlugin.archiveFile.get()))
+    }
+
+    @Test
     void 'publish task is configured with change notes'() {
         project.teamcity {
             server {
