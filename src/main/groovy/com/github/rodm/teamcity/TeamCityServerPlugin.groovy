@@ -86,6 +86,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
     }
 
+    @SuppressWarnings('GrMethodMayBeStatic')
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 

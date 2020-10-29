@@ -59,7 +59,7 @@ class ProcessDescriptor extends DefaultTask {
     }
 
     @TaskAction
-    public void process() {
+    void process() {
         project.copy {
             into destination.get().asFile.parentFile
             from descriptor.get().asFile

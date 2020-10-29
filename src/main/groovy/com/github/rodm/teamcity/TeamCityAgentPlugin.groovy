@@ -80,6 +80,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         }
     }
 
+    @SuppressWarnings('GrMethodMayBeStatic')
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
@@ -169,7 +170,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         @Override
         void execute(Task task) {
             def paths = files.flatten { fileCopyDetails -> fileCopyDetails.path }
-            List<String> executableFiles = getExecutableFiles()
+            def executableFiles = getExecutableFiles()
             for (String executableFile : executableFiles) {
                 if (!paths.contains(executableFile)) {
                     LOGGER.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
