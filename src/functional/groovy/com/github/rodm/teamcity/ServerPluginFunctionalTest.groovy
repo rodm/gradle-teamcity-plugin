@@ -24,17 +24,19 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
-import static org.hamcrest.CoreMatchers.equalTo
+import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
+import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
+import static org.gradle.testkit.runner.TaskOutcome.FAILED
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
+import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import static org.gradle.testkit.runner.TaskOutcome.SKIPPED
-import static org.gradle.testkit.runner.TaskOutcome.FAILED
-import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class ServerPluginFunctionalTest {
 
@@ -67,10 +69,6 @@ class ServerPluginFunctionalTest {
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
             }
         }
-    """
-
-    static final String SETTINGS_SCRIPT_DEFAULT = """
-        rootProject.name = 'test-plugin'
     """
 
     static final String SERVER_DESCRIPTOR_FILE = """<?xml version="1.0" encoding="UTF-8"?>
@@ -500,9 +498,5 @@ class ServerPluginFunctionalTest {
         BuildResult result = executeBuild('--init-script', 'init.gradle', '--refresh-dependencies', 'serverPlugin')
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
-    }
-
-    private static String windowsCompatiblePath(File path) {
-        path.canonicalPath.replace('\\', '\\\\')
     }
 }

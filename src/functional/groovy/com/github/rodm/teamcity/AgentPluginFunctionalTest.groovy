@@ -24,6 +24,8 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
+import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.FAILED
@@ -60,10 +62,6 @@ class AgentPluginFunctionalTest {
                 descriptor = file(\"\$rootDir/teamcity-plugin.xml\")
             }
         }
-    """
-
-    static final String SETTINGS_SCRIPT_DEFAULT = """
-        rootProject.name = 'test-plugin'
     """
 
     static final String AGENT_DESCRIPTOR_FILE = """<?xml version="1.0" encoding="UTF-8"?>
@@ -458,9 +456,5 @@ class AgentPluginFunctionalTest {
 
         result = executeBuild('--build-cache', 'clean', 'assemble')
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
-    }
-
-    private static String windowsCompatiblePath(File path) {
-        path.canonicalPath.replace('\\', '\\\\')
     }
 }

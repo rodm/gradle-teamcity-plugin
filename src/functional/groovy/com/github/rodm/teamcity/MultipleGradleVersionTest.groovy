@@ -46,8 +46,6 @@ class MultipleGradleVersionTest {
     @Rule
     public final TemporaryFolder projectDir = new TemporaryFolder()
 
-    private File buildFile
-
     @Parameterized.Parameter(0)
     public String version
 
@@ -60,7 +58,7 @@ class MultipleGradleVersionTest {
 
     @Before
     void setup() throws IOException {
-        buildFile = projectDir.newFile("build.gradle")
+        File buildFile = projectDir.newFile("build.gradle")
 
         buildFile << """
             plugins {

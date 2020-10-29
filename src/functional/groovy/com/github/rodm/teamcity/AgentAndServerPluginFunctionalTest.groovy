@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static org.gradle.testkit.runner.TaskOutcome.*
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
@@ -34,10 +35,12 @@ class AgentAndServerPluginFunctionalTest {
     public final TemporaryFolder testProjectDir = new TemporaryFolder()
 
     private File buildFile
+    private File settingsFile
 
     @Before
     void setup() throws IOException {
         buildFile = testProjectDir.newFile("build.gradle")
+        settingsFile = testProjectDir.newFile('settings.gradle')
     }
 
     private BuildResult executeBuild(String... args = ['build']) {
@@ -77,10 +80,7 @@ class AgentAndServerPluginFunctionalTest {
             }
         """
 
-        File settingsFile = testProjectDir.newFile('settings.gradle')
-        settingsFile << """
-            rootProject.name = 'test-plugin'
-        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
 
         testProjectDir.newFolder('lib')
         testProjectDir.newFile('lib/agent-lib.jar')
@@ -154,7 +154,6 @@ class AgentAndServerPluginFunctionalTest {
             }
         """
 
-        File settingsFile = testProjectDir.newFile('settings.gradle')
         settingsFile << """
             rootProject.name = 'test-plugin'
             include 'common'
