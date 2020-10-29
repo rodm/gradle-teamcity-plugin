@@ -38,6 +38,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
+import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityAgentPlugin implements Plugin<Project> {
 
@@ -128,8 +129,9 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             packagePlugin.configure {archiveAppendix.convention('agent') }
         }
 
-        def assemble = project.tasks['assemble']
-        assemble.dependsOn packagePlugin
+        project.tasks.named(ASSEMBLE_TASK_NAME) {
+            dependsOn packagePlugin
+        }
 
         project.artifacts.add('plugin', packagePlugin)
 

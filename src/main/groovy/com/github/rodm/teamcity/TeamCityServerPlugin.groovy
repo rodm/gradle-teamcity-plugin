@@ -42,6 +42,7 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
+import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityServerPlugin implements Plugin<Project> {
 
@@ -132,8 +133,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
             dependsOn processDescriptor, generateDescriptor
         }
 
-        def assemble = project.tasks['assemble']
-        assemble.dependsOn packagePlugin
+        project.tasks.named(ASSEMBLE_TASK_NAME) {
+            dependsOn packagePlugin
+        }
 
         project.artifacts.add('plugin', packagePlugin)
 
