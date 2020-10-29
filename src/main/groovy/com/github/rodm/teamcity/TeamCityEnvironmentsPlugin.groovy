@@ -31,6 +31,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
+import static com.github.rodm.teamcity.TeamCityServerPlugin.SERVER_PLUGIN_TASK_NAME
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 
 class TeamCityEnvironmentsPlugin implements Plugin<Project> {
@@ -152,7 +153,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 javaHome = javaHome ?: project.file(System.properties['java.home'])
 
                 if (plugins.isEmpty()) {
-                    def serverPlugin = project.tasks.findByName('serverPlugin')
+                    def serverPlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME)
                     if (serverPlugin) {
                         plugins serverPlugin.archivePath
                     }

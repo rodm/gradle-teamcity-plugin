@@ -37,6 +37,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 
 class TeamCityAgentPlugin implements Plugin<Project> {
 
@@ -45,6 +46,10 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
 
     public static final String AGENT_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/agent'
+
+    public static final String PROCESS_AGENT_DESCRIPTOR_TASK_NAME = 'processAgentDescriptor'
+    public static final String GENERATE_AGENT_DESCRIPTOR_TASK_NAME = 'generateAgentDescriptor'
+    public static final String AGENT_PLUGIN_TASK_NAME = 'agentPlugin'
 
     static final String MISSING_EXECUTABLE_FILE_WARNING = "%s: Executable file %s is missing."
 
@@ -80,25 +85,24 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         def layout = project.layout
         def descriptorFile = layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
 
-        def processDescriptor = project.tasks.register('processAgentDescriptor', ProcessDescriptor) {
+        def processDescriptor = project.tasks.register(PROCESS_AGENT_DESCRIPTOR_TASK_NAME, ProcessDescriptor) {
             descriptor.set(extension.agent.descriptorFile)
             tokens.set(project.providers.provider({ extension.agent.tokens }))
             destination.set(layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
         }
 
-        def generateDescriptor = project.tasks.register('generateAgentDescriptor', GenerateAgentPluginDescriptor) {
+        def generateDescriptor = project.tasks.register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor) {
             version.set(project.providers.provider({ extension.version }))
             descriptor.set(project.providers.provider({ extension.agent.descriptor }))
             destination.set(descriptorFile)
         }
 
-        def packagePlugin = project.tasks.register('agentPlugin', Zip) {
+        def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, Zip) {
             description = 'Package TeamCity Agent plugin'
             group = TEAMCITY_GROUP
             into("lib") {
                 project.plugins.withType(JavaPlugin) {
-                    def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-                    from(jar)
+                    from(project.tasks.named(JAR_TASK_NAME))
                     from(project.configurations.runtimeClasspath)
                 }
                 from(project.configurations.agent)
@@ -130,7 +134,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            project.tasks.named('agentPlugin') { Zip task ->
+            project.tasks.named(AGENT_PLUGIN_TASK_NAME) { Zip task ->
                 configurePluginArchiveTask(task, extension.agent.archiveName)
             }
         }

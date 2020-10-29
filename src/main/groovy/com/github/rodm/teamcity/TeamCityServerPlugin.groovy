@@ -30,6 +30,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
+import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
@@ -40,12 +41,18 @@ import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 
 class TeamCityServerPlugin implements Plugin<Project> {
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-server-plugin*.xml"
 
     public static final String SERVER_PLUGIN_DESCRIPTOR_DIR = PLUGIN_DESCRIPTOR_DIR + '/server'
+
+    public static final String PROCESS_SERVER_DESCRIPTOR_TASK_NAME = 'processServerDescriptor'
+    public static final String GENERATE_SERVER_DESCRIPTOR_TASK_NAME = 'generateServerDescriptor'
+    public static final String SERVER_PLUGIN_TASK_NAME = 'serverPlugin'
+    public static final String PUBLISH_PLUGIN_TASK_NAME = 'publishPlugin'
 
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
@@ -83,31 +90,31 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         def descriptorFile = project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
 
-        def processDescriptor = project.tasks.register('processServerDescriptor', ProcessDescriptor) {
+        def processDescriptor = project.tasks.register(PROCESS_SERVER_DESCRIPTOR_TASK_NAME, ProcessDescriptor) {
             descriptor.set(extension.server.descriptorFile)
             tokens.set(project.providers.provider({ extension.server.tokens }))
             destination.set(descriptorFile)
         }
 
-        def generateDescriptor = project.tasks.register('generateServerDescriptor', GenerateServerPluginDescriptor) {
+        def generateDescriptor = project.tasks.register(GENERATE_SERVER_DESCRIPTOR_TASK_NAME, GenerateServerPluginDescriptor) {
             version.set(project.providers.provider({ extension.version }))
             descriptor.set(project.providers.provider({ extension.server.descriptor }))
             destination.set(descriptorFile)
         }
 
-        def packagePlugin = project.tasks.register('serverPlugin', Zip) {
+        def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, Zip) {
             description = 'Package TeamCity plugin'
             group = TEAMCITY_GROUP
             into('server') {
                 project.plugins.withType(JavaPlugin) {
-                    from(project.tasks.named(JavaPlugin.JAR_TASK_NAME))
+                    from(project.tasks.named(JAR_TASK_NAME))
                     from(project.configurations.runtimeClasspath)
                 }
                 from(project.configurations.server)
             }
             into('agent') {
                 if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
-                    from(project.tasks.named('agentPlugin'))
+                    from(project.tasks.named(AGENT_PLUGIN_TASK_NAME))
                 } else {
                     from(project.configurations.agent)
                 }
@@ -131,7 +138,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            project.tasks.named('serverPlugin') { Zip task ->
+            project.tasks.named(SERVER_PLUGIN_TASK_NAME) { Zip task ->
                 configurePluginArchiveTask(task, extension.server.archiveName)
                 doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version), descriptorFile))
                 doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
@@ -160,8 +167,8 @@ class TeamCityServerPlugin implements Plugin<Project> {
     private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
-                Zip buildPluginTask = project.tasks.findByName('serverPlugin') as Zip
-                project.tasks.create("publishPlugin", PublishTask) {
+                Zip buildPluginTask = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
+                project.tasks.create(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
                     group = TEAMCITY_GROUP
                     description = "Publish plugin distribution on plugins.jetbrains.com."
                     channels.set(extension.server.publish.channels)
