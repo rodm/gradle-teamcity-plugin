@@ -131,7 +131,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            project.tasks.named('serverPlugin').configure { Zip task ->
+            project.tasks.named('serverPlugin') { Zip task ->
                 configurePluginArchiveTask(task, extension.server.archiveName)
                 doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version), descriptorFile))
                 doLast(new PluginDescriptorContentsValidationAction(descriptorFile))

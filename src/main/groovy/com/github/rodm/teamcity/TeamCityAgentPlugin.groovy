@@ -130,7 +130,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         project.artifacts.add('plugin', packagePlugin)
 
         project.afterEvaluate {
-            project.tasks.named('agentPlugin').configure { Zip task ->
+            project.tasks.named('agentPlugin') { Zip task ->
                 configurePluginArchiveTask(task, extension.agent.archiveName)
             }
         }
