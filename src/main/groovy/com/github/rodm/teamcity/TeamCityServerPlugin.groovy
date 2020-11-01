@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
+import com.github.rodm.teamcity.tasks.ServerPlugin
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -30,7 +31,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
-import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
@@ -41,7 +41,6 @@ import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
-import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityServerPlugin implements Plugin<Project> {
@@ -104,31 +103,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
             destination.set(descriptorFile)
         }
 
-        def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, Zip) {
-            description = 'Package TeamCity plugin'
+        def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, ServerPlugin) {
             group = TEAMCITY_GROUP
-            into('server') {
-                project.plugins.withType(JavaPlugin) {
-                    from(project.tasks.named(JAR_TASK_NAME))
-                    from(project.configurations.runtimeClasspath)
-                }
-                from(project.configurations.server)
-            }
-            into('agent') {
-                if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
-                    from(project.tasks.named(AGENT_PLUGIN_TASK_NAME))
-                } else {
-                    from(project.configurations.agent)
-                }
-            }
-            into('') {
-                from {
-                    descriptorFile
-                }
-                rename {
-                    PLUGIN_DESCRIPTOR_FILENAME
-                }
-            }
+            descriptor.set(descriptorFile)
             with(extension.server.files)
             onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
             dependsOn processDescriptor, generateDescriptor

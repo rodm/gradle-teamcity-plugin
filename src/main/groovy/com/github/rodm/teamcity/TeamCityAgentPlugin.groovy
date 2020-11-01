@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.AgentPlugin
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import org.gradle.api.Action
@@ -37,7 +38,6 @@ import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
-import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityAgentPlugin implements Plugin<Project> {
@@ -98,27 +98,12 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             destination.set(descriptorFile)
         }
 
-        def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, Zip) {
-            description = 'Package TeamCity Agent plugin'
+        def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, AgentPlugin) {
             group = TEAMCITY_GROUP
-            into("lib") {
-                project.plugins.withType(JavaPlugin) {
-                    from(project.tasks.named(JAR_TASK_NAME))
-                    from(project.configurations.runtimeClasspath)
-                }
-                from(project.configurations.agent)
-            }
-            into('') {
-                from {
-                    descriptorFile
-                }
-                rename {
-                    PLUGIN_DESCRIPTOR_FILENAME
-                }
-            }
-            doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
+            descriptor.set(descriptorFile)
             with(extension.agent.files)
             onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
+            doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
             Set<FileCopyDetails> files = []
             filesMatching('**/*', new FileCollectorAction(files))
             doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
