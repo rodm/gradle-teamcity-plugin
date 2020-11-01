@@ -15,20 +15,20 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
+import com.github.rodm.teamcity.tasks.Undeploy
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.logging.Logger
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Delete
 
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityServerPlugin.SERVER_PLUGIN_TASK_NAME
@@ -74,19 +74,17 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     dependsOn download
                 }
 
-                def deployPlugin = project.tasks.register(String.format('deployTo%s', name), Copy) {
+                def deployPlugin = project.tasks.register(String.format('deployTo%s', name), Deploy) {
                     group = TEAMCITY_GROUP
-                    from { environment.plugins }
-                    into { environment.pluginsDir }
+                    plugins.from(environment.plugins)
+                    pluginsDir.set(environment.pluginsDir)
                     dependsOn build
                 }
 
-                def undeployPlugin = project.tasks.register(String.format('undeployFrom%s', name), Delete) {
+                def undeployPlugin = project.tasks.register(String.format('undeployFrom%s', name), Undeploy) {
                     group = TEAMCITY_GROUP
-                    delete {
-                        project.fileTree(dir: environment.pluginsDir,
-                            includes: environment.plugins.files.collect { it.name })
-                    }
+                    plugins.from(environment.plugins)
+                    pluginsDir.set(environment.pluginsDir)
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
                     def plugins = environment.plugins.files
