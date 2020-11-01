@@ -16,6 +16,10 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.model.ObjectFactory
+
+import javax.inject.Inject
 
 @CompileStatic
 class TeamCityEnvironment {
@@ -47,7 +51,7 @@ class TeamCityEnvironment {
      */
     File javaHome
 
-    private List<Object> plugins = []
+    private ConfigurableFileCollection plugins
 
     private List<String> serverOptions = [
         '-Dteamcity.development.mode=true',
@@ -57,8 +61,10 @@ class TeamCityEnvironment {
 
     private List<String> agentOptions = []
 
-    TeamCityEnvironment(String name) {
+    @Inject
+    TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
+        this.plugins = factory.fileCollection()
     }
 
     File getPluginsDir() {
@@ -80,22 +86,20 @@ class TeamCityEnvironment {
     /**
      * The list of plugins to be deployed to this environment.
      */
-    List<Object> getPlugins() {
+    ConfigurableFileCollection getPlugins() {
         return plugins
     }
 
     def setPlugins(Object plugins) {
-        this.plugins.clear()
-        this.plugins.addAll(plugins)
+        this.plugins.setFrom(plugins)
     }
 
     def setPlugins(List<Object> plugins) {
-        this.plugins.clear()
-        this.plugins.addAll(plugins)
+        this.plugins.setFrom(plugins)
     }
 
     def plugins(Object plugin) {
-        this.plugins.add(plugin)
+        this.plugins.from(plugin)
     }
 
     /**

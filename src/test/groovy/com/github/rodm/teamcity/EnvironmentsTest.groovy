@@ -387,9 +387,10 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         TeamCityEnvironment environment = extension.environments.getByName('test')
-        assertThat(environment.plugins, hasSize(2))
-        assertThat(environment.plugins, hasItem('plugin1.zip'))
-        assertThat(environment.plugins, hasItem('plugin2.zip'))
+        List<File> plugins = environment.plugins.toList()
+        assertThat(plugins, hasSize(2))
+        assertThat(plugins, hasItem(project.file('plugin1.zip')))
+        assertThat(plugins, hasItem(project.file('plugin2.zip')))
     }
 
     @Test
@@ -406,8 +407,9 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         TeamCityEnvironment environment = extension.environments.getByName('test')
-        assertThat(environment.plugins, hasSize(1))
-        assertThat(environment.plugins, hasItem('plugin2.zip'))
+        List<File> plugins = environment.plugins.toList()
+        assertThat(plugins, hasSize(1))
+        assertThat(plugins, hasItem(project.file('plugin2.zip')))
     }
 
     @Test
@@ -423,9 +425,10 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         TeamCityEnvironment environment = extension.environments.getByName('test')
-        assertThat(environment.plugins, hasSize(2))
-        assertThat(environment.plugins, hasItem('plugin1.zip'))
-        assertThat(environment.plugins, hasItem('plugin2.zip'))
+        def plugins = environment.plugins.toList()
+        assertThat(plugins, hasSize(2))
+        assertThat(plugins, hasItem(project.file('plugin1.zip')))
+        assertThat(plugins, hasItem(project.file('plugin2.zip')))
     }
 
     private String ENVIRONMENTS_WARNING = 'Configuring environments with the teamcity-server plugin is deprecated'
@@ -712,7 +715,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
-        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call()
+        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call().toList()
         assertThat(deployFiles, hasSize(1))
         assertThat(deployFiles, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
         assertThat(normalizePath(deployPlugin.rootSpec.destinationDir), endsWith('data/10.0/plugins'))
@@ -742,10 +745,10 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
-        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call()
+        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call().toList()
         assertThat(deployFiles, hasSize(2))
-        assertThat(deployFiles, hasItem('plugin1.zip'))
-        assertThat(deployFiles, hasItem('plugin2.zip'))
+        assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
+        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
         ConfigurableFileTree fileTree = undeployPlugin.delete[0].call()

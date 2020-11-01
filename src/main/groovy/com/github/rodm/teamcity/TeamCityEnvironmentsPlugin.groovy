@@ -85,11 +85,11 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     group = TEAMCITY_GROUP
                     delete {
                         project.fileTree(dir: environment.pluginsDir,
-                            includes: project.files(environment.plugins).collect { it.name })
+                            includes: environment.plugins.files.collect { it.name })
                     }
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
-                    def plugins = project.files(environment.plugins).files
+                    def plugins = environment.plugins.files
                     def disabledPlugins = []
                     deployPlugin.configure {
                         doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
