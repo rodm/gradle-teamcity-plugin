@@ -84,13 +84,12 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     void configureTasks(Project project, TeamCityPluginExtension extension) {
         configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
 
-        def layout = project.layout
-        def descriptorFile = layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
+        def descriptorFile = project.layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
 
         def processDescriptor = project.tasks.register(PROCESS_AGENT_DESCRIPTOR_TASK_NAME, ProcessDescriptor) {
             descriptor.set(extension.agent.descriptorFile)
             tokens.set(project.providers.provider({ extension.agent.tokens }))
-            destination.set(layout.buildDirectory.file(AGENT_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME))
+            destination.set(descriptorFile)
         }
 
         def generateDescriptor = project.tasks.register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor) {

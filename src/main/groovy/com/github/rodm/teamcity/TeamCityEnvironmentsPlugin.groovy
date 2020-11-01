@@ -33,6 +33,7 @@ import org.gradle.api.logging.Logger
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityServerPlugin.SERVER_PLUGIN_TASK_NAME
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static org.gradle.language.base.plugins.LifecycleBasePlugin.BUILD_TASK_NAME
 
 class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
@@ -54,7 +55,6 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         @Override
         void execute(Project project) {
-            def build = project.tasks.getByName('build')
             TeamCityEnvironments environments = extension.environments
             environments.environments.each { environment ->
                 defaultMissingProperties(project, environments, environment)
@@ -78,7 +78,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     group = TEAMCITY_GROUP
                     plugins.from(environment.plugins)
                     pluginsDir.set(environment.pluginsDir)
-                    dependsOn build
+                    dependsOn project.tasks.named(BUILD_TASK_NAME)
                 }
 
                 def undeployPlugin = project.tasks.register(String.format('undeployFrom%s', name), Undeploy) {

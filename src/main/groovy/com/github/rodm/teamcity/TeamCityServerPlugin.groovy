@@ -170,15 +170,15 @@ class TeamCityServerPlugin implements Plugin<Project> {
     private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
-                Zip buildPluginTask = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
+                Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
                 project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
                     group = TEAMCITY_GROUP
                     description = "Publish plugin distribution on plugins.jetbrains.com."
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
                     notes.set(extension.server.publish.notes)
-                    distributionFile.set(buildPluginTask.archiveFile)
-                    dependsOn(buildPluginTask)
+                    distributionFile.set(packagePlugin.archiveFile)
+                    dependsOn(packagePlugin)
                 }
             }
         }
