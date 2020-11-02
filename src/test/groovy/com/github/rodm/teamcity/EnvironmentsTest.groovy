@@ -213,7 +213,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo(defaultOptions))
+        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions))
         assertThat(optionsAsString(environment.agentOptions), equalTo(''))
     }
 
@@ -251,7 +251,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo('-DnewOption=test'))
+        assertThat(optionsAsString(environment.serverOptions), equalTo('-DnewOption=test'))
     }
 
     @Test
@@ -269,7 +269,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo('-Doption1=value1 -Doption2=value2'))
+        assertThat(optionsAsString(environment.serverOptions), equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
     @Test
@@ -287,7 +287,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption=test'))
+        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions + ' -DadditionalOption=test'))
     }
 
     @Test
@@ -305,7 +305,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo(defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'))
+        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'))
     }
 
     @Test
@@ -824,7 +824,7 @@ class EnvironmentsTest {
         assertThat(normalize(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
         assertThat(normalize(startServer.getDataDir()), endsWith('data/10.0'))
         assertThat(normalize(startServer.javaHome), endsWith('/opt/jdk1.8.0'))
-        assertThat(startServer.serverOptions, endsWith(defaultOptions))
+        assertThat(startServer.serverOptions.get(), endsWith(defaultOptions))
     }
 
     @Test

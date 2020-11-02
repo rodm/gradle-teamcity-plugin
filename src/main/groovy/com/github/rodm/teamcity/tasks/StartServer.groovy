@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
@@ -24,7 +25,7 @@ class StartServer extends TeamCityTask {
     String dataDir
 
     @Input
-    String serverOptions
+    Property<String> serverOptions = project.objects.property(String)
 
     StartServer() {
         description = 'Starts the TeamCity Server'
@@ -39,7 +40,7 @@ class StartServer extends TeamCityTask {
         ant.exec(executable: "$homeDir/bin/$name") {
             env key: 'JAVA_HOME', path: getJavaHome()
             env key: 'TEAMCITY_DATA_PATH', path: getDataDir()
-            env key: 'TEAMCITY_SERVER_OPTS', value: getServerOptions()
+            env key: 'TEAMCITY_SERVER_OPTS', value: getServerOptions().get()
             arg value: 'start'
         }
     }

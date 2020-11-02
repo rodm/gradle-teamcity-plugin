@@ -97,7 +97,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(environment.serverOptions as String, equalTo(""))
+        assertThat(optionsAsString(environment.serverOptions), equalTo(""))
     }
 
     @Test
@@ -113,7 +113,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(environment.serverOptions as String, equalTo("-DnewOption=test"))
+        assertThat(optionsAsString(environment.serverOptions), equalTo("-DnewOption=test"))
     }
 
     @Test
@@ -129,7 +129,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(environment.serverOptions as String, equalTo("-Doption1=value1 -Doption2=value2"))
+        assertThat(optionsAsString(environment.serverOptions), equalTo("-Doption1=value1 -Doption2=value2"))
     }
 
     @Test

@@ -103,7 +103,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
-                    conventionMapping.map('serverOptions') { environment.serverOptions }
+                    serverOptions.set(environment.serverOptions.map({it.join(' ')}))
                     doFirst {
                         project.mkdir(getDataDir())
                     }

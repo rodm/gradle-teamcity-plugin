@@ -25,6 +25,12 @@ import javax.inject.Inject
 @CompileStatic
 class TeamCityEnvironment {
 
+    private static final List<String> DEFAULT_SERVER_OPTIONS = [
+        '-Dteamcity.development.mode=true',
+        '-Dteamcity.development.shadowCopyClasses=true',
+        '-Dteamcity.superUser.token.saveToFile=true'
+    ].asImmutable()
+
     /**
      * The name of the environment
      */
@@ -53,19 +59,15 @@ class TeamCityEnvironment {
     File javaHome
 
     private ConfigurableFileCollection plugins
-
-    private List<String> serverOptions = [
-        '-Dteamcity.development.mode=true',
-        '-Dteamcity.development.shadowCopyClasses=true',
-        '-Dteamcity.superUser.token.saveToFile=true'
-    ]
-
+    private ListProperty<String> serverOptions
     private ListProperty<String> agentOptions
 
     @Inject
     TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
         this.plugins = factory.fileCollection()
+        this.serverOptions = factory.listProperty(String)
+        this.serverOptions.addAll(DEFAULT_SERVER_OPTIONS)
         this.agentOptions = factory.listProperty(String)
     }
 
@@ -112,11 +114,11 @@ class TeamCityEnvironment {
      *      '-Dteamcity.superUser.token.saveToFile=true'
      */
     Object getServerOptions() {
-        return serverOptions.join(' ')
+        return serverOptions
     }
 
     def setServerOptions(Object options) {
-        this.serverOptions.clear()
+        this.serverOptions.empty()
         if (options instanceof List) {
             this.serverOptions.addAll(options)
         } else {
