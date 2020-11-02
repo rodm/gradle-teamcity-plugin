@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 
 import javax.inject.Inject
 
@@ -59,12 +60,13 @@ class TeamCityEnvironment {
         '-Dteamcity.superUser.token.saveToFile=true'
     ]
 
-    private List<String> agentOptions = []
+    private ListProperty<String> agentOptions
 
     @Inject
     TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
         this.plugins = factory.fileCollection()
+        this.agentOptions = factory.listProperty(String)
     }
 
     File getPluginsDir() {
@@ -130,11 +132,11 @@ class TeamCityEnvironment {
      * The Java command line options to be used when starting the TeamCity Agent.
      */
     Object getAgentOptions() {
-        return agentOptions.join(' ')
+        return agentOptions
     }
 
     void setAgentOptions(Object options) {
-        this.agentOptions.clear()
+        this.agentOptions.empty()
         if (options instanceof List) {
             this.agentOptions.addAll(options)
         } else {

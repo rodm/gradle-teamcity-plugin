@@ -121,7 +121,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
-                    conventionMapping.map('agentOptions') { environment.agentOptions }
+                    agentOptions.set(environment.agentOptions.map({it.join(' ')}))
                 }
 
                 def stopAgent = project.tasks.register(String.format('stop%sAgent', name), StopAgent) {

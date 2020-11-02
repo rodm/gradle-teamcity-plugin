@@ -15,13 +15,14 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 class StartAgent extends TeamCityTask {
 
     @Input
-    String agentOptions
+    Property<String> agentOptions = project.objects.property(String)
 
     StartAgent() {
         description = 'Starts the TeamCity Agent'
@@ -33,7 +34,7 @@ class StartAgent extends TeamCityTask {
         def name = isWindows() ? 'agent.bat' : 'agent.sh'
         ant.exec(executable: "$homeDir/buildAgent/bin/$name") {
             env key: 'JAVA_HOME', path: getJavaHome()
-            env key: 'TEAMCITY_AGENT_OPTS', value: getAgentOptions()
+            env key: 'TEAMCITY_AGENT_OPTS', value: getAgentOptions().get()
             arg value: 'start'
         }
     }
