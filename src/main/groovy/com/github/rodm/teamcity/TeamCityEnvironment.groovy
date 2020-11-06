@@ -39,11 +39,7 @@ class TeamCityEnvironment {
 
     private String version = '9.0'
     private Property<String> downloadUrl
-
-    /**
-     * The home directory for this environment's TeamCity installation.
-     */
-    File homeDir
+    private Property<String> homeDir
 
     /**
      * The data directory for this environment's TeamCity configuration.
@@ -59,6 +55,7 @@ class TeamCityEnvironment {
     TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
         this.downloadUrl= factory.property(String)
+        this.homeDir = factory.property(String)
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
@@ -91,6 +88,17 @@ class TeamCityEnvironment {
 
     void setDownloadUrl(String downloadUrl) {
         this.downloadUrl.set(downloadUrl)
+    }
+
+    /**
+     * The home directory for this environment's TeamCity installation.
+     */
+    Property<String> getHomeDir() {
+        return homeDir
+    }
+
+    void setHomeDir(String homeDir) {
+        this.homeDir.set(homeDir)
     }
 
     /**

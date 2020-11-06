@@ -23,13 +23,13 @@ import org.gradle.api.tasks.Input
 class TeamCityTask extends DefaultTask {
 
     @Input
-    String homeDir
+    final Property<String> homeDir = project.objects.property(String)
 
     @Input
     final Property<String> javaHome = project.objects.property(String)
 
     void validate() {
-        validDirectory('homeDir', getHomeDir())
+        validDirectory('homeDir', getHomeDir().get())
         validDirectory('javaHome', getJavaHome().get())
     }
 

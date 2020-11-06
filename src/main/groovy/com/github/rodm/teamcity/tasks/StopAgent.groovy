@@ -27,7 +27,7 @@ class StopAgent extends TeamCityTask {
     void stop() {
         validate()
         def name = isWindows() ? 'agent.bat' : 'agent.sh'
-        ant.exec(executable: "$homeDir/buildAgent/bin/$name") {
+        ant.exec(executable: "${getHomeDir().get()}/buildAgent/bin/$name") {
             env key: 'JAVA_HOME', path: getJavaHome()
             arg value: 'stop'
         }
