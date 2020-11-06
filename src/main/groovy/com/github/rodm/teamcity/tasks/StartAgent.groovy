@@ -22,7 +22,7 @@ import org.gradle.api.tasks.TaskAction
 class StartAgent extends TeamCityTask {
 
     @Input
-    Property<String> agentOptions = project.objects.property(String)
+    final Property<String> agentOptions = project.objects.property(String)
 
     StartAgent() {
         description = 'Starts the TeamCity Agent'

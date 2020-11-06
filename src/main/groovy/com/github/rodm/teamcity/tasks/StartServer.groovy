@@ -25,7 +25,7 @@ class StartServer extends TeamCityTask {
     String dataDir
 
     @Input
-    Property<String> serverOptions = project.objects.property(String)
+    final Property<String> serverOptions = project.objects.property(String)
 
     StartServer() {
         description = 'Starts the TeamCity Server'

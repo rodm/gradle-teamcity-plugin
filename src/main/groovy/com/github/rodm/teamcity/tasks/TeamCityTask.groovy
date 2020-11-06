@@ -26,7 +26,7 @@ class TeamCityTask extends DefaultTask {
     String homeDir
 
     @Input
-    Property<String> javaHome = project.objects.property(String)
+    final Property<String> javaHome = project.objects.property(String)
 
     void validate() {
         validDirectory('homeDir', getHomeDir())
