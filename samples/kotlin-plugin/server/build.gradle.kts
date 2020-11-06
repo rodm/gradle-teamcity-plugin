@@ -46,19 +46,19 @@ teamcity {
 
         "teamcity2019.1" {
             version = "2019.1.5"
-            javaHome = file(extra["java8Home"] as String)
+            javaHome.set(extra["java8Home"] as String)
             serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
             agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
         }
 
         create("teamcity2019.2") {
             version = "2019.2.4"
-            javaHome = file(extra["java8Home"] as String)
+            javaHome.set(extra["java8Home"] as String)
         }
 
         register("teamcity2020.1") {
             version = "2020.1"
-            javaHome = file(extra["java8Home"] as String)
+            javaHome.set(extra["java8Home"] as String)
         }
     }
 }

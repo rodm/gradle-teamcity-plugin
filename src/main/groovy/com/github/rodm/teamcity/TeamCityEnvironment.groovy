@@ -19,6 +19,7 @@ import groovy.transform.CompileStatic
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 
 import javax.inject.Inject
 
@@ -53,11 +54,7 @@ class TeamCityEnvironment {
      */
     File dataDir
 
-    /**
-     * The Java home directory used to start the server and agent for this environment.
-     */
-    File javaHome
-
+    private Property<String> javaHome
     private ConfigurableFileCollection plugins
     private ListProperty<String> serverOptions
     private ListProperty<String> agentOptions
@@ -65,6 +62,7 @@ class TeamCityEnvironment {
     @Inject
     TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
+        this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
         this.serverOptions.addAll(DEFAULT_SERVER_OPTIONS)
@@ -85,6 +83,16 @@ class TeamCityEnvironment {
     void setVersion(String version) {
         this.version = version
         TeamCityVersion.version(version)
+    }
+
+    /**
+     * The Java home directory used to start the server and agent for this environment.
+     */
+    Property<String> getJavaHome() {
+        return javaHome
+    }
+    void setJavaHome(String javaHome) {
+        this.javaHome.set(javaHome)
     }
 
     /**

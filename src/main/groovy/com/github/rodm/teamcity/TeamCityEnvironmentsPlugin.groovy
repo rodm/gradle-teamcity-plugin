@@ -102,7 +102,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
                     conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    javaHome.set(environment.javaHome)
                     serverOptions.set(environment.serverOptions.map({it.join(' ')}))
                     doFirst {
                         project.mkdir(getDataDir())
@@ -113,21 +113,21 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 def stopServer = project.tasks.register(String.format('stop%sServer', name), StopServer) {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    javaHome.set(environment.javaHome)
                     finalizedBy undeployPlugin
                 }
 
                 def startAgent = project.tasks.register(String.format('start%sAgent', name), StartAgent) {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    javaHome.set(environment.javaHome)
                     agentOptions.set(environment.agentOptions.map({it.join(' ')}))
                 }
 
                 def stopAgent = project.tasks.register(String.format('stop%sAgent', name), StopAgent) {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('homeDir') { environment.homeDir.absolutePath }
-                    conventionMapping.map('javaHome') { environment.javaHome.absolutePath }
+                    javaHome.set(environment.javaHome)
                 }
 
                 project.tasks.register("start${name}") {
@@ -148,7 +148,6 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 downloadUrl = downloadUrl ?: "${environments.baseDownloadUrl}/TeamCity-${version}.tar.gz"
                 homeDir = homeDir ?: project.file("${environments.baseHomeDir}/TeamCity-${version}")
                 dataDir = dataDir ?: project.file("${environments.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
-                javaHome = javaHome ?: project.file(System.properties['java.home'])
 
                 if (plugins.isEmpty()) {
                     def serverPlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME)

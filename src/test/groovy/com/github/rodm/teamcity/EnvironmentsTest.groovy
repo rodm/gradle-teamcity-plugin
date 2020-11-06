@@ -509,13 +509,13 @@ class EnvironmentsTest {
         assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('/data/9.1'))
-        assertThat(normalizePath(environment1.javaHome), equalTo(normalize(System.getProperty('java.home'))))
+        assertThat(normalize(environment1.javaHome.get()), equalTo(normalize(System.getProperty('java.home'))))
 
         def environment2 = extension.environments.getByName('test2')
         assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/data/10.0'))
-        assertThat(normalizePath(environment2.javaHome), equalTo(normalize(System.getProperty('java.home'))))
+        assertThat(normalize(environment2.javaHome.get()), equalTo(normalize(System.getProperty('java.home'))))
     }
 
     @Test
@@ -573,7 +573,7 @@ class EnvironmentsTest {
         assertThat(environment.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment.dataDir), endsWith('/tmp/data/teamcity9.1'))
-        assertThat(normalizePath(environment.javaHome), endsWith('/tmp/java'))
+        assertThat(normalize(environment.javaHome.get()), endsWith('/tmp/java'))
     }
 
     @Test
@@ -823,7 +823,7 @@ class EnvironmentsTest {
         StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
         assertThat(normalize(startServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
         assertThat(normalize(startServer.getDataDir()), endsWith('data/10.0'))
-        assertThat(normalize(startServer.javaHome), endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(startServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
         assertThat(startServer.serverOptions.get(), endsWith(defaultOptions))
     }
 
@@ -836,7 +836,7 @@ class EnvironmentsTest {
 
         StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
         assertThat(normalize(stopServer.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(stopServer.javaHome), endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(stopServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test
@@ -848,7 +848,7 @@ class EnvironmentsTest {
 
         StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
         assertThat(normalize(startAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(startAgent.javaHome), endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(startAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
         assertThat(startAgent.agentOptions.get(), endsWith('-DagentOption=agentValue'))
     }
 
@@ -861,7 +861,7 @@ class EnvironmentsTest {
 
         StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
         assertThat(normalize(stopAgent.getHomeDir()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(stopAgent.javaHome), endsWith('/opt/jdk1.8.0'))
+        assertThat(normalize(stopAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
     }
 
     @Test

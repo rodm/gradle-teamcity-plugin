@@ -38,7 +38,7 @@ class EnvironmentsKotlinTest {
         if (options is ListProperty<*>) {
             return options.get().joinToString(" ").trim()
         } else {
-            return "";
+            return ""
         }
     }
 
@@ -156,7 +156,22 @@ class EnvironmentsKotlinTest {
             }
         }
 
-        val environment = teamcity.environments.named("test")
-        assertThat(environment.get().version as String, equalTo("2020.1"))
+        val environment = teamcity.environments.named("test").get()
+        assertThat(environment.version as String, equalTo("2020.1"))
+    }
+
+    @Test
+    fun `set java home`() {
+        teamcity {
+            environments {
+                it.register("test") {
+                    it.version = "2020.1"
+                    it.javaHome.set("/opt/java1.8.0")
+                }
+            }
+        }
+
+        val environment = teamcity.environments.named("test").get()
+        assertThat(environment.javaHome.get(), equalTo("/opt/java1.8.0"))
     }
 }

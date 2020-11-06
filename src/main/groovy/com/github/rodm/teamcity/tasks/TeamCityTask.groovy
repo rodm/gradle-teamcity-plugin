@@ -17,6 +17,7 @@ package com.github.rodm.teamcity.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 
 class TeamCityTask extends DefaultTask {
@@ -25,11 +26,11 @@ class TeamCityTask extends DefaultTask {
     String homeDir
 
     @Input
-    String javaHome
+    Property<String> javaHome = project.objects.property(String)
 
     void validate() {
         validDirectory('homeDir', getHomeDir())
-        validDirectory('javaHome', getJavaHome())
+        validDirectory('javaHome', getJavaHome().get())
     }
 
     static void validDirectory(String propertyName, String value) {
