@@ -506,13 +506,13 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         def environment1 = extension.environments.getByName('test1')
-        assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment1.downloadUrl.get(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('/data/9.1'))
         assertThat(normalize(environment1.javaHome.get()), equalTo(normalize(System.getProperty('java.home'))))
 
         def environment2 = extension.environments.getByName('test2')
-        assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
+        assertThat(environment2.downloadUrl.get(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/data/10.0'))
         assertThat(normalize(environment2.javaHome.get()), equalTo(normalize(System.getProperty('java.home'))))
@@ -540,12 +540,12 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         def environment1 = extension.environments.getByName('test1')
-        assertThat(environment1.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment1.downloadUrl.get(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment1.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment1.dataDir), endsWith('/tmp/data/9.1'))
 
         def environment2 = extension.environments.getByName('test2')
-        assertThat(environment2.downloadUrl, equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+        assertThat(environment2.downloadUrl.get(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(environment2.homeDir), endsWith('/tmp/servers/TeamCity-10.0.4'))
         assertThat(normalizePath(environment2.dataDir), endsWith('/tmp/data/10.0'))
     }
@@ -570,7 +570,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         def environment = extension.environments.getByName('test')
-        assertThat(environment.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+        assertThat(environment.downloadUrl.get(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
         assertThat(normalizePath(environment.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
         assertThat(normalizePath(environment.dataDir), endsWith('/tmp/data/teamcity9.1'))
         assertThat(normalize(environment.javaHome.get()), endsWith('/tmp/java'))

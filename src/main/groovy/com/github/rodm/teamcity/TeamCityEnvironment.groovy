@@ -38,11 +38,7 @@ class TeamCityEnvironment {
     final String name
 
     private String version = '9.0'
-
-    /**
-     * The download URL used to download the TeamCity distribution for this environment.
-     */
-    String downloadUrl
+    private Property<String> downloadUrl
 
     /**
      * The home directory for this environment's TeamCity installation.
@@ -62,6 +58,7 @@ class TeamCityEnvironment {
     @Inject
     TeamCityEnvironment(String name, ObjectFactory factory) {
         this.name = name
+        this.downloadUrl= factory.property(String)
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
@@ -83,6 +80,17 @@ class TeamCityEnvironment {
     void setVersion(String version) {
         this.version = version
         TeamCityVersion.version(version)
+    }
+
+    /**
+     * The download URL used to download the TeamCity distribution for this environment.
+     */
+    Property<String> getDownloadUrl() {
+        return downloadUrl
+    }
+
+    void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl.set(downloadUrl)
     }
 
     /**
