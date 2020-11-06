@@ -87,21 +87,22 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     pluginsDir.set(environment.pluginsDir)
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
+                    def dataDir = project.file(environment.dataDir.get())
                     def plugins = environment.plugins.files
                     def disabledPlugins = []
                     deployPlugin.configure {
-                        doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
-                        doLast(new EnablePluginAction(project.logger, environment.dataDir, plugins, disabledPlugins))
+                        doFirst(new DisablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
+                        doLast(new EnablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
                     }
                     undeployPlugin.configure {
-                        doFirst(new DisablePluginAction(project.logger, environment.dataDir, plugins, []))
+                        doFirst(new DisablePluginAction(project.logger, dataDir, plugins, []))
                     }
                 }
 
                 def startServer = project.tasks.register(String.format('start%sServer', name), StartServer) {
                     group = TEAMCITY_GROUP
                     homeDir.set(environment.homeDir)
-                    conventionMapping.map('dataDir') { environment.dataDir.absolutePath }
+                    dataDir.set(environment.dataDir)
                     javaHome.set(environment.javaHome)
                     serverOptions.set(environment.serverOptions.map({it.join(' ')}))
                     doFirst {
@@ -148,7 +149,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             environment.with {
                 downloadUrl.convention("${environments.baseDownloadUrl}/TeamCity-${version}.tar.gz")
                 homeDir.convention(project.file("${environments.baseHomeDir}/TeamCity-${version}").absolutePath)
-                dataDir = dataDir ?: project.file("${environments.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1])
+                dataDir.convention(project.file("${environments.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1]).absolutePath)
 
                 if (plugins.isEmpty()) {
                     def serverPlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME)

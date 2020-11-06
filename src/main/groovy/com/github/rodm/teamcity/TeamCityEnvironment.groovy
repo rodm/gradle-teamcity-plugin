@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,12 +40,7 @@ class TeamCityEnvironment {
     private String version = '9.0'
     private Property<String> downloadUrl
     private Property<String> homeDir
-
-    /**
-     * The data directory for this environment's TeamCity configuration.
-     */
-    File dataDir
-
+    private Property<String> dataDir
     private Property<String> javaHome
     private ConfigurableFileCollection plugins
     private ListProperty<String> serverOptions
@@ -56,6 +51,7 @@ class TeamCityEnvironment {
         this.name = name
         this.downloadUrl= factory.property(String)
         this.homeDir = factory.property(String)
+        this.dataDir = factory.property(String)
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
@@ -64,7 +60,7 @@ class TeamCityEnvironment {
     }
 
     File getPluginsDir() {
-        return new File(dataDir, 'plugins')
+        return new File(dataDir.get(), 'plugins')
     }
 
     /**
@@ -99,6 +95,17 @@ class TeamCityEnvironment {
 
     void setHomeDir(String homeDir) {
         this.homeDir.set(homeDir)
+    }
+
+    /**
+     * The data directory for this environment's TeamCity configuration.
+     */
+    Property<String> getDataDir() {
+        return dataDir
+    }
+
+    void setDataDir(String dataDir) {
+        this.dataDir.set(dataDir)
     }
 
     /**
