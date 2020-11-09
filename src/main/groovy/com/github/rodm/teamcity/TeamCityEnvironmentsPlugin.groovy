@@ -61,27 +61,27 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 String name = environment.name.capitalize()
                 def downloadFile = "${environments.downloadsDir}/${toFilename(environment.downloadUrl.get())}"
-                def download = project.tasks.register(String.format("download%s", name), DownloadTeamCity) {
+                def download = project.tasks.register("download${name}", DownloadTeamCity) {
                     group = TEAMCITY_GROUP
                     src { environment.downloadUrl }
                     dest { project.file(downloadFile) }
                 }
 
-                project.tasks.register(String.format("install%s", name), InstallTeamCity) {
+                project.tasks.register("install${name}", InstallTeamCity) {
                     group = TEAMCITY_GROUP
                     conventionMapping.map('source') { project.file(downloadFile) }
                     conventionMapping.map('target') { project.file(environment.homeDir.get()) }
                     dependsOn download
                 }
 
-                def deployPlugin = project.tasks.register(String.format('deployTo%s', name), Deploy) {
+                def deployPlugin = project.tasks.register("deployTo${name}", Deploy) {
                     group = TEAMCITY_GROUP
                     plugins.from(environment.plugins)
                     pluginsDir.set(environment.pluginsDir)
                     dependsOn project.tasks.named(BUILD_TASK_NAME)
                 }
 
-                def undeployPlugin = project.tasks.register(String.format('undeployFrom%s', name), Undeploy) {
+                def undeployPlugin = project.tasks.register("undeployFrom${name}", Undeploy) {
                     group = TEAMCITY_GROUP
                     plugins.from(environment.plugins)
                     pluginsDir.set(environment.pluginsDir)
@@ -99,7 +99,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     }
                 }
 
-                def startServer = project.tasks.register(String.format('start%sServer', name), StartServer) {
+                def startServer = project.tasks.register("start${name}Server", StartServer) {
                     group = TEAMCITY_GROUP
                     homeDir.set(environment.homeDir)
                     dataDir.set(environment.dataDir)
@@ -111,21 +111,21 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     dependsOn deployPlugin
                 }
 
-                def stopServer = project.tasks.register(String.format('stop%sServer', name), StopServer) {
+                def stopServer = project.tasks.register("stop${name}Server", StopServer) {
                     group = TEAMCITY_GROUP
                     homeDir.set(environment.homeDir)
                     javaHome.set(environment.javaHome)
                     finalizedBy undeployPlugin
                 }
 
-                def startAgent = project.tasks.register(String.format('start%sAgent', name), StartAgent) {
+                def startAgent = project.tasks.register("start${name}Agent", StartAgent) {
                     group = TEAMCITY_GROUP
                     homeDir.set(environment.homeDir)
                     javaHome.set(environment.javaHome)
                     agentOptions.set(environment.agentOptions.map({it.join(' ')}))
                 }
 
-                def stopAgent = project.tasks.register(String.format('stop%sAgent', name), StopAgent) {
+                def stopAgent = project.tasks.register("stop${name}Agent", StopAgent) {
                     group = TEAMCITY_GROUP
                     homeDir.set(environment.homeDir)
                     javaHome.set(environment.javaHome)
