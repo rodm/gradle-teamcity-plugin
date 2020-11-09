@@ -91,7 +91,6 @@ class PublishTask extends DefaultTask {
      * @return the token used for uploading the plugin to the plugin repository
      */
     @Input
-    @Optional
     Property<String> getToken() {
         return token
     }
