@@ -69,8 +69,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 project.tasks.register("install${name}", InstallTeamCity) {
                     group = TEAMCITY_GROUP
-                    conventionMapping.map('source') { project.file(downloadFile) }
-                    conventionMapping.map('target') { project.file(environment.homeDir.get()) }
+                    source.set(project.file(downloadFile))
+                    target.set(project.file(environment.homeDir.get()))
                     dependsOn download
                 }
 
