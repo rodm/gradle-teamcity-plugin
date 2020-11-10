@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,8 @@
  */
 package com.github.rodm.teamcity
 
-import org.junit.Test
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
@@ -76,5 +77,37 @@ class TeamCityVersionTest {
 
     private static TeamCityVersion version(String version) {
         TeamCityVersion.version(version)
+    }
+
+    @Nested
+    class TeamCityVersionAllowingSnapshots {
+
+        @Test
+        void 'valid TeamCity versions allowing snapshots'() {
+            version('10.0-SNAPSHOT')
+            version('10.0.5-SNAPSHOT')
+            version('2020.1.5-SNAPSHOT')
+            version('2020.2-SNAPSHOT')
+        }
+
+        @Test
+        void 'compare TeamCity versions allowing snapshots'() {
+            assertThat(version('9.0-SNAPSHOT'), lessThan(version('9.0.1-SNAPSHOT')))
+            assertThat(version('9.0-SNAPSHOT'), lessThan(version('10.0-SNAPSHOT')))
+            assertThat(version('9.0-SNAPSHOT'), lessThan(version('2018.1-SNAPSHOT')))
+            assertThat(version('2020.1.5-SNAPSHOT'), lessThan(version('2020.2-SNAPSHOT')))
+            assertThat(version('2020.1.5-SNAPSHOT'), lessThan(version('SNAPSHOT')))
+
+            assertThat(version('10.0-SNAPSHOT'), equalTo(version('10.0-SNAPSHOT')))
+            assertThat(version('2020.2-SNAPSHOT'), equalTo(version('2020.2-SNAPSHOT')))
+
+            assertThat(version('9.0.1-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
+            assertThat(version('10.0-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
+            assertThat(version('SNAPSHOT'), greaterThan(version('2020.2-SNAPSHOT')))
+        }
+
+        private static TeamCityVersion version(String version) {
+            TeamCityVersion.version(version, true)
+        }
     }
 }

@@ -32,17 +32,22 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
         VERSION_2020_1 = version('2020.1')
     }
 
-    private static final Pattern VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)')
+    private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)')
+    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)-SNAPSHOT')
+
+    static TeamCityVersion version(String version) throws IllegalArgumentException {
+        return new TeamCityVersion(version, RELEASE_VERSION_PATTERN)
+    }
+
+    static TeamCityVersion version(String version, boolean allowSnapshots) throws IllegalArgumentException {
+        return new TeamCityVersion(version, (allowSnapshots ? SNAPSHOT_VERSION_PATTERN : RELEASE_VERSION_PATTERN))
+    }
 
     private final String version
 
-    static TeamCityVersion version(String version) throws IllegalArgumentException {
-        return new TeamCityVersion(version)
-    }
-
-    private TeamCityVersion(String version) {
+    private TeamCityVersion(String version, Pattern versionPattern) {
         this.version = version
-        Matcher matcher = VERSION_PATTERN.matcher(version)
+        Matcher matcher = versionPattern.matcher(version)
         if (!matcher.matches() && 'SNAPSHOT' != version) {
             throw new IllegalArgumentException("'${version}' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')")
         }
@@ -60,10 +65,12 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
         } else if (version == teamcityVersion.version) {
             return 0
         }
-        String[] versionParts = version.split('\\.')
-        String[] otherVersionParts = teamcityVersion.version.split('\\.')
+        String[] versionParts = version.split('[.|-]')
+        String[] otherVersionParts = teamcityVersion.version.split('[.|-]')
 
         for (int diff = 0; diff < versionParts.length && diff < otherVersionParts.length; ++diff) {
+            if (versionParts[diff] == 'SNAPSHOT') continue
+            if (otherVersionParts[diff] == 'SNAPSHOT') continue
             int part = Integer.parseInt(versionParts[diff])
             int otherPart = Integer.parseInt(otherVersionParts[diff])
             if (part > otherPart) {
