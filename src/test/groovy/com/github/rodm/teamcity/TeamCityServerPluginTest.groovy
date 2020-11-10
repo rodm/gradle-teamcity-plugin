@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
+import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
@@ -84,18 +85,33 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'reject invalid version'() {
+    void 'reject snapshot version without allow snapshots setting'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         try {
             project.teamcity {
-                version = '123'
+                version = '2020.2-SNAPSHOT'
             }
+            project.evaluate()
             fail('Invalid version not rejected')
         }
-        catch (IllegalArgumentException expected) {
-            assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
+        catch (ProjectConfigurationException expected) {
+            def cause = expected.cause
+            assertThat(cause.message, startsWith("'2020.2-SNAPSHOT' is not a valid TeamCity version"))
         }
+    }
+
+    @Test
+    void 'allow snapshot version with allow snapshots setting'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            version = '2020.2-SNAPSHOT'
+            allowSnapshotVersions = true
+        }
+        project.evaluate()
+
+        assertEquals('2020.2-SNAPSHOT', project.extensions.getByName('teamcity').version)
     }
 
     @Test

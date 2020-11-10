@@ -19,6 +19,7 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.Property
 
 /**
  * TeamCity Plugin extension.
@@ -28,6 +29,8 @@ class TeamCityPluginExtension {
     private String version
 
     boolean defaultRepositories = true
+
+    private Property<Boolean> allowSnapshotVersions
 
     private AgentPluginConfiguration agent
 
@@ -39,6 +42,7 @@ class TeamCityPluginExtension {
 
     TeamCityPluginExtension(Project project) {
         this.project = project
+        this.allowSnapshotVersions = project.objects.property(Boolean).convention(false)
     }
 
     void init() {
@@ -55,7 +59,6 @@ class TeamCityPluginExtension {
      */
      void setVersion(String version) {
         this.version = version
-        TeamCityVersion.version(version)
     }
 
     String getVersion() {
@@ -68,6 +71,19 @@ class TeamCityPluginExtension {
             }
         }
         (version) ?: '9.0'
+    }
+
+    /**
+     * Allow version to include snapshot versions.
+     *
+     * @param allowSnapshots
+     */
+    void setAllowSnapshotVersions(boolean allowSnapshots) {
+        allowSnapshotVersions.set(allowSnapshots)
+    }
+
+    Property<Boolean> getAllowSnapshotVersions() {
+        return allowSnapshotVersions
     }
 
     def getAgent() {

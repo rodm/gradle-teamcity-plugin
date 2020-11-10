@@ -85,6 +85,7 @@ class TeamCityPlugin implements Plugin<Project> {
         }
         configureRepositories(project, extension)
         configureConfigurations(project)
+        validateVersion(project, extension)
     }
 
     private static configureRepositories(Project project, TeamCityPluginExtension extension) {
@@ -109,6 +110,12 @@ class TeamCityPlugin implements Plugin<Project> {
                     .setDescription('Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.')
             configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
             configurations.getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(providedConfiguration)
+        }
+    }
+
+    static void validateVersion(Project project, TeamCityPluginExtension extension) {
+        project.afterEvaluate {
+            TeamCityVersion.version(extension.version, extension.allowSnapshotVersions.get())
         }
     }
 
