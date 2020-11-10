@@ -28,7 +28,7 @@ class StopServer extends TeamCityTask {
         validate()
         def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
         ant.exec(executable: "${getHomeDir().get()}/bin/$name") {
-            env key: 'JAVA_HOME', path: getJavaHome()
+            env key: 'JAVA_HOME', path: getJavaHome().get()
             arg value: 'stop'
         }
     }

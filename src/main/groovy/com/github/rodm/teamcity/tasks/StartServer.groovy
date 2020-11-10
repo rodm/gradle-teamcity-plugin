@@ -38,7 +38,7 @@ class StartServer extends TeamCityTask {
 
         def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
         ant.exec(executable: "${getHomeDir().get()}/bin/$name") {
-            env key: 'JAVA_HOME', path: getJavaHome()
+            env key: 'JAVA_HOME', path: getJavaHome().get()
             env key: 'TEAMCITY_DATA_PATH', path: getDataDir().get()
             env key: 'TEAMCITY_SERVER_OPTS', value: getServerOptions().get()
             arg value: 'start'
