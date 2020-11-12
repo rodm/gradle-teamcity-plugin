@@ -16,6 +16,9 @@
 
 package com.github.rodm.teamcity
 
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
+
 class TestSupport {
 
     static final String SETTINGS_SCRIPT_DEFAULT = """
@@ -24,5 +27,14 @@ class TestSupport {
 
     static String windowsCompatiblePath(File path) {
         path.canonicalPath.replace('\\', '\\\\')
+    }
+
+    static BuildResult executeBuild(File projectDir, String... args = ['build']) {
+        GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withArguments('--warning-mode', 'fail', *args)
+            .withPluginClasspath()
+            .forwardOutput()
+            .build()
     }
 }

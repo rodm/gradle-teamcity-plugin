@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
+import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -97,13 +98,8 @@ class AgentPluginFunctionalTest {
         settingsFile = testProjectDir.newFile('settings.gradle')
     }
 
-    private BuildResult executeBuild(String... args = ['agentPlugin']) {
-        GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments(args)
-                .withPluginClasspath()
-                .forwardOutput()
-                .build()
+    private BuildResult executeBuild(String... args = ['build']) {
+        return executeBuild(testProjectDir.root, args)
     }
 
     @Test
@@ -421,7 +417,7 @@ class AgentPluginFunctionalTest {
             rootProject.name = 'test-plugin'
 
             buildCache {
-                local(DirectoryBuildCache) {
+                local {
                     directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }
@@ -442,7 +438,7 @@ class AgentPluginFunctionalTest {
             rootProject.name = 'test-plugin'
 
             buildCache {
-                local(DirectoryBuildCache) {
+                local {
                     directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
                 }
             }

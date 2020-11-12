@@ -23,6 +23,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
+import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -49,13 +50,8 @@ class EnvironmentsPluginFunctionalTest {
         settingsFile << SETTINGS_SCRIPT_DEFAULT
     }
 
-    private BuildResult executeBuild(String... args) {
-        GradleRunner.create()
-            .withProjectDir(testProjectDir.getRoot())
-            .withArguments(args)
-            .withPluginClasspath()
-            .forwardOutput()
-            .build()
+    private BuildResult executeBuild(String... args = ['build']) {
+        return executeBuild(testProjectDir.root, args)
     }
 
     @Test

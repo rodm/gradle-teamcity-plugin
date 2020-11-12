@@ -91,10 +91,9 @@ class SamplesTest {
     }
 
     private static BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
-        def buildArgs = ['--warning-mode', 'all', *args]
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir)
-                .withArguments(buildArgs)
+                .withArguments('--warning-mode', 'fail', *args)
                 .withPluginClasspath()
                 .forwardOutput()
                 .build()

@@ -25,6 +25,7 @@ import org.junit.rules.TemporaryFolder
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
+import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static org.gradle.testkit.runner.TaskOutcome.*
 import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.MatcherAssert.assertThat
@@ -44,11 +45,7 @@ class AgentAndServerPluginFunctionalTest {
     }
 
     private BuildResult executeBuild(String... args = ['build']) {
-        GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
-                .withArguments(args)
-                .withPluginClasspath()
-                .build()
+        return executeBuild(testProjectDir.root, args)
     }
 
     @Test

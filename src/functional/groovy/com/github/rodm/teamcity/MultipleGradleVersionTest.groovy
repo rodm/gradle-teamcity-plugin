@@ -213,7 +213,7 @@ class MultipleGradleVersionTest {
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.getRoot())
-                .withArguments('--warning-mode', 'all', 'build')
+                .withArguments('--warning-mode', 'fail', 'build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
                 .forwardOutput()
