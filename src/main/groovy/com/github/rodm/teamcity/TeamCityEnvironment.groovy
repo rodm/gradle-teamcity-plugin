@@ -40,6 +40,7 @@ class TeamCityEnvironment {
 
     private String version = '9.0'
     private Property<String> downloadUrl
+    private Provider<String> installerFile
     private Property<String> homeDir
     private Property<String> dataDir
     private Property<String> javaHome
@@ -50,6 +51,7 @@ class TeamCityEnvironment {
     TeamCityEnvironment(String name, TeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name
         this.downloadUrl= factory.property(String).convention(defaultDownloadUrl(environments))
+        this.installerFile = factory.property(String).value(defaultInstallerFile(environments))
         this.homeDir = factory.property(String).convention(defaultHomeDir(environments))
         this.dataDir = factory.property(String).convention(defaultDataDir(environments))
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
@@ -61,6 +63,14 @@ class TeamCityEnvironment {
 
     private Provider<String> defaultDownloadUrl(TeamCityEnvironments environments) {
         return environments.defaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
+    }
+
+    private Provider<String> defaultInstallerFile(TeamCityEnvironments environments) {
+        return environments.defaultDownloadsDir().map {it + '/' + toFilename(this.downloadUrl.get()) }
+    }
+
+    private static String toFilename(String url) {
+        return url[(url.lastIndexOf('/') + 1)..-1]
     }
 
     private Provider<String> defaultHomeDir(TeamCityEnvironments environments) {
@@ -101,6 +111,10 @@ class TeamCityEnvironment {
 
     void setDownloadUrl(String downloadUrl) {
         this.downloadUrl.set(downloadUrl)
+    }
+
+    Provider<String> getInstallerFile() {
+        return installerFile
     }
 
     /**

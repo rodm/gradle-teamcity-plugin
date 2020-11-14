@@ -60,16 +60,15 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 defaultMissingProperties(project, environments, environment)
 
                 String name = environment.name.capitalize()
-                def downloadFile = "${environments.downloadsDir.get()}/${toFilename(environment.downloadUrl.get())}"
                 def download = project.tasks.register("download${name}", DownloadTeamCity) {
                     group = TEAMCITY_GROUP
                     src { environment.downloadUrl }
-                    dest { project.file(downloadFile) }
+                    dest { project.file(environment.installerFile) }
                 }
 
                 project.tasks.register("install${name}", InstallTeamCity) {
                     group = TEAMCITY_GROUP
-                    source.set(project.file(downloadFile))
+                    source.set(project.file(environment.installerFile))
                     target.set(project.file(environment.homeDir.get()))
                     dependsOn download
                 }
@@ -154,10 +153,6 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     }
                 }
             }
-        }
-
-        private static String toFilename(String url) {
-            return url[(url.lastIndexOf('/') + 1)..-1]
         }
     }
 
