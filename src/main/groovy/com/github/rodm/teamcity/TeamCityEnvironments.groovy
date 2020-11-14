@@ -19,9 +19,12 @@ import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.UnknownDomainObjectException
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 
 import static groovy.transform.TypeCheckingMode.SKIP
 
@@ -38,13 +41,10 @@ class TeamCityEnvironments {
     public static final String DEFAULT_BASE_DATA_DIR = 'data'
     public static final String DEFAULT_BASE_HOME_DIR = 'servers'
 
-    private String downloadsDir
-
-    private String baseDownloadUrl
-
-    private String baseDataDir
-
-    private String baseHomeDir
+    private Property<String> baseDownloadUrl
+    private Property<String> downloadsDir
+    private Property<String> baseHomeDir
+    private Property<String> baseDataDir
 
     final NamedDomainObjectContainer<TeamCityEnvironment> environments
 
@@ -52,7 +52,19 @@ class TeamCityEnvironments {
 
     TeamCityEnvironments(Project project) {
         this.project = project
-        this.environments = project.container(TeamCityEnvironment)
+        this.baseDownloadUrl = project.objects.property(String).convention(DEFAULT_BASE_DOWNLOAD_URL)
+        this.downloadsDir = project.objects.property(String).convention(DEFAULT_DOWNLOADS_DIR)
+        def defaultHomePath = project.layout.projectDirectory.dir(DEFAULT_BASE_HOME_DIR).toString()
+        this.baseHomeDir = project.objects.property(String).convention(defaultHomePath)
+        def defaultDataPath = project.layout.projectDirectory.dir(DEFAULT_BASE_DATA_DIR).toString()
+        this.baseDataDir = project.objects.property(String).convention(defaultDataPath)
+        NamedDomainObjectFactory<TeamCityEnvironment> factory = new NamedDomainObjectFactory<TeamCityEnvironment>() {
+            @Override
+            TeamCityEnvironment create(String name) {
+                return new TeamCityEnvironment(name, TeamCityEnvironments.this, project.objects)
+            }
+        }
+        this.environments = project.container(TeamCityEnvironment, factory)
     }
 
     TeamCityEnvironment getByName(String name) {
@@ -66,52 +78,69 @@ class TeamCityEnvironments {
     /**
      * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".
      */
-    String getDownloadsDir() {
-        return property(DOWNLOADS_DIR_PROPERTY, downloadsDir, DEFAULT_DOWNLOADS_DIR)
+    Property<String> getDownloadsDir() {
+        return downloadsDir
     }
 
     void setDownloadsDir(String downloadsDir) {
-        this.downloadsDir = downloadsDir
+        this.downloadsDir.set(downloadsDir)
+    }
+
+    Provider<String> defaultDownloadsDir() {
+        return gradleProperty(DOWNLOADS_DIR_PROPERTY).orElse(downloadsDir)
     }
 
     /**
      * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
      */
-    String getBaseDownloadUrl() {
-        return property(BASE_DOWNLOAD_URL_PROPERTY, baseDownloadUrl, DEFAULT_BASE_DOWNLOAD_URL)
+    Property<String> getBaseDownloadUrl() {
+        return baseDownloadUrl
     }
 
     void setBaseDownloadUrl(String baseDownloadUrl) {
-        this.baseDownloadUrl = baseDownloadUrl
+        this.baseDownloadUrl.set(baseDownloadUrl)
     }
 
-    /**
-     * The base data directory used to store TeamCity configurations. Defaults to "data"
-     */
-    String getBaseDataDir() {
-        return property(BASE_DATA_DIR_PROPERTY, baseDataDir, DEFAULT_BASE_DATA_DIR)
-    }
-
-    void setBaseDataDir(String baseDataDir) {
-        this.baseDataDir = baseDataDir
+    Provider<String> defaultBaseDownloadUrl() {
+        return gradleProperty(BASE_DOWNLOAD_URL_PROPERTY).orElse(baseDownloadUrl)
     }
 
     /**
      * The base home directory used to install TeamCity distributions. Defaults to "servers"
      */
-    String getBaseHomeDir() {
-        return property(BASE_HOME_DIR_PROPERTY, baseHomeDir, DEFAULT_BASE_HOME_DIR)
+    Property<String> getBaseHomeDir() {
+        return baseHomeDir
     }
 
     void setBaseHomeDir(String baseHomeDir) {
-        this.baseHomeDir = baseHomeDir
+        this.baseHomeDir.set(project.layout.projectDirectory.dir(baseHomeDir).toString())
     }
 
-    private String property(String name, String value, String defaultValue) {
-        if (project.hasProperty(name)) {
-            return project.property(name)
-        }
-        return value ? value : defaultValue
+    void setBaseHomeDir(File baseHomeDir) {
+        this.baseHomeDir.set(baseHomeDir.absolutePath)
+    }
+
+    Provider<String> defaultBaseHomeDir() {
+        return gradleProperty(BASE_HOME_DIR_PROPERTY).orElse(baseHomeDir)
+    }
+
+    /**
+     * The base data directory used to store TeamCity configurations. Defaults to "data"
+     */
+    Property<String> getBaseDataDir() {
+        return baseDataDir
+    }
+
+    void setBaseDataDir(String baseDataDir) {
+        this.baseDataDir.set(project.layout.projectDirectory.dir(baseDataDir).toString())
+    }
+
+    void setBaseDataDir(File baseDataDir) {
+        this.baseDataDir.set(baseDataDir.absolutePath)
+    }
+
+    Provider<String> defaultBaseDataDir() {
+        return gradleProperty(BASE_DATA_DIR_PROPERTY).orElse(baseDataDir)
     }
 
     TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
@@ -131,5 +160,11 @@ class TeamCityEnvironments {
         } else {
             throw new MissingMethodException(name, getClass(), args)
         }
+    }
+
+    private Provider<String> gradleProperty(String name) {
+        final Project project = this.project
+        def callable = { project.findProperty(name) ?: null }
+        return project.<String>provider(callable)
     }
 }

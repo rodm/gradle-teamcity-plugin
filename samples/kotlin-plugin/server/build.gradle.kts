@@ -36,9 +36,9 @@ teamcity {
     }
 
     environments {
-        downloadsDir = extra["downloadsDir"] as String
-        baseHomeDir = extra["serversDir"] as String
-        baseDataDir = "${rootDir}/data"
+        downloadsDir.set(extra["downloadsDir"] as String)
+        baseHomeDir.set(extra["serversDir"] as String)
+        baseDataDir.set("${rootDir}/data")
 
         operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) {
             environments.create(this, closureOf<TeamCityEnvironment>(block))

@@ -20,8 +20,9 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 
-import javax.inject.Inject
+import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
 class TeamCityEnvironment {
@@ -46,17 +47,33 @@ class TeamCityEnvironment {
     private ListProperty<String> serverOptions
     private ListProperty<String> agentOptions
 
-    @Inject
-    TeamCityEnvironment(String name, ObjectFactory factory) {
+    TeamCityEnvironment(String name, TeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name
-        this.downloadUrl= factory.property(String)
-        this.homeDir = factory.property(String)
-        this.dataDir = factory.property(String)
+        this.downloadUrl= factory.property(String).convention(defaultDownloadUrl(environments))
+        this.homeDir = factory.property(String).convention(defaultHomeDir(environments))
+        this.dataDir = factory.property(String).convention(defaultDataDir(environments))
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
         this.serverOptions.addAll(DEFAULT_SERVER_OPTIONS)
         this.agentOptions = factory.listProperty(String)
+    }
+
+    private Provider<String> defaultDownloadUrl(TeamCityEnvironments environments) {
+        return environments.defaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
+    }
+
+    private Provider<String> defaultHomeDir(TeamCityEnvironments environments) {
+        return environments.defaultBaseHomeDir().map {it + "/TeamCity-${version}" }
+    }
+
+    private Provider<String> defaultDataDir(TeamCityEnvironments environments) {
+        return environments.defaultBaseDataDir().map {it + "/${dataVersion(version)}" }
+    }
+
+    @CompileStatic(SKIP)
+    private String dataVersion(String version) {
+        return (version =~ (/(\d+\.\d+).*/))[0][1]
     }
 
     File getPluginsDir() {

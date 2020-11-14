@@ -60,7 +60,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 defaultMissingProperties(project, environments, environment)
 
                 String name = environment.name.capitalize()
-                def downloadFile = "${environments.downloadsDir}/${toFilename(environment.downloadUrl.get())}"
+                def downloadFile = "${environments.downloadsDir.get()}/${toFilename(environment.downloadUrl.get())}"
                 def download = project.tasks.register("download${name}", DownloadTeamCity) {
                     group = TEAMCITY_GROUP
                     src { environment.downloadUrl }
@@ -147,10 +147,6 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         @SuppressWarnings('GroovyMissingReturnStatement')
         private static void defaultMissingProperties(Project project, TeamCityEnvironments environments, TeamCityEnvironment environment) {
             environment.with {
-                downloadUrl.convention("${environments.baseDownloadUrl}/TeamCity-${version}.tar.gz")
-                homeDir.convention(project.file("${environments.baseHomeDir}/TeamCity-${version}").absolutePath)
-                dataDir.convention(project.file("${environments.baseDataDir}/" + (version =~ (/(\d+\.\d+).*/))[0][1]).absolutePath)
-
                 if (plugins.isEmpty()) {
                     def serverPlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME)
                     if (serverPlugin) {
