@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
+import com.github.rodm.teamcity.tasks.ServerPlugin
 import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
@@ -57,7 +58,6 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         void execute(Project project) {
             TeamCityEnvironments environments = extension.environments
             environments.environments.each { environment ->
-                defaultMissingProperties(project, environments, environment)
 
                 String name = environment.name.capitalize()
                 def download = project.tasks.register("download${name}", DownloadTeamCity) {
@@ -140,16 +140,10 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     description = 'Stops the TeamCity Server and Build Agent'
                     dependsOn = [stopServer, stopAgent]
                 }
-            }
-        }
 
-        @SuppressWarnings('GroovyMissingReturnStatement')
-        private static void defaultMissingProperties(Project project, TeamCityEnvironments environments, TeamCityEnvironment environment) {
-            environment.with {
-                if (plugins.isEmpty()) {
-                    def serverPlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME)
-                    if (serverPlugin) {
-                        plugins serverPlugin.archivePath
+                project.tasks.withType(ServerPlugin) {
+                    if (environment.plugins.isEmpty()) {
+                        environment.plugins(project.tasks.named(SERVER_PLUGIN_TASK_NAME))
                     }
                 }
             }
