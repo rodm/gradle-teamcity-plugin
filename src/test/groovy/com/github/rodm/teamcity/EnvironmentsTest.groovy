@@ -98,8 +98,8 @@ class EnvironmentsTest {
         TeamCityEnvironments environments = project.extensions.getByType(TeamCityPluginExtension).environments
         assertThat(environments.getDownloadsDir().get(), equalTo('downloads'))
         assertThat(environments.getBaseDownloadUrl().get(), equalTo('https://download.jetbrains.com/teamcity'))
-        assertThat(environments.getBaseHomeDir().get(), endsWith('/servers'))
-        assertThat(environments.getBaseDataDir().get(), endsWith('data'))
+        assertThat(normalize(environments.getBaseHomeDir().get()), endsWith('/servers'))
+        assertThat(normalize(environments.getBaseDataDir().get()), endsWith('/data'))
     }
 
     @Test
@@ -141,7 +141,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.getBaseDataDir().get(), equalTo('/tmp/data'))
+        assertThat(normalize(extension.environments.getBaseDataDir().get()), endsWith('/tmp/data'))
     }
 
     @Test
@@ -155,7 +155,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.defaultBaseHomeDir().get(), equalTo('/tmp/servers'))
+        assertThat(normalize(extension.environments.defaultBaseHomeDir().get()), endsWith('/tmp/servers'))
     }
 
     @Test
