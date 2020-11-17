@@ -97,10 +97,11 @@ The following properties are defined in the `teamcity` configuration block. The 
 of the TeamCity API dependencies added to the `provided` configuration. The plugin descriptor can be specified as a
 path to a file or by a configuration block within the build script.
 
-* `version` : The version of the TeamCity API to build against. Defaults to '{default-api-version}'.
-* `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By default Maven Central
-and the TeamCity repository, https://download.jetbrains.com/teamcity-repository, are configured for resolving dependencies. Setting this
- flag to false allows a local repository to be used for resolving dependencies.
+* `version` : The version of the TeamCity API to build against. Default is '{default-api-version}'.
+* `allowSnapshotVersions` : Allow a snapshot version to be specified in the `version` property. Default is false.
+* `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By
+default, Maven Central and the TeamCity repository, https://download.jetbrains.com/teamcity-repository, are configured
+for resolving dependencies. Setting this flag to false allows a local repository to be used for resolving dependencies.
 
 === TeamCity Server Plugin
 
