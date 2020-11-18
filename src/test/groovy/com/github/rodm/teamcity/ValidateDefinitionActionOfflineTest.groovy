@@ -26,6 +26,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
@@ -82,9 +83,13 @@ class ValidateDefinitionActionOfflineTest {
         System.clearProperty("socksProxyPort")
     }
 
+    private TeamCityPlugin.PluginDefinitionValidationAction createValidationAction() {
+        new TeamCityPlugin.PluginDefinitionValidationAction(WARN, definitions, classes)
+    }
+
     @Test
     void 'output warning message on failed bean definition parsing failure'() {
-        Action<Task> validationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> validationAction = createValidationAction()
 
         validationAction.execute(stubTask)
 
@@ -93,7 +98,7 @@ class ValidateDefinitionActionOfflineTest {
 
     @Test
     void 'no warning message on failed bean definition parsing failure with offline option'() {
-        Action<Task> validationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> validationAction = createValidationAction()
 
         project.gradle.startParameter.offline = true
         validationAction.execute(stubTask)

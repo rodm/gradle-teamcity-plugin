@@ -30,6 +30,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static com.github.rodm.teamcity.ValidationMode.IGNORE
+import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
@@ -80,9 +82,13 @@ class ValidateDefinitionActionTest {
         when(stubTask.getProject()).thenReturn(project)
     }
 
+    private TeamCityPlugin.PluginDefinitionValidationAction createValidationAction(ValidationMode mode = WARN) {
+        new TeamCityPlugin.PluginDefinitionValidationAction(mode, definitions, classes)
+    }
+
     @Test
     void logWarningMessageForMissingPluginDefinitionFiles() {
-        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> pluginValidationAction = createValidationAction()
 
         pluginValidationAction.execute(stubTask)
 
@@ -94,7 +100,7 @@ class ValidateDefinitionActionTest {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
-        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
         pluginValidationAction.execute(stubTask)
@@ -107,7 +113,7 @@ class ValidateDefinitionActionTest {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << EMPTY_BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
-        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
         pluginValidationAction.execute(stubTask)
@@ -121,7 +127,7 @@ class ValidateDefinitionActionTest {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
-        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
         pluginValidationAction.execute(stubTask)
@@ -136,13 +142,41 @@ class ValidateDefinitionActionTest {
         definitionFile << BEAN_DEFINITION_FILE
         definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
         classes.add('example/Plugin.class')
-        Action<Task> pluginValidationAction = new TeamCityPlugin.PluginDefinitionValidationAction(definitions, classes)
+        Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
         pluginValidationAction.execute(stubTask)
 
         String expectedMessage = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin.xml', 'example.Plugin')
         assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
+    }
+
+    @Test
+    void 'no warning message for missing plugin definition files with validation mode set to ignore'() {
+        Action<Task> pluginValidationAction = createValidationAction(IGNORE)
+
+        pluginValidationAction.execute(stubTask)
+
+        assertThat(outputEventListener.toString(), not(containsString(NO_DEFINITION_WARNING)))
+    }
+
+    @Test
+    void 'no warning message for invalid definition files with validation mode set to ignore'() {
+        File emptyDefinitionFile = project.file('build-server-plugin1.xml')
+        emptyDefinitionFile << EMPTY_BEAN_DEFINITION_FILE
+        definitions.add(new TeamCityPlugin.PluginDefinition(emptyDefinitionFile))
+        File definitionFile = project.file('build-server-plugin2.xml')
+        definitionFile << BEAN_DEFINITION_FILE
+        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        outputEventListener.reset()
+
+        Action<Task> pluginValidationAction = createValidationAction(IGNORE)
+        pluginValidationAction.execute(stubTask)
+
+        String noBeanClassesMessage = String.format(NO_BEAN_CLASSES_WARNING, 'build-server-plugin1.xml')
+        assertThat(outputEventListener.toString(), not(containsString(noBeanClassesMessage)))
+        String noBeanClassMessage = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin2.xml', 'example.Plugin')
+        assertThat(outputEventListener.toString(), not(containsString(noBeanClassMessage)))
     }
 
     @Test

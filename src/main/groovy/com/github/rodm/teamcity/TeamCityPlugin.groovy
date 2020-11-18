@@ -38,6 +38,9 @@ import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
 
+import static com.github.rodm.teamcity.ValidationMode.IGNORE
+import static com.github.rodm.teamcity.ValidationMode.WARN
+
 class TeamCityPlugin implements Plugin<Project> {
 
     private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
@@ -127,7 +130,7 @@ class TeamCityPlugin implements Plugin<Project> {
                 Set<String> classes = []
                 jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
                 jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes))
-                jarTask.doLast new PluginDefinitionValidationAction(pluginDefinitions, classes)
+                jarTask.doLast new PluginDefinitionValidationAction(WARN, pluginDefinitions, classes)
             }
         }
     }
@@ -211,16 +214,21 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static class PluginDefinitionValidationAction implements Action<Task> {
 
+        private final ValidationMode mode
         private final List<PluginDefinition> definitions
         private final Set<String> classes
 
-        PluginDefinitionValidationAction(List<PluginDefinition> definitions, Set<String> classes) {
+        PluginDefinitionValidationAction(ValidationMode mode, List < PluginDefinition > definitions, Set<String> classes) {
+            this.mode = mode
             this.definitions = definitions
             this.classes = classes
         }
 
         @Override
         void execute(Task task) {
+            if (mode == IGNORE) {
+                return
+            }
             if (definitions.isEmpty()) {
                 LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
             } else {
