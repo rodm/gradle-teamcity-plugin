@@ -65,6 +65,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
+        configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
         configureServerPluginTasks(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
@@ -87,8 +88,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     @SuppressWarnings('GrMethodMayBeStatic')
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
-        configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
-
         def descriptorFile = project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
 
         def processDescriptor = project.tasks.register(PROCESS_SERVER_DESCRIPTOR_TASK_NAME, ProcessDescriptor) {
