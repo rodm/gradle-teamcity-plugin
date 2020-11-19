@@ -38,8 +38,8 @@ import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
 
+import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
-import static com.github.rodm.teamcity.ValidationMode.WARN
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -218,11 +218,13 @@ class TeamCityPlugin implements Plugin<Project> {
         private final ValidationMode mode
         private final List<PluginDefinition> definitions
         private final Set<String> classes
+        private boolean warningShown
 
         PluginDefinitionValidationAction(ValidationMode mode, List < PluginDefinition > definitions, Set<String> classes) {
             this.mode = mode
             this.definitions = definitions
             this.classes = classes
+            this.warningShown = false
         }
 
         @Override
@@ -231,11 +233,14 @@ class TeamCityPlugin implements Plugin<Project> {
                 return
             }
             if (definitions.isEmpty()) {
-                LOGGER.warn(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
+                report(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
             } else {
                 for (PluginDefinition definition : definitions) {
                     validateDefinition(definition, task)
                 }
+            }
+            if (mode == FAIL && warningShown) {
+                throw new GradleException('Plugin definition validation failed')
             }
         }
 
@@ -246,19 +251,24 @@ class TeamCityPlugin implements Plugin<Project> {
                 beans = definition.getBeans(offline)
             }
             catch (IOException e) {
-                LOGGER.warn(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
+                report(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
                 return
             }
             if (beans.isEmpty()) {
-                LOGGER.warn(String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
+                report(String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
             } else {
                 for (PluginBean bean : beans) {
                     def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
                     if (!classes.contains(fqcn)) {
-                        LOGGER.warn(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
+                        report(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
                     }
                 }
             }
+        }
+
+        private void report(String message, Object... objects) {
+            LOGGER.warn(message, objects)
+            warningShown = true
         }
     }
 

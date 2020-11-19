@@ -17,5 +17,6 @@ package com.github.rodm.teamcity
 
 enum ValidationMode {
     IGNORE,
-    WARN
+    WARN,
+    FAIL
 }

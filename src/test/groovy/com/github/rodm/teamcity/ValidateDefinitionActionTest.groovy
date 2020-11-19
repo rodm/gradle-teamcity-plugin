@@ -17,6 +17,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
@@ -30,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.containsString
@@ -38,6 +40,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasKey
+import static org.junit.Assert.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -177,6 +180,46 @@ class ValidateDefinitionActionTest {
         assertThat(outputEventListener.toString(), not(containsString(noBeanClassesMessage)))
         String noBeanClassMessage = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin2.xml', 'example.Plugin')
         assertThat(outputEventListener.toString(), not(containsString(noBeanClassMessage)))
+    }
+
+    @Test
+    void 'throws exception for missing plugin definition files with validation mode set to fail'() {
+        Action<Task> pluginValidationAction = createValidationAction(FAIL)
+
+        try {
+            pluginValidationAction.execute(stubTask)
+            fail("Should throw exception when plugin definition is missing and mode is set to fail")
+        }
+        catch (GradleException e) {
+            assertThat(e.message, equalTo('Plugin definition validation failed'))
+        }
+
+        assertThat(outputEventListener.toString(), containsString(NO_DEFINITION_WARNING))
+    }
+
+    @Test
+    void 'throws exception for invalid plugin definition files with validation mode set to fail'() {
+        File emptyDefinitionFile = project.file('build-server-plugin1.xml')
+        emptyDefinitionFile << EMPTY_BEAN_DEFINITION_FILE
+        definitions.add(new TeamCityPlugin.PluginDefinition(emptyDefinitionFile))
+        File definitionFile = project.file('build-server-plugin2.xml')
+        definitionFile << BEAN_DEFINITION_FILE
+        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        outputEventListener.reset()
+
+        try {
+            Action<Task> pluginValidationAction = createValidationAction(FAIL)
+            pluginValidationAction.execute(stubTask)
+            fail("Should throw exception when plugin definitions are invalid and mode is set to fail")
+        }
+        catch (GradleException e) {
+            assertThat(e.message, equalTo('Plugin definition validation failed'))
+        }
+
+        String noBeanClassesMessage = String.format(NO_BEAN_CLASSES_WARNING, 'build-server-plugin1.xml')
+        assertThat(outputEventListener.toString(), containsString(noBeanClassesMessage))
+        String noBeanClassMessage = String.format(NO_BEAN_CLASS_WARNING, 'build-server-plugin2.xml', 'example.Plugin')
+        assertThat(outputEventListener.toString(), containsString(noBeanClassMessage))
     }
 
     @Test
