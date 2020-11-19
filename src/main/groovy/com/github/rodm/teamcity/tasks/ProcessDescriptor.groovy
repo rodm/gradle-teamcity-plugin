@@ -30,32 +30,18 @@ import org.gradle.api.tasks.TaskAction
 @CacheableTask
 class ProcessDescriptor extends DefaultTask {
 
-    private RegularFileProperty descriptor
-    private RegularFileProperty destination
-    private Provider tokens
-
-    ProcessDescriptor() {
-        descriptor = project.objects.fileProperty()
-        destination = project.objects.fileProperty()
-        tokens = project.objects.mapProperty(String, Object)
-        tokens.set([:])
-        onlyIf { descriptor.isPresent() }
-    }
-
     @InputFile
     @PathSensitive(PathSensitivity.RELATIVE)
-    RegularFileProperty getDescriptor() {
-        return descriptor
-    }
+    final RegularFileProperty descriptor = project.objects.fileProperty()
 
     @Input
-    Provider<Map<String, Object>> getTokens() {
-        return tokens
-    }
+    final Provider tokens = project.objects.mapProperty(String, Object).convention([:])
 
     @OutputFile
-    RegularFileProperty getDestination() {
-        return destination
+    final RegularFileProperty destination = project.objects.fileProperty()
+
+    ProcessDescriptor() {
+        onlyIf { descriptor.isPresent() }
     }
 
     @TaskAction

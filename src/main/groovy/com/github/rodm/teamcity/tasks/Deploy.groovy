@@ -23,23 +23,14 @@ import org.gradle.api.tasks.OutputDirectory
 
 class Deploy extends Copy {
 
-    private ConfigurableFileCollection plugins
-    private DirectoryProperty pluginsDir
-
-    Deploy() {
-        plugins = project.objects.fileCollection()
-        pluginsDir = project.objects.directoryProperty()
-        from { getPlugins() }
-        into { getPluginsDir() }
-    }
-
     @InputFiles
-    ConfigurableFileCollection getPlugins() {
-        this.plugins
-    }
+    final ConfigurableFileCollection plugins = project.objects.fileCollection()
 
     @OutputDirectory
-    DirectoryProperty getPluginsDir() {
-        this.pluginsDir
+    final DirectoryProperty pluginsDir = project.objects.directoryProperty()
+
+    Deploy() {
+        from { getPlugins() }
+        into { getPluginsDir() }
     }
 }

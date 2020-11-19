@@ -36,32 +36,17 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 @CacheableTask
 class GenerateServerPluginDescriptor extends DefaultTask {
 
-    private Property<String> version
-
-    private Property<ServerPluginDescriptor> descriptor
-
-    private RegularFileProperty destination
-
-    GenerateServerPluginDescriptor() {
-        version = project.objects.property(String)
-        descriptor = project.objects.property(ServerPluginDescriptor)
-        destination = project.objects.fileProperty()
-        onlyIf { descriptor.isPresent() }
-    }
-
     @Input
-    Property<String> getVersion() {
-        return version
-    }
+    final Property<String> version = project.objects.property(String)
 
     @Nested
-    Property<ServerPluginDescriptor> getDescriptor() {
-        return descriptor
-    }
+    final Property<ServerPluginDescriptor> descriptor = project.objects.property(ServerPluginDescriptor)
 
     @OutputFile
-    RegularFileProperty getDestination() {
-        return destination
+    final RegularFileProperty destination = project.objects.fileProperty()
+
+    GenerateServerPluginDescriptor() {
+        onlyIf { descriptor.isPresent() }
     }
 
     @TaskAction

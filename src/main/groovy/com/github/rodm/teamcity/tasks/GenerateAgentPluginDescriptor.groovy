@@ -34,32 +34,17 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 @CacheableTask
 class GenerateAgentPluginDescriptor extends DefaultTask {
 
-    private Property<String> version
-
-    private Property<AgentPluginDescriptor> descriptor
-
-    private RegularFileProperty destination
-
-    GenerateAgentPluginDescriptor() {
-        version = project.objects.property(String)
-        descriptor = project.objects.property(AgentPluginDescriptor)
-        destination = project.objects.fileProperty()
-        onlyIf { descriptor.isPresent() }
-    }
-
     @Input
-    Property<String> getVersion() {
-        return version
-    }
+    final Property<String> version = project.objects.property(String)
 
     @Nested
-    Property<AgentPluginDescriptor> getDescriptor() {
-        return descriptor
-    }
+    final Property<AgentPluginDescriptor> descriptor = project.objects.property(AgentPluginDescriptor)
 
     @OutputFile
-    RegularFileProperty getDestination() {
-        return destination
+    final RegularFileProperty destination = project.objects.fileProperty()
+
+    GenerateAgentPluginDescriptor() {
+        onlyIf { descriptor.isPresent() }
     }
 
     @TaskAction

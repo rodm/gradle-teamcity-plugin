@@ -25,11 +25,11 @@ import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 
 class AgentPlugin extends Zip {
 
-    private RegularFileProperty descriptor
+    @InputFile
+    final RegularFileProperty descriptor = project.objects.fileProperty()
 
     AgentPlugin() {
         description = 'Package TeamCity Agent plugin'
-        descriptor = project.objects.fileProperty()
         into("lib") {
             project.plugins.withType(JavaPlugin) {
                 from(project.tasks.named(JAR_TASK_NAME))
@@ -41,10 +41,5 @@ class AgentPlugin extends Zip {
             from { getDescriptor() }
             rename { PLUGIN_DESCRIPTOR_FILENAME }
         }
-    }
-
-    @InputFile
-    RegularFileProperty getDescriptor() {
-        this.descriptor
     }
 }

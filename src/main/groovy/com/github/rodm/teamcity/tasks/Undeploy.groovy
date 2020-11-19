@@ -22,25 +22,16 @@ import org.gradle.api.tasks.Internal
 
 class Undeploy extends Delete {
 
-    private ConfigurableFileCollection plugins
-    private DirectoryProperty pluginsDir
+    @Internal
+    final ConfigurableFileCollection plugins = project.objects.fileCollection()
+
+    @Internal
+    final DirectoryProperty pluginsDir = project.objects.directoryProperty()
 
     Undeploy() {
-        plugins = project.objects.fileCollection()
-        pluginsDir = project.objects.directoryProperty()
         delete {
             project.fileTree(dir: getPluginsDir().get().asFile,
                 includes: getPlugins().files.collect { it.name })
         }
-    }
-
-    @Internal
-    ConfigurableFileCollection getPlugins() {
-        this.plugins
-    }
-
-    @Internal
-    DirectoryProperty getPluginsDir() {
-        this.pluginsDir
     }
 }
