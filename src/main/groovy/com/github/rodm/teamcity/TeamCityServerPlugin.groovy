@@ -65,7 +65,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
-        configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
+        configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN)
         configureServerPluginTasks(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)

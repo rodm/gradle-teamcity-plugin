@@ -65,7 +65,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
-        configureJarTask(project, PLUGIN_DEFINITION_PATTERN)
+        configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN)
         configureTasks(project, extension)
     }
 

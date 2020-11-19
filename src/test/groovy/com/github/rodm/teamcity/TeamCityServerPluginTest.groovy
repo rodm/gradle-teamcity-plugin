@@ -115,6 +115,28 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    void 'default mode for bean definition validation'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.evaluate()
+
+        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.WARN))
+    }
+
+    @Test
+    void 'set ignore mode for bean definition validation'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            validateBeanDefinition = 'ignore'
+        }
+        project.evaluate()
+
+        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.IGNORE))
+    }
+
+    @Test
     void 'sub-project inherits version from root poject'() {
         Project rootProject = project
 

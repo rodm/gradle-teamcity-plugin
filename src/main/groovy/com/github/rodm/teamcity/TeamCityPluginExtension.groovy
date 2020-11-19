@@ -32,6 +32,8 @@ class TeamCityPluginExtension {
 
     private Property<Boolean> allowSnapshotVersions
 
+    private Property<ValidationMode> validateBeanDefinition
+
     private AgentPluginConfiguration agent
 
     private ServerPluginConfiguration server
@@ -43,6 +45,7 @@ class TeamCityPluginExtension {
     TeamCityPluginExtension(Project project) {
         this.project = project
         this.allowSnapshotVersions = project.objects.property(Boolean).convention(false)
+        this.validateBeanDefinition = project.objects.property(ValidationMode).convention(ValidationMode.WARN)
     }
 
     void init() {
@@ -84,6 +87,23 @@ class TeamCityPluginExtension {
 
     Property<Boolean> getAllowSnapshotVersions() {
         return allowSnapshotVersions
+    }
+
+    /**
+     * Set the validation mode for validating plugin bean definition files
+     *
+     * @param mode
+     */
+    void setValidateBeanDefinition(ValidationMode mode) {
+        validateBeanDefinition.set(mode)
+    }
+
+    void setValidateBeanDefinition(String mode) {
+        validateBeanDefinition.set(ValidationMode.valueOf(mode.toUpperCase()))
+    }
+
+    Property<ValidationMode> getValidateBeanDefinition() {
+        return validateBeanDefinition
     }
 
     def getAgent() {
