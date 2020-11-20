@@ -38,6 +38,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
 import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityAgentPlugin implements Plugin<Project> {
@@ -100,8 +101,13 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, AgentPlugin) {
             group = TEAMCITY_GROUP
             descriptor.set(descriptorFile)
-            with(extension.agent.files)
             onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
+            lib.from(project.configurations.agent)
+            project.plugins.withType(JavaPlugin) {
+                lib.from(project.tasks.named(JAR_TASK_NAME))
+                lib.from(project.configurations.runtimeClasspath)
+            }
+            with(extension.agent.files)
             doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
             Set<FileCopyDetails> files = []
             filesMatching('**/*', new FileCollectorAction(files))

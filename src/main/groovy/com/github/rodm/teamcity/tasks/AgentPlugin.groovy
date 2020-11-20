@@ -15,27 +15,26 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
-import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 
 class AgentPlugin extends Zip {
 
     @InputFile
     final RegularFileProperty descriptor = project.objects.fileProperty()
 
+    @InputFiles
+    final ConfigurableFileCollection lib = project.objects.fileCollection()
+
     AgentPlugin() {
         description = 'Package TeamCity Agent plugin'
         into("lib") {
-            project.plugins.withType(JavaPlugin) {
-                from(project.tasks.named(JAR_TASK_NAME))
-                from(project.configurations.runtimeClasspath)
-            }
-            from(project.configurations.agent)
+            from(getLib())
         }
         into('') {
             from { getDescriptor() }
