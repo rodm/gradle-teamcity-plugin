@@ -31,6 +31,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
+import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
@@ -41,6 +42,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
+import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityServerPlugin implements Plugin<Project> {
@@ -105,8 +107,18 @@ class TeamCityServerPlugin implements Plugin<Project> {
         def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, ServerPlugin) {
             group = TEAMCITY_GROUP
             descriptor.set(descriptorFile)
-            with(extension.server.files)
             onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
+            server.from(project.configurations.server)
+            project.plugins.withType(JavaPlugin) {
+                server.from(project.tasks.named(JAR_TASK_NAME))
+                server.from(project.configurations.runtimeClasspath)
+            }
+            if (project.plugins.hasPlugin(TeamCityAgentPlugin)) {
+                agent.from(project.tasks.named(AGENT_PLUGIN_TASK_NAME))
+            } else {
+                agent.from(project.configurations.agent)
+            }
+            with(extension.server.files)
             dependsOn processDescriptor, generateDescriptor
         }
 
