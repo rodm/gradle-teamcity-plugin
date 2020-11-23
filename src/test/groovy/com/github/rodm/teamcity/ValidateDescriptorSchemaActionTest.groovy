@@ -50,6 +50,7 @@ class ValidateDescriptorSchemaActionTest {
         project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
         stubTask = mock(Task)
         when(stubTask.getProject()).thenReturn(project)
+        when(stubTask.getLogger()).thenReturn(project.logger)
 
         descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>

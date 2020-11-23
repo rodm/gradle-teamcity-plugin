@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Project
+import org.gradle.api.Task
 import org.xml.sax.ErrorHandler
 import org.xml.sax.SAXException
 import org.xml.sax.SAXParseException
@@ -24,12 +24,9 @@ import org.xml.sax.SAXParseException
 @CompileStatic
 class PluginDescriptorErrorHandler implements ErrorHandler {
 
-    private Project project
+    private Task task
 
-    private String task
-
-    PluginDescriptorErrorHandler(Project project, String task) {
-        this.project = project
+    PluginDescriptorErrorHandler(Task task) {
         this.task = task
     }
 
@@ -49,6 +46,6 @@ class PluginDescriptorErrorHandler implements ErrorHandler {
     }
 
     private void outputMessage(SAXParseException exception) {
-        project.logger.warn(task + ': Plugin descriptor is invalid: ' + exception.message)
+        task.logger.warn(task.path + ': Plugin descriptor is invalid: ' + exception.message)
     }
 }

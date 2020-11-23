@@ -312,12 +312,11 @@ class TeamCityPlugin implements Plugin<Project> {
 
         @Override
         void execute(Task task) {
-            Project project = task.getProject()
             def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
             URL url = this.getClass().getResource('/schema/' + schema)
             def schema = factory.newSchema(url)
             def validator = schema.newValidator()
-            def errorHandler = new PluginDescriptorErrorHandler(project, task.getPath())
+            def errorHandler = new PluginDescriptorErrorHandler(task)
             validator.setErrorHandler(errorHandler)
             validator.validate(new StreamSource(new FileReader(descriptor.get().asFile)))
         }
