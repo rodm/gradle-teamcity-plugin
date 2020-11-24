@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
+import com.github.rodm.teamcity.tasks.ServerPlugin
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationResult
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
@@ -33,6 +34,7 @@ import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasEntry
@@ -437,6 +439,17 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
         assertThat(serverPlugin.archiveFileName.get(), equalTo('my-plugin.zip'))
+    }
+
+    @Test
+    void 'applying server plugin configures validation actions on all ServerPlugin tasks'() {
+        project.tasks.create('alternativeServerPlugin', ServerPlugin)
+        project.evaluate()
+
+        ServerPlugin serverPlugin = project.tasks.getByName('alternativeServerPlugin') as ServerPlugin
+        List<String> taskActionClassNames = serverPlugin.taskActions.collect { it.action.getClass().name }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDescriptorValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(TeamCityServerPlugin.PluginDescriptorContentsValidationAction.name))
     }
 
     @Test

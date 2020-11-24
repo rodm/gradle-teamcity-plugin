@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.AgentPlugin
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.artifacts.Configuration
@@ -26,6 +27,7 @@ import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
+import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
@@ -500,5 +502,16 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
         Zip agentPlugin = (Zip) project.tasks.findByPath(':agentPlugin')
         assertThat(agentPlugin.archiveFileName.get(), equalTo('my-plugin.zip'))
+    }
+
+    @Test
+    void 'applying agent plugin configures validation actions on all AgentPlugin tasks'() {
+        project.tasks.create('alternativeAgentPlugin', AgentPlugin)
+        project.evaluate()
+
+        AgentPlugin agentPlugin = project.tasks.getByName('alternativeAgentPlugin') as AgentPlugin
+        List<String> taskActionClassNames = agentPlugin.taskActions.collect { it.action.getClass().name }
+        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDescriptorValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(TeamCityAgentPlugin.PluginExecutableFilesValidationAction.name))
     }
 }
