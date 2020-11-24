@@ -15,18 +15,13 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 
-class AgentPlugin extends Zip {
-
-    @InputFile
-    final RegularFileProperty descriptor = project.objects.fileProperty()
+class AgentPlugin extends AbstractPluginTask {
 
     @InputFiles
     final ConfigurableFileCollection lib = project.objects.fileCollection()
