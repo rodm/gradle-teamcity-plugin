@@ -16,6 +16,7 @@
 
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -58,12 +59,17 @@ class ValidateExecutableFileActionTest {
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
-    private Task stubTask
+    private File descriptorFile
+    private AbstractPluginTask stubTask
+
+    static class DummyPluginTask extends AbstractPluginTask {}
 
     @Before
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
-        stubTask = mock(Task)
+        descriptorFile = project.file('teamcity-plugin.xml')
+        stubTask = project.tasks.create('dummy', DummyPluginTask)
+        stubTask.descriptor.set(descriptorFile)
     }
 
     private static FileCopyDetails fileCopyDetails(String path) {
@@ -72,17 +78,16 @@ class ValidateExecutableFileActionTest {
         return fileCopyDetails
     }
 
-    private validationAction(File descriptorFile, Set<FileCopyDetails> files) {
+    private validationAction(Set<FileCopyDetails> files) {
         def file = project.objects.fileProperty().fileValue(descriptorFile)
-        new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(file, files)
+        new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(files)
     }
 
     @Test
     void 'output warning when executable file is missing'() {
-        File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << AGENT_PLUGIN_DESCRIPTOR
         Set<FileCopyDetails> files = [fileCopyDetails('test1')]
-        Action<Task> validationAction = validationAction(descriptorFile, files)
+        Action<Task> validationAction = validationAction(files)
         outputEventListener.reset()
 
         validationAction.execute(stubTask)
@@ -93,10 +98,9 @@ class ValidateExecutableFileActionTest {
 
     @Test
     void 'does not output warning when executable file is present'() {
-        File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << AGENT_PLUGIN_DESCRIPTOR
         Set<FileCopyDetails> files = [fileCopyDetails('test1'), fileCopyDetails('bin/test2')]
-        Action<Task> validationAction =  validationAction(descriptorFile, files)
+        Action<Task> validationAction =  validationAction(files)
         outputEventListener.reset()
 
         validationAction.execute(stubTask)

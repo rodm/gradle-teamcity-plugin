@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import com.github.rodm.teamcity.tasks.AgentPlugin
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
@@ -24,11 +25,9 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
@@ -111,7 +110,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd'))
             Set<FileCopyDetails> files = []
             filesMatching('**/*', new FileCollectorAction(files))
-            doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
+            doLast(new PluginExecutableFilesValidationAction(files))
             dependsOn processDescriptor, generateDescriptor
         }
 
@@ -148,18 +147,17 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
     static class PluginExecutableFilesValidationAction implements Action<Task> {
 
-        private Provider<RegularFile> descriptor
         private Set<FileCopyDetails> files
 
-        PluginExecutableFilesValidationAction(Provider<RegularFile> descriptor, Set<FileCopyDetails> files) {
-            this.descriptor = descriptor
+        PluginExecutableFilesValidationAction(Set<FileCopyDetails> files) {
             this.files = files
         }
 
         @Override
         void execute(Task task) {
+            AbstractPluginTask pluginTask = (AbstractPluginTask) task
             def paths = files.flatten { fileCopyDetails -> fileCopyDetails.path }
-            def executableFiles = getExecutableFiles()
+            def executableFiles = getExecutableFiles(pluginTask.descriptor.get().asFile)
             for (String executableFile : executableFiles) {
                 if (!paths.contains(executableFile)) {
                     LOGGER.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
@@ -167,9 +165,9 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             }
         }
 
-        def getExecutableFiles() {
+        static def getExecutableFiles(File descriptorFile) {
             def parser = createXmlParser()
-            def descriptor = parser.parse(descriptor.get().asFile)
+            def descriptor = parser.parse(descriptorFile)
             return descriptor.breadthFirst().findAll { node -> node.name() == 'include' }.flatten { node -> node['@name'] }
         }
     }
