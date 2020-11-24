@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
@@ -24,11 +25,9 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
@@ -132,7 +131,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
             project.tasks.named(SERVER_PLUGIN_TASK_NAME) { Zip task ->
                 configurePluginArchiveTask(task, extension.server.archiveName)
                 doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version)))
-                doLast(new PluginDescriptorContentsValidationAction(descriptorFile))
+                doLast(new PluginDescriptorContentsValidationAction())
             }
         }
     }
@@ -178,16 +177,11 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty."
 
-        private Provider<RegularFile> descriptorFile
-
-        PluginDescriptorContentsValidationAction(Provider<RegularFile> descriptorFile) {
-            this.descriptorFile = descriptorFile
-        }
-
         @Override
         void execute(Task task) {
+            AbstractPluginTask pluginTask = (AbstractPluginTask) task
             def parser = createXmlParser()
-            def descriptor = parser.parse(descriptorFile.get().asFile)
+            def descriptor = parser.parse(pluginTask.descriptor.get().asFile)
 
             if (descriptor.info.name.text().trim().isEmpty()) {
                 LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))

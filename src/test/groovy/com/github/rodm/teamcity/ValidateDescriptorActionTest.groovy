@@ -16,6 +16,7 @@
 
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -29,8 +30,6 @@ import static com.github.rodm.teamcity.TeamCityServerPlugin.PluginDescriptorCont
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
 
 class ValidateDescriptorActionTest {
 
@@ -45,23 +44,25 @@ class ValidateDescriptorActionTest {
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
-    private Task stubTask
+    private File descriptorFile
+    private AbstractPluginTask stubTask
+
+    static class DummyPluginTask extends AbstractPluginTask {}
 
     @Before
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
-        stubTask = mock(Task)
-        when(stubTask.getProject()).thenReturn(project)
+        descriptorFile = project.file('teamcity-plugin.xml')
+        stubTask = project.tasks.create('dummy', DummyPluginTask)
+        stubTask.descriptor.set(descriptorFile)
     }
 
-    private TeamCityServerPlugin.PluginDescriptorContentsValidationAction validationAction(File descriptorFile) {
-        def file = project.objects.fileProperty().fileValue(descriptorFile)
-        new TeamCityServerPlugin.PluginDescriptorContentsValidationAction(file)
+    private TeamCityServerPlugin.PluginDescriptorContentsValidationAction validationAction() {
+        new TeamCityServerPlugin.PluginDescriptorContentsValidationAction()
     }
 
     @Test
     void 'warn about required descriptor values being empty'() {
-        File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
         <teamcity-plugin>
             <info>
@@ -74,7 +75,7 @@ class ValidateDescriptorActionTest {
             </info>
         </teamcity-plugin>
         '''
-        Action<Task> validationAction = validationAction(descriptorFile)
+        Action<Task> validationAction = validationAction()
 
         validationAction.execute(stubTask)
 
@@ -88,7 +89,6 @@ class ValidateDescriptorActionTest {
     void 'warn about empty descriptor values required for publishing a plugin'() {
         // publishing a plugin to the JetBrains TeamCity Plugin Repository, https://plugins.jetbrains.com/teamcity
         // requires the description and vendor url descriptor elements to be populated
-        File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
         <teamcity-plugin>
             <info>
@@ -102,7 +102,7 @@ class ValidateDescriptorActionTest {
         </teamcity-plugin>
         '''
 
-        Action<Task> validationAction = validationAction(descriptorFile)
+        Action<Task> validationAction = validationAction()
         validationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), containsString(warningFor('description')))
@@ -111,7 +111,6 @@ class ValidateDescriptorActionTest {
 
     @Test
     void 'no warnings when required descriptor values are not empty'() {
-        File descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
         <teamcity-plugin>
             <info>
@@ -126,7 +125,7 @@ class ValidateDescriptorActionTest {
             </info>
         </teamcity-plugin>
         '''
-        Action<Task> validationAction = validationAction(descriptorFile)
+        Action<Task> validationAction = validationAction()
         outputEventListener.reset()
 
         validationAction.execute(stubTask)
