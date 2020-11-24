@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -23,12 +24,10 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.file.RegularFile
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.util.GradleVersion
@@ -303,22 +302,21 @@ class TeamCityPlugin implements Plugin<Project> {
     static class PluginDescriptorValidationAction implements Action<Task> {
 
         private String schema
-        private Provider<RegularFile> descriptor
 
-        PluginDescriptorValidationAction(String schema, Provider<RegularFile> descriptor) {
+        PluginDescriptorValidationAction(String schema) {
             this.schema = schema
-            this.descriptor = descriptor
         }
 
         @Override
         void execute(Task task) {
+            AbstractPluginTask pluginTask = (AbstractPluginTask) task
             def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
             URL url = this.getClass().getResource('/schema/' + schema)
             def schema = factory.newSchema(url)
             def validator = schema.newValidator()
             def errorHandler = new PluginDescriptorErrorHandler(task)
             validator.setErrorHandler(errorHandler)
-            validator.validate(new StreamSource(new FileReader(descriptor.get().asFile)))
+            validator.validate(new StreamSource(new FileReader(pluginTask.descriptor.get().asFile)))
         }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.AbstractPluginTask
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -28,8 +29,6 @@ import org.junit.rules.TemporaryFolder
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
 
 class ValidateDescriptorSchemaActionTest {
 
@@ -42,15 +41,15 @@ class ValidateDescriptorSchemaActionTest {
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
-    private Task stubTask
+    private AbstractPluginTask stubTask
     private File descriptorFile
+
+    static class DummyPluginTask extends AbstractPluginTask {}
 
     @Before
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
-        stubTask = mock(Task)
-        when(stubTask.getProject()).thenReturn(project)
-        when(stubTask.getLogger()).thenReturn(project.logger)
+        stubTask = project.tasks.create('dummy', DummyPluginTask)
 
         descriptorFile = project.file('teamcity-plugin.xml')
         descriptorFile << '''<?xml version="1.0" encoding="UTF-8"?>
@@ -68,17 +67,17 @@ class ValidateDescriptorSchemaActionTest {
             <deployment allow-runtime-reload='true' node-responsibilities-aware='true'/>
         </teamcity-plugin>
         '''
+        stubTask.descriptor.set(descriptorFile)
     }
 
-    private validationAction(String schema, File descriptorFile) {
-        def file = project.objects.fileProperty().fileValue(descriptorFile)
-        new TeamCityPlugin.PluginDescriptorValidationAction(schema, file)
+    private static validationAction(String schema) {
+        new TeamCityPlugin.PluginDescriptorValidationAction(schema)
     }
 
     @Test
     void 'warn about allow-reload-plugin attribute when using schema for TeamCity 2018_1 and earlier'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = validationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema)
 
         validationAction.execute(stubTask)
 
@@ -88,7 +87,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'no warnings when using schema for TeamCity 2018_2 and later'() {
         def schema = '2018.2/teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = validationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema)
 
         validationAction.execute(stubTask)
 
@@ -98,7 +97,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'warn about node-responsibilities-aware attribute when using schema for TeamCity 2019_2 and earlier'() {
         def schema = 'teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = validationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema)
 
         validationAction.execute(stubTask)
 
@@ -108,7 +107,7 @@ class ValidateDescriptorSchemaActionTest {
     @Test
     void 'no warning about node-responsibilities-aware when using schema for TeamCity 2020_1 and later'() {
         def schema = '2020.1/teamcity-server-plugin-descriptor.xsd'
-        Action<Task> validationAction = validationAction(schema, descriptorFile)
+        Action<Task> validationAction = validationAction(schema)
 
         validationAction.execute(stubTask)
 

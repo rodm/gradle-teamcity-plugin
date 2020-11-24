@@ -108,7 +108,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
                 lib.from(project.configurations.runtimeClasspath)
             }
             with(extension.agent.files)
-            doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd', descriptorFile))
+            doLast(new PluginDescriptorValidationAction('teamcity-agent-plugin-descriptor.xsd'))
             Set<FileCopyDetails> files = []
             filesMatching('**/*', new FileCollectorAction(files))
             doLast(new PluginExecutableFilesValidationAction(descriptorFile, files))
