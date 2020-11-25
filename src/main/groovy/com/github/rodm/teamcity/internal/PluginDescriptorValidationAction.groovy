@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity.internal
 
-import com.github.rodm.teamcity.PluginDescriptorErrorHandler
 import org.gradle.api.Action
 import org.gradle.api.Task
 
