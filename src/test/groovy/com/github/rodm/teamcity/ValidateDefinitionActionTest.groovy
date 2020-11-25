@@ -16,6 +16,10 @@
 
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.ClassCollectorAction
+import com.github.rodm.teamcity.internal.PluginDefinition
+import com.github.rodm.teamcity.internal.PluginDefinitionCollectorAction
+import com.github.rodm.teamcity.internal.PluginDefinitionValidationAction
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -34,6 +38,9 @@ import org.junit.rules.TemporaryFolder
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 import static com.github.rodm.teamcity.ValidationMode.WARN
+import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASSES_WARNING_MESSAGE
+import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
+import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
@@ -59,9 +66,9 @@ class ValidateDefinitionActionTest {
             </beans>
         """
 
-    private static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
-    private static final String NO_BEAN_CLASS_WARNING = TeamCityPlugin.NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
-    private static final String NO_BEAN_CLASSES_WARNING = TeamCityPlugin.NO_BEAN_CLASSES_WARNING_MESSAGE.substring(4)
+    private static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
+    private static final String NO_BEAN_CLASS_WARNING = NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
+    private static final String NO_BEAN_CLASSES_WARNING = NO_BEAN_CLASSES_WARNING_MESSAGE.substring(4)
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
@@ -73,7 +80,7 @@ class ValidateDefinitionActionTest {
 
     private Project project
     private Task stubTask
-    private List<TeamCityPlugin.PluginDefinition> definitions
+    private List<PluginDefinition> definitions
     private Set<String> classes
 
     @Before
@@ -86,8 +93,8 @@ class ValidateDefinitionActionTest {
         when(stubTask.getLogger()).thenReturn(project.logger)
     }
 
-    private TeamCityPlugin.PluginDefinitionValidationAction createValidationAction(ValidationMode mode = WARN) {
-        new TeamCityPlugin.PluginDefinitionValidationAction(mode, definitions, classes)
+    private PluginDefinitionValidationAction createValidationAction(ValidationMode mode = WARN) {
+        new PluginDefinitionValidationAction(mode, definitions, classes)
     }
 
     @Test
@@ -103,7 +110,7 @@ class ValidateDefinitionActionTest {
     void noWarningMessageWithPluginDefinition() {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
@@ -116,7 +123,7 @@ class ValidateDefinitionActionTest {
     void logWarningMessageForEmptyDefinitionFile() {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << EMPTY_BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
@@ -130,7 +137,7 @@ class ValidateDefinitionActionTest {
     void logWarningMessageForMissingClass() {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
 
@@ -144,7 +151,7 @@ class ValidateDefinitionActionTest {
     void noWarningMessageWithClass() {
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         classes.add('example/Plugin.class')
         Action<Task> pluginValidationAction = createValidationAction()
         outputEventListener.reset()
@@ -168,10 +175,10 @@ class ValidateDefinitionActionTest {
     void 'no warning message for invalid definition files with validation mode set to ignore'() {
         File emptyDefinitionFile = project.file('build-server-plugin1.xml')
         emptyDefinitionFile << EMPTY_BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(emptyDefinitionFile))
+        definitions.add(new PluginDefinition(emptyDefinitionFile))
         File definitionFile = project.file('build-server-plugin2.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         outputEventListener.reset()
 
         Action<Task> pluginValidationAction = createValidationAction(IGNORE)
@@ -202,10 +209,10 @@ class ValidateDefinitionActionTest {
     void 'throws exception for invalid plugin definition files with validation mode set to fail'() {
         File emptyDefinitionFile = project.file('build-server-plugin1.xml')
         emptyDefinitionFile << EMPTY_BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(emptyDefinitionFile))
+        definitions.add(new PluginDefinition(emptyDefinitionFile))
         File definitionFile = project.file('build-server-plugin2.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         outputEventListener.reset()
 
         try {
@@ -233,10 +240,10 @@ class ValidateDefinitionActionTest {
 
         def descriptorPattern = 'META-INF/build-server-plugin*.xml'
         assertThat(jar.filesMatching, hasKey(descriptorPattern))
-        assertThat(jar.filesMatching.get(descriptorPattern).getClass().name, equalTo(TeamCityPlugin.PluginDefinitionCollectorAction.name))
+        assertThat(jar.filesMatching.get(descriptorPattern).getClass().name, equalTo(PluginDefinitionCollectorAction.name))
         def classPattern = '**/*.class'
         assertThat(jar.filesMatching, hasKey(classPattern))
-        assertThat(jar.filesMatching.get(classPattern).getClass().name, equalTo(TeamCityPlugin.ClassCollectorAction.name))
+        assertThat(jar.filesMatching.get(classPattern).getClass().name, equalTo(ClassCollectorAction.name))
     }
 
     @Test
@@ -247,7 +254,7 @@ class ValidateDefinitionActionTest {
 
         Jar jar = project.tasks.getByName('jar') as Jar
         List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -258,7 +265,7 @@ class ValidateDefinitionActionTest {
 
         Jar jar = project.tasks.getByName('jar') as Jar
         List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -271,10 +278,10 @@ class ValidateDefinitionActionTest {
 
         def descriptorPattern = 'META-INF/build-agent-plugin*.xml'
         assertThat(mockJarTask.filesMatching, hasKey(descriptorPattern))
-        assertThat(mockJarTask.filesMatching.get(descriptorPattern).getClass().name, equalTo(TeamCityPlugin.PluginDefinitionCollectorAction.name))
+        assertThat(mockJarTask.filesMatching.get(descriptorPattern).getClass().name, equalTo(PluginDefinitionCollectorAction.name))
         def classPattern = '**/*.class'
         assertThat(mockJarTask.filesMatching, hasKey(classPattern))
-        assertThat(mockJarTask.filesMatching.get(classPattern).getClass().name, equalTo(TeamCityPlugin.ClassCollectorAction.name))
+        assertThat(mockJarTask.filesMatching.get(classPattern).getClass().name, equalTo(ClassCollectorAction.name))
     }
 
     @Test
@@ -285,7 +292,7 @@ class ValidateDefinitionActionTest {
 
         Jar jar = project.tasks.getByName('jar') as Jar
         List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
     }
 
     @Test
@@ -296,13 +303,13 @@ class ValidateDefinitionActionTest {
 
         Jar jar = project.tasks.getByName('jar') as Jar
         List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDefinitionValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
     }
 
     @Test
     void 'PluginDefinitionCollector collects plugin definition files'() {
-        List<TeamCityPlugin.PluginDefinition> definitions = new ArrayList<TeamCityPlugin.PluginDefinition>()
-        Action<FileCopyDetails> collectorAction = new TeamCityPlugin.PluginDefinitionCollectorAction(definitions)
+        List<PluginDefinition> definitions = new ArrayList<PluginDefinition>()
+        Action<FileCopyDetails> collectorAction = new PluginDefinitionCollectorAction(definitions)
         File definitionFile = project.file('build-server-plugin.xml')
         FileCopyDetails stubDetails = mock(FileCopyDetails)
         when(stubDetails.getFile()).thenReturn(definitionFile)
@@ -316,7 +323,7 @@ class ValidateDefinitionActionTest {
     @Test
     void "ClassCollector collects classes"() {
         Set<String> classList = new HashSet<String>()
-        Action<FileCopyDetails> classManifestCollector = new TeamCityPlugin.ClassCollectorAction(classList)
+        Action<FileCopyDetails> classManifestCollector = new ClassCollectorAction(classList)
         FileCopyDetails stubDetails = mock(FileCopyDetails)
         when(stubDetails.getRelativePath()).thenReturn(new RelativePath(true, 'com', 'example', 'Plugin.class'))
 

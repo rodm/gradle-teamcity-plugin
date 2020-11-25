@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
+import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
@@ -448,8 +450,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
         ServerPlugin serverPlugin = project.tasks.getByName('alternativeServerPlugin') as ServerPlugin
         List<String> taskActionClassNames = serverPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDescriptorValidationAction.name))
-        assertThat(taskActionClassNames, hasItem(TeamCityServerPlugin.PluginDescriptorContentsValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDescriptorValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDescriptorContentsValidationAction.name))
     }
 
     @Test

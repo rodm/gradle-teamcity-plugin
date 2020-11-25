@@ -17,6 +17,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.PluginExecutableFilesValidationAction
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -48,7 +49,7 @@ class ValidateExecutableFileActionTest {
         </teamcity-agent-plugin>
     '''
 
-    private static final String MISSING_EXECUTABLE_FILE_WARNING = TeamCityAgentPlugin.MISSING_EXECUTABLE_FILE_WARNING.substring(4)
+    private static final String MISSING_EXECUTABLE_FILE_WARNING = PluginExecutableFilesValidationAction.MISSING_EXECUTABLE_FILE_WARNING.substring(4)
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
@@ -79,8 +80,7 @@ class ValidateExecutableFileActionTest {
     }
 
     private validationAction(Set<FileCopyDetails> files) {
-        def file = project.objects.fileProperty().fileValue(descriptorFile)
-        new TeamCityAgentPlugin.PluginExecutableFilesValidationAction(files)
+        new PluginExecutableFilesValidationAction(files)
     }
 
     @Test

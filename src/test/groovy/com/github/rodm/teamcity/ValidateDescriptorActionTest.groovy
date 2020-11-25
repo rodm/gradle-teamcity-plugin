@@ -17,6 +17,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -26,7 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-import static com.github.rodm.teamcity.TeamCityServerPlugin.PluginDescriptorContentsValidationAction.EMPTY_VALUE_WARNING_MESSAGE
+import static com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction.EMPTY_VALUE_WARNING_MESSAGE
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
@@ -57,8 +58,8 @@ class ValidateDescriptorActionTest {
         stubTask.descriptor.set(descriptorFile)
     }
 
-    private TeamCityServerPlugin.PluginDescriptorContentsValidationAction validationAction() {
-        new TeamCityServerPlugin.PluginDescriptorContentsValidationAction()
+    static private PluginDescriptorContentsValidationAction validationAction() {
+        new PluginDescriptorContentsValidationAction()
     }
 
     @Test

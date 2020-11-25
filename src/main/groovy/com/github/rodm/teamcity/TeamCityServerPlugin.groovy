@@ -15,18 +15,15 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
+import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
 import com.github.rodm.teamcity.tasks.ServerPlugin
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
@@ -36,8 +33,6 @@ import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
-import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
-import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
@@ -170,37 +165,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
                     distributionFile.set(packagePlugin.archiveFile)
                     dependsOn(packagePlugin)
                 }
-            }
-        }
-    }
-
-    static class PluginDescriptorContentsValidationAction implements Action<Task> {
-
-        static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty."
-
-        @Override
-        void execute(Task task) {
-            AbstractPluginTask pluginTask = (AbstractPluginTask) task
-            def parser = createXmlParser()
-            def descriptor = parser.parse(pluginTask.descriptor.get().asFile)
-
-            if (descriptor.info.name.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))
-            }
-            if (descriptor.info.'display-name'.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'display name'))
-            }
-            if (descriptor.info.version.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'version'))
-            }
-            if (descriptor.info.vendor.name.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor name'))
-            }
-            if (descriptor.info.description.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'description'))
-            }
-            if (descriptor.info.vendor.url.text().trim().isEmpty()) {
-                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor url'))
             }
         }
     }

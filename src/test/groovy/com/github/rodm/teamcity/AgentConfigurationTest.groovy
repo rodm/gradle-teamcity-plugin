@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
+import com.github.rodm.teamcity.internal.PluginExecutableFilesValidationAction
 import com.github.rodm.teamcity.tasks.AgentPlugin
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import org.gradle.api.InvalidUserDataException
@@ -511,7 +513,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
         AgentPlugin agentPlugin = project.tasks.getByName('alternativeAgentPlugin') as AgentPlugin
         List<String> taskActionClassNames = agentPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityPlugin.PluginDescriptorValidationAction.name))
-        assertThat(taskActionClassNames, hasItem(TeamCityAgentPlugin.PluginExecutableFilesValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginDescriptorValidationAction.name))
+        assertThat(taskActionClassNames, hasItem(PluginExecutableFilesValidationAction.name))
     }
 }

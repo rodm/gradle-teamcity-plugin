@@ -17,6 +17,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -71,7 +72,7 @@ class ValidateDescriptorSchemaActionTest {
     }
 
     private static validationAction(String schema) {
-        new TeamCityPlugin.PluginDescriptorValidationAction(schema)
+        new PluginDescriptorValidationAction(schema)
     }
 
     @Test

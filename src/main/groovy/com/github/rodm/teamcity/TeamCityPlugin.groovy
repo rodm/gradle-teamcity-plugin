@@ -15,12 +15,14 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.ClassCollectorAction
+import com.github.rodm.teamcity.internal.PluginDefinition
+import com.github.rodm.teamcity.internal.PluginDefinitionCollectorAction
+import com.github.rodm.teamcity.internal.PluginDefinitionValidationAction
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCopyDetails
@@ -32,11 +34,6 @@ import org.gradle.util.GradleVersion
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
-import javax.xml.transform.stream.StreamSource
-import javax.xml.validation.SchemaFactory
-
-import static com.github.rodm.teamcity.ValidationMode.FAIL
-import static com.github.rodm.teamcity.ValidationMode.IGNORE
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -51,14 +48,6 @@ class TeamCityPlugin implements Plugin<Project> {
     static final String JETBRAINS_MAVEN_REPOSITORY = 'https://download.jetbrains.com/teamcity-repository'
 
     static final String CLASSES_PATTERN = "**/*.class"
-
-    static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar."
-
-    static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans."
-
-    static final String NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE = "%s: Failed to parse plugin definition file %s: %s"
-
-    static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF"
 
     private final String MINIMUM_SUPPORTED_VERSION = '6.0'
 
@@ -178,141 +167,6 @@ class TeamCityPlugin implements Plugin<Project> {
                     }
                 }
             }
-        }
-    }
-
-    static class PluginDefinitionCollectorAction implements Action<FileCopyDetails> {
-
-        List<PluginDefinition> pluginDefinitions
-
-        PluginDefinitionCollectorAction(List<PluginDefinition> pluginDefinitions) {
-            this.pluginDefinitions = pluginDefinitions
-        }
-        @Override
-        void execute(FileCopyDetails fileCopyDetails) {
-            pluginDefinitions << new PluginDefinition(fileCopyDetails.file)
-        }
-    }
-
-    static class ClassCollectorAction implements Action<FileCopyDetails> {
-
-        private Set<String> classes
-
-        ClassCollectorAction(Set<String> classes) {
-            this.classes = classes
-        }
-
-        @Override
-        void execute(FileCopyDetails fileCopyDetails) {
-            classes << fileCopyDetails.relativePath.toString()
-        }
-    }
-
-    static class PluginDefinitionValidationAction implements Action<Task> {
-
-        private final ValidationMode mode
-        private final List<PluginDefinition> definitions
-        private final Set<String> classes
-        private boolean warningShown
-
-        PluginDefinitionValidationAction(ValidationMode mode, List < PluginDefinition > definitions, Set<String> classes) {
-            this.mode = mode
-            this.definitions = definitions
-            this.classes = classes
-            this.warningShown = false
-        }
-
-        @Override
-        void execute(Task task) {
-            if (mode == IGNORE) {
-                return
-            }
-            if (definitions.isEmpty()) {
-                report(task, String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
-            } else {
-                for (PluginDefinition definition : definitions) {
-                    validateDefinition(definition, task)
-                }
-            }
-            if (mode == FAIL && warningShown) {
-                throw new GradleException('Plugin definition validation failed')
-            }
-        }
-
-        private void validateDefinition(PluginDefinition definition, Task task) {
-            boolean offline = task.project.gradle.startParameter.isOffline()
-            List<PluginBean> beans
-            try {
-                beans = definition.getBeans(offline)
-            }
-            catch (IOException e) {
-                report(task, String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
-                return
-            }
-            if (beans.isEmpty()) {
-                report(task, String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
-            } else {
-                for (PluginBean bean : beans) {
-                    def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
-                    if (!classes.contains(fqcn)) {
-                        report(task, String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
-                    }
-                }
-            }
-        }
-
-        private void report(Task task, String message, Object... objects) {
-            task.logger.warn(message, objects)
-            warningShown = true
-        }
-    }
-
-    static class PluginDefinition {
-
-        private File definitionFile
-
-        PluginDefinition(File file) {
-            this.definitionFile = file
-        }
-
-        String getName() {
-            return this.definitionFile.name
-        }
-
-        def getBeans(boolean offline) {
-            List<PluginBean> pluginBeans = []
-            def parser = createXmlParser(offline)
-            def beans = parser.parse(definitionFile)
-            beans.bean.each { bean ->
-                pluginBeans << new PluginBean(id: bean.attribute('id'), className: bean.attribute('class'))
-            }
-            return pluginBeans
-        }
-    }
-
-    static class PluginBean {
-        String id
-        String className
-    }
-
-    static class PluginDescriptorValidationAction implements Action<Task> {
-
-        private String schema
-
-        PluginDescriptorValidationAction(String schema) {
-            this.schema = schema
-        }
-
-        @Override
-        void execute(Task task) {
-            AbstractPluginTask pluginTask = (AbstractPluginTask) task
-            def factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-            URL url = this.getClass().getResource('/schema/' + schema)
-            def schema = factory.newSchema(url)
-            def validator = schema.newValidator()
-            def errorHandler = new PluginDescriptorErrorHandler(task)
-            validator.setErrorHandler(errorHandler)
-            validator.validate(new StreamSource(new FileReader(pluginTask.descriptor.get().asFile)))
         }
     }
 }

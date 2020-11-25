@@ -16,6 +16,8 @@
 
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.PluginDefinition
+import com.github.rodm.teamcity.internal.PluginDefinitionValidationAction
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -53,7 +55,7 @@ class ValidateDefinitionActionOfflineTest {
 
     private Project project
     private Task stubTask
-    private List<TeamCityPlugin.PluginDefinition> definitions
+    private List<PluginDefinition> definitions
     private Set<String> classes
 
     @Before
@@ -67,7 +69,7 @@ class ValidateDefinitionActionOfflineTest {
 
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
-        definitions.add(new TeamCityPlugin.PluginDefinition(definitionFile))
+        definitions.add(new PluginDefinition(definitionFile))
         outputEventListener.reset()
     }
 
@@ -84,8 +86,8 @@ class ValidateDefinitionActionOfflineTest {
         System.clearProperty("socksProxyPort")
     }
 
-    private TeamCityPlugin.PluginDefinitionValidationAction createValidationAction() {
-        new TeamCityPlugin.PluginDefinitionValidationAction(WARN, definitions, classes)
+    private PluginDefinitionValidationAction createValidationAction() {
+        new PluginDefinitionValidationAction(WARN, definitions, classes)
     }
 
     @Test

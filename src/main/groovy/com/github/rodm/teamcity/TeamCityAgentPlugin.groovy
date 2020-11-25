@@ -15,26 +15,24 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.internal.AbstractPluginTask
+import com.github.rodm.teamcity.internal.FileCollectorAction
+import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
+import com.github.rodm.teamcity.internal.PluginExecutableFilesValidationAction
 import com.github.rodm.teamcity.tasks.AgentPlugin
 import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
-import static com.github.rodm.teamcity.TeamCityPlugin.PluginDescriptorValidationAction
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
-import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
@@ -48,7 +46,6 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     public static final String GENERATE_AGENT_DESCRIPTOR_TASK_NAME = 'generateAgentDescriptor'
     public static final String AGENT_PLUGIN_TASK_NAME = 'agentPlugin'
 
-    static final String MISSING_EXECUTABLE_FILE_WARNING = "%s: Executable file %s is missing."
 
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
@@ -127,47 +124,6 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             project.tasks.named(AGENT_PLUGIN_TASK_NAME) { Zip task ->
                 configurePluginArchiveTask(task, extension.agent.archiveName)
             }
-        }
-    }
-
-    static class FileCollectorAction implements Action<FileCopyDetails> {
-
-        private Set<FileCopyDetails> files
-
-        FileCollectorAction(Set<FileCopyDetails> files) {
-            this.files = files
-        }
-
-        @Override
-        void execute(FileCopyDetails fileCopyDetails) {
-            files << fileCopyDetails
-        }
-    }
-
-    static class PluginExecutableFilesValidationAction implements Action<Task> {
-
-        private Set<FileCopyDetails> files
-
-        PluginExecutableFilesValidationAction(Set<FileCopyDetails> files) {
-            this.files = files
-        }
-
-        @Override
-        void execute(Task task) {
-            AbstractPluginTask pluginTask = (AbstractPluginTask) task
-            def paths = files.flatten { fileCopyDetails -> fileCopyDetails.path }
-            def executableFiles = getExecutableFiles(pluginTask.descriptor.get().asFile)
-            for (String executableFile : executableFiles) {
-                if (!paths.contains(executableFile)) {
-                    task.logger.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
-                }
-            }
-        }
-
-        static def getExecutableFiles(File descriptorFile) {
-            def parser = createXmlParser()
-            def descriptor = parser.parse(descriptorFile)
-            return descriptor.breadthFirst().findAll { node -> node.name() == 'include' }.flatten { node -> node['@name'] }
         }
     }
 }
