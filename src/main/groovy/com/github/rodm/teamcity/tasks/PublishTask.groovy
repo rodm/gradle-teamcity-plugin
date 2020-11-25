@@ -26,8 +26,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -38,8 +36,6 @@ import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
 import org.jetbrains.intellij.pluginRepository.PluginUploader
 
 class PublishTask extends DefaultTask {
-
-    private static final Logger LOGGER = Logging.getLogger(PublishTask.class)
 
     private static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
 
@@ -127,14 +123,14 @@ class PublishTask extends DefaultTask {
         def creationResult = createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
-            LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host")
+            logger.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host")
             for (String channel : getChannels().get()) {
-                LOGGER.info("Uploading plugin to ${channel} channel")
+                logger.info("Uploading plugin to ${channel} channel")
                 try {
                     def uploadChannel = channel && 'default' != channel ? channel : ''
                     def uploader = createRepositoryUploader()
                     uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, notes.orNull)
-                    LOGGER.info("Uploaded successfully")
+                    logger.info("Uploaded successfully")
                 }
                 catch (exception) {
                     throw new GradleException('Failed to upload plugin', exception)

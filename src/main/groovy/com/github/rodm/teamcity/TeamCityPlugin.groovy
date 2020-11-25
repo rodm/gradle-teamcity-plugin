@@ -24,8 +24,6 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
@@ -41,8 +39,6 @@ import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 
 class TeamCityPlugin implements Plugin<Project> {
-
-    private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
 
     public static final String PLUGIN_DESCRIPTOR_FILENAME = 'teamcity-plugin.xml'
 
@@ -232,7 +228,7 @@ class TeamCityPlugin implements Plugin<Project> {
                 return
             }
             if (definitions.isEmpty()) {
-                report(String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
+                report(task, String.format(NO_DEFINITION_WARNING_MESSAGE, task.getPath()))
             } else {
                 for (PluginDefinition definition : definitions) {
                     validateDefinition(definition, task)
@@ -250,23 +246,23 @@ class TeamCityPlugin implements Plugin<Project> {
                 beans = definition.getBeans(offline)
             }
             catch (IOException e) {
-                report(String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
+                report(task, String.format(NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE, task.getPath(), definition.name, e.message), e)
                 return
             }
             if (beans.isEmpty()) {
-                report(String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
+                report(task, String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.name))
             } else {
                 for (PluginBean bean : beans) {
                     def fqcn = bean.className.replaceAll('\\.', '/') + '.class'
                     if (!classes.contains(fqcn)) {
-                        report(String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
+                        report(task, String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.name, bean.className))
                     }
                 }
             }
         }
 
-        private void report(String message, Object... objects) {
-            LOGGER.warn(message, objects)
+        private void report(Task task, String message, Object... objects) {
+            task.logger.warn(message, objects)
             warningShown = true
         }
     }

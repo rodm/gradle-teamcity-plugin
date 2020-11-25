@@ -176,8 +176,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     static class PluginDescriptorContentsValidationAction implements Action<Task> {
 
-        private static final Logger LOGGER = Logging.getLogger(TeamCityPlugin.class)
-
         static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty."
 
         @Override
@@ -187,22 +185,22 @@ class TeamCityServerPlugin implements Plugin<Project> {
             def descriptor = parser.parse(pluginTask.descriptor.get().asFile)
 
             if (descriptor.info.name.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'name'))
             }
             if (descriptor.info.'display-name'.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'display name'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'display name'))
             }
             if (descriptor.info.version.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'version'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'version'))
             }
             if (descriptor.info.vendor.name.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor name'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor name'))
             }
             if (descriptor.info.description.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'description'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'description'))
             }
             if (descriptor.info.vendor.url.text().trim().isEmpty()) {
-                LOGGER.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor url'))
+                task.logger.warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), 'vendor url'))
             }
         }
     }

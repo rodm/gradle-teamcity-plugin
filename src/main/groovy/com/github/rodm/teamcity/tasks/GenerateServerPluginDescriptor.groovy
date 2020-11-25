@@ -53,13 +53,13 @@ class GenerateServerPluginDescriptor extends DefaultTask {
     void generateDescriptor() {
         TeamCityVersion teamcityVersion = TeamCityVersion.version(version.get())
         if (teamcityVersion < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
+            logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
         if (teamcityVersion < VERSION_2018_2 && descriptor.get().allowRuntimeReload != null) {
-            project.logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${version.get()}")
+            logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${version.get()}")
         }
         if (teamcityVersion < VERSION_2020_1 && descriptor.get().nodeResponsibilitiesAware != null) {
-            project.logger.warn("${path}: Plugin descriptor does not support nodeResponsibilitiesAware for version ${version.get()}")
+            logger.warn("${path}: Plugin descriptor does not support nodeResponsibilitiesAware for version ${version.get()}")
         }
         ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get())
         destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }

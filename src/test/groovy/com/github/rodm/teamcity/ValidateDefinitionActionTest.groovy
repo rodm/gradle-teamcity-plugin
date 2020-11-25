@@ -83,6 +83,7 @@ class ValidateDefinitionActionTest {
         definitions = []
         classes = new HashSet<String>()
         when(stubTask.getProject()).thenReturn(project)
+        when(stubTask.getLogger()).thenReturn(project.logger)
     }
 
     private TeamCityPlugin.PluginDefinitionValidationAction createValidationAction(ValidationMode mode = WARN) {

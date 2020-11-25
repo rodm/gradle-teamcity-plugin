@@ -63,6 +63,7 @@ class ValidateDefinitionActionOfflineTest {
         definitions = []
         classes = new HashSet<String>()
         when(stubTask.getProject()).thenReturn(project)
+        when(stubTask.getLogger()).thenReturn(project.logger)
 
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE

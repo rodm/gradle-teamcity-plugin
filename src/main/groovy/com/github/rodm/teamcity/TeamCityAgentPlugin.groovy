@@ -25,8 +25,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
@@ -41,8 +39,6 @@ import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
 class TeamCityAgentPlugin implements Plugin<Project> {
-
-    private static final Logger LOGGER = Logging.getLogger(TeamCityAgentPlugin)
 
     public static final String PLUGIN_DEFINITION_PATTERN = "META-INF/build-agent-plugin*.xml"
 
@@ -163,7 +159,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
             def executableFiles = getExecutableFiles(pluginTask.descriptor.get().asFile)
             for (String executableFile : executableFiles) {
                 if (!paths.contains(executableFile)) {
-                    LOGGER.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
+                    task.logger.warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile))
                 }
             }
         }

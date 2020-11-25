@@ -50,7 +50,7 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     @TaskAction
     void generateDescriptor() {
         if (TeamCityVersion.version(version.get()) < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
-            project.logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
+            logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
         AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor.get())
         destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
