@@ -29,6 +29,7 @@ import org.junit.rules.TemporaryFolder
 
 import java.util.zip.ZipFile
 
+import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem
@@ -41,7 +42,7 @@ import static org.junit.Assume.assumeThat
 @RunWith(Parameterized)
 class MultipleGradleVersionTest {
 
-    static final String NO_DEFINITION_WARNING = TeamCityPlugin.NO_DEFINITION_WARNING_MESSAGE.substring(4)
+    static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     @Rule
     public final TemporaryFolder projectDir = new TemporaryFolder()
