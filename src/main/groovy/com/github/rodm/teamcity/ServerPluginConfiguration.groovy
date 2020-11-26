@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.util.ConfigureUtil
 
@@ -29,16 +30,17 @@ import static groovy.transform.TypeCheckingMode.SKIP
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
+    private Project project
+    private ConfigurableFileCollection web
     private PublishConfiguration publish
 
     @Delegate
     private TeamCityEnvironments environments
 
-    private Project project
-
     ServerPluginConfiguration(Project project, TeamCityEnvironments environments) {
         super(project)
         this.project = project
+        this.web = project.objects.fileCollection()
         this.environments = environments
     }
 
@@ -56,6 +58,18 @@ class ServerPluginConfiguration extends PluginConfiguration {
             descriptor.init()
         }
         configuration.execute(descriptor)
+    }
+
+    ConfigurableFileCollection getWeb() {
+        return web
+    }
+
+    void setWeb(Object web) {
+        this.web.setFrom(web)
+    }
+
+    void web(Object web) {
+        this.web.from(web)
     }
 
     /**

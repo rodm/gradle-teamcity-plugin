@@ -428,6 +428,7 @@ class ServerPluginFunctionalTest {
         assertThat(entries, not(hasItem('server/server-api-8.1.5.jar')))
         assertThat(entries.size(), equalTo(5))
     }
+
     @Test
     void 'plugin archive includes additional files'() {
         buildFile << """
@@ -469,6 +470,41 @@ class ServerPluginFunctionalTest {
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1'))
         assertThat(entries, hasItem('files/file2'))
+    }
+
+    @Test
+    void 'jar archive contains additional frontend javascript in buildServerResources'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '2020.2'
+                server {
+                    descriptor {
+                        name = 'test-plugin'
+                        displayName = 'Test plugin'
+                        version = '1.0'
+                        vendorName = 'vendor name'
+                    }
+                    web {
+                        project.files('bundle.js')
+                    }
+                }
+            }
+        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
+        testProjectDir.newFile("bundle.js")
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+
+        ZipFile archive = new ZipFile(new File(testProjectDir.root, 'build/libs/test-plugin.jar'))
+        List<String> entries = archive.entries().collect { it.name }
+        assertThat(entries, hasItem('buildServerResources/'))
+        assertThat(entries, hasItem('buildServerResources/bundle.js'))
     }
 
     @Test

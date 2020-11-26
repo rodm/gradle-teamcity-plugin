@@ -25,6 +25,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 
 import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
@@ -84,6 +85,14 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
     @SuppressWarnings('GrMethodMayBeStatic')
     void configureServerPluginTasks(Project project, TeamCityPluginExtension extension) {
+        project.plugins.withType(JavaPlugin) {
+            project.tasks.named(JAR_TASK_NAME, Jar).configure {
+                into('buildServerResources') {
+                    from(extension.server.web)
+                }
+            }
+        }
+
         def descriptorFile = project.layout.buildDirectory.file(SERVER_PLUGIN_DESCRIPTOR_DIR + '/' + PLUGIN_DESCRIPTOR_FILENAME)
 
         def processDescriptor = project.tasks.register(PROCESS_SERVER_DESCRIPTOR_TASK_NAME, ProcessDescriptor) {
