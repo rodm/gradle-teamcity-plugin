@@ -1,0 +1,21 @@
+.wrapper {
+  padding: 0 28px;
+}
+
+.name {
+  cursor: pointer;
+}
+
+.subtitle {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.tasksWrapper {
+  padding-bottom: 16px;
+}
+
+.taskItem {
+  margin: 0;
+  padding: 0;
+}
