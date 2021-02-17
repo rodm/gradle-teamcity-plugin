@@ -17,14 +17,6 @@
     </properties>
 
   <repositories>
-      <repository>
-          <id>bintray-rodm-maven</id>
-          <name>bintray</name>
-          <url>https://dl.bintray.com/rodm/maven</url>
-          <snapshots>
-              <enabled>false</enabled>
-          </snapshots>
-      </repository>
     <repository>
       <id>jetbrains-all</id>
       <url>https://download.jetbrains.com/teamcity-repository</url>
@@ -115,7 +107,7 @@
       <dependency>
           <groupId>com.github.rodm</groupId>
           <artifactId>teamcity-dsl-extensions</artifactId>
-          <version>0.5</version>
+          <version>0.7</version>
           <scope>compile</scope>
       </dependency>
   </dependencies>
