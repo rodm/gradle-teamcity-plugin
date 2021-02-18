@@ -5,10 +5,10 @@
 :uri-agent-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor2
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
-:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
-:uri-travis-project: https://travis-ci.org/rodm/gradle-teamcity-plugin
-:uri-travis-status: https://travis-ci.org/rodm/gradle-teamcity-plugin.svg?branch=master
+:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
+:uri-github-actions: {uri-github-project}/actions
+:uri-github-status: {uri-github-project}/workflows/Build/badge.svg
 :uri-appveyor-project: https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin
 :uri-appveyor-status: https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true
 :plugin-version: 1.1
@@ -18,7 +18,7 @@
 The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
-image:{uri-travis-status}["Build Status", link="{uri-travis-project}"]
+image:{uri-github-status}?branch=master["Build Status", link="{uri-github-actions}"]
 image:{uri-appveyor-status}["Build Status", link="{uri-appveyor-project}"]
 
 == Supported Gradle and Java versions
