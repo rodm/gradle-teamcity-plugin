@@ -24,7 +24,7 @@ jobs:
         run: ./gradlew -s build
 
   test:
-    runs-on: ubunutu-latest
+    runs-on: ubuntu-latest
     name: Functional Tests
     needs: build
     steps:
