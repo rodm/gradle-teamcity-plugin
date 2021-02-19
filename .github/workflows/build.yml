@@ -24,8 +24,11 @@ jobs:
         run: ./gradlew -s build
 
   test:
-    runs-on: ubuntu-latest
-    name: Functional Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    name: Functional Tests - ${{ matrix.os }}
     needs: build
     steps:
       - uses: actions/checkout@v2
