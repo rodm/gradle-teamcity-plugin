@@ -4,6 +4,9 @@ name: Build
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - '.teamcity/**'
+      - 'README.adoc'
 
 jobs:
   build:
