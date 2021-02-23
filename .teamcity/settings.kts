@@ -244,7 +244,10 @@ project {
                         id = "vcsTrigger"
                         quietPeriodMode = USE_DEFAULT
                         branchFilter = "+:<default>"
-                        triggerRules = "-:.github/**"
+                        triggerRules = """
+                            -:.github/**
+                            -:README.adoc
+                        """.trimIndent()
                     }
                 }
             }
