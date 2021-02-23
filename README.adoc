@@ -6,11 +6,9 @@
 :uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
-:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin/
+:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin
 :uri-github-actions: {uri-github-project}/actions
 :uri-github-status: {uri-github-project}/workflows/Build/badge.svg
-:uri-appveyor-project: https://ci.appveyor.com/project/rodm/gradle-teamcity-plugin
-:uri-appveyor-status: https://ci.appveyor.com/api/projects/status/github/rodm/gradle-teamcity-plugin?branch=master&svg=true
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2018.1
@@ -19,7 +17,6 @@ The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plug
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 image:{uri-github-status}?branch=master["Build Status", link="{uri-github-actions}"]
-image:{uri-appveyor-status}["Build Status", link="{uri-appveyor-project}"]
 
 == Supported Gradle and Java versions
 
