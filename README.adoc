@@ -130,12 +130,13 @@ The plugin descriptor properties shown in the examples below and described in th
 ==== Tasks
 
 * `serverPlugin` : Builds and packages a TeamCity plugin. The task performs validation of the plugin descriptor
-and outputs a warning if a required value is missing.
+and outputs a warning if a required value is missing. The plugin zip file is output to the directory
+`build/distributions`.
 * `publishPlugin` : Publishes a plugin to the {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]
 * `generateDescriptor` : If the descriptor is defined in the build script this task is enabled and will
 output the descriptor to the build directory.
 * `processDescriptor` : If the descriptor is defined as an external file this task is enabled and will copy
-the file to the build directory. ('build/descriptor/server')
+the file to the build directory. (`build/descriptor/server`)
 
 The plugin enhances the `jar` task to perform validation of the bean definition file and outputs a warning if
 there are no beans defined or if a class is missing from the jar file.
