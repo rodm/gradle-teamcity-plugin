@@ -17,35 +17,46 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static com.github.rodm.teamcity.TestSupport.executeBuild
-import static org.gradle.testkit.runner.TaskOutcome.*
-import static org.hamcrest.CoreMatchers.*
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.hamcrest.CoreMatchers.containsString
+import static org.hamcrest.CoreMatchers.hasItem
+import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.MatcherAssert.assertThat
 
 class AgentAndServerPluginFunctionalTest {
 
-    @Rule
-    public final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir
+    public Path testProjectDir
 
     private File buildFile
     private File settingsFile
 
-    @Before
+    @BeforeEach
     void setup() throws IOException {
-        buildFile = testProjectDir.newFile("build.gradle")
-        settingsFile = testProjectDir.newFile('settings.gradle')
+        buildFile = createFile('build.gradle')
+        settingsFile = createFile('settings.gradle')
+    }
+
+    private File createFile(String name) {
+        Files.createFile(testProjectDir.resolve(name)).toFile()
+    }
+
+    private Path createDirectory(String name) {
+        Files.createDirectory(testProjectDir.resolve(name))
     }
 
     private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.root, args)
+        return executeBuild(testProjectDir.toFile(), args)
     }
 
     @Test
@@ -79,21 +90,21 @@ class AgentAndServerPluginFunctionalTest {
 
         settingsFile << SETTINGS_SCRIPT_DEFAULT
 
-        testProjectDir.newFolder('lib')
-        testProjectDir.newFile('lib/agent-lib.jar')
-        testProjectDir.newFile('lib/server-lib.jar')
+        createDirectory('lib')
+        createFile('lib/agent-lib.jar')
+        createFile('lib/server-lib.jar')
 
         BuildResult result = executeBuild()
 
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile agentPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
+        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/agent-lib.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> entries = serverPluginFile.entries().collect { it.name }
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('agent/test-plugin-agent.zip'))
@@ -158,23 +169,23 @@ class AgentAndServerPluginFunctionalTest {
             include 'server'
         """
 
-        testProjectDir.newFolder('lib')
-        testProjectDir.newFile('lib/agent-lib.jar')
-        testProjectDir.newFile('lib/server-lib.jar')
+        createDirectory('lib')
+        createFile('lib/agent-lib.jar')
+        createFile('lib/server-lib.jar')
 
         BuildResult result = executeBuild()
 
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile agentPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin-agent.zip'))
+        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
         assertThat(agentEntries, hasItem('lib/agent-lib.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> entries = serverPluginFile.entries().collect { it.name }
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('agent/test-plugin-agent.zip'))
@@ -197,7 +208,7 @@ class AgentAndServerPluginFunctionalTest {
         """
 
         BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(testProjectDir.toFile())
                 .withArguments("assemble")
                 .withPluginClasspath()
                 .forwardOutput()
