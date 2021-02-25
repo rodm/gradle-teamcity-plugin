@@ -20,11 +20,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
-import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
@@ -36,39 +34,11 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class EnvironmentsPluginFunctionalTest {
-
-    @TempDir
-    public Path testProjectDir
-
-    private File buildFile
-    private File settingsFile
+class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
 
     @BeforeEach
     void setup() throws IOException {
-        buildFile = createFile("build.gradle")
-        settingsFile = createFile('settings.gradle')
         settingsFile << SETTINGS_SCRIPT_DEFAULT
-    }
-
-    private File createFile(String name) {
-        Files.createFile(testProjectDir.resolve(name)).toFile()
-    }
-
-    private File createDirectory(String name) {
-        Files.createDirectories(testProjectDir.resolve(name)).toFile()
-    }
-
-    private static File createFile(Path folder, String name) {
-        Files.createFile(folder.resolve(name)).toFile()
-    }
-
-    private static File createDirectory(Path folder, String name) {
-        Files.createDirectories(folder.resolve(name)).toFile()
-    }
-
-    private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.toFile(), args)
     }
 
     @Test

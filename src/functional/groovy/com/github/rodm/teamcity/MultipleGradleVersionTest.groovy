@@ -22,12 +22,9 @@ import org.gradle.util.GradleVersion
 import org.hamcrest.Matcher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
@@ -40,12 +37,9 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.oneOf
 import static org.junit.Assume.assumeThat
 
-class MultipleGradleVersionTest {
+class MultipleGradleVersionTest extends FunctionalTestCase {
 
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
-
-    @TempDir
-    public Path projectDir
 
     static List<String> data() {
         return [
@@ -56,8 +50,6 @@ class MultipleGradleVersionTest {
 
     @BeforeEach
     void setup() throws IOException {
-        File buildFile = createFile('build.gradle')
-
         buildFile << """
             plugins {
                 id 'java'
@@ -117,7 +109,6 @@ class MultipleGradleVersionTest {
             }
         """
 
-        File settingsFile = createFile('settings.gradle')
         settingsFile << """
             rootProject.name = 'test-plugin'
 
@@ -187,18 +178,6 @@ class MultipleGradleVersionTest {
         """
     }
 
-    private File createFile(String name) {
-        Files.createFile(projectDir.resolve(name)).toFile()
-    }
-
-    private File createDirectory(String name) {
-        Files.createDirectories(projectDir.resolve(name)).toFile()
-    }
-
-    private static File createFile(Path folder, String name) {
-        Files.createFile(folder.resolve(name)).toFile()
-    }
-
     @DisplayName('build plugin')
     @ParameterizedTest(name = 'with Gradle {0}')
     @MethodSource("data")
@@ -224,7 +203,7 @@ class MultipleGradleVersionTest {
 
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
-                .withProjectDir(projectDir.toFile())
+                .withProjectDir(testProjectDir.toFile())
                 .withArguments('--warning-mode', 'fail', 'build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
@@ -241,13 +220,13 @@ class MultipleGradleVersionTest {
         assertThat(result.getOutput(), not(containsString('but the implementation class')))
         assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
 
-        ZipFile agentPluginFile = new ZipFile(projectDir.resolve('agent/build/distributions/test-plugin-agent.zip').toFile())
+        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('agent/build/distributions/test-plugin-agent.zip').toFile())
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(projectDir.resolve('build/distributions/test-plugin.zip').toFile())
+        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> serverEntries = serverPluginFile.entries().collect { it.name }
         assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(serverEntries, hasItem('server/common.jar'))

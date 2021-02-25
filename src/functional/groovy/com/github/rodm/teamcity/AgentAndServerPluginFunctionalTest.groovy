@@ -17,47 +17,18 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
-import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.MatcherAssert.assertThat
 
-class AgentAndServerPluginFunctionalTest {
-
-    @TempDir
-    public Path testProjectDir
-
-    private File buildFile
-    private File settingsFile
-
-    @BeforeEach
-    void setup() throws IOException {
-        buildFile = createFile('build.gradle')
-        settingsFile = createFile('settings.gradle')
-    }
-
-    private File createFile(String name) {
-        Files.createFile(testProjectDir.resolve(name)).toFile()
-    }
-
-    private Path createDirectory(String name) {
-        Files.createDirectory(testProjectDir.resolve(name))
-    }
-
-    private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.toFile(), args)
-    }
+class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
 
     @Test
     void agentAndServerPluginPackage() {

@@ -17,16 +17,11 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
-import static com.github.rodm.teamcity.TestSupport.executeBuild
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
@@ -42,7 +37,7 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 
-class ServerPluginFunctionalTest {
+class ServerPluginFunctionalTest extends FunctionalTestCase {
 
     static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
         plugins {
@@ -99,30 +94,6 @@ class ServerPluginFunctionalTest {
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     static final String NO_BEAN_CLASS_WARNING = NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
-
-    @TempDir
-    public final Path testProjectDir
-
-    private File buildFile
-    private File settingsFile
-
-    @BeforeEach
-    void setup() throws IOException {
-        buildFile = createFile("build.gradle")
-        settingsFile = createFile('settings.gradle')
-    }
-
-    private File createFile(String name) {
-        Files.createFile(testProjectDir.resolve(name)).toFile()
-    }
-
-    private File createDirectory(String name) {
-        Files.createDirectories(testProjectDir.resolve(name)).toFile()
-    }
-
-    private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.toFile(), args)
-    }
 
     @Test
     void serverPluginBuildAndPackage() {
