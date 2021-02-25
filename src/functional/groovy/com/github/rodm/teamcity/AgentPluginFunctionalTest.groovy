@@ -17,6 +17,9 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 import java.util.zip.ZipFile
@@ -394,10 +397,13 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         assertThat(entries, hasItem('files/file2'))
     }
 
-    @Test
-    void 'generate agent descriptor task should be cacheable'() {
-        buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
-        settingsFile << """
+    @Nested
+    @DisplayName("with build cache")
+    class WithBuildCache {
+
+        @BeforeEach
+        void setupWithLocalBuildCache() {
+            settingsFile << """
             rootProject.name = 'test-plugin'
 
             buildCache {
@@ -405,36 +411,33 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
                     directory = new File('${windowsCompatiblePath(testProjectDir.toFile())}', 'build-cache')
                 }
             }
-        """
+            """
+        }
 
-        BuildResult result
-        result = executeBuild('--build-cache', 'clean', 'assemble')
-        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SUCCESS))
+        @Test
+        void 'generate agent descriptor task should be cacheable'() {
+            buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        result = executeBuild('--build-cache', 'clean', 'assemble')
-        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(FROM_CACHE))
-    }
+            BuildResult result
+            result = executeBuild('--build-cache', 'clean', 'assemble')
+            assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SUCCESS))
 
-    @Test
-    void 'process agent descriptor task should be cacheable'() {
-        buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
-        settingsFile << """
-            rootProject.name = 'test-plugin'
+            result = executeBuild('--build-cache', 'clean', 'assemble')
+            assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(FROM_CACHE))
+        }
 
-            buildCache {
-                local {
-                    directory = new File('${windowsCompatiblePath(testProjectDir.toFile())}', 'build-cache')
-                }
-            }
-        """
-        File descriptorFile = createFile("teamcity-plugin.xml")
-        descriptorFile << AGENT_DESCRIPTOR_FILE
+        @Test
+        void 'process agent descriptor task should be cacheable'() {
+            buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+            File descriptorFile = createFile("teamcity-plugin.xml")
+            descriptorFile << AGENT_DESCRIPTOR_FILE
 
-        BuildResult result
-        result = executeBuild('--build-cache', 'clean', 'assemble')
-        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SUCCESS))
+            BuildResult result
+            result = executeBuild('--build-cache', 'clean', 'assemble')
+            assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SUCCESS))
 
-        result = executeBuild('--build-cache', 'clean', 'assemble')
-        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
+            result = executeBuild('--build-cache', 'clean', 'assemble')
+            assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
+        }
     }
 }
