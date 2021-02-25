@@ -43,3 +43,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew -s functionalTest
+      - name: Upload reports
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: reports
+          path: build/reports/**
+          retention-days: 3
