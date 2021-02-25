@@ -17,11 +17,12 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
@@ -99,20 +100,28 @@ class ServerPluginFunctionalTest {
 
     static final String NO_BEAN_CLASS_WARNING = NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
 
-    @Rule
-    public final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir
+    public final Path testProjectDir
 
     private File buildFile
     private File settingsFile
 
-    @Before
+    @BeforeEach
     void setup() throws IOException {
-        buildFile = testProjectDir.newFile("build.gradle")
-        settingsFile = testProjectDir.newFile('settings.gradle')
+        buildFile = createFile("build.gradle")
+        settingsFile = createFile('settings.gradle')
+    }
+
+    private File createFile(String name) {
+        Files.createFile(testProjectDir.resolve(name)).toFile()
+    }
+
+    private File createDirectory(String name) {
+        Files.createDirectories(testProjectDir.resolve(name)).toFile()
     }
 
     private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.root, args)
+        return executeBuild(testProjectDir.toFile(), args)
     }
 
     @Test
@@ -126,7 +135,7 @@ class ServerPluginFunctionalTest {
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(SKIPPED))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginFile = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile pluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> entries = pluginFile.entries().collect { it.name }
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('server/test-plugin.jar'))
@@ -136,7 +145,7 @@ class ServerPluginFunctionalTest {
     void serverPluginWithDescriptorFile() {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
-        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        File descriptorFile = createFile("teamcity-plugin.xml")
         descriptorFile << SERVER_DESCRIPTOR_FILE
 
         BuildResult result = executeBuild()
@@ -151,7 +160,7 @@ class ServerPluginFunctionalTest {
     void serverPluginNoWarningsWithDefinitionFile() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File metaInfDir = createDirectory('src/main/resources/META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-example.xml')
         definitionFile << '<beans></beans>'
 
@@ -173,7 +182,7 @@ class ServerPluginFunctionalTest {
     void noWarningWithValidDefinitionFile() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File exampleJavaDir = createDirectory('src/main/java/example')
         File javaFile = new File(exampleJavaDir, 'ExampleServerPlugin.java')
         javaFile << """
             package example;
@@ -181,7 +190,7 @@ class ServerPluginFunctionalTest {
             }
         """
 
-        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File metaInfDir = createDirectory('src/main/resources/META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
@@ -195,7 +204,7 @@ class ServerPluginFunctionalTest {
     void warningAboutMissingClass() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File metaInfDir = createDirectory('src/main/resources/META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
         definitionFile << PLUGIN_DEFINITION_FILE
 
@@ -210,7 +219,7 @@ class ServerPluginFunctionalTest {
     void supportOlderPluginDefinitionFile() {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
-        File exampleJavaDir = testProjectDir.newFolder('src', 'main', 'java', 'example')
+        File exampleJavaDir = createDirectory('src/main/java/example')
         File javaFile = new File(exampleJavaDir, 'ExampleServerPlugin.java')
         javaFile << """
             package example;
@@ -218,7 +227,7 @@ class ServerPluginFunctionalTest {
             }
         """
 
-        File metaInfDir = testProjectDir.newFolder('src', 'main', 'resources', 'META-INF')
+        File metaInfDir = createDirectory('src/main/resources/META-INF')
         File definitionFile = new File(metaInfDir, 'build-server-plugin-test.xml')
         definitionFile << """<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
@@ -238,7 +247,7 @@ class ServerPluginFunctionalTest {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
         BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.getRoot())
+                .withProjectDir(testProjectDir.toFile())
                 .withArguments("serverPlugin")
                 .withPluginClasspath()
                 .buildAndFail()
@@ -251,7 +260,7 @@ class ServerPluginFunctionalTest {
     void invalidServerPluginDescriptor() {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
-        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        File descriptorFile = createFile("teamcity-plugin.xml")
         descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
             <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
@@ -320,7 +329,7 @@ class ServerPluginFunctionalTest {
                 }
             }
         """
-        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        File descriptorFile = createFile("teamcity-plugin.xml")
         descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
             <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                              xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
@@ -353,7 +362,7 @@ class ServerPluginFunctionalTest {
 
             buildCache {
                 local {
-                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.toFile())}', 'build-cache')
                 }
             }
         """
@@ -374,11 +383,11 @@ class ServerPluginFunctionalTest {
 
             buildCache {
                 local {
-                    directory = new File('${windowsCompatiblePath(testProjectDir.root)}', 'build-cache')
+                    directory = new File('${windowsCompatiblePath(testProjectDir.toFile())}', 'build-cache')
                 }
             }
         """
-        File descriptorFile = testProjectDir.newFile("teamcity-plugin.xml")
+        File descriptorFile = createFile("teamcity-plugin.xml")
         descriptorFile << SERVER_DESCRIPTOR_FILE
 
         BuildResult result
@@ -418,7 +427,7 @@ class ServerPluginFunctionalTest {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> entries = pluginArchive.entries().collect { it.name }
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('server/'))
@@ -455,7 +464,7 @@ class ServerPluginFunctionalTest {
         """
         settingsFile << SETTINGS_SCRIPT_DEFAULT
 
-        File srcdir = testProjectDir.newFolder('srcdir')
+        File srcdir = createDirectory('srcdir')
         File file1 = new File(srcdir, 'file1')
         file1 << "file1"
         File file2 = new File(srcdir, 'file2')
@@ -465,7 +474,7 @@ class ServerPluginFunctionalTest {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(new File(testProjectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> entries = pluginArchive.entries().collect { it.name }
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1'))
@@ -495,13 +504,13 @@ class ServerPluginFunctionalTest {
             }
         """
         settingsFile << SETTINGS_SCRIPT_DEFAULT
-        testProjectDir.newFile("bundle.js")
+        createFile("bundle.js")
 
         BuildResult result = executeBuild()
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile archive = new ZipFile(new File(testProjectDir.root, 'build/libs/test-plugin.jar'))
+        ZipFile archive = new ZipFile(testProjectDir.resolve('build/libs/test-plugin.jar').toFile())
         List<String> entries = archive.entries().collect { it.name }
         assertThat(entries, hasItem('buildServerResources/'))
         assertThat(entries, hasItem('buildServerResources/bundle.js'))
@@ -512,7 +521,7 @@ class ServerPluginFunctionalTest {
         buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
 
         // Provides similar functionality to the init.gradle script used by the TeamCity Gradle Runner plugin
-        File initFile = testProjectDir.newFile('init.gradle')
+        File initFile = createFile('init.gradle')
         initFile << """
             public class DummyTeamcityPropertiesListener implements ProjectEvaluationListener {
                 void beforeEvaluate(Project project) {

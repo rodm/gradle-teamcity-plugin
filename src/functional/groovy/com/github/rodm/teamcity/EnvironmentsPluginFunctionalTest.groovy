@@ -16,11 +16,12 @@
 package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static com.github.rodm.teamcity.TestSupport.executeBuild
@@ -37,28 +38,44 @@ import static org.junit.Assert.assertTrue
 
 class EnvironmentsPluginFunctionalTest {
 
-    @Rule
-    public final TemporaryFolder testProjectDir = new TemporaryFolder()
+    @TempDir
+    public Path testProjectDir
 
     private File buildFile
     private File settingsFile
 
-    @Before
+    @BeforeEach
     void setup() throws IOException {
-        buildFile = testProjectDir.newFile("build.gradle")
-        settingsFile = testProjectDir.newFile('settings.gradle')
+        buildFile = createFile("build.gradle")
+        settingsFile = createFile('settings.gradle')
         settingsFile << SETTINGS_SCRIPT_DEFAULT
     }
 
+    private File createFile(String name) {
+        Files.createFile(testProjectDir.resolve(name)).toFile()
+    }
+
+    private File createDirectory(String name) {
+        Files.createDirectories(testProjectDir.resolve(name)).toFile()
+    }
+
+    private static File createFile(Path folder, String name) {
+        Files.createFile(folder.resolve(name)).toFile()
+    }
+
+    private static File createDirectory(Path folder, String name) {
+        Files.createDirectories(folder.resolve(name)).toFile()
+    }
+
     private BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.root, args)
+        return executeBuild(testProjectDir.toFile(), args)
     }
 
     @Test
     void 'startServer creates data directory'() {
         File homeDir = createFakeTeamCityInstall('teamcity', '9.1.6')
-        File dataDir = new File(testProjectDir.root, 'data')
-        File javaHome = testProjectDir.newFolder('jdk')
+        File javaHome = createDirectory('jdk')
+        File dataDir = testProjectDir.resolve('data').toFile()
 
         buildFile << """
             plugins {
@@ -88,7 +105,7 @@ class EnvironmentsPluginFunctionalTest {
     @Test
     void startServerAfterDeployingPlugin() {
         File homeDir = createFakeTeamCityInstall('teamcity', '9.1.6')
-        File dataDir = testProjectDir.newFolder('data')
+        File dataDir = createDirectory('data')
 
         buildFile << """
             plugins {
@@ -161,15 +178,15 @@ class EnvironmentsPluginFunctionalTest {
 
         BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
-        File pluginFile = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/test-plugin.zip')
+        File pluginFile = testProjectDir.resolve('teamcity/data/9.1/plugins/test-plugin.zip').toFile()
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
         assertThat(result.output, not(containsString('server configuration is deprecated')))
     }
 
-    @Rule
-    public final TemporaryFolder serversDir = new TemporaryFolder()
+    @TempDir
+    public Path serversDir
 
     @Test
     void startNamedEnvironmentServerInAlternativeDirectory() {
@@ -192,8 +209,8 @@ class EnvironmentsPluginFunctionalTest {
                     }
                 }
                 environments {
-                    baseHomeDir = file('${windowsCompatiblePath(serversDir.root)}/teamcity')
-                    baseDataDir = file('${windowsCompatiblePath(serversDir.root)}/data')
+                    baseHomeDir = file('${windowsCompatiblePath(serversDir.toFile())}/teamcity')
+                    baseDataDir = file('${windowsCompatiblePath(serversDir.toFile())}/data')
 
                     teamcity8 {
                         version = '8.1.5'
@@ -207,7 +224,7 @@ class EnvironmentsPluginFunctionalTest {
 
         BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
-        File pluginFile = new File(serversDir.root, 'data/9.1/plugins/test-plugin.zip')
+        File pluginFile = serversDir.resolve('data/9.1/plugins/test-plugin.zip').toFile()
         assertTrue('Plugin archive not deployed', pluginFile.exists())
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
@@ -234,13 +251,13 @@ class EnvironmentsPluginFunctionalTest {
             }
         """
 
-        testProjectDir.newFile('plugin1.zip')
-        testProjectDir.newFile('plugin2.zip')
+        createFile('plugin1.zip')
+        createFile('plugin2.zip')
 
         BuildResult result = executeBuild('-S', 'deployToTeamcity')
 
-        File plugin1File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin1.zip')
-        File plugin2File = new File(testProjectDir.root, 'teamcity/data/9.1/plugins/plugin2.zip')
+        File plugin1File = testProjectDir.resolve('teamcity/data/9.1/plugins/plugin1.zip').toFile()
+        File plugin2File = testProjectDir.resolve('teamcity/data/9.1/plugins/plugin2.zip').toFile()
         assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
         assertTrue('Plugin1 archive not deployed', plugin1File.exists())
         assertTrue('Plugin2 archive not deployed', plugin2File.exists())
@@ -281,18 +298,18 @@ class EnvironmentsPluginFunctionalTest {
         createFakeTeamCityInstall(testProjectDir, baseDir, version)
     }
 
-    private static File createFakeTeamCityInstall(TemporaryFolder folder, String baseDir, String version) {
-        File homeDir = folder.newFolder(baseDir, "TeamCity-${version}")
-        File binDir = folder.newFolder(baseDir, "TeamCity-${version}", 'bin')
+    private static File createFakeTeamCityInstall(Path folder, String baseDir, String version) {
+        File homeDir = createDirectory(folder, "${baseDir}/TeamCity-${version}".toString())
+        File binDir = createDirectory(homeDir.toPath(), 'bin')
 
-        File teamcityServerShellFile = new File(binDir, 'teamcity-server.sh')
+        File teamcityServerShellFile = createFile(binDir.toPath(), 'teamcity-server.sh')
         teamcityServerShellFile << """
             #!/bin/bash
             echo "Fake TeamCity startup script"
         """
         teamcityServerShellFile.executable = true
 
-        File teamcityServerBatchFile = new File(binDir, 'teamcity-server.bat')
+        File teamcityServerBatchFile = createFile(binDir.toPath(), 'teamcity-server.bat')
         teamcityServerBatchFile << """
             @echo off
             echo "Fake TeamCity startup script"

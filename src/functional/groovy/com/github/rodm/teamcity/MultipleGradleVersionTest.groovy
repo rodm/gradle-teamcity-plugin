@@ -20,13 +20,14 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.hamcrest.Matcher
-import org.junit.Before
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
@@ -39,18 +40,13 @@ import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.oneOf
 import static org.junit.Assume.assumeThat
 
-@RunWith(Parameterized)
 class MultipleGradleVersionTest {
 
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
+    @TempDir
+    public Path projectDir
 
-    @Parameterized.Parameter(0)
-    public String version
-
-    @Parameterized.Parameters(name = 'Gradle {0}')
     static List<String> data() {
         return [
             '6.0.1', '6.1.1', '6.2.2', '6.3', '6.4.1', '6.5.1', '6.6.1', '6.7.1', '6.8.3',
@@ -58,9 +54,9 @@ class MultipleGradleVersionTest {
         ]
     }
 
-    @Before
+    @BeforeEach
     void setup() throws IOException {
-        File buildFile = projectDir.newFile("build.gradle")
+        File buildFile = createFile('build.gradle')
 
         buildFile << """
             plugins {
@@ -121,7 +117,7 @@ class MultipleGradleVersionTest {
             }
         """
 
-        File settingsFile = projectDir.newFile('settings.gradle')
+        File settingsFile = createFile('settings.gradle')
         settingsFile << """
             rootProject.name = 'test-plugin'
 
@@ -129,8 +125,8 @@ class MultipleGradleVersionTest {
             include 'agent'
         """
 
-        File commonJavaDir = projectDir.newFolder('common', 'src', 'main', 'java', 'example', 'common')
-        File commonJavaFile = new File(commonJavaDir, 'ExampleBuildFeature.java')
+        File commonJavaDir = createDirectory('common/src/main/java/example/common')
+        File commonJavaFile = createFile(commonJavaDir.toPath(), 'ExampleBuildFeature.java')
         commonJavaFile << """
             package example.common;
 
@@ -141,8 +137,8 @@ class MultipleGradleVersionTest {
             }
         """
 
-        File agentJavaDir = projectDir.newFolder('agent', 'src', 'main', 'java', 'example', 'agent')
-        File agentJavaFile = new File(agentJavaDir, 'ExampleBuildFeature.java')
+        File agentJavaDir = createDirectory('agent/src/main/java/example/agent')
+        File agentJavaFile = createFile(agentJavaDir.toPath(), 'ExampleBuildFeature.java')
         agentJavaFile << """
             package example.agent;
 
@@ -153,8 +149,8 @@ class MultipleGradleVersionTest {
             }
         """
 
-        File agentMetaInfDir = projectDir.newFolder('agent', 'src', 'main', 'resources', 'META-INF')
-        File agentDefinitionFile = new File(agentMetaInfDir, 'build-agent-plugin-example.xml')
+        File agentMetaInfDir = createDirectory('agent/src/main/resources/META-INF')
+        File agentDefinitionFile = createFile(agentMetaInfDir.toPath(), 'build-agent-plugin-example.xml')
         agentDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
             <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.springframework.org/schema/beans"
@@ -165,8 +161,8 @@ class MultipleGradleVersionTest {
             </beans>
         """
 
-        File serverJavaDir = projectDir.newFolder('src', 'main', 'java', 'example', 'server')
-        File serverJavaFile = new File(serverJavaDir, 'ExampleServerPlugin.java')
+        File serverJavaDir = createDirectory('src/main/java/example/server')
+        File serverJavaFile = createFile(serverJavaDir.toPath(), 'ExampleServerPlugin.java')
         serverJavaFile << """
             package example.server;
 
@@ -178,8 +174,8 @@ class MultipleGradleVersionTest {
             }
         """
 
-        File serverMetaInfDir = projectDir.newFolder('src', 'main', 'resources', 'META-INF')
-        File serverDefinitionFile = new File(serverMetaInfDir, 'build-server-plugin-example.xml')
+        File serverMetaInfDir = createDirectory('src/main/resources/META-INF')
+        File serverDefinitionFile = createFile(serverMetaInfDir.toPath(), 'build-server-plugin-example.xml')
         serverDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
             <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.springframework.org/schema/beans"
@@ -191,8 +187,22 @@ class MultipleGradleVersionTest {
         """
     }
 
-    @Test
-    void 'build plugin'() {
+    private File createFile(String name) {
+        Files.createFile(projectDir.resolve(name)).toFile()
+    }
+
+    private File createDirectory(String name) {
+        Files.createDirectories(projectDir.resolve(name)).toFile()
+    }
+
+    private static File createFile(Path folder, String name) {
+        Files.createFile(folder.resolve(name)).toFile()
+    }
+
+    @DisplayName('build plugin')
+    @ParameterizedTest(name = 'with Gradle {0}')
+    @MethodSource("data")
+    void 'build plugin'(String version) {
         def javaVersion = JavaVersion.current().toString()
         assumeThat(javaVersion, is(supportedByGradle(version) as Matcher<String>))
 
@@ -214,7 +224,7 @@ class MultipleGradleVersionTest {
 
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
-                .withProjectDir(projectDir.getRoot())
+                .withProjectDir(projectDir.toFile())
                 .withArguments('--warning-mode', 'fail', 'build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
@@ -231,13 +241,13 @@ class MultipleGradleVersionTest {
         assertThat(result.getOutput(), not(containsString('but the implementation class')))
         assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
 
-        ZipFile agentPluginFile = new ZipFile(new File(projectDir.root, 'agent/build/distributions/test-plugin-agent.zip'))
+        ZipFile agentPluginFile = new ZipFile(projectDir.resolve('agent/build/distributions/test-plugin-agent.zip').toFile())
         List<String> agentEntries = agentPluginFile.entries().collect { it.name }
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(new File(projectDir.root, 'build/distributions/test-plugin.zip'))
+        ZipFile serverPluginFile = new ZipFile(projectDir.resolve('build/distributions/test-plugin.zip').toFile())
         List<String> serverEntries = serverPluginFile.entries().collect { it.name }
         assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(serverEntries, hasItem('server/common.jar'))
