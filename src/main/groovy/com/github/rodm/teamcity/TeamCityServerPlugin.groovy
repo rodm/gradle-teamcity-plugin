@@ -17,26 +17,21 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
-import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
-import com.github.rodm.teamcity.tasks.ProcessDescriptor
-import com.github.rodm.teamcity.tasks.PublishTask
-import com.github.rodm.teamcity.tasks.ServerPlugin
+import com.github.rodm.teamcity.tasks.*
+import org.apache.commons.io.FilenameUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 
+
 import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
-import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
-import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
-import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
-import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
-import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
-import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
-import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
-import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
+import static com.github.rodm.teamcity.TeamCityPlugin.*
+import static com.github.rodm.teamcity.TeamCityVersion.*
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 
@@ -50,6 +45,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
     public static final String GENERATE_SERVER_DESCRIPTOR_TASK_NAME = 'generateServerDescriptor'
     public static final String SERVER_PLUGIN_TASK_NAME = 'serverPlugin'
     public static final String PUBLISH_PLUGIN_TASK_NAME = 'publishPlugin'
+    public static final String SIGN_PLUGIN_TASK_NAME = 'signPlugin'
 
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
@@ -64,6 +60,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configureDependencies(project, extension)
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN)
         configureServerPluginTasks(project, extension)
+        configureSignPluginTask(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
     }
@@ -161,18 +158,47 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
     }
 
+    private static void configureSignPluginTask(Project project, TeamCityPluginExtension extension) {
+        project.afterEvaluate {
+            if (extension.server.sign) {
+                Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
+
+                def pluginFile = packagePlugin.archiveFile.get().asFile
+                def unsignedPluginPathWithoutExtension = FilenameUtils.removeExtension(pluginFile.path)
+                def signedPluginPath =
+                    "$unsignedPluginPathWithoutExtension-signed.${FilenameUtils.getExtension(pluginFile.name)}"
+
+                project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPluginTask) {
+                    group = TEAMCITY_GROUP
+                    description = "Sign plugin before publishing."
+                    certificateChain.set(extension.server.sign.certificateChain)
+                    privateKey.set(extension.server.sign.privateKey)
+                    it.pluginFile.set(packagePlugin.archiveFile)
+                    signedPluginFile.fileValue(new File(signedPluginPath))
+                    dependsOn(packagePlugin)
+                }
+            }
+        }
+    }
+
     private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
+                SignPluginTask signTask = project.tasks.findByName(SIGN_PLUGIN_TASK_NAME) as SignPluginTask
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
+
                 project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
                     group = TEAMCITY_GROUP
                     description = "Publish plugin distribution on plugins.jetbrains.com."
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
                     notes.set(extension.server.publish.notes)
-                    distributionFile.set(packagePlugin.archiveFile)
-                    dependsOn(packagePlugin)
+                    distributionFile.set(signTask != null ? signTask.signedPluginFile : packagePlugin.archiveFile)
+                    if (signTask != null) {
+                        dependsOn(signTask)
+                    } else {
+                        dependsOn(packagePlugin)
+                    }
                 }
             }
         }

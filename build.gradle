@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.jetbrains.intellij.plugins:structure-base:3.112'
     implementation 'org.jetbrains.intellij.plugins:structure-teamcity:3.112'
     implementation 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.11'
+    implementation 'org.jetbrains:marketplace-zip-signer:0.1.2'
 
     testImplementation(platform('org.junit:junit-bom:5.6.2')) {
         because('Platform, Jupiter, and Vintage versions should match')
