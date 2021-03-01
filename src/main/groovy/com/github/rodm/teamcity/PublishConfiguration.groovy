@@ -32,10 +32,7 @@ class PublishConfiguration {
 
     private Property<String> notes
 
-    private Project project
-
     PublishConfiguration(Project project) {
-        this.project = project
         this.channels = project.objects.listProperty(String)
         this.channels.set(DEFAULT_CHANNELS)
         this.token = project.objects.property(String)

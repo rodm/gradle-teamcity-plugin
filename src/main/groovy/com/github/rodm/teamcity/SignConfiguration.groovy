@@ -25,12 +25,11 @@ import java.security.PrivateKey
 import java.security.cert.X509Certificate
 
 class SignConfiguration {
+
     private ListProperty<X509Certificate> certificateChain
     private Property<PrivateKey> privateKey
-    private Project project
 
     SignConfiguration(Project project) {
-        this.project = project
         this.certificateChain = project.objects.listProperty(X509Certificate)
         this.privateKey = project.objects.property(PrivateKey)
     }
