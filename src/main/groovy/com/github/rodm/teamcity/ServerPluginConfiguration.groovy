@@ -33,6 +33,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
     private Project project
     private ConfigurableFileCollection web
     private PublishConfiguration publish
+    private SignConfiguration sign
 
     @Delegate
     private TeamCityEnvironments environments
@@ -89,6 +90,18 @@ class ServerPluginConfiguration extends PluginConfiguration {
 
     PublishConfiguration getPublish() {
         return publish
+    }
+
+    void sign(Action<SignConfiguration> configuration) {
+        if (!sign) {
+            sign = (this as ExtensionAware).extensions.create('sign', SignConfiguration, project)
+        }
+        configuration.execute(sign)
+    }
+
+
+    SignConfiguration getSign() {
+        return sign
     }
 
     void setDownloadsDir(String downloadsDir) {
