@@ -19,6 +19,7 @@ dependencies {
     implementation 'org.jetbrains.intellij.plugins:structure-base:3.112'
     implementation 'org.jetbrains.intellij.plugins:structure-teamcity:3.112'
     implementation 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.11'
+    implementation 'org.jetbrains:marketplace-zip-signer:0.1.2'
 
     testImplementation(platform('org.junit:junit-bom:5.6.2')) {
         because('Platform, Jupiter, and Vintage versions should match')
@@ -62,6 +63,25 @@ test {
 
 gradlePlugin {
     testSourceSets sourceSets.functionalTest, sourceSets.samples
+
+    plugins {
+        teamcityServerPlugin {
+            id = 'com.github.rodm.teamcity-server'
+            implementationClass = 'com.github.rodm.teamcity.TeamCityServerPlugin'
+        }
+        teamcityAgentPlugin {
+            id = 'com.github.rodm.teamcity-agent'
+            implementationClass = 'com.github.rodm.teamcity.TeamCityAgentPlugin'
+        }
+        teamcityCommonPlugin {
+            id = 'com.github.rodm.teamcity-common'
+            implementationClass = 'com.github.rodm.teamcity.TeamCityCommonPlugin'
+        }
+        teamcityEnvironmentsPlugin {
+            id = 'com.github.rodm.teamcity-environments'
+            implementationClass = 'com.github.rodm.teamcity.TeamCityEnvironmentsPlugin'
+        }
+    }
 }
 
 task functionalTest(type: Test) {
@@ -96,19 +116,15 @@ pluginBundle {
 
     plugins {
         teamcityServerPlugin {
-            id = 'com.github.rodm.teamcity-server'
             displayName = 'Gradle TeamCity Server plugin'
         }
         teamcityAgentPlugin {
-            id = 'com.github.rodm.teamcity-agent'
             displayName = 'Gradle TeamCity Agent plugin'
         }
         teamcityCommonPlugin {
-            id = 'com.github.rodm.teamcity-common'
             displayName = 'Gradle TeamCity Common API plugin'
         }
         teamcityEnvironmentsPlugin {
-            id = 'com.github.rodm.teamcity-environments'
             displayName = 'Gradle TeamCity Environments plugin'
         }
     }
