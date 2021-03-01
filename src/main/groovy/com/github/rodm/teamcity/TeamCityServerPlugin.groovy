@@ -17,21 +17,28 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
-import com.github.rodm.teamcity.tasks.*
+import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
+import com.github.rodm.teamcity.tasks.ProcessDescriptor
+import com.github.rodm.teamcity.tasks.PublishTask
+import com.github.rodm.teamcity.tasks.SignPluginTask
+import com.github.rodm.teamcity.tasks.ServerPlugin
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFile
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 
-
 import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME
-import static com.github.rodm.teamcity.TeamCityPlugin.*
-import static com.github.rodm.teamcity.TeamCityVersion.*
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME
+import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
+import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask
+import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 

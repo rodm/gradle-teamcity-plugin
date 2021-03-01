@@ -80,7 +80,6 @@ class ServerPluginConfiguration extends PluginConfiguration {
      *
      * @param configuration The action.
      */
-    @CompileStatic(SKIP)
     def publish(Action<PublishConfiguration> configuration) {
         if (!publish) {
             publish = (this as ExtensionAware).extensions.create('publish', PublishConfiguration, project)
@@ -98,7 +97,6 @@ class ServerPluginConfiguration extends PluginConfiguration {
         }
         configuration.execute(sign)
     }
-
 
     SignConfiguration getSign() {
         return sign

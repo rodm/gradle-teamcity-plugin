@@ -32,6 +32,7 @@ import java.security.PrivateKey
 import java.security.cert.X509Certificate
 
 class SignPluginTask extends DefaultTask {
+
     private RegularFileProperty pluginFile = project.objects.fileProperty()
     private RegularFileProperty signedPluginFile = project.objects.fileProperty()
     private ListProperty<X509Certificate> certificateChain = project.objects.listProperty(X509Certificate)
@@ -53,7 +54,6 @@ class SignPluginTask extends DefaultTask {
         return signedPluginFile
     }
 
-
     @Input
     ListProperty<X509Certificate> getCertificateChain() {
         return certificateChain
@@ -64,7 +64,6 @@ class SignPluginTask extends DefaultTask {
         return privateKey
     }
 
-    @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     protected void signPlugin() {
         def pluginFile = getPluginFile().get().asFile

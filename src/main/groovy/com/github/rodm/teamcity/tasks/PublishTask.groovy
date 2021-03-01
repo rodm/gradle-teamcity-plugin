@@ -112,7 +112,6 @@ class PublishTask extends DefaultTask {
         return distributionFile
     }
 
-    @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     protected void publishPlugin() {
         if (!getChannels().get()) {
