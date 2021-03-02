@@ -11,3 +11,6 @@ out/
 
 # TeamCity SDK Maven plugin
 .teamcity/target/
+
+# macOS
+.DS_Store
