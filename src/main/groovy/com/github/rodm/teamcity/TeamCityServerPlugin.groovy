@@ -170,18 +170,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
             if (extension.server.sign) {
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
 
-                def pluginFile = packagePlugin.archiveFile.get().asFile
-                def unsignedPluginPathWithoutExtension = FilenameUtils.removeExtension(pluginFile.path)
-                def signedPluginPath =
-                    "$unsignedPluginPathWithoutExtension-signed.${FilenameUtils.getExtension(pluginFile.name)}"
-
                 project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPluginTask) {
                     group = TEAMCITY_GROUP
                     description = "Sign plugin before publishing."
                     certificateChain.set(extension.server.sign.certificateChain)
                     privateKey.set(extension.server.sign.privateKey)
-                    it.pluginFile.set(packagePlugin.archiveFile)
-                    signedPluginFile.fileValue(new File(signedPluginPath))
+                    pluginFile.set(packagePlugin.archiveFile)
                     dependsOn(packagePlugin)
                 }
             }

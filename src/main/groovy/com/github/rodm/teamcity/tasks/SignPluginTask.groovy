@@ -17,6 +17,7 @@ package com.github.rodm.teamcity.tasks
 
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -37,6 +38,10 @@ class SignPluginTask extends DefaultTask {
     private RegularFileProperty signedPluginFile = project.objects.fileProperty()
     private ListProperty<X509Certificate> certificateChain = project.objects.listProperty(X509Certificate)
     private Property<PrivateKey> privateKey = project.objects.property(PrivateKey)
+
+    SignPluginTask() {
+        signedPluginFile.convention(pluginFile.map({signedName(it) }))
+    }
 
     /**
      * @return the plugin file that will be signed
@@ -67,10 +72,7 @@ class SignPluginTask extends DefaultTask {
     @TaskAction
     protected void signPlugin() {
         def pluginFile = getPluginFile().get().asFile
-        def defaultSignedPluginName = FilenameUtils.removeExtension(pluginFile.path)
-        def signedPluginFile = getSignedPluginFile().getOrNull()?.asFile ?:
-            new File(defaultSignedPluginName + "-signed" + FilenameUtils.getExtension(pluginFile.name))
-
+        def signedPluginFile = getSignedPluginFile().get().asFile
         def certificateChain = getCertificateChain().get()
         def privateKey = getPrivateKey().get()
 
@@ -83,5 +85,11 @@ class SignPluginTask extends DefaultTask {
                 privateKey
             )
         )
+    }
+
+    RegularFile signedName(RegularFile file) {
+        def path = FilenameUtils.removeExtension(file.asFile.path)
+        def extension = FilenameUtils.getExtension(file.asFile.name)
+        return project.layout.projectDirectory.file("${path}-signed.${extension}")
     }
 }
