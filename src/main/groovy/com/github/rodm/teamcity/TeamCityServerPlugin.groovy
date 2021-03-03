@@ -22,7 +22,6 @@ import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
 import com.github.rodm.teamcity.tasks.SignPluginTask
 import com.github.rodm.teamcity.tasks.ServerPlugin
-import org.apache.commons.io.FilenameUtils
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
