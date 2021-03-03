@@ -21,6 +21,7 @@ import com.github.rodm.teamcity.tasks.SignPluginTask
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -61,7 +62,7 @@ class ServerSignConfigurationTest {
         assertThat(signPlugin, is(nullValue()))
     }
 
-    @Test
+    @Test @Disabled
     void 'sign task is configured with a certificate chain'() {
         File certificateChainFile = projectDir.resolve('ca.crt').toFile()
         certificateChainFile << ""
