@@ -25,8 +25,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-import java.util.zip.ZipFile
-
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
@@ -220,14 +218,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         assertThat(result.getOutput(), not(containsString('but the implementation class')))
         assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
 
-        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('agent/build/distributions/test-plugin-agent.zip').toFile())
-        List<String> agentEntries = agentPluginFile.entries().collect { it.name }
+        List<String> agentEntries = archiveEntries('agent/build/distributions/test-plugin-agent.zip')
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> serverEntries = serverPluginFile.entries().collect { it.name }
+        List<String> serverEntries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(serverEntries, hasItem('server/common.jar'))
         assertThat(serverEntries, hasItem('server/test-plugin.jar'))

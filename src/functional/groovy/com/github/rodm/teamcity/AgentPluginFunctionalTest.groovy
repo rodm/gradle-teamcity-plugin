@@ -22,8 +22,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-import java.util.zip.ZipFile
-
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
@@ -102,8 +100,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SKIPPED))
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = pluginFile.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('lib/test-plugin.jar'))
     }
@@ -345,8 +342,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
 
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
-        List<String> entries = pluginArchive.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin-agent.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('lib/'))
         assertThat(entries, hasItem('lib/test-plugin.jar'))
@@ -390,8 +386,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
 
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
-        List<String> entries = pluginArchive.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin-agent.zip')
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1'))
         assertThat(entries, hasItem('files/file2'))

@@ -19,8 +19,6 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
 
-import java.util.zip.ZipFile
-
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
@@ -70,13 +68,11 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
-        List<String> agentEntries = agentPluginFile.entries().collect { it.name }
+        List<String> agentEntries = archiveEntries('build/distributions/test-plugin-agent.zip')
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/agent-lib.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = serverPluginFile.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(entries, hasItem('server/server-lib.jar'))
@@ -149,15 +145,13 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile agentPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin-agent.zip').toFile())
-        List<String> agentEntries = agentPluginFile.entries().collect { it.name }
+        List<String> agentEntries = archiveEntries('build/distributions/test-plugin-agent.zip')
         assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
         assertThat(agentEntries, hasItem('lib/common.jar'))
         assertThat(agentEntries, hasItem('lib/agent.jar'))
         assertThat(agentEntries, hasItem('lib/agent-lib.jar'))
 
-        ZipFile serverPluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = serverPluginFile.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('agent/test-plugin-agent.zip'))
         assertThat(entries, hasItem('server/common.jar'))

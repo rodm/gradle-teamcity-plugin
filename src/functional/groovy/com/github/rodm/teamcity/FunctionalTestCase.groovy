@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.zip.ZipFile
 
 import static com.github.rodm.teamcity.TestSupport.executeBuild
 
@@ -56,5 +57,12 @@ class FunctionalTestCase {
 
     BuildResult executeBuild(String... args = ['build']) {
         return executeBuild(testProjectDir.toFile(), args)
+    }
+
+    List<String> archiveEntries(String path) {
+        ZipFile archiveFile = new ZipFile(testProjectDir.resolve(path).toFile())
+        List<String> agentEntries = archiveFile.entries().collect { it.name }
+        archiveFile.close()
+        return agentEntries
     }
 }

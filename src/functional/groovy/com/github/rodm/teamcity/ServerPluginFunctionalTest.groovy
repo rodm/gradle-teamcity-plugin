@@ -22,8 +22,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-import java.util.zip.ZipFile
-
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
@@ -109,8 +107,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(SKIPPED))
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginFile = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = pluginFile.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('server/test-plugin.jar'))
     }
@@ -401,8 +398,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = pluginArchive.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('teamcity-plugin.xml'))
         assertThat(entries, hasItem('server/'))
         assertThat(entries, hasItem('server/test-plugin.jar'))
@@ -448,8 +444,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile pluginArchive = new ZipFile(testProjectDir.resolve('build/distributions/test-plugin.zip').toFile())
-        List<String> entries = pluginArchive.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/distributions/test-plugin.zip')
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1'))
         assertThat(entries, hasItem('files/file2'))
@@ -484,8 +479,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
 
-        ZipFile archive = new ZipFile(testProjectDir.resolve('build/libs/test-plugin.jar').toFile())
-        List<String> entries = archive.entries().collect { it.name }
+        List<String> entries = archiveEntries('build/libs/test-plugin.jar')
         assertThat(entries, hasItem('buildServerResources/'))
         assertThat(entries, hasItem('buildServerResources/bundle.js'))
     }
