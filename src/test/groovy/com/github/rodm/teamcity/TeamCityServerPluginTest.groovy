@@ -20,10 +20,9 @@ import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
@@ -37,20 +36,17 @@ import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.startsWith
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.junit.jupiter.api.Assertions.fail
 
 class TeamCityServerPluginTest {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
     private Project project
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
     }
 
     @Test
@@ -119,7 +115,7 @@ class TeamCityServerPluginTest {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
         assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.WARN))
     }
 
@@ -132,7 +128,7 @@ class TeamCityServerPluginTest {
         }
         project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByName('teamcity')
+        TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
         assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.IGNORE))
     }
 

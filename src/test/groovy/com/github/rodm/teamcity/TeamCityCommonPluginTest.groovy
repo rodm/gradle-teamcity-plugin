@@ -18,24 +18,20 @@ package com.github.rodm.teamcity
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static org.hamcrest.MatcherAssert.assertThat
 
 class TeamCityCommonPluginTest {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
     private Project project
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
     }
 
     @Test

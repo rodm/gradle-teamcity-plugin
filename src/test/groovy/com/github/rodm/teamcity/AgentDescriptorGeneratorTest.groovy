@@ -17,10 +17,9 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 
 import javax.xml.XMLConstants
 
@@ -31,9 +30,6 @@ import static org.hamcrest.Matchers.not
 
 class AgentDescriptorGeneratorTest {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
     private Project project
 
     private StringWriter writer
@@ -42,10 +38,10 @@ class AgentDescriptorGeneratorTest {
 
     private AgentPluginDescriptorGenerator generator
 
-    @Before
-    void setup() {
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder()
-                .withProjectDir(projectDir.root)
+                .withProjectDir(projectDir)
                 .withName('test-plugin')
                 .build()
         project.apply plugin: 'com.github.rodm.teamcity-agent'

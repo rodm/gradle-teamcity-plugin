@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.lessThan
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.core.StringEndsWith.endsWith
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.fail
 
 class TeamCityVersionTest {
 
