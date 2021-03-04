@@ -25,14 +25,9 @@ dependencies {
         because('Platform, Jupiter, and Vintage versions should match')
     }
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'junit:junit:4.13'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation 'org.mockito:mockito-core:3.3.3'
-
-    testRuntimeOnly ('org.junit.vintage:junit-vintage-engine') {
-        because('allows JUnit 3 and JUnit 4 tests to run')
-    }
 }
 
 version = '1.4-SNAPSHOT'

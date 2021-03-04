@@ -31,8 +31,8 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertTrue
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertTrue
 
 class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
 
@@ -62,11 +62,11 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             }
         """
 
-        assertFalse('Data directory should not exist', dataDir.exists())
+        assertFalse(dataDir.exists(), 'Data directory should not exist')
 
         BuildResult result = executeBuild('--info', 'startTeamcityServer')
 
-        assertTrue('Data directory was not created by startServer task', dataDir.exists())
+        assertTrue(dataDir.exists(), 'Data directory was not created by startServer task')
         assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
         assertThat(result.output, not(containsString('server configuration is deprecated')))
@@ -106,7 +106,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         BuildResult result = executeBuild('build', 'startTeamcityServer')
 
         File pluginFile = new File(dataDir, 'plugins/test-plugin.zip')
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertTrue(pluginFile.exists(), 'Plugin archive not deployed')
         assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
         assertThat(result.task(":startTeamcityServer").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
@@ -149,7 +149,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
         File pluginFile = testProjectDir.resolve('teamcity/data/9.1/plugins/test-plugin.zip').toFile()
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertTrue(pluginFile.exists(), 'Plugin archive not deployed')
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
         assertThat(result.output, not(containsString('server configuration is deprecated')))
@@ -195,7 +195,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         BuildResult result = executeBuild('build', 'startTeamcity9Server')
 
         File pluginFile = serversDir.resolve('data/9.1/plugins/test-plugin.zip').toFile()
-        assertTrue('Plugin archive not deployed', pluginFile.exists())
+        assertTrue(pluginFile.exists(), 'Plugin archive not deployed')
         assertThat(result.task(":startTeamcity9Server").getOutcome(), is(SUCCESS))
         assertThat(result.output, not(containsString('property is deprecated')))
         assertThat(result.output, not(containsString('server configuration is deprecated')))
@@ -229,13 +229,13 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         File plugin1File = testProjectDir.resolve('teamcity/data/9.1/plugins/plugin1.zip').toFile()
         File plugin2File = testProjectDir.resolve('teamcity/data/9.1/plugins/plugin2.zip').toFile()
         assertThat(result.task(":deployToTeamcity").getOutcome(), is(SUCCESS))
-        assertTrue('Plugin1 archive not deployed', plugin1File.exists())
-        assertTrue('Plugin2 archive not deployed', plugin2File.exists())
+        assertTrue(plugin1File.exists(), 'Plugin1 archive not deployed')
+        assertTrue(plugin2File.exists(), 'Plugin2 archive not deployed')
 
         result = executeBuild('undeployFromTeamcity')
         assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(SUCCESS))
-        assertFalse('Plugin1 archive not undeployed', plugin1File.exists())
-        assertFalse('Plugin2 archive not undeployed', plugin2File.exists())
+        assertFalse(plugin1File.exists(), 'Plugin1 archive not undeployed')
+        assertFalse(plugin2File.exists(), 'Plugin2 archive not undeployed')
     }
 
     @Test

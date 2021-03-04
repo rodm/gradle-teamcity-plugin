@@ -19,7 +19,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
-import org.hamcrest.Matcher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.params.ParameterizedTest
@@ -32,8 +31,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.oneOf
-import static org.junit.Assume.assumeThat
+import static org.junit.jupiter.api.Assumptions.assumingThat
 
 class MultipleGradleVersionTest extends FunctionalTestCase {
 
@@ -179,15 +177,15 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @DisplayName('build plugin')
     @ParameterizedTest(name = 'with Gradle {0}')
     @MethodSource("data")
-    void 'build plugin'(String version) {
+    void 'build plugin'(String gradleVersion) {
         def javaVersion = JavaVersion.current().toString()
-        assumeThat(javaVersion, is(supportedByGradle(version) as Matcher<String>))
-
-        BuildResult result = executeBuild(version)
-        checkBuild(result)
+        assumingThat(supportedByGradle(gradleVersion).contains(javaVersion), {
+            BuildResult result = executeBuild(gradleVersion)
+            checkBuild(result)
+        })
     }
 
-    Matcher supportedByGradle(String version) {
+    static List<String> supportedByGradle(String version) {
         def gradleVersion = GradleVersion.version(version)
         def javaVersions = ['1.8', '1.9', '1.10', '11', '12', '13']
         if (gradleVersion >= GradleVersion.version('6.3')) {
@@ -196,7 +194,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         if (gradleVersion >= GradleVersion.version('6.7-rc-1')) {
             javaVersions << '15'
         }
-        return is(oneOf(*javaVersions))
+        return javaVersions
     }
 
     private BuildResult executeBuild(String version) {
