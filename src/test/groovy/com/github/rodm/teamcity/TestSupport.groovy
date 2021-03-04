@@ -19,7 +19,19 @@ package com.github.rodm.teamcity
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 
+import java.nio.file.Files
+import java.nio.file.Path
+
 class TestSupport {
+
+    static File createFile(Path folder) {
+        Files.createFile(folder).toFile()
+    }
+
+    static File createDirectory(Path folder) {
+        Files.createDirectories(folder).toFile()
+    }
+
     static String normalizePath(DirectoryProperty directoryProperty) {
         normalizePath(directoryProperty.get().asFile)
     }

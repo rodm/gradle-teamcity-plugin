@@ -22,11 +22,11 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.containsString
@@ -47,10 +47,7 @@ class ValidateDefinitionActionOfflineTest {
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
@@ -58,9 +55,9 @@ class ValidateDefinitionActionOfflineTest {
     private List<PluginDefinition> definitions
     private Set<String> classes
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         stubTask = mock(Task)
         definitions = []
         classes = new HashSet<String>()
@@ -73,14 +70,14 @@ class ValidateDefinitionActionOfflineTest {
         outputEventListener.reset()
     }
 
-    @Before
+    @BeforeEach
     void disableNetworking() {
         // Using the proxy properties causes the XML parser to fail to download DTDs
         System.setProperty("socksProxyHost", "127.0.0.1")
         System.setProperty("socksProxyPort", "8080")
     }
 
-    @After
+    @AfterEach
     void enableNetworking() {
         System.clearProperty("socksProxyHost")
         System.clearProperty("socksProxyPort")

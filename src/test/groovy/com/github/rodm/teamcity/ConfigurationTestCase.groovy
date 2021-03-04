@@ -17,26 +17,28 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
+
+import java.nio.file.Path
 
 class ConfigurationTestCase {
 
     final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
+    @TempDir
+    public Path projectDir
 
     Project project
 
     TeamCityPluginExtension extension
 
-    @Before
+    @BeforeEach
     void createProject() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
     }
 }

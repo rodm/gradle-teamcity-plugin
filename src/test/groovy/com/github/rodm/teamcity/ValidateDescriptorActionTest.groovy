@@ -22,10 +22,10 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction.EMPTY_VALUE_WARNING_MESSAGE
 import static org.hamcrest.CoreMatchers.containsString
@@ -38,10 +38,7 @@ class ValidateDescriptorActionTest {
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
@@ -50,9 +47,9 @@ class ValidateDescriptorActionTest {
 
     static class DummyPluginTask extends AbstractPluginTask {}
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         descriptorFile = project.file('teamcity-plugin.xml')
         stubTask = project.tasks.create('dummy', DummyPluginTask)
         stubTask.descriptor.set(descriptorFile)

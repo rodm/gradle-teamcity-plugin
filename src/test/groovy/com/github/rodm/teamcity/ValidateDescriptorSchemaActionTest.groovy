@@ -22,10 +22,10 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
@@ -35,10 +35,7 @@ class ValidateDescriptorSchemaActionTest {
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
@@ -47,9 +44,9 @@ class ValidateDescriptorSchemaActionTest {
 
     static class DummyPluginTask extends AbstractPluginTask {}
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         stubTask = project.tasks.create('dummy', DummyPluginTask)
 
         descriptorFile = project.file('teamcity-plugin.xml')

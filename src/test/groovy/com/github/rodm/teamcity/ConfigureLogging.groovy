@@ -20,13 +20,16 @@ import org.gradle.api.logging.LogLevel
 import org.gradle.internal.logging.events.OutputEventListener
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
 import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext
+import org.junit.jupiter.api.extension.AfterEachCallback
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.rules.ExternalResource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.util.logging.LogManager
 
-class ConfigureLogging extends ExternalResource {
+class ConfigureLogging extends ExternalResource implements BeforeEachCallback, AfterEachCallback {
     private final OutputEventListener listener
     private final OutputEventListenerBackedLoggerContext context
     private final OutputEventListenerBackedLogger logger
@@ -36,6 +39,16 @@ class ConfigureLogging extends ExternalResource {
         this.listener = listener
         context = LoggerFactory.ILoggerFactory as OutputEventListenerBackedLoggerContext
         logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as OutputEventListenerBackedLogger
+    }
+
+    @Override
+    void beforeEach(ExtensionContext context) throws Exception {
+        attachListener()
+    }
+
+    @Override
+    void afterEach(ExtensionContext context) throws Exception {
+        resetLogging()
     }
 
     @Override

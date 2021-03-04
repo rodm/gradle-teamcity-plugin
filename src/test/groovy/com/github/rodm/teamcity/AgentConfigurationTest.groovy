@@ -22,10 +22,11 @@ import com.github.rodm.teamcity.tasks.GenerateAgentPluginDescriptor
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.bundling.Zip
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
+import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
@@ -37,13 +38,13 @@ import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.fail
 
 class AgentConfigurationTest extends ConfigurationTestCase {
 
-    @Before
+    @BeforeEach
     void applyPlugin() {
         project.apply plugin: 'com.github.rodm.teamcity-agent'
         extension = project.extensions.getByType(TeamCityPluginExtension)
@@ -286,7 +287,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        projectDir.newFolder('build', 'descriptor', 'agent')
+        createDirectory(projectDir.resolve('build/descriptor/agent'))
 
         GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
         task.generateDescriptor()
@@ -307,7 +308,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        File outputDir = projectDir.newFolder('build', 'descriptor', 'agent')
+        File outputDir = createDirectory(projectDir.resolve('build/descriptor/agent'))
 
         GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
         task.generateDescriptor()

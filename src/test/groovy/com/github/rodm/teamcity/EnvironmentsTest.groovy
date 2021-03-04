@@ -31,12 +31,16 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
+
+import java.nio.file.Path
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
+import static com.github.rodm.teamcity.TestSupport.createDirectory
+import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalize
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.MatcherAssert.assertThat
@@ -48,21 +52,21 @@ import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.startsWith
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertThrows
-import static org.junit.Assert.assertTrue
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
+import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 class EnvironmentsTest {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
+    @TempDir
+    public Path projectDir
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private String defaultOptions = [
@@ -82,9 +86,9 @@ class EnvironmentsTest {
         }
     }
 
-    @Before
+    @BeforeEach
     void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
     }
 
     private static Action<Project>  createConfigureAction(TeamCityPluginExtension extension) {
@@ -895,7 +899,7 @@ class EnvironmentsTest {
         }
 
         project.evaluate()
-        projectDir.newFolder('servers', 'TeamCity-2020.1')
+        createDirectory(projectDir.resolve('servers/TeamCity-2020.1'))
 
         StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
@@ -914,8 +918,8 @@ class EnvironmentsTest {
             }
         }
         project.evaluate()
-        def serverDir = projectDir.newFolder('servers')
-        new File(serverDir, 'TeamCity-2020.1').createNewFile()
+        def serverDir = createDirectory(projectDir.resolve('servers'))
+        createFile(serverDir.toPath().resolve('TeamCity-2020.1'))
 
         StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
@@ -988,14 +992,14 @@ class EnvironmentsTest {
     }
 
     private void createMaintenanceTokenFile() {
-        File pluginDir = projectDir.newFolder('system', 'pluginData', 'superUser')
+        File pluginDir = createDirectory(projectDir.resolve('system/pluginData/superUser'))
         File maintenanceTokenFile = new File(pluginDir, 'token.txt')
         maintenanceTokenFile << '0123456789012345'
     }
 
     @Test
     void 'does not send plugin action request when maintenance token file is not available'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, false) {
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), false) {
             @Override
             void sendRequest(HttpURLConnection request, String pluginName) {
                 fail('Should not send request when maintenance token file not available')
@@ -1010,7 +1014,7 @@ class EnvironmentsTest {
 
     @Test
     void 'sends plugin action to correct path'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, false)
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), false)
         createMaintenanceTokenFile()
 
         action.executeAction('test-plugin.zip')
@@ -1021,7 +1025,7 @@ class EnvironmentsTest {
 
     @Test
     void 'sends plugin action with authorization token from maintenance file'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), true)
         createMaintenanceTokenFile()
 
         action.executeAction('test-plugin.zip')
@@ -1032,7 +1036,7 @@ class EnvironmentsTest {
 
     @Test
     void 'sends plugin action with settings to disable plugin'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, false)
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), false)
         createMaintenanceTokenFile()
 
         action.executeAction('test-plugin.zip')
@@ -1043,7 +1047,7 @@ class EnvironmentsTest {
 
     @Test
     void 'sends plugin action with settings to enable plugin'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), true)
         createMaintenanceTokenFile()
 
         action.executeAction('test-plugin.zip')
@@ -1054,7 +1058,7 @@ class EnvironmentsTest {
 
     @Test
     void 'sends plugin action with encoded plugin path'() {
-        def action = new TestPluginAction(project.logger, projectDir.root, true)
+        def action = new TestPluginAction(project.logger, projectDir.toFile(), true)
         createMaintenanceTokenFile()
 
         action.executeAction('plugin-1.0.0+test.zip')
@@ -1065,7 +1069,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unload response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [] as Set, [])
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1080,7 +1084,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, [] as Set, [])
+        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1093,7 +1097,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin loaded response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [] as Set, [])
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1106,7 +1110,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, [] as Set, [])
+        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1126,7 +1130,7 @@ class EnvironmentsTest {
     private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded, String response) {
         def request = mock(HttpURLConnection)
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
-        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.root, plugins , unloaded) {
+        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), plugins , unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 wasRequestSent = true
@@ -1138,7 +1142,7 @@ class EnvironmentsTest {
         def request = mock(HttpURLConnection)
         def response = 'Plugin loaded successfully'
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
-        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.root, plugins, unloaded) {
+        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), plugins, unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 wasRequestSent = true
@@ -1149,8 +1153,8 @@ class EnvironmentsTest {
     @Test
     void 'disable plugin request not sent for a new plugin'() {
         def pluginName = 'test-plugin.zip'
-        File pluginDir = projectDir.newFolder('plugins')
-        File pluginFile = projectDir.newFile(pluginName)
+        File pluginDir = createDirectory(projectDir.resolve('plugins'))
+        File pluginFile = createFile(projectDir.resolve(pluginName))
         def deploy = project.tasks.create('deploy', Copy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
@@ -1169,9 +1173,8 @@ class EnvironmentsTest {
     @Test
     void 'disable plugin request sent for an existing plugin'() {
         def pluginName = 'test-plugin.zip'
-        File pluginDir = projectDir.newFolder('plugins')
-        projectDir.newFile("plugins/${pluginName}")
-        File pluginFile = projectDir.newFile(pluginName)
+        File pluginDir = createDirectory(projectDir.resolve('plugins'))
+        File pluginFile = createFile(pluginDir.toPath().resolve(pluginName))
         def deploy = project.tasks.create('deploy', Copy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
@@ -1190,9 +1193,8 @@ class EnvironmentsTest {
     @Test
     void 'disable plugin request partially unloads existing plugin'() {
         def pluginName = 'test-plugin.zip'
-        File pluginDir = projectDir.newFolder('plugins')
-        projectDir.newFile("plugins/${pluginName}")
-        File pluginFile = projectDir.newFile(pluginName)
+        File pluginDir = createDirectory(projectDir.resolve('plugins'))
+        File pluginFile = createFile(pluginDir.toPath().resolve(pluginName))
         def deploy = project.tasks.create('deploy', Copy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
@@ -1211,8 +1213,8 @@ class EnvironmentsTest {
     @Test
     void 'enable plugin request not sent if plugin was not disabled'() {
         def pluginName = 'test-plugin.zip'
-        File pluginDir = projectDir.newFolder('plugins')
-        File pluginFile = projectDir.newFile(pluginName)
+        File pluginDir = createDirectory(projectDir.resolve('plugins'))
+        File pluginFile = createFile(projectDir.resolve(pluginName))
         def deploy = project.tasks.create('deploy', Copy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
@@ -1229,8 +1231,8 @@ class EnvironmentsTest {
     @Test
     void 'enable plugin request sent if plugin was disabled'() {
         def pluginName = 'test-plugin.zip'
-        File pluginDir = projectDir.newFolder('plugins')
-        File pluginFile = projectDir.newFile(pluginName)
+        File pluginDir = createDirectory(projectDir.resolve('plugins'))
+        File pluginFile = createFile(projectDir.resolve(pluginName))
         def deploy = project.tasks.create('deploy', Copy) {
             from { "${pluginFile.name}" }
             into { pluginDir }

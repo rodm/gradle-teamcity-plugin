@@ -30,10 +30,10 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
@@ -47,7 +47,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasKey
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -72,10 +72,7 @@ class ValidateDefinitionActionTest {
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder()
-
-    @Rule
+    @RegisterExtension
     public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
 
     private Project project
@@ -83,9 +80,9 @@ class ValidateDefinitionActionTest {
     private List<PluginDefinition> definitions
     private Set<String> classes
 
-    @Before
-    void setup() {
-        project = ProjectBuilder.builder().withProjectDir(projectDir.root).build()
+    @BeforeEach
+    void setup(@TempDir File projectDir) {
+        project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         stubTask = mock(Task)
         definitions = []
         classes = new HashSet<String>()

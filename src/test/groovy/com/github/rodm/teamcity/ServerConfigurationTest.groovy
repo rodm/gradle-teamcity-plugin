@@ -29,9 +29,11 @@ import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.intellij.pluginRepository.PluginUploader
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
+import static com.github.rodm.teamcity.TestSupport.createDirectory
+import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
@@ -43,9 +45,9 @@ import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.Matchers.not
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.fail
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.mock
@@ -54,7 +56,7 @@ import static org.mockito.Mockito.when
 
 class ServerConfigurationTest extends ConfigurationTestCase {
 
-    @Before
+    @BeforeEach
     void applyPlugin() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
@@ -140,7 +142,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        projectDir.newFolder('build', 'descriptor', 'server')
+        createDirectory(projectDir.resolve('build/descriptor/server'))
 
         GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
         task.generateDescriptor()
@@ -159,7 +161,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        projectDir.newFolder('build', 'descriptor', 'server')
+        createDirectory(projectDir.resolve('build/descriptor/server'))
 
         GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
         task.generateDescriptor()
@@ -178,7 +180,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        projectDir.newFolder('build', 'descriptor', 'server')
+        createDirectory(projectDir.resolve('build/descriptor/server'))
 
         GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
         task.generateDescriptor()
@@ -197,7 +199,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        File outputDir = projectDir.newFolder('build', 'descriptor', 'server')
+        File outputDir = createDirectory(projectDir.resolve('build/descriptor/server'))
 
         GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
         task.generateDescriptor()
@@ -252,7 +254,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 tokens BUILD_NUMBER: '456'
             }
         }
-        File descriptorFile = projectDir.newFile('teamcity-plugin.xml')
+        File descriptorFile = createFile(projectDir.resolve('teamcity-plugin.xml'))
         descriptorFile << """<?xml version="1.0" encoding="UTF-8"?>
             <teamcity-plugin>
                 <info>
@@ -269,7 +271,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             </teamcity-plugin>
         """
 
-        File outputDir = projectDir.newFolder('build', 'descriptor', 'server')
+        File outputDir = createDirectory(projectDir.resolve('build/descriptor/server'))
         ProcessDescriptor task = (ProcessDescriptor) project.tasks.findByName('processServerDescriptor')
         task.process()
 
