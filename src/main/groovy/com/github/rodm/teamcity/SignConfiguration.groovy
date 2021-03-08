@@ -16,45 +16,30 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
-import org.gradle.api.provider.ListProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
-import org.jetbrains.zip.signer.signer.CertificateUtils
-import org.jetbrains.zip.signer.signer.PrivateKeyUtils
-
-import java.security.PrivateKey
-import java.security.cert.X509Certificate
 
 class SignConfiguration {
 
-    private ListProperty<X509Certificate> certificateChain
-    private Property<PrivateKey> privateKey
+    private RegularFileProperty certificateFile
+    private RegularFileProperty privateKeyFile
+    private Property<String> password
 
     SignConfiguration(Project project) {
-        this.certificateChain = project.objects.listProperty(X509Certificate)
-        this.privateKey = project.objects.property(PrivateKey)
+        this.certificateFile = project.objects.fileProperty()
+        this.privateKeyFile = project.objects.fileProperty()
+        this.password = project.objects.property(String)
     }
 
-    ListProperty<X509Certificate> getCertificateChain() {
-        return certificateChain
+    RegularFileProperty getCertificateFile() {
+        return certificateFile
     }
 
-    void setCertificateChain(List<X509Certificate> certificateChain) {
-        this.certificateChain.set(certificateChain)
+    RegularFileProperty getPrivateKeyFile() {
+        return privateKeyFile
     }
 
-    Property<PrivateKey> getPrivateKey() {
-        return privateKey
-    }
-
-    void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey.set(privateKey)
-    }
-
-    List<X509Certificate> loadCertificateChain(File file) {
-        return CertificateUtils.loadCertificatesFromFile(file)
-    }
-
-    PrivateKey loadPrivateKey(File file, String password = null) {
-        return PrivateKeyUtils.loadPrivateKey(file, password?.toCharArray())
+    Property<String> getPassword() {
+        return password
     }
 }

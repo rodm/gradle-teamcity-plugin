@@ -19,12 +19,14 @@ import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.zip.signer.signer.CertificateUtils
+import org.jetbrains.zip.signer.signer.PrivateKeyUtils
 import org.jetbrains.zip.signer.signer.PublicKeyUtils
 import org.jetbrains.zip.signer.signing.DefaultSignatureProvider
 import org.jetbrains.zip.signer.signing.ZipSigner
@@ -36,8 +38,9 @@ class SignPluginTask extends DefaultTask {
 
     private RegularFileProperty pluginFile = project.objects.fileProperty()
     private RegularFileProperty signedPluginFile = project.objects.fileProperty()
-    private ListProperty<X509Certificate> certificateChain = project.objects.listProperty(X509Certificate)
-    private Property<PrivateKey> privateKey = project.objects.property(PrivateKey)
+    private RegularFileProperty certificateFile = project.objects.fileProperty()
+    private RegularFileProperty privateKeyFile = project.objects.fileProperty()
+    private Property<String> password = project.objects.property(String)
 
     SignPluginTask() {
         signedPluginFile.convention(pluginFile.map({signedName(it) }))
@@ -59,22 +62,28 @@ class SignPluginTask extends DefaultTask {
         return signedPluginFile
     }
 
-    @Input
-    ListProperty<X509Certificate> getCertificateChain() {
-        return certificateChain
+    @InputFile
+    RegularFileProperty getCertificateFile() {
+        return certificateFile
+    }
+
+    @InputFile
+    RegularFileProperty getPrivateKeyFile() {
+        return privateKeyFile
     }
 
     @Input
-    Property<PrivateKey> getPrivateKey() {
-        return privateKey
+    @Optional
+    Property<String> getPassword() {
+        return password
     }
 
     @TaskAction
     protected void signPlugin() {
         def pluginFile = getPluginFile().get().asFile
         def signedPluginFile = getSignedPluginFile().get().asFile
-        def certificateChain = getCertificateChain().get()
-        def privateKey = getPrivateKey().get()
+        def certificateChain = loadCertificateChain(certificateFile.get().asFile)
+        def privateKey = loadPrivateKey(privateKeyFile.get().asFile, password.orNull)
 
         ZipSigner.sign(
             pluginFile,
@@ -91,5 +100,13 @@ class SignPluginTask extends DefaultTask {
         def path = FilenameUtils.removeExtension(file.asFile.path)
         def extension = FilenameUtils.getExtension(file.asFile.name)
         return project.layout.projectDirectory.file("${path}-signed.${extension}")
+    }
+
+    static List<X509Certificate> loadCertificateChain(File file) {
+        return CertificateUtils.loadCertificatesFromFile(file)
+    }
+
+    static PrivateKey loadPrivateKey(File file, String password) {
+        return PrivateKeyUtils.loadPrivateKey(file, password?.toCharArray())
     }
 }

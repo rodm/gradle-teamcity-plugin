@@ -21,7 +21,6 @@ import com.github.rodm.teamcity.tasks.SignPluginTask
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -62,14 +61,14 @@ class ServerSignConfigurationTest {
         assertThat(signPlugin, is(nullValue()))
     }
 
-    @Test @Disabled
-    void 'sign task is configured with a certificate chain'() {
-        File certificateChainFile = projectDir.resolve('ca.crt').toFile()
-        certificateChainFile << ""
+    @Test
+    void 'sign task is configured with a certificate file'() {
+        File dummyCertificateFile = projectDir.resolve('ca.crt').toFile()
+        dummyCertificateFile << ""
         project.teamcity {
             server {
                 sign {
-                    certificateChain = loadCertificateChain(certificateChainFile)
+                    certificateFile = project.file('ca.crt')
                 }
             }
         }
@@ -77,7 +76,48 @@ class ServerSignConfigurationTest {
         project.evaluate()
 
         SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-        assertThat(signPlugin.certificateChain.get(), notNullValue())
+        def certificateFile = signPlugin.certificateFile.get().asFile.canonicalFile
+        assertThat(certificateFile, equalTo(dummyCertificateFile.canonicalFile))
+    }
+
+    @Test
+    void 'sign task is configured with a password file and no password'() {
+        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
+        dummyPrivateKeyFile << ""
+        project.teamcity {
+            server {
+                sign {
+                    privateKeyFile = project.file('private-key-file')
+                }
+            }
+        }
+
+        project.evaluate()
+
+        SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+        def privateKeyFile = signPlugin.privateKeyFile.get().asFile.canonicalFile
+        assertThat(privateKeyFile, equalTo(dummyPrivateKeyFile.canonicalFile))
+        assertThat(signPlugin.password.orNull, is(nullValue()))
+    }
+
+    @Test
+    void 'sign task is configured with a password file and password'() {
+        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
+        dummyPrivateKeyFile << ""
+        project.teamcity {
+            server {
+                sign {
+                    privateKeyFile = project.file('private-key-file')
+                    password = 'password'
+                }
+            }
+        }
+
+        project.evaluate()
+
+        SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+        assertThat(signPlugin.privateKeyFile.get().asFile.canonicalFile, equalTo(dummyPrivateKeyFile.canonicalFile))
+        assertThat(signPlugin.password.orNull, equalTo('password'))
     }
 
     @Test

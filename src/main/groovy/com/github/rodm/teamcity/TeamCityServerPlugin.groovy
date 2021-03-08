@@ -172,8 +172,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPluginTask) {
                     group = TEAMCITY_GROUP
                     description = "Sign plugin before publishing."
-                    certificateChain.set(extension.server.sign.certificateChain)
-                    privateKey.set(extension.server.sign.privateKey)
+                    certificateFile.set(extension.server.sign.certificateFile)
+                    privateKeyFile.set(extension.server.sign.privateKeyFile)
+                    password.set(extension.server.sign.password)
                     pluginFile.set(packagePlugin.archiveFile)
                     dependsOn(packagePlugin)
                 }
