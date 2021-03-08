@@ -22,6 +22,10 @@ image:{uri-github-status}?branch=master["Build Status", link="{uri-github-action
 
 |===
 |Plugin version |Gradle version |Java version |Documentation
+|v1.4-beta-1
+|6.0+
+|Java 8 & later
+|{uri-github-project}/blob/master/README.adoc#using-the-plugin[README]
 |v1.3
 |5.0+
 |Java 8 & later
@@ -132,6 +136,7 @@ The plugin descriptor properties shown in the examples below and described in th
 * `serverPlugin` : Builds and packages a TeamCity plugin. The task performs validation of the plugin descriptor
 and outputs a warning if a required value is missing. The plugin zip file is output to the directory
 `build/distributions`.
+* `signPlugin` : Signs a plugin before publishing to the {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]
 * `publishPlugin` : Publishes a plugin to the {uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository]
 * `generateDescriptor` : If the descriptor is defined in the build script this task is enabled and will
 output the descriptor to the build directory.
@@ -271,6 +276,28 @@ The following example uses the Kotlin DSL.
             }
         }
     }
+----
+
+==== Signing a plugin
+
+The `signPlugin` task is used to sign the plugin archive before publishing to the
+{uri-jetbrains-plugin-portal}[JetBrains TeamCity Plugin Repository].
+
+[source,groovy]
+.build.gradle
+----
+teamcity {
+    server {
+        descriptor {
+            ...
+        }
+        sign {
+            certificateFile = project.file('ca.crt')
+            privateKeyFile = project.file('private-key.file')
+            password = findProperty('private-key.password')
+        }
+    }
+}
 ----
 
 ==== Publishing a plugin
