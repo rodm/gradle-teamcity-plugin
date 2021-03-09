@@ -87,13 +87,14 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
                     def dataDir = project.file(environment.dataDir.get())
-                    def plugins = environment.plugins.files
-                    def disabledPlugins = []
                     deployPlugin.configure {
+                        def plugins = environment.plugins.files
+                        def disabledPlugins = []
                         doFirst(new DisablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
                         doLast(new EnablePluginAction(project.logger, dataDir, plugins, disabledPlugins))
                     }
                     undeployPlugin.configure {
+                        def plugins = environment.plugins.files
                         doFirst(new DisablePluginAction(project.logger, dataDir, plugins, []))
                     }
                 }
