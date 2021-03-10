@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
-import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
@@ -336,7 +335,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
 
             buildCache {
                 local {
-                    directory = new File('${windowsCompatiblePath(testProjectDir.toFile())}', 'build-cache')
+                    directory = '${testProjectDir.resolve('local-cache').toUri()}'
                 }
             }
             """

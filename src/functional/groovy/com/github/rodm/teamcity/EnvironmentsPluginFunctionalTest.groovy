@@ -23,7 +23,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
-import static com.github.rodm.teamcity.TestSupport.windowsCompatiblePath
 import static org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
@@ -54,9 +53,9 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             teamcity {
                 environments {
                     teamcity {
-                        homeDir = file('${windowsCompatiblePath(homeDir)}')
-                        dataDir = file('${windowsCompatiblePath(dataDir)}')
-                        javaHome = file('${windowsCompatiblePath(javaHome)}')
+                        homeDir = file('${homeDir.toURI()}')
+                        dataDir = file('${dataDir.toURI()}')
+                        javaHome = file('${javaHome.toURI()}')
                     }
                 }
             }
@@ -95,9 +94,9 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
                 }
                 environments {
                     teamcity {
-                        homeDir = file('${windowsCompatiblePath(homeDir)}')
-                        dataDir = file('${windowsCompatiblePath(dataDir)}')
-                        javaHome = file('${windowsCompatiblePath(dataDir)}')
+                        homeDir = file('${homeDir.toURI()}')
+                        dataDir = file('${dataDir.toURI()}')
+                        javaHome = file('${dataDir.toURI()}')
                     }
                 }
             }
@@ -179,8 +178,8 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
                     }
                 }
                 environments {
-                    baseHomeDir = file('${windowsCompatiblePath(serversDir.toFile())}/teamcity')
-                    baseDataDir = file('${windowsCompatiblePath(serversDir.toFile())}/data')
+                    baseHomeDir = file('${serversDir.resolve('teamcity').toUri()}')
+                    baseDataDir = file('${serversDir.resolve('data').toUri()}')
 
                     teamcity8 {
                         version = '8.1.5'

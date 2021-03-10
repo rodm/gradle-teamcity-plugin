@@ -25,10 +25,6 @@ class TestSupport {
         rootProject.name = 'test-plugin'
     """
 
-    static String windowsCompatiblePath(File path) {
-        path.canonicalPath.replace('\\', '\\\\')
-    }
-
     static BuildResult executeBuild(File projectDir, String... args = ['build']) {
         GradleRunner.create()
             .withProjectDir(projectDir)
