@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.jupiter.api.Assumptions.assumingThat
+import static org.junit.jupiter.api.Assumptions.assumeTrue
 
 class MultipleGradleVersionTest extends FunctionalTestCase {
 
@@ -178,23 +178,31 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @ParameterizedTest(name = 'with Gradle {0}')
     @MethodSource("data")
     void 'build plugin'(String gradleVersion) {
+        def releasedJavaVersions = releasedJavaVersions()
         def javaVersion = JavaVersion.current().toString()
-        assumingThat(supportedByGradle(gradleVersion).contains(javaVersion), {
-            BuildResult result = executeBuild(gradleVersion)
-            checkBuild(result)
-        })
+        assertThat(releasedJavaVersions, hasItem(javaVersion) )
+
+        def supportedJavaVersions = supportedByGradle(gradleVersion)
+        assumeTrue(supportedJavaVersions.contains(javaVersion))
+
+        BuildResult result = executeBuild(gradleVersion)
+        checkBuild(result)
     }
 
     static List<String> supportedByGradle(String version) {
         def gradleVersion = GradleVersion.version(version)
-        def javaVersions = ['1.8', '1.9', '1.10', '11', '12', '13']
-        if (gradleVersion >= GradleVersion.version('6.3')) {
-            javaVersions << '14'
+        def javaVersions = releasedJavaVersions()
+        if (gradleVersion < GradleVersion.version('6.3')) {
+            javaVersions.remove('14')
         }
-        if (gradleVersion >= GradleVersion.version('6.7-rc-1')) {
-            javaVersions << '15'
+        if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
+            javaVersions.remove('15')
         }
         return javaVersions
+    }
+
+    static List<String> releasedJavaVersions() {
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15']
     }
 
     private BuildResult executeBuild(String version) {
