@@ -155,6 +155,33 @@ class ServerSignConfigurationTest {
     }
 
     @Test
+    void 'support signing configuration being created from multiple configuration blocks'() {
+        File dummyCertificateFile = projectDir.resolve('ca.crt').toFile()
+        dummyCertificateFile << ""
+        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
+        dummyPrivateKeyFile << ""
+        project.teamcity {
+            server {
+                sign {
+                    certificateFile = project.file('ca.crt')
+                }
+            }
+        }
+        project.teamcity {
+            server {
+                sign {
+                    privateKeyFile = project.file('private-key-file')
+                }
+            }
+        }
+        project.evaluate()
+
+        SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+        def certificateFile = signPlugin.certificateFile.get().asFile.canonicalFile
+        assertThat(certificateFile, equalTo(dummyCertificateFile.canonicalFile))
+    }
+
+    @Test
     void 'publish task is configured with output of sign task'() {
         project.teamcity {
             server {
