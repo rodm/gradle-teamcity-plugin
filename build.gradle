@@ -34,12 +34,9 @@ version = '1.4-SNAPSHOT'
 group = 'com.github.rodm'
 
 sourceSets {
-    functionalTest {
+    functional {
         compileClasspath += main.output + configurations.testRuntimeClasspath
         runtimeClasspath += main.output + configurations.testRuntimeClasspath
-        groovy {
-            srcDir 'src/functional/groovy'
-        }
     }
     samples {
         compileClasspath += main.output + configurations.testRuntimeClasspath
@@ -57,7 +54,7 @@ test {
 }
 
 gradlePlugin {
-    testSourceSets sourceSets.functionalTest, sourceSets.samples
+    testSourceSets sourceSets.functional, sourceSets.samples
 
     plugins {
         teamcityServerPlugin {
@@ -83,8 +80,8 @@ task functionalTest(type: Test) {
     description = 'Runs the functional tests.'
     group = 'verification'
     useJUnitPlatform()
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+    testClassesDirs = sourceSets.functional.output.classesDirs
+    classpath = sourceSets.functional.runtimeClasspath
 }
 
 task samplesTest(type: Test) {
