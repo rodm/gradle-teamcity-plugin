@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Nested
@@ -22,6 +23,7 @@ import org.gradle.api.tasks.Nested
 /**
  * Agent-side plugin tool deployment configuration
  */
+@CompileStatic
 class ToolDeployment {
 
     @Nested

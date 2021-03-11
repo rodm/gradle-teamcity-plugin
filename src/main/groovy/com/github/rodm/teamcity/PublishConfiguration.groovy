@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -22,6 +23,7 @@ import org.gradle.api.provider.Property
 /**
  * Configuration for publishing a plugin to a plugin repository.
  */
+@CompileStatic
 class PublishConfiguration {
 
     public static final List<String> DEFAULT_CHANNELS = ['default'].asImmutable()

@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.plugins.ExtensionAware
@@ -25,6 +26,7 @@ import org.gradle.api.tasks.Optional
 /**
  * Agent-side plugin descriptor
  */
+@CompileStatic
 class AgentPluginDescriptor {
 
     @Nested
