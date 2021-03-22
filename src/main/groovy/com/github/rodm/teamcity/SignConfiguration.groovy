@@ -17,28 +17,27 @@ package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
 import org.gradle.api.Project
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 
 @CompileStatic
 class SignConfiguration {
 
-    private RegularFileProperty certificateFile
-    private RegularFileProperty privateKeyFile
+    private Property<String> certificateChain
+    private Property<String> privateKey
     private Property<String> password
 
     SignConfiguration(Project project) {
-        this.certificateFile = project.objects.fileProperty()
-        this.privateKeyFile = project.objects.fileProperty()
+        this.certificateChain = project.objects.property(String)
+        this.privateKey = project.objects.property(String)
         this.password = project.objects.property(String)
     }
 
-    RegularFileProperty getCertificateFile() {
-        return certificateFile
+    Property<String> getCertificateChain() {
+        return certificateChain
     }
 
-    RegularFileProperty getPrivateKeyFile() {
-        return privateKeyFile
+    Property<String> getPrivateKey() {
+        return privateKey
     }
 
     Property<String> getPassword() {

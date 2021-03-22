@@ -29,7 +29,6 @@ import java.nio.file.Path
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.nullValue
-import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
 
 class ServerSignConfigurationTest {
@@ -63,12 +62,10 @@ class ServerSignConfigurationTest {
 
     @Test
     void 'sign task is configured with a certificate file'() {
-        File dummyCertificateFile = projectDir.resolve('ca.crt').toFile()
-        dummyCertificateFile << ""
         project.teamcity {
             server {
                 sign {
-                    certificateFile = project.file('ca.crt')
+                    certificateChain = 'certificate-chain'
                 }
             }
         }
@@ -76,18 +73,15 @@ class ServerSignConfigurationTest {
         project.evaluate()
 
         SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-        def certificateFile = signPlugin.certificateFile.get().asFile.canonicalFile
-        assertThat(certificateFile, equalTo(dummyCertificateFile.canonicalFile))
+        assertThat(signPlugin.certificateChain.get(), equalTo('certificate-chain'))
     }
 
     @Test
     void 'sign task is configured with a password file and no password'() {
-        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
-        dummyPrivateKeyFile << ""
         project.teamcity {
             server {
                 sign {
-                    privateKeyFile = project.file('private-key-file')
+                    privateKey = 'private-key'
                 }
             }
         }
@@ -95,19 +89,16 @@ class ServerSignConfigurationTest {
         project.evaluate()
 
         SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-        def privateKeyFile = signPlugin.privateKeyFile.get().asFile.canonicalFile
-        assertThat(privateKeyFile, equalTo(dummyPrivateKeyFile.canonicalFile))
+        assertThat(signPlugin.privateKey.get(), equalTo('private-key'))
         assertThat(signPlugin.password.orNull, is(nullValue()))
     }
 
     @Test
     void 'sign task is configured with a password file and password'() {
-        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
-        dummyPrivateKeyFile << ""
         project.teamcity {
             server {
                 sign {
-                    privateKeyFile = project.file('private-key-file')
+                    privateKey = 'private-key'
                     password = 'password'
                 }
             }
@@ -116,7 +107,7 @@ class ServerSignConfigurationTest {
         project.evaluate()
 
         SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-        assertThat(signPlugin.privateKeyFile.get().asFile.canonicalFile, equalTo(dummyPrivateKeyFile.canonicalFile))
+        assertThat(signPlugin.privateKey.get(), equalTo('private-key'))
         assertThat(signPlugin.password.orNull, equalTo('password'))
     }
 
@@ -156,29 +147,24 @@ class ServerSignConfigurationTest {
 
     @Test
     void 'support signing configuration being created from multiple configuration blocks'() {
-        File dummyCertificateFile = projectDir.resolve('ca.crt').toFile()
-        dummyCertificateFile << ""
-        File dummyPrivateKeyFile = projectDir.resolve('private-key-file').toFile()
-        dummyPrivateKeyFile << ""
         project.teamcity {
             server {
                 sign {
-                    certificateFile = project.file('ca.crt')
+                    certificateChain = 'certificate-chain'
                 }
             }
         }
         project.teamcity {
             server {
                 sign {
-                    privateKeyFile = project.file('private-key-file')
+                    privateKey = 'private-key'
                 }
             }
         }
         project.evaluate()
 
         SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-        def certificateFile = signPlugin.certificateFile.get().asFile.canonicalFile
-        assertThat(certificateFile, equalTo(dummyCertificateFile.canonicalFile))
+        assertThat(signPlugin.certificateChain.get(), equalTo('certificate-chain'))
     }
 
     @Test
