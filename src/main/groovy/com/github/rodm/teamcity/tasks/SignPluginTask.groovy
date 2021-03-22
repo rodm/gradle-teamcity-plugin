@@ -38,8 +38,8 @@ class SignPluginTask extends DefaultTask {
 
     private RegularFileProperty pluginFile = project.objects.fileProperty()
     private RegularFileProperty signedPluginFile = project.objects.fileProperty()
-    private RegularFileProperty certificateFile = project.objects.fileProperty()
-    private RegularFileProperty privateKeyFile = project.objects.fileProperty()
+    private Property<String> certificateChain = project.objects.property(String)
+    private Property<String> privateKey = project.objects.property(String)
     private Property<String> password = project.objects.property(String)
 
     SignPluginTask() {
@@ -62,14 +62,14 @@ class SignPluginTask extends DefaultTask {
         return signedPluginFile
     }
 
-    @InputFile
-    RegularFileProperty getCertificateFile() {
-        return certificateFile
+    @Input
+    Property<String> getCertificateChain() {
+        return certificateChain
     }
 
-    @InputFile
-    RegularFileProperty getPrivateKeyFile() {
-        return privateKeyFile
+    @Input
+    Property<String> getPrivateKey() {
+        return privateKey
     }
 
     @Input
@@ -82,8 +82,8 @@ class SignPluginTask extends DefaultTask {
     protected void signPlugin() {
         def pluginFile = getPluginFile().get().asFile
         def signedPluginFile = getSignedPluginFile().get().asFile
-        def certificateChain = loadCertificateChain(certificateFile.get().asFile)
-        def privateKey = loadPrivateKey(privateKeyFile.get().asFile, password.orNull)
+        def certificateChain = CertificateUtils.loadCertificates(certificateChain.get())
+        def privateKey = PrivateKeyUtils.loadPrivateKey(privateKey.get(), password.orNull?.toCharArray())
 
         ZipSigner.sign(
             pluginFile,
@@ -100,13 +100,5 @@ class SignPluginTask extends DefaultTask {
         def path = FilenameUtils.removeExtension(file.asFile.path)
         def extension = FilenameUtils.getExtension(file.asFile.name)
         return project.layout.projectDirectory.file("${path}-signed.${extension}")
-    }
-
-    static List<X509Certificate> loadCertificateChain(File file) {
-        return CertificateUtils.loadCertificatesFromFile(file)
-    }
-
-    static PrivateKey loadPrivateKey(File file, String password) {
-        return PrivateKeyUtils.loadPrivateKey(file, password?.toCharArray())
     }
 }
