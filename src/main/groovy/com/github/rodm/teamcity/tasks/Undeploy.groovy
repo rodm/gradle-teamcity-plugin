@@ -29,6 +29,7 @@ class Undeploy extends Delete {
     final DirectoryProperty pluginsDir = project.objects.directoryProperty()
 
     Undeploy() {
+        description = "Un-deploys plugins from the TeamCity Server"
         delete {
             project.fileTree(dir: getPluginsDir().get().asFile,
                 includes: getPlugins().files.collect { it.name })

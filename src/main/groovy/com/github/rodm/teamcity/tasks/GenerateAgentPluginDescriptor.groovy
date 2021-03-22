@@ -44,6 +44,7 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     final RegularFileProperty destination = project.objects.fileProperty()
 
     GenerateAgentPluginDescriptor() {
+        description = "Generates the Agent-side plugin descriptor"
         onlyIf { descriptor.isPresent() }
     }
 

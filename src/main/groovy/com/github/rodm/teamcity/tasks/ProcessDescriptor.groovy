@@ -41,6 +41,7 @@ class ProcessDescriptor extends DefaultTask {
     final RegularFileProperty destination = project.objects.fileProperty()
 
     ProcessDescriptor() {
+        description = "Processes the plugin descriptor"
         onlyIf { descriptor.isPresent() }
     }
 

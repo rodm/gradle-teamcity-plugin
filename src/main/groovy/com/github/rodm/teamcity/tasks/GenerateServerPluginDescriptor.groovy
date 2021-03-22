@@ -46,6 +46,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
     final RegularFileProperty destination = project.objects.fileProperty()
 
     GenerateServerPluginDescriptor() {
+        description = "Generates the Server-side plugin descriptor"
         onlyIf { descriptor.isPresent() }
     }
 

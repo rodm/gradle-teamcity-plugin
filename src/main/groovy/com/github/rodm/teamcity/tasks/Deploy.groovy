@@ -30,6 +30,7 @@ class Deploy extends Copy {
     final DirectoryProperty pluginsDir = project.objects.directoryProperty()
 
     Deploy() {
+        description = "Deploys plugins to the TeamCity Server"
         from { getPlugins() }
         into { getPluginsDir() }
     }

@@ -59,6 +59,7 @@ class PublishTask extends DefaultTask {
     private RegularFileProperty distributionFile
 
     PublishTask() {
+        description = "Publishes the plugin to the TeamCity plugin repository"
         enabled = !project.gradle.startParameter.offline
         channels = project.objects.listProperty(String)
         token = project.objects.property(String)

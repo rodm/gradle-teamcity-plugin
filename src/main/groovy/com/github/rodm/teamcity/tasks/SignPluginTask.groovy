@@ -43,6 +43,7 @@ class SignPluginTask extends DefaultTask {
     private Property<String> password = project.objects.property(String)
 
     SignPluginTask() {
+        description = "Signs the plugin"
         signedPluginFile.convention(pluginFile.map({signedName(it) }))
     }
 
