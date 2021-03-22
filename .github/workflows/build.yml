@@ -23,10 +23,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew -s build
+        run: |
+          ./gradlew -v
+          ./gradlew -s build
 
   test:
     runs-on: ${{ matrix.os }}
@@ -41,10 +41,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew -s functionalTest
+        run: |
+          ./gradlew -v
+          ./gradlew -s functionalTest
       - name: Upload reports
         uses: actions/upload-artifact@v2
         if: failure()
