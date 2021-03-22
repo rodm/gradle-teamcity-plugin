@@ -18,7 +18,7 @@ package com.github.rodm.teamcity.internal
 import org.gradle.api.Action
 import org.gradle.api.Task
 
-import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
+import static ValidationSupport.createXmlParser
 
 class PluginDescriptorContentsValidationAction implements Action<Task> {
 

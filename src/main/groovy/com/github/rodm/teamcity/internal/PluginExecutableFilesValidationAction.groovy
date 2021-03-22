@@ -19,7 +19,7 @@ import org.gradle.api.Action
 import org.gradle.api.Task
 import org.gradle.api.file.FileCopyDetails
 
-import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
+import static ValidationSupport.createXmlParser
 
 class PluginExecutableFilesValidationAction implements Action<Task> {
 

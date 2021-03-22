@@ -30,9 +30,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.util.GradleVersion
-import org.xml.sax.SAXNotRecognizedException
-
-import javax.xml.XMLConstants
 
 class TeamCityPlugin implements Plugin<Project> {
 
@@ -123,27 +120,6 @@ class TeamCityPlugin implements Plugin<Project> {
         if (archiveName) {
             task.archiveFileName = archiveName.endsWith('.zip') ? archiveName : archiveName + '.zip'
         }
-    }
-
-    static XmlParser createXmlParser() {
-        return createXmlParser(false)
-    }
-
-    static XmlParser createXmlParser(boolean offline) {
-        def parser = new XmlParser(false, true, true)
-        if (offline) {
-            parser.setFeature('http://apache.org/xml/features/nonvalidating/load-external-dtd', false)
-        }
-        setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_DTD, "file,http")
-        setParserProperty(parser, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file,http")
-        return parser
-    }
-
-    private static void setParserProperty(XmlParser parser, String uri, Object value) {
-        try {
-            parser.setProperty(uri, value)
-        }
-        catch (SAXNotRecognizedException ignore) { }
     }
 
     static class ConfigureRepositories implements Action<Project> {

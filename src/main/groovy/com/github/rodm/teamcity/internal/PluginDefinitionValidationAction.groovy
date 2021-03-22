@@ -20,7 +20,7 @@ import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Task
 
-import static com.github.rodm.teamcity.TeamCityPlugin.createXmlParser
+import static ValidationSupport.createXmlParser
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 
