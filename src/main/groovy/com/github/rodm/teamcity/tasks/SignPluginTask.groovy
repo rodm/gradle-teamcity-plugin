@@ -31,9 +31,6 @@ import org.jetbrains.zip.signer.signer.PublicKeyUtils
 import org.jetbrains.zip.signer.signing.DefaultSignatureProvider
 import org.jetbrains.zip.signer.signing.ZipSigner
 
-import java.security.PrivateKey
-import java.security.cert.X509Certificate
-
 class SignPluginTask extends DefaultTask {
 
     private RegularFileProperty pluginFile = project.objects.fileProperty()
