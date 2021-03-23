@@ -15,10 +15,12 @@
  */
 package com.github.rodm.teamcity.internal
 
+import groovy.transform.CompileStatic
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
 
+@CompileStatic
 class ValidationSupport {
 
     static XmlParser createXmlParser() {
