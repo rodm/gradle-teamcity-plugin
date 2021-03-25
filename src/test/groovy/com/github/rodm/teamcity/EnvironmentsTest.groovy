@@ -72,7 +72,8 @@ class EnvironmentsTest {
     private String defaultOptions = [
         '-Dteamcity.development.mode=true',
         '-Dteamcity.development.shadowCopyClasses=true',
-        '-Dteamcity.superUser.token.saveToFile=true'
+        '-Dteamcity.superUser.token.saveToFile=true',
+        '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
     ].join(' ')
 
     private Project project

@@ -30,7 +30,8 @@ class TeamCityEnvironment {
     private static final List<String> DEFAULT_SERVER_OPTIONS = [
         '-Dteamcity.development.mode=true',
         '-Dteamcity.development.shadowCopyClasses=true',
-        '-Dteamcity.superUser.token.saveToFile=true'
+        '-Dteamcity.superUser.token.saveToFile=true',
+        '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
     ].asImmutable()
 
     /**
@@ -174,6 +175,7 @@ class TeamCityEnvironment {
      *      '-Dteamcity.development.mode=true'
      *      '-Dteamcity.development.shadowCopyClasses=true'
      *      '-Dteamcity.superUser.token.saveToFile=true'
+     *      '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
      */
     Object getServerOptions() {
         return serverOptions
