@@ -13,6 +13,11 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 version = "2020.2"
 
+fun supportedGradleVersion(javaVersion: String?): String? {
+    val versionsMap = mapOf("14" to "6.3", "15" to "6.7.1", "16" to "7.0-rc-1")
+    return versionsMap[javaVersion]
+}
+
 project {
 
     val vcsId = "GradleTeamcityPlugin"
@@ -137,97 +142,44 @@ project {
                 }
             }
 
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava8")
-                name = "Build - Functional Test - Java 8"
+            matrix {
+                axes {
+                    "Java"("8", "11", "12", "13")
+                }
+                build {
+                    val javaVersion = axes["Java"]
+                    id("BuildFunctionalTestJava${javaVersion}")
+                    name = "Build - Functional Test - Java ${javaVersion}"
+                    templates(buildTemplate)
 
-                params {
-                    param("gradle.tasks", "clean functionalTest")
+                    params {
+                        param("gradle.tasks", "clean functionalTest")
+                        param("java.home", "%java${javaVersion}.home%")
+                    }
                 }
             }
 
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava11")
-                name = "Build - Functional Test - Java 11"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("java.home", "%java11.home%")
+            matrix {
+                axes {
+                    "Java"("14", "15", "16")
                 }
-            }
+                build {
+                    val javaVersion = axes["Java"]
+                    val gradleVersion = supportedGradleVersion(javaVersion)
+                    id("BuildFunctionalTestJava${javaVersion}")
+                    name = "Build - Functional Test - Java ${javaVersion}"
+                    templates(buildTemplate)
 
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava12")
-                name = "Build - Functional Test - Java 12"
+                    params {
+                        param("gradle.tasks", "clean functionalTest")
+                        param("gradle.version", "${gradleVersion}")
+                        param("java.home", "%java${javaVersion}.home%")
+                    }
 
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("java.home", "%java12.home%")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava13")
-                name = "Build - Functional Test - Java 13"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("java.home", "%java13.home%")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava14")
-                name = "Build - Functional Test - Java 14"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("gradle.version", "6.3")
-                    param("java.home", "%java14.home%")
-                }
-
-                steps {
-                    switchGradleBuildStep()
-                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava15")
-                name = "Build - Functional Test - Java 15"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("gradle.version", "6.7-rc-1")
-                    param("java.home", "%java15.home%")
-                }
-
-                steps {
-                    switchGradleBuildStep()
-                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
-                }
-            }
-
-            build {
-                templates(buildTemplate)
-                id("BuildFunctionalTestJava16")
-                name = "Build - Functional Test - Java 16"
-
-                params {
-                    param("gradle.tasks", "clean functionalTest")
-                    param("gradle.version", "7.0-rc-1")
-                    param("java.home", "%java16.home%")
-                }
-
-                steps {
-                    switchGradleBuildStep()
-                    stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                    steps {
+                        switchGradleBuildStep()
+                        stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                    }
                 }
             }
 
