@@ -198,11 +198,14 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
             javaVersions.remove('15')
         }
+        if (gradleVersion < GradleVersion.version('7.0-rc-1')) {
+            javaVersions.remove('16')
+        }
         return javaVersions
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15']
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16']
     }
 
     private BuildResult executeBuild(String version) {
