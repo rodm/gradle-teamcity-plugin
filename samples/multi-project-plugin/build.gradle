@@ -1,8 +1,4 @@
 
-plugins {
-    id 'com.github.rodm.teamcity-server' version '1.4-beta-1' apply false
-}
-
 ext {
     teamcityVersion = '2019.1'
 }

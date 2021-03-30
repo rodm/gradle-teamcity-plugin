@@ -1,6 +1,8 @@
 
-apply plugin: 'java'
-apply plugin: 'com.github.rodm.teamcity-agent'
+plugins {
+    id 'java'
+    id 'com.github.rodm.teamcity-agent'
+}
 
 dependencies {
     implementation project(':common')

@@ -1,7 +1,8 @@
 
-apply plugin: 'java'
-
-apply plugin: 'com.github.rodm.teamcity-common'
+plugins {
+    id 'java'
+    id 'com.github.rodm.teamcity-common'
+}
 
 teamcity {
     version = teamcityVersion

@@ -1,7 +1,9 @@
 
-apply plugin: 'java'
-apply plugin: 'com.github.rodm.teamcity-server'
-apply plugin: 'com.github.rodm.teamcity-environments'
+plugins {
+    id 'java'
+    id 'com.github.rodm.teamcity-server'
+    id 'com.github.rodm.teamcity-environments'
+}
 
 ext {
     downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"

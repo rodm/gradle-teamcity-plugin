@@ -1,4 +1,10 @@
 
+pluginManagement {
+    plugins {
+        id 'com.github.rodm.teamcity-server' version '1.4-beta-1'
+    }
+}
+
 rootProject.name = 'multi-project-plugin'
 
 include 'common'
