@@ -181,6 +181,7 @@ class TeamCityEnvironment {
         return serverOptions
     }
 
+    @CompileStatic(SKIP)
     def setServerOptions(Object options) {
         this.serverOptions.empty()
         if (options instanceof List) {
@@ -201,6 +202,7 @@ class TeamCityEnvironment {
         return agentOptions
     }
 
+    @CompileStatic(SKIP)
     void setAgentOptions(Object options) {
         this.agentOptions.empty()
         if (options instanceof List) {
