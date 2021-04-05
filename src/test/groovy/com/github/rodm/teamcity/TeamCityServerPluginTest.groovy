@@ -211,6 +211,29 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    void 'creates configuration for signing and publishing task dependencies'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        def configuration = project.configurations.getByName('marketplace')
+        assertThat(configuration, notNullValue())
+        assertThat(configuration.visible, is(false))
+        assertThat(configuration.transitive, is(true))
+    }
+
+    @Test
+    void 'apply adds signing and publishing dependencies to the marketplace configuration'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('marketplace')
+        assertThat(configuration, hasDependency('org.jetbrains', 'marketplace-zip-signer', '0.1.3'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.112'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.112'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.11'))
+    }
+
+    @Test
     void 'ConfigureRepositories adds MavenCentral and JetBrains repositories'() {
         project.apply plugin: 'java'
 

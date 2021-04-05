@@ -25,6 +25,7 @@ import com.github.rodm.teamcity.tasks.ServerPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
@@ -62,6 +63,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
             }
         }
 
+        configureConfigurations(project)
+        configureTaskDependencies(project)
+
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN)
@@ -69,6 +73,24 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configureSignPluginTask(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
+    }
+
+    static void configureConfigurations(final Project project) {
+        ConfigurationContainer configurations = project.getConfigurations()
+        configurations.maybeCreate('marketplace')
+            .setVisible(false)
+            .setDescription("Configuration for signing and publishing task dependencies.")
+    }
+
+    static void configureTaskDependencies(final Project project) {
+        project.afterEvaluate {
+            project.dependencies {
+                marketplace 'org.jetbrains:marketplace-zip-signer:0.1.3'
+                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.112'
+                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.112'
+                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.11'
+            }
+        }
     }
 
     void configureDependencies(Project project, TeamCityPluginExtension extension) {

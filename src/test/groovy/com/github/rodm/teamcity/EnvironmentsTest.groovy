@@ -25,6 +25,7 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.ListProperty
@@ -38,11 +39,14 @@ import org.junit.jupiter.api.io.TempDir
 
 import java.nio.file.Path
 
+import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalize
 import static com.github.rodm.teamcity.TestSupport.normalizePath
+import static org.hamcrest.CoreMatchers.is
+import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.endsWith
@@ -938,6 +942,26 @@ class EnvironmentsTest {
         InstallTeamCity install = project.tasks.getByName('installTeamcity10') as InstallTeamCity
         assertThat(normalizePath(install.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
         assertThat(normalizePath(install.getTarget()), endsWith('servers/TeamCity-10.0.4'))
+    }
+
+    @Test
+    void 'creates configuration for download task dependencies'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+
+        def configuration = project.configurations.getByName('environment')
+        assertThat(configuration, notNullValue())
+        assertThat(configuration.visible, is(false))
+        assertThat(configuration.transitive, is(true))
+    }
+
+    @Test
+    void 'apply adds download task dependencies to the environment configuration'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('environment')
+        assertThat(configuration, hasDependency('de.undercouch', 'gradle-download-task', '4.0.4'))
     }
 
     @Test
