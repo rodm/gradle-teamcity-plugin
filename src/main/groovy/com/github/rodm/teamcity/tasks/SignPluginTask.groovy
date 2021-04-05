@@ -15,21 +15,23 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import com.github.rodm.teamcity.internal.SignAction
 import org.apache.commons.io.FilenameUtils
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.zip.signer.signer.CertificateUtils
-import org.jetbrains.zip.signer.signer.PrivateKeyUtils
-import org.jetbrains.zip.signer.signer.PublicKeyUtils
-import org.jetbrains.zip.signer.signing.DefaultSignatureProvider
-import org.jetbrains.zip.signer.signing.ZipSigner
+import org.gradle.workers.WorkQueue
+import org.gradle.workers.WorkerExecutor
+
+import javax.inject.Inject
 
 class SignPluginTask extends DefaultTask {
 
@@ -38,10 +40,23 @@ class SignPluginTask extends DefaultTask {
     private Property<String> certificateChain = project.objects.property(String)
     private Property<String> privateKey = project.objects.property(String)
     private Property<String> password = project.objects.property(String)
+    private FileCollection classpath
+    private final WorkerExecutor executor
 
-    SignPluginTask() {
+    @Inject
+    SignPluginTask(WorkerExecutor executor) {
         description = "Signs the plugin"
         signedPluginFile.convention(pluginFile.map({signedName(it) }))
+        this.executor = executor
+    }
+
+    @Classpath
+    FileCollection getClasspath() {
+        return classpath
+    }
+
+    void setClasspath(FileCollection classpath) {
+        this.classpath = classpath
     }
 
     /**
@@ -78,20 +93,17 @@ class SignPluginTask extends DefaultTask {
 
     @TaskAction
     protected void signPlugin() {
-        def pluginFile = getPluginFile().get().asFile
-        def signedPluginFile = getSignedPluginFile().get().asFile
-        def certificateChain = CertificateUtils.loadCertificates(certificateChain.get())
-        def privateKey = PrivateKeyUtils.loadPrivateKey(privateKey.get(), password.orNull?.toCharArray())
-
-        ZipSigner.sign(
-            pluginFile,
-            signedPluginFile,
-            certificateChain,
-            new DefaultSignatureProvider(
-                PublicKeyUtils.INSTANCE.getSuggestedSignatureAlgorithm(certificateChain[0].publicKey),
-                privateKey
-            )
-        )
+        WorkQueue queue = executor.classLoaderIsolation { spec ->
+            spec.classpath.from(this.classpath)
+        }
+        queue.submit(SignAction) { params ->
+            params.pluginFile = this.pluginFile
+            params.certificateChain = this.certificateChain
+            params.privateKey = this.privateKey
+            params.password = this.password
+            params.signedPluginFile = this.signedPluginFile
+        }
+        queue.await()
     }
 
     RegularFile signedName(RegularFile file) {
