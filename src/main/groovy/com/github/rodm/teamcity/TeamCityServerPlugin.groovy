@@ -214,6 +214,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
                 project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
                     group = TEAMCITY_GROUP
                     description = "Publish plugin distribution on plugins.jetbrains.com."
+                    classpath = project.configurations.marketplace
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
                     notes.set(extension.server.publish.notes)

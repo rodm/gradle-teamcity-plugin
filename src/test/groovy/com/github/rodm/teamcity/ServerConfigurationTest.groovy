@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
+import com.github.rodm.teamcity.internal.PublishAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
 import com.github.rodm.teamcity.tasks.PublishTask
@@ -27,6 +28,10 @@ import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
 import com.jetbrains.plugin.structure.teamcity.TeamcityPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.intellij.pluginRepository.PluginUploader
 import org.junit.jupiter.api.BeforeEach
@@ -573,13 +578,14 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'publish task logs successful uploaded to default channel'() {
+    void 'publish action logs successful uploaded to default channel'() {
         def pluginFile = project.file('test-plugin.zip')
-        PublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['default'])
-        }
-        task.publishPlugin()
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.host = PublishTask.DEFAULT_HOST
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['default'])
+
+        publish.execute()
 
         String output = outputEventListener.toString()
         assertThat(output, containsString("Uploading plugin TestPluginId from ${pluginFile.absolutePath} to https://plugins.jetbrains.com"))
@@ -588,47 +594,53 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'publish task uploads plugin to default channel'() {
+    void 'publish action uploads plugin to default channel'() {
         def pluginFile = project.file('test-plugin.zip')
-        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['default'])
-        }
-        task.publishPlugin()
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['default'])
 
-        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), isNull() as String)
+        publish.execute()
+
+        verify(publish.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), isNull() as String)
     }
 
     @Test
-    void 'publish task uploads plugin to custom channel'() {
+    void 'publish action uploads plugin to custom channel'() {
         def pluginFile = project.file('test-plugin.zip')
-        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['Beta'])
-        }
-        task.publishPlugin()
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['Beta'])
 
-        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq('Beta'), isNull() as String)
+        publish.execute()
+
+        verify(publish.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq('Beta'), isNull() as String)
     }
 
     @Test
-    void 'publish task uploads plugin with change notes'() {
+    void 'publish action uploads plugin with change notes'() {
         def pluginFile = project.file('test-plugin.zip')
-        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['default'])
-            notes.set('change notes')
-        }
-        task.publishPlugin()
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['default'])
+        publish.parameters.notes.set('change notes')
 
-        verify(task.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), eq('change notes'))
+        publish.execute()
+
+        verify(publish.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), eq('change notes'))
     }
 
     @Test
     void 'publish task throws exception if channels list is empty'() {
-        PublishTask task = project.tasks.create('publish', MockPublishTask) {
-            channels.set([])
+        project.teamcity {
+            server {
+                publish {
+                    channels = []
+                }
+            }
         }
+        PublishTask task = project.tasks.findByPath(':publishPlugin') as PublishTask
+
         try {
             task.publishPlugin()
             fail('Should fail when channels list is empty')
@@ -639,13 +651,13 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'publish task logs upload to multiple channels'() {
+    void 'publish action logs upload to multiple channels'() {
         def pluginFile = project.file('test-plugin.zip')
-        PublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['Beta', 'Test'])
-        }
-        task.publishPlugin()
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['Beta', 'Test'])
+
+        publish.execute()
 
         String output = outputEventListener.toString()
         assertThat(output, containsString('Uploading plugin to Beta channel'))
@@ -653,15 +665,15 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void 'publish task throws exception for invalid plugin'() {
+    void 'publish action throws exception for invalid plugin'() {
         def pluginFile = project.file('test-plugin.zip')
-        MockPublishTask task = project.tasks.create('publish', MockPublishTask) {
-            distributionFile.set(pluginFile)
-            channels.set(['default'])
-        }
-        task.result = mock(PluginCreationFail)
+        PublishAction publish = new MockPublishAction(project)
+        publish.parameters.distributionFile.set(pluginFile)
+        publish.parameters.channels.set(['default'])
+
+        publish.result = mock(PluginCreationFail)
         try {
-            task.publishPlugin()
+            publish.execute()
             fail('Should throw exception on plugin creation failure')
         }
         catch (GradleException expected) {
@@ -669,21 +681,37 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
     }
 
-    static class MockPublishTask extends PublishTask {
+    static class PublishParameters implements PublishAction.Parameters {
+        String host
+        ListProperty<String> channels
+        Property<String> token
+        Property<String> notes
+        RegularFileProperty distributionFile
+        PublishParameters(Project project) {
+            channels = project.objects.listProperty(String)
+            token = project.objects.property(String)
+            notes = project.objects.property(String)
+            distributionFile = project.objects.fileProperty()
+        }
+    }
+
+    static class MockPublishAction extends PublishAction {
         PluginCreationResult result
         PluginUploader uploader
+        PublishAction.Parameters parameters
 
-        MockPublishTask() {
+        MockPublishAction(Project project) {
             TeamcityPlugin plugin = mock(TeamcityPlugin)
             when(plugin.getPluginId()).thenReturn('TestPluginId')
             result = mock(PluginCreationSuccess)
             when(result.getPlugin()).thenReturn(plugin)
             uploader = mock(PluginUploader)
+            parameters = new PublishParameters(project)
         }
 
         @Override
-        protected void publishPlugin() {
-            super.publishPlugin()
+        PublishAction.Parameters getParameters() {
+            return parameters
         }
 
         @Override
@@ -692,7 +720,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
 
         @Override
-        PluginUploader createRepositoryUploader() {
+        PluginUploader createRepositoryUploader(String host, String token) {
             return uploader
         }
     }

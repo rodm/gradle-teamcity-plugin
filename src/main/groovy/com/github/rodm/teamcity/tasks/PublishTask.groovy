@@ -16,28 +16,26 @@
 
 package com.github.rodm.teamcity.tasks
 
-import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
-import com.jetbrains.plugin.structure.base.plugin.PluginCreationResult
-import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
-import com.jetbrains.plugin.structure.base.plugin.PluginProblem
-import com.jetbrains.plugin.structure.teamcity.TeamcityPlugin
-import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
+import com.github.rodm.teamcity.internal.PublishAction
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
-import org.jetbrains.intellij.pluginRepository.PluginUploader
+import org.gradle.workers.WorkQueue
+import org.gradle.workers.WorkerExecutor
+
+import javax.inject.Inject
 
 class PublishTask extends DefaultTask {
 
-    private static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
+    static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
 
     private String host = DEFAULT_HOST
 
@@ -58,13 +56,27 @@ class PublishTask extends DefaultTask {
 
     private RegularFileProperty distributionFile
 
-    PublishTask() {
+    private FileCollection classpath
+    private final WorkerExecutor executor
+
+    @Inject
+    PublishTask(WorkerExecutor executor) {
         description = "Publishes the plugin to the TeamCity plugin repository"
         enabled = !project.gradle.startParameter.offline
         channels = project.objects.listProperty(String)
         token = project.objects.property(String)
         notes = project.objects.property(String)
         distributionFile = project.objects.fileProperty()
+        this.executor = executor
+    }
+
+    @Classpath
+    FileCollection getClasspath() {
+        return classpath
+    }
+
+    void setClasspath(FileCollection classpath) {
+        this.classpath = classpath
     }
 
     @Input
@@ -119,36 +131,16 @@ class PublishTask extends DefaultTask {
             throw new InvalidUserDataException("Channels list can't be empty")
         }
 
-        def distributionFile = getDistributionFile().get().asFile
-        def creationResult = createPlugin(distributionFile)
-        if (creationResult instanceof PluginCreationSuccess) {
-            def pluginId = creationResult.plugin.pluginId
-            logger.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to $host")
-            for (String channel : getChannels().get()) {
-                logger.info("Uploading plugin to ${channel} channel")
-                try {
-                    def uploadChannel = channel && 'default' != channel ? channel : ''
-                    def uploader = createRepositoryUploader()
-                    uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, notes.orNull)
-                    logger.info("Uploaded successfully")
-                }
-                catch (exception) {
-                    throw new GradleException('Failed to upload plugin', exception)
-                }
-            }
-        } else if (creationResult instanceof PluginCreationFail) {
-            def problems = creationResult.errorsAndWarnings.findAll { it.level == PluginProblem.Level.ERROR }.join(", ")
-            throw new GradleException("Cannot upload plugin. $problems")
-        } else {
-            throw new GradleException("Cannot upload plugin.")
+        WorkQueue queue = executor.classLoaderIsolation { spec ->
+            spec.classpath.from(this.classpath)
         }
-    }
-
-    PluginCreationResult<TeamcityPlugin> createPlugin(File distributionFile) {
-        TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
-    }
-
-    PluginUploader createRepositoryUploader() {
-        PluginRepositoryFactory.create(host, token.orNull).uploader
+        queue.submit(PublishAction, {params ->
+            params.host = this.host
+            params.channels = this.channels
+            params.token = this.token
+            params.notes = this.notes
+            params.distributionFile = this.distributionFile
+        })
+        queue.await()
     }
 }
