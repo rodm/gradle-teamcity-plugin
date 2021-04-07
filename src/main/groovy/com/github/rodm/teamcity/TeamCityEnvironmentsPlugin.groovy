@@ -29,7 +29,6 @@ import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.logging.Logger
 
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP
@@ -43,26 +42,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
 
-        configureConfigurations(project)
-        configureTaskDependencies(project)
-
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension))
-    }
-
-    static void configureConfigurations(final Project project) {
-        ConfigurationContainer configurations = project.getConfigurations()
-        configurations.maybeCreate('environment')
-            .setVisible(false)
-            .setDescription("Configuration for download task dependencies.")
-    }
-
-    static void configureTaskDependencies(final Project project) {
-        project.afterEvaluate {
-            project.dependencies {
-                environment 'de.undercouch:gradle-download-task:4.0.4'
-            }
-        }
     }
 
     static class ConfigureEnvironmentTasksAction implements Action<Project> {
