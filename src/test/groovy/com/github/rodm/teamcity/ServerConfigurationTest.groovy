@@ -581,7 +581,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     void 'publish action logs successful uploaded to default channel'() {
         def pluginFile = project.file('test-plugin.zip')
         PublishAction publish = new MockPublishAction(project)
-        publish.parameters.host = PublishTask.DEFAULT_HOST
+        publish.parameters.host.set(PublishTask.DEFAULT_HOST)
         publish.parameters.distributionFile.set(pluginFile)
         publish.parameters.channels.set(['default'])
 
@@ -682,12 +682,13 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     static class PublishParameters implements PublishAction.Parameters {
-        String host
+        Property<String> host
         ListProperty<String> channels
         Property<String> token
         Property<String> notes
         RegularFileProperty distributionFile
         PublishParameters(Project project) {
+            host = project.objects.property(String).convention(PublishTask.DEFAULT_HOST)
             channels = project.objects.listProperty(String)
             token = project.objects.property(String)
             notes = project.objects.property(String)

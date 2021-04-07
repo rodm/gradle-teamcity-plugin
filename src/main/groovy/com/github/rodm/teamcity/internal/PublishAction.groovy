@@ -36,8 +36,8 @@ abstract class PublishAction implements WorkAction<Parameters> {
 
     private final static Logger LOGGER = Logging.getLogger(PublishAction)
 
-    interface Parameters extends WorkParameters {
-        String getHost()
+    static interface Parameters extends WorkParameters {
+        Property<String> getHost()
         ListProperty<String> getChannels()
         Property<String> getToken()
         Property<String> getNotes()
@@ -52,12 +52,12 @@ abstract class PublishAction implements WorkAction<Parameters> {
         def creationResult = createPlugin(distributionFile)
         if (creationResult instanceof PluginCreationSuccess) {
             def pluginId = creationResult.plugin.pluginId
-            LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to ${parameters.host}")
+            LOGGER.info("Uploading plugin ${pluginId} from $distributionFile.absolutePath to ${parameters.host.get()}")
             for (String channel : parameters.channels.get()) {
                 LOGGER.info("Uploading plugin to ${channel} channel")
                 try {
                     def uploadChannel = channel && 'default' != channel ? channel : ''
-                    def uploader = createRepositoryUploader(parameters.host, parameters.token.orNull)
+                    def uploader = createRepositoryUploader(parameters.host.get(), parameters.token.orNull)
                     uploader.uploadPlugin(pluginId, distributionFile, uploadChannel, parameters.notes.orNull)
                     LOGGER.info("Uploaded successfully")
                 }
