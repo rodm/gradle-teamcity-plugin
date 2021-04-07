@@ -228,9 +228,9 @@ class TeamCityServerPluginTest {
 
         Configuration configuration = project.configurations.getByName('marketplace')
         assertThat(configuration, hasDependency('org.jetbrains', 'marketplace-zip-signer', '0.1.3'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.112'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.112'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.11'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.164'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.164'))
+        assertThat(configuration, hasDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.15'))
     }
 
     @Test

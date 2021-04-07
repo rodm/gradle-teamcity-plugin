@@ -93,9 +93,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 marketplace 'org.jetbrains:marketplace-zip-signer:0.1.3'
-                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.112'
-                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.112'
-                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.11'
+                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.164'
+                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.164'
+                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.15'
             }
         }
     }

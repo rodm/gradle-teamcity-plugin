@@ -21,6 +21,7 @@ import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
 import com.jetbrains.plugin.structure.base.plugin.PluginProblem
 import com.jetbrains.plugin.structure.teamcity.TeamcityPlugin
 import com.jetbrains.plugin.structure.teamcity.TeamcityPluginManager
+import org.apache.commons.io.FileUtils
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logger
@@ -74,7 +75,8 @@ abstract class PublishAction implements WorkAction<Parameters> {
     }
 
     PluginCreationResult<TeamcityPlugin> createPlugin(File distributionFile) {
-        TeamcityPluginManager.@Companion.createManager(true).createPlugin(distributionFile)
+        def extractDir = FileUtils.getTempDirectory().toPath().resolve('extracted-plugins')
+        TeamcityPluginManager.@Companion.createManager(extractDir, true).createPlugin(distributionFile.toPath())
     }
 
     PluginUploader createRepositoryUploader(String host, String token) {
