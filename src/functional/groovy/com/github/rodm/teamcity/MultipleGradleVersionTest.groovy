@@ -211,7 +211,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     private BuildResult executeBuild(String version) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(testProjectDir.toFile())
-                .withArguments('--warning-mode', 'fail', 'build')
+                .withArguments('--warning-mode', 'all', 'build')
                 .withPluginClasspath()
                 .withGradleVersion(version)
                 .forwardOutput()
