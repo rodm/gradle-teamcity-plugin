@@ -63,6 +63,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
             }
         }
 
+        configureRepository(project)
         configureConfigurations(project)
         configureTaskDependencies(project)
 
@@ -73,6 +74,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configureSignPluginTask(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
+    }
+
+    static void configureRepository(final Project project) {
+        project.repositories {
+            jcenter()
+        }
     }
 
     static void configureConfigurations(final Project project) {

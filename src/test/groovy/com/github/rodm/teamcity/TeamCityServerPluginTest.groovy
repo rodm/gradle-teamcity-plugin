@@ -234,6 +234,16 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    void 'adds jcenter repository for signing and publishing dependencies'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.evaluate()
+
+        List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
+        assertThat(urls, hasItem('https://jcenter.bintray.com/'))
+    }
+
+    @Test
     void 'ConfigureRepositories adds MavenCentral and JetBrains repositories'() {
         project.apply plugin: 'java'
 
