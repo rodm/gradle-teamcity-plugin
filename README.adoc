@@ -22,7 +22,7 @@ image:{uri-github-status}?branch=master["Build Status", link="{uri-github-action
 
 |===
 |Plugin version |Gradle version |Java version |Documentation
-|v1.4-beta-1
+|v1.4-beta-2
 |6.0+
 |Java 8 & later
 |{uri-github-project}/blob/master/README.adoc#using-the-plugin[README]
@@ -292,8 +292,8 @@ teamcity {
             ...
         }
         sign {
-            certificateFile = project.file('ca.crt')
-            privateKeyFile = project.file('private-key.file')
+            certificateFile = findProperty('ca.crt')
+            privateKeyFile = findProperty('private-key.file')
             password = findProperty('private-key.password')
         }
     }
