@@ -33,11 +33,11 @@ import org.gradle.workers.WorkParameters
 import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
 import org.jetbrains.intellij.pluginRepository.PluginUploader
 
-abstract class PublishAction implements WorkAction<Parameters> {
+abstract class PublishAction implements WorkAction<PublishParameters> {
 
     private final static Logger LOGGER = Logging.getLogger(PublishAction)
 
-    static interface Parameters extends WorkParameters {
+    static interface PublishParameters extends WorkParameters {
         Property<String> getHost()
         ListProperty<String> getChannels()
         Property<String> getToken()
@@ -47,7 +47,7 @@ abstract class PublishAction implements WorkAction<Parameters> {
 
     @Override
     void execute() {
-        Parameters parameters = getParameters()
+        PublishParameters parameters = getParameters()
 
         def distributionFile = parameters.distributionFile.get().asFile
         def creationResult = createPlugin(distributionFile)

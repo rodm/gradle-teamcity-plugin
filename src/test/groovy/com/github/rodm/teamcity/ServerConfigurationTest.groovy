@@ -681,13 +681,13 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
     }
 
-    static class PublishParameters implements PublishAction.Parameters {
+    static class TestPublishParameters implements PublishAction.PublishParameters {
         Property<String> host
         ListProperty<String> channels
         Property<String> token
         Property<String> notes
         RegularFileProperty distributionFile
-        PublishParameters(Project project) {
+        TestPublishParameters(Project project) {
             host = project.objects.property(String).convention(PublishTask.DEFAULT_HOST)
             channels = project.objects.listProperty(String)
             token = project.objects.property(String)
@@ -699,7 +699,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     static class MockPublishAction extends PublishAction {
         PluginCreationResult result
         PluginUploader uploader
-        PublishAction.Parameters parameters
+        PublishParameters parameters
 
         MockPublishAction(Project project) {
             TeamcityPlugin plugin = mock(TeamcityPlugin)
@@ -707,11 +707,11 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             result = mock(PluginCreationSuccess)
             when(result.getPlugin()).thenReturn(plugin)
             uploader = mock(PluginUploader)
-            parameters = new PublishParameters(project)
+            parameters = new TestPublishParameters(project)
         }
 
         @Override
-        PublishAction.Parameters getParameters() {
+        PublishParameters getParameters() {
             return parameters
         }
 

@@ -25,9 +25,9 @@ import org.jetbrains.zip.signer.signer.PublicKeyUtils
 import org.jetbrains.zip.signer.signing.DefaultSignatureProvider
 import org.jetbrains.zip.signer.signing.ZipSigner
 
-abstract class SignAction implements WorkAction<Parameters> {
+abstract class SignAction implements WorkAction<SignParameters> {
 
-    static interface Parameters extends WorkParameters {
+    static interface SignParameters extends WorkParameters {
         RegularFileProperty getPluginFile()
         Property<String> getCertificateChain()
         Property<String> getPrivateKey()
@@ -37,7 +37,7 @@ abstract class SignAction implements WorkAction<Parameters> {
 
     @Override
     void execute() {
-        Parameters parameters = getParameters()
+        SignParameters parameters = getParameters()
         def pluginFile = parameters.pluginFile.get().asFile
         def signedPluginFile = parameters.signedPluginFile.get().asFile
         def certificateChain = CertificateUtils.loadCertificates(parameters.certificateChain.get())
