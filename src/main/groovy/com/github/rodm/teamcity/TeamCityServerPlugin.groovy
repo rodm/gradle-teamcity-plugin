@@ -63,7 +63,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
             }
         }
 
-        configureRepository(project)
         configureConfigurations(project)
         configureTaskDependencies(project)
 
@@ -74,12 +73,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configureSignPluginTask(project, extension)
         configurePublishPluginTask(project, extension)
         configureEnvironmentTasks(project, extension)
-    }
-
-    static void configureRepository(final Project project) {
-        project.repositories {
-            jcenter()
-        }
     }
 
     static void configureConfigurations(final Project project) {
@@ -93,9 +86,9 @@ class TeamCityServerPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 marketplace 'org.jetbrains:marketplace-zip-signer:0.1.3'
-                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.164'
-                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.164'
-                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.15'
+                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.171'
+                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.171'
+                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.17'
             }
         }
     }
