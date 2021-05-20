@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
+import static com.github.rodm.teamcity.GradleMatchers.hasDefaultDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.anyOf
@@ -221,16 +222,16 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'apply adds signing and publishing dependencies to the marketplace configuration'() {
+    void 'apply adds signing and publishing as default dependencies to the marketplace configuration'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 
         Configuration configuration = project.configurations.getByName('marketplace')
-        assertThat(configuration, hasDependency('org.jetbrains', 'marketplace-zip-signer', '0.1.3'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.171'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.171'))
-        assertThat(configuration, hasDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.17'))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains', 'marketplace-zip-signer', '0.1.3'))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.171'))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.171'))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.17'))
     }
 
     @Test

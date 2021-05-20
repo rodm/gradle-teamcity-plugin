@@ -64,7 +64,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
 
         configureConfigurations(project)
-        configureTaskDependencies(project)
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
         configureDependencies(project, extension)
@@ -80,17 +79,12 @@ class TeamCityServerPlugin implements Plugin<Project> {
         configurations.maybeCreate('marketplace')
             .setVisible(false)
             .setDescription("Configuration for signing and publishing task dependencies.")
-    }
-
-    static void configureTaskDependencies(final Project project) {
-        project.afterEvaluate {
-            project.dependencies {
-                marketplace 'org.jetbrains:marketplace-zip-signer:0.1.3'
-                marketplace 'org.jetbrains.intellij.plugins:structure-base:3.171'
-                marketplace 'org.jetbrains.intellij.plugins:structure-teamcity:3.171'
-                marketplace 'org.jetbrains.intellij:plugin-repository-rest-client:2.0.17'
+            .defaultDependencies { dependencies ->
+                dependencies.add(project.dependencies.create('org.jetbrains:marketplace-zip-signer:0.1.3'))
+                dependencies.add(project.dependencies.create('org.jetbrains.intellij.plugins:structure-base:3.171'))
+                dependencies.add(project.dependencies.create('org.jetbrains.intellij.plugins:structure-teamcity:3.171'))
+                dependencies.add(project.dependencies.create('org.jetbrains.intellij:plugin-repository-rest-client:2.0.17'))
             }
-        }
     }
 
     void configureDependencies(Project project, TeamCityPluginExtension extension) {

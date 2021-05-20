@@ -27,6 +27,10 @@ class GradleMatchers {
         return new HasDependency(group, name, version)
     }
 
+    static Matcher<Configuration> hasDefaultDependency(String group, String name, String version) {
+        return new HasDefaultDependency(group, name, version)
+    }
+
     static Matcher<TaskContainer> hasTask(String name) {
         return new TypeSafeDiagnosingMatcher<TaskContainer>() {
             @Override
@@ -62,11 +66,27 @@ class GradleMatchers {
 
         @Override
         protected boolean matchesSafely(Configuration item, Description mismatchDescription) {
-            List<String> dependencies = item.dependencies.collect { dependency ->
-                "${dependency.group}:${dependency.name}:${dependency.version}".toString()
-            }
+            List<String> dependencies = getDependencies(item)
             mismatchDescription.appendText(" was ").appendValue(dependencies)
             return dependencies.contains("${group}:${name}:${version}".toString())
+        }
+
+        List<String> getDependencies(Configuration configuration) {
+            configuration.dependencies.collect {dependency ->
+                "${dependency.group}:${dependency.name}:${dependency.version}".toString()
+            }
+        }
+    }
+
+    static class HasDefaultDependency extends HasDependency {
+        HasDefaultDependency(String group, String name, String version) {
+            super(group, name, version)
+        }
+
+        List<String> getDependencies(Configuration configuration) {
+            configuration.incoming.dependencies.collect {dependency ->
+                "${dependency.group}:${dependency.name}:${dependency.version}".toString()
+            }
         }
     }
 }
