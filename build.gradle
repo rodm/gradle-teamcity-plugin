@@ -63,18 +63,22 @@ gradlePlugin {
     plugins {
         teamcityServerPlugin {
             id = 'com.github.rodm.teamcity-server'
+            displayName = 'Gradle TeamCity Server plugin'
             implementationClass = 'com.github.rodm.teamcity.TeamCityServerPlugin'
         }
         teamcityAgentPlugin {
             id = 'com.github.rodm.teamcity-agent'
+            displayName = 'Gradle TeamCity Agent plugin'
             implementationClass = 'com.github.rodm.teamcity.TeamCityAgentPlugin'
         }
         teamcityCommonPlugin {
             id = 'com.github.rodm.teamcity-common'
+            displayName = 'Gradle TeamCity Common API plugin'
             implementationClass = 'com.github.rodm.teamcity.TeamCityCommonPlugin'
         }
         teamcityEnvironmentsPlugin {
             id = 'com.github.rodm.teamcity-environments'
+            displayName = 'Gradle TeamCity Environments plugin'
             implementationClass = 'com.github.rodm.teamcity.TeamCityEnvironmentsPlugin'
         }
     }
@@ -109,19 +113,4 @@ pluginBundle {
     vcsUrl = 'https://github.com/rodm/gradle-teamcity-plugin'
     description = 'Gradle plugin for developing TeamCity plugins'
     tags = ['teamcity']
-
-    plugins {
-        teamcityServerPlugin {
-            displayName = 'Gradle TeamCity Server plugin'
-        }
-        teamcityAgentPlugin {
-            displayName = 'Gradle TeamCity Agent plugin'
-        }
-        teamcityCommonPlugin {
-            displayName = 'Gradle TeamCity Common API plugin'
-        }
-        teamcityEnvironmentsPlugin {
-            displayName = 'Gradle TeamCity Environments plugin'
-        }
-    }
 }
