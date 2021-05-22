@@ -17,17 +17,21 @@ ext {
     java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
 }
 
+def dockerCommandLine = ['docker', 'run', '--rm',
+                         '--name', 'npmbuild',
+                         '-v', "${projectDir}:/project",
+                         '-w', '/project', 'node:lts']
+
 task npmInstall(type: Exec) {
-    commandLine "npm", "install"
+    commandLine = [*dockerCommandLine, 'npm', 'install']
 }
 
 task webpack(type: Exec) {
-    inputs.dir("src/main/js")
-    inputs.file("package-lock.json")
-    inputs.file("webpack.config.js")
+    inputs.dir('src/main/js')
+    inputs.file('package-lock.json')
+    inputs.file('webpack.config.js')
     outputs.dir("$buildDir/js")
-
-    commandLine "npm", "run", "build"
+    commandLine = [*dockerCommandLine, 'npm', 'run', 'build']
 }
 
 teamcity {
