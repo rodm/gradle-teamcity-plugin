@@ -556,6 +556,30 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'ConfigureEnvironmentTasks configures environments composed with shared properties'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                baseHomeDir = '/tmp/servers'
+                baseDataDir = '/tmp/data'
+                test1 {
+                    version = '2021.1'
+                    homeDir = "${baseHomeDir}/Test1"
+                    dataDir = "${baseDataDir}/Test1"
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        def environment1 = extension.environments.getByName('test1')
+        assertThat(normalize(environment1.homeDir), endsWith('/tmp/servers/Test1'))
+        assertThat(normalize(environment1.dataDir), endsWith('/tmp/data/Test1'))
+    }
+
+    @Test
     void 'ConfigureEnvironmentTasks configures environment using environment properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {

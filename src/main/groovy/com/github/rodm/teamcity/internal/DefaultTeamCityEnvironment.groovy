@@ -42,6 +42,8 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      */
     final String name
 
+    private TeamCityEnvironments environments
+
     private String version = '9.0'
     private Property<String> downloadUrl
     private Provider<String> installerFile
@@ -54,6 +56,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     DefaultTeamCityEnvironment(String name, TeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name
+        this.environments = environments
         this.downloadUrl= factory.property(String).convention(defaultDownloadUrl(environments))
         this.installerFile = factory.property(String).value(defaultInstallerFile(environments))
         this.homeDir = factory.property(String).convention(defaultHomeDir(environments))
@@ -88,6 +91,14 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     @CompileStatic(SKIP)
     private String dataVersion(String version) {
         return (version =~ (/(\d+\.\d+).*/))[0][1]
+    }
+
+    String getBaseHomeDir() {
+        this.environments.defaultBaseHomeDir().get()
+    }
+
+    String getBaseDataDir() {
+        this.environments.defaultBaseDataDir().get()
     }
 
     File getPluginsDir() {

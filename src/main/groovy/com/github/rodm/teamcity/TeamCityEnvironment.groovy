@@ -76,4 +76,10 @@ interface TeamCityEnvironment {
     Object getAgentOptions()
     void setAgentOptions(Object options)
     void agentOptions(String... options)
+
+    /**
+     * Convenience accessors for base properties
+     */
+    String getBaseHomeDir()
+    String getBaseDataDir()
 }
