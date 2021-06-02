@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironment
 import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
@@ -26,6 +27,7 @@ import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.tasks.Undeploy
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -56,8 +58,8 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         @Override
         void execute(Project project) {
-            TeamCityEnvironments environments = extension.environments
-            environments.environments.each { environment ->
+            NamedDomainObjectContainer<TeamCityEnvironment> environments = extension.environments.environments
+            environments.each { DefaultTeamCityEnvironment environment ->
 
                 String name = environment.name.capitalize()
                 def download = project.tasks.register("download${name}", DownloadTeamCity) {
@@ -69,7 +71,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 project.tasks.register("install${name}", InstallTeamCity) {
                     group = TEAMCITY_GROUP
                     source.set(project.file(environment.installerFile))
-                    target.set(project.file(environment.homeDir.get()))
+                    target.set(project.file(environment.homeDirProperty.get()))
                     dependsOn download
                 }
 
@@ -86,7 +88,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     pluginsDir.set(environment.pluginsDir)
                 }
                 if (TeamCityVersion.version(environment.version) >= VERSION_2018_2) {
-                    def dataDir = project.file(environment.dataDir.get())
+                    def dataDir = project.file(environment.dataDirProperty.get())
                     deployPlugin.configure {
                         def plugins = environment.plugins.files
                         def disabledPlugins = []
@@ -101,9 +103,9 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def startServer = project.tasks.register("start${name}Server", StartServer) {
                     group = TEAMCITY_GROUP
-                    homeDir.set(environment.homeDir)
-                    dataDir.set(environment.dataDir)
-                    javaHome.set(environment.javaHome)
+                    homeDir.set(environment.homeDirProperty)
+                    dataDir.set(environment.dataDirProperty)
+                    javaHome.set(environment.javaHomeProperty)
                     serverOptions.set(environment.serverOptions.map({it.join(' ')}))
                     doFirst {
                         project.mkdir(getDataDir())
@@ -113,22 +115,22 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def stopServer = project.tasks.register("stop${name}Server", StopServer) {
                     group = TEAMCITY_GROUP
-                    homeDir.set(environment.homeDir)
-                    javaHome.set(environment.javaHome)
+                    homeDir.set(environment.homeDirProperty)
+                    javaHome.set(environment.javaHomeProperty)
                     finalizedBy undeployPlugin
                 }
 
                 def startAgent = project.tasks.register("start${name}Agent", StartAgent) {
                     group = TEAMCITY_GROUP
-                    homeDir.set(environment.homeDir)
-                    javaHome.set(environment.javaHome)
+                    homeDir.set(environment.homeDirProperty)
+                    javaHome.set(environment.javaHomeProperty)
                     agentOptions.set(environment.agentOptions.map({it.join(' ')}))
                 }
 
                 def stopAgent = project.tasks.register("stop${name}Agent", StopAgent) {
                     group = TEAMCITY_GROUP
-                    homeDir.set(environment.homeDir)
-                    javaHome.set(environment.javaHome)
+                    homeDir.set(environment.homeDirProperty)
+                    javaHome.set(environment.javaHomeProperty)
                 }
 
                 project.tasks.register("start${name}") {

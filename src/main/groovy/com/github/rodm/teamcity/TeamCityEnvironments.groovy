@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironment
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
@@ -61,7 +62,7 @@ class TeamCityEnvironments {
         NamedDomainObjectFactory<TeamCityEnvironment> factory = new NamedDomainObjectFactory<TeamCityEnvironment>() {
             @Override
             TeamCityEnvironment create(String name) {
-                return new TeamCityEnvironment(name, TeamCityEnvironments.this, project.objects)
+                return new DefaultTeamCityEnvironment(name, TeamCityEnvironments.this, project.objects)
             }
         }
         this.environments = project.container(TeamCityEnvironment, factory)

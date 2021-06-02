@@ -166,12 +166,12 @@ class EnvironmentsKotlinTest {
             environments {
                 it.register("test") {
                     it.version = "2020.1"
-                    it.javaHome.set("/opt/java1.8.0")
+                    it.javaHome = "/opt/java1.8.0"
                 }
             }
         }
 
         val environment = teamcity.environments.named("test").get()
-        assertThat(environment.javaHome.get(), equalTo("/opt/java1.8.0"))
+        assertThat(environment.javaHome, equalTo("/opt/java1.8.0"))
     }
 }
