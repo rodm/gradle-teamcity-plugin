@@ -17,6 +17,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -126,10 +127,16 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
                 .withProjectDir(testProjectDir.toFile())
                 .withArguments("agentPlugin")
                 .withPluginClasspath()
+                .forwardOutput()
                 .buildAndFail()
 
         assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FAILED))
-        assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
+        if (GradleVersion.current() < GradleVersion.version('7.0')) {
+            assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
+        } else {
+            assertThat(result.getOutput(), containsString("property 'descriptor' specifies file"))
+            assertThat(result.getOutput(), containsString("which doesn't exist."))
+        }
     }
 
     @Test
