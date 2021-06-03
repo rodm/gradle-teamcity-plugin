@@ -55,7 +55,7 @@ class EnvironmentsKotlinTest {
     fun `replace default agent options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.environments.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
 
                 "test" {
                     agentOptions = "-DnewOption1=value1"
@@ -72,7 +72,7 @@ class EnvironmentsKotlinTest {
     fun `replace default agent options with multiple values`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.environments.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
 
                 "test" {
                     agentOptions = listOf("-Doption1=value1", "-Doption2=value2")
@@ -88,7 +88,7 @@ class EnvironmentsKotlinTest {
     fun `clear default server options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.environments.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
 
                 "test" {
                     serverOptions = emptyList<String>()
@@ -104,7 +104,7 @@ class EnvironmentsKotlinTest {
     fun `replace default server options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.environments.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
 
                 "test" {
                     serverOptions = "-DnewOption=test"
@@ -120,7 +120,7 @@ class EnvironmentsKotlinTest {
     fun `replace default server options with multiple values`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.environments.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
 
                 "test" {
                     serverOptions = listOf("-Doption1=value1", "-Doption2=value2")
