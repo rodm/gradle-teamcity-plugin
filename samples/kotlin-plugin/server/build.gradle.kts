@@ -36,29 +36,27 @@ teamcity {
     }
 
     environments {
-        downloadsDir.set(extra["downloadsDir"] as String)
-        baseHomeDir.set(extra["serversDir"] as String)
-        baseDataDir.set("${rootDir}/data")
+        downloadsDir = extra["downloadsDir"] as String
+        baseHomeDir = extra["serversDir"] as String
+        baseDataDir = "${rootDir}/data"
 
-        operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) {
-            environments.create(this, closureOf<TeamCityEnvironment>(block))
-        }
+        operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = environments.create(this, block)
 
         "teamcity2019.1" {
             version = "2019.1.5"
-            javaHome.set(extra["java8Home"] as String)
+            javaHome = extra["java8Home"] as String
             serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
             agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
         }
 
         create("teamcity2019.2") {
             version = "2019.2.4"
-            javaHome.set(extra["java8Home"] as String)
+            javaHome = extra["java8Home"] as String
         }
 
         register("teamcity2020.1") {
             version = "2020.1"
-            javaHome.set(extra["java8Home"] as String)
+            javaHome = extra["java8Home"] as String
         }
     }
 }
