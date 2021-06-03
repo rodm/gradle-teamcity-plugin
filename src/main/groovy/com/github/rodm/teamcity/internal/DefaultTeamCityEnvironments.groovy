@@ -81,7 +81,7 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.downloadsDir.set(downloadsDir)
     }
 
-    Provider<String> defaultDownloadsDir() {
+    Provider<String> getDefaultDownloadsDir() {
         return gradleProperty(DOWNLOADS_DIR_PROPERTY).orElse(downloadsDir)
     }
 
@@ -96,7 +96,7 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseDownloadUrl.set(baseDownloadUrl)
     }
 
-    Provider<String> defaultBaseDownloadUrl() {
+    Provider<String> getDefaultBaseDownloadUrl() {
         return gradleProperty(BASE_DOWNLOAD_URL_PROPERTY).orElse(baseDownloadUrl)
     }
 
@@ -115,7 +115,7 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir.set(baseHomeDir.absolutePath)
     }
 
-    Provider<String> defaultBaseHomeDir() {
+    Provider<String> getDefaultBaseHomeDir() {
         return gradleProperty(BASE_HOME_DIR_PROPERTY).orElse(baseHomeDir)
     }
 
@@ -134,7 +134,7 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseDataDir.set(baseDataDir.absolutePath)
     }
 
-    Provider<String> defaultBaseDataDir() {
+    Provider<String> getDefaultBaseDataDir() {
         return gradleProperty(BASE_DATA_DIR_PROPERTY).orElse(baseDataDir)
     }
 

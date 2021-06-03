@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity.internal
 
 import com.github.rodm.teamcity.TeamCityEnvironment
-import com.github.rodm.teamcity.TeamCityEnvironments
 import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
 import org.gradle.api.file.ConfigurableFileCollection
@@ -42,7 +41,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      */
     final String name
 
-    private TeamCityEnvironments environments
+    private DefaultTeamCityEnvironments environments
 
     private String version = '9.0'
     private Property<String> downloadUrl
@@ -54,13 +53,13 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     private ListProperty<String> serverOptions
     private ListProperty<String> agentOptions
 
-    DefaultTeamCityEnvironment(String name, TeamCityEnvironments environments, ObjectFactory factory) {
+    DefaultTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name
         this.environments = environments
-        this.downloadUrl= factory.property(String).convention(defaultDownloadUrl(environments))
-        this.installerFile = factory.property(String).value(defaultInstallerFile(environments))
-        this.homeDir = factory.property(String).convention(defaultHomeDir(environments))
-        this.dataDir = factory.property(String).convention(defaultDataDir(environments))
+        this.downloadUrl= factory.property(String).convention(defaultDownloadUrl())
+        this.installerFile = factory.property(String).value(defaultInstallerFile())
+        this.homeDir = factory.property(String).convention(defaultHomeDir())
+        this.dataDir = factory.property(String).convention(defaultDataDir())
         this.javaHome = factory.property(String).convention(System.getProperty('java.home'))
         this.plugins = factory.fileCollection()
         this.serverOptions = factory.listProperty(String)
@@ -68,24 +67,24 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
         this.agentOptions = factory.listProperty(String)
     }
 
-    private Provider<String> defaultDownloadUrl(TeamCityEnvironments environments) {
-        return environments.defaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
+    private Provider<String> defaultDownloadUrl() {
+        return environments.getDefaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
     }
 
-    private Provider<String> defaultInstallerFile(TeamCityEnvironments environments) {
-        return environments.defaultDownloadsDir().map {it + '/' + toFilename(this.downloadUrl.get()) }
+    private Provider<String> defaultInstallerFile() {
+        return environments.getDefaultDownloadsDir().map {it + '/' + toFilename(this.downloadUrl.get()) }
     }
 
     private static String toFilename(String url) {
         return url[(url.lastIndexOf('/') + 1)..-1]
     }
 
-    private Provider<String> defaultHomeDir(TeamCityEnvironments environments) {
-        return environments.defaultBaseHomeDir().map {it + "/TeamCity-${version}" }
+    private Provider<String> defaultHomeDir() {
+        return environments.getDefaultBaseHomeDir().map {it + "/TeamCity-${version}" }
     }
 
-    private Provider<String> defaultDataDir(TeamCityEnvironments environments) {
-        return environments.defaultBaseDataDir().map {it + "/${dataVersion(version)}" }
+    private Provider<String> defaultDataDir() {
+        return environments.getDefaultBaseDataDir().map {it + "/${dataVersion(version)}" }
     }
 
     @CompileStatic(SKIP)
@@ -94,11 +93,11 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     String getBaseHomeDir() {
-        this.environments.defaultBaseHomeDir().get()
+        this.environments.getDefaultBaseHomeDir().get()
     }
 
     String getBaseDataDir() {
-        this.environments.defaultBaseDataDir().get()
+        this.environments.getDefaultBaseDataDir().get()
     }
 
     File getPluginsDir() {

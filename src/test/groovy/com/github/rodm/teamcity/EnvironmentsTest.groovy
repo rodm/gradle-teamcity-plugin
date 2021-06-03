@@ -132,7 +132,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.defaultBaseDownloadUrl().get(), equalTo('http://local-repository'))
+        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://local-repository'))
     }
 
     @Test
@@ -160,7 +160,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(normalize(extension.environments.defaultBaseHomeDir().get()), endsWith('/tmp/servers'))
+        assertThat(normalize(extension.environments.getDefaultBaseHomeDir().get()), endsWith('/tmp/servers'))
     }
 
     @Test
@@ -173,10 +173,10 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        assertThat(extension.environments.defaultDownloadsDir().get(), equalTo('/alt/downloads'))
-        assertThat(extension.environments.defaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
-        assertThat(extension.environments.defaultBaseHomeDir().get(), equalTo('/alt/servers'))
-        assertThat(extension.environments.defaultBaseDataDir().get(), equalTo('/alt/data'))
+        assertThat(extension.environments.getDefaultDownloadsDir().get(), equalTo('/alt/downloads'))
+        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
+        assertThat(extension.environments.getDefaultBaseHomeDir().get(), equalTo('/alt/servers'))
+        assertThat(extension.environments.getDefaultBaseDataDir().get(), equalTo('/alt/data'))
     }
 
     @Test
@@ -198,10 +198,10 @@ class EnvironmentsTest {
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
-        assertThat(extension.environments.defaultDownloadsDir().get(), equalTo('/alt/downloads'))
-        assertThat(extension.environments.defaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
-        assertThat(extension.environments.defaultBaseHomeDir().get(), equalTo('/alt/servers'))
-        assertThat(extension.environments.defaultBaseDataDir().get(), equalTo('/alt/data'))
+        assertThat(extension.environments.getDefaultDownloadsDir().get(), equalTo('/alt/downloads'))
+        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
+        assertThat(extension.environments.getDefaultBaseHomeDir().get(), equalTo('/alt/servers'))
+        assertThat(extension.environments.getDefaultBaseDataDir().get(), equalTo('/alt/data'))
     }
 
     @Test

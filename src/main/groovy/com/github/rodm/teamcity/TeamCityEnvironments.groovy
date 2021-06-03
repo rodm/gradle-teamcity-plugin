@@ -29,14 +29,12 @@ interface TeamCityEnvironments {
      */
     Property<String> getDownloadsDir()
     void setDownloadsDir(String downloadsDir)
-    Provider<String> defaultDownloadsDir()
 
     /**
      * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
      */
     Property<String> getBaseDownloadUrl()
     void setBaseDownloadUrl(String baseDownloadUrl)
-    Provider<String> defaultBaseDownloadUrl()
 
     /**
      * The base home directory used to install TeamCity distributions. Defaults to "servers"
@@ -44,7 +42,6 @@ interface TeamCityEnvironments {
     Property<String> getBaseHomeDir()
     void setBaseHomeDir(String baseHomeDir)
     void setBaseHomeDir(File baseHomeDir)
-    Provider<String> defaultBaseHomeDir()
 
     /**
      * The base data directory used to store TeamCity configurations. Defaults to "data"
@@ -52,7 +49,6 @@ interface TeamCityEnvironments {
     Property<String> getBaseDataDir()
     void setBaseDataDir(String baseDataDir)
     void setBaseDataDir(File baseDataDir)
-    Provider<String> defaultBaseDataDir()
 
     // methods to create and access TeamCityEnvironments
     TeamCityEnvironment getByName(String name)
