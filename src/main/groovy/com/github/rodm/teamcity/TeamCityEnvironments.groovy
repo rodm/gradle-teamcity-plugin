@@ -19,34 +19,32 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.UnknownDomainObjectException
-import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 
 interface TeamCityEnvironments {
 
     /**
      * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".
      */
-    Property<String> getDownloadsDir()
+    String getDownloadsDir()
     void setDownloadsDir(String downloadsDir)
 
     /**
      * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
      */
-    Property<String> getBaseDownloadUrl()
+    String getBaseDownloadUrl()
     void setBaseDownloadUrl(String baseDownloadUrl)
 
     /**
      * The base home directory used to install TeamCity distributions. Defaults to "servers"
      */
-    Property<String> getBaseHomeDir()
+    String getBaseHomeDir()
     void setBaseHomeDir(String baseHomeDir)
     void setBaseHomeDir(File baseHomeDir)
 
     /**
      * The base data directory used to store TeamCity configurations. Defaults to "data"
      */
-    Property<String> getBaseDataDir()
+    String getBaseDataDir()
     void setBaseDataDir(String baseDataDir)
     void setBaseDataDir(File baseDataDir)
 

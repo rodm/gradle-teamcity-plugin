@@ -101,10 +101,10 @@ class EnvironmentsTest {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
 
         TeamCityEnvironments environments = project.extensions.getByType(TeamCityPluginExtension).environments
-        assertThat(environments.getDownloadsDir().get(), equalTo('downloads'))
-        assertThat(environments.getBaseDownloadUrl().get(), equalTo('https://download.jetbrains.com/teamcity'))
-        assertThat(normalize(environments.getBaseHomeDir().get()), endsWith('/servers'))
-        assertThat(normalize(environments.getBaseDataDir().get()), endsWith('/data'))
+        assertThat(environments.downloadsDir, equalTo('downloads'))
+        assertThat(environments.baseDownloadUrl, equalTo('https://download.jetbrains.com/teamcity'))
+        assertThat(normalize(environments.baseHomeDir), endsWith('/servers'))
+        assertThat(normalize(environments.baseDataDir), endsWith('/data'))
     }
 
     @Test
@@ -118,7 +118,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.getDownloadsDir().get(), equalTo('/tmp/downloads'))
+        assertThat(extension.environments.downloadsDir, equalTo('/tmp/downloads'))
     }
 
     @Test
@@ -132,7 +132,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://local-repository'))
+        assertThat(extension.environments.baseDownloadUrl, equalTo('http://local-repository'))
     }
 
     @Test
@@ -146,7 +146,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(normalize(extension.environments.getBaseDataDir().get()), endsWith('/tmp/data'))
+        assertThat(normalize(extension.environments.baseDataDir), endsWith('/tmp/data'))
     }
 
     @Test
@@ -160,7 +160,7 @@ class EnvironmentsTest {
         }
 
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(normalize(extension.environments.getDefaultBaseHomeDir().get()), endsWith('/tmp/servers'))
+        assertThat(normalize(extension.environments.baseHomeDir), endsWith('/tmp/servers'))
     }
 
     @Test
