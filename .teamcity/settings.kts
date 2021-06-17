@@ -14,7 +14,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 version = "2020.2"
 
 fun supportedGradleVersion(javaVersion: String?): String? {
-    val versionsMap = mapOf("14" to "6.3", "15" to "6.7.1", "16" to "7.0-rc-1")
+    val versionsMap = mapOf("14" to "6.3", "15" to "6.7.1", "16" to "7.0.2")
     return versionsMap[javaVersion]
 }
 
