@@ -16,9 +16,9 @@
 package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
 
+import static com.github.rodm.teamcity.TestSupport.executeBuildAndFail
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
@@ -172,12 +172,7 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
             }
         """
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.toFile())
-                .withArguments("assemble")
-                .withPluginClasspath()
-                .forwardOutput()
-                .buildAndFail()
+        BuildResult result = executeBuildAndFail(testProjectDir.toFile(), 'assemble')
 
         assertThat(result.getOutput(), containsString("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin"))
     }

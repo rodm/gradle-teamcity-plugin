@@ -33,4 +33,13 @@ class TestSupport {
             .forwardOutput()
             .build()
     }
+
+    static BuildResult executeBuildAndFail(File projectDir, String args) {
+        GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withArguments(args)
+            .withPluginClasspath()
+            .forwardOutput()
+            .buildAndFail()
+    }
 }

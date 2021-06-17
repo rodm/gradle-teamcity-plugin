@@ -16,13 +16,13 @@
 package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
+import static com.github.rodm.teamcity.TestSupport.executeBuildAndFail
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
@@ -217,12 +217,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
     void serverPluginFailsWithMissingDescriptorFile() {
         buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
 
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.toFile())
-                .withArguments("serverPlugin")
-                .withPluginClasspath()
-                .forwardOutput()
-                .buildAndFail()
+        BuildResult result = executeBuildAndFail(testProjectDir.toFile(), 'serverPlugin')
 
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(FAILED))
         if (GradleVersion.current() < GradleVersion.version('7.0')) {
