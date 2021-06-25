@@ -18,7 +18,6 @@ package com.github.rodm.teamcity.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.file.RelativePath
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -43,12 +42,10 @@ class InstallTeamCity extends DefaultTask {
             from(project.tarTree(getSource().get())) {
                 includeEmptyDirs = false
                 eachFile { file ->
-                    String[] segments = file.relativePath.segments[0..-1] as String[]
-                    segments[0] = targetName
-                    file.relativePath = new RelativePath(file.relativePath.endsWithFile, segments)
+                    file.path = targetName + '/' + path.split('/', 2)[1]
                 }
             }
-            into getTarget().get().asFile.parentFile
+            into(getTarget().get().asFile.parentFile)
         }
     }
 }
