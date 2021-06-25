@@ -18,7 +18,12 @@ package com.github.rodm.teamcity
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+
+import java.nio.file.Path
+import java.nio.file.Paths
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.CoreMatchers.is
@@ -26,73 +31,97 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class SamplesTest {
 
-    private File samplesDir
+    private Path samples
 
     @BeforeEach
     void setup() throws IOException {
-        samplesDir = new File('samples')
-    }
-
-    @Test
-    void serverPlugin() {
-        File projectDir = new File(samplesDir, 'server-plugin')
-        BuildResult result = executeBuild(projectDir)
-
-        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
+        samples = Paths.get('samples')
     }
 
     @Test
     void serverPluginWithAlternativeBuildFile() {
-        File projectDir = new File(samplesDir, 'server-plugin')
-        BuildResult result = executeBuild(projectDir, '--include-build', '../..', '-b', 'build-alt.gradle', 'clean', 'build')
-
-        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
-    }
-
-    @Test
-    void agentServerPlugin() {
-        File projectDir = new File(samplesDir, 'agent-server-plugin')
-        BuildResult result = executeBuild(projectDir)
-
-        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
-    }
-
-    @Test
-    void agentToolPlugin() {
-        File projectDir = new File(samplesDir, 'agent-tool-plugin')
-        BuildResult result = executeBuild(projectDir)
+        BuildResult result = executeBuild(samples.resolve('server-plugin'),
+            '--include-build', '../..', '-b', 'build-alt.gradle', 'clean', 'build')
 
         assertThat(result.task(':build').getOutcome(), is(SUCCESS))
     }
 
     @Test
     void multiProjectPlugin() {
-        File projectDir = new File(samplesDir, 'multi-project-plugin')
-        BuildResult result = executeBuild(projectDir)
+        BuildResult result = executeBuild(samples.resolve('multi-project-plugin'))
 
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
 
     @Test
     void 'build kotlin plugin'() {
-        File projectDir = new File(samplesDir, 'kotlin-plugin')
-        BuildResult result = executeBuild(projectDir)
+        BuildResult result = executeBuild(samples.resolve('kotlin-plugin'))
 
         assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
     }
 
-    @Test
-    void 'multiple plugins'() {
-        File projectDir = new File(samplesDir, 'multiple-plugins')
-        BuildResult result = executeBuild(projectDir)
+    abstract class Samples {
 
-        assertThat(result.task(':plugin1:build').getOutcome(), is(SUCCESS))
-        assertThat(result.task(':plugin2:build').getOutcome(), is(SUCCESS))
+        abstract BuildResult executeBuild(Path projectDir)
+
+        @Test
+        void 'server plugin'() {
+            BuildResult result = executeBuild(samples.resolve('server-plugin'))
+
+            assertThat(result.task(':build').getOutcome(), is(SUCCESS))
+        }
+
+        @Test
+        void 'agent server plugin'() {
+            BuildResult result = executeBuild(samples.resolve('agent-server-plugin'))
+
+            assertThat(result.task(':build').getOutcome(), is(SUCCESS))
+        }
+
+        @Test
+        void 'agent tool plugin'() {
+            BuildResult result = executeBuild(samples.resolve('agent-tool-plugin'))
+
+            assertThat(result.task(':build').getOutcome(), is(SUCCESS))
+        }
+
+        @Test
+        void 'multiple plugins'() {
+            BuildResult result = executeBuild(samples.resolve('multiple-plugins'))
+
+            assertThat(result.task(':plugin1:build').getOutcome(), is(SUCCESS))
+            assertThat(result.task(':plugin2:build').getOutcome(), is(SUCCESS))
+        }
+
+        @Test
+        void 'reloadable plugin'() {
+            BuildResult result = executeBuild(samples.resolve('reloadable-plugin'))
+
+            assertThat(result.task(':build').getOutcome(), is(SUCCESS))
+        }
     }
 
-    private static BuildResult executeBuild(File projectDir, String... args = ['clean', 'build']) {
+    @Nested
+    @DisplayName("using groovy build scripts")
+    class UsingGroovyBuildScripts extends Samples {
+        @Override
+        BuildResult executeBuild(Path projectDir) {
+            return SamplesTest.executeBuild(projectDir)
+        }
+    }
+
+    @Nested
+    @DisplayName("using kotlin build scripts")
+    class UsingKotlinBuildScripts extends Samples {
+        @Override
+        BuildResult executeBuild(Path projectDir) {
+            executeBuild(projectDir, '-c', 'settings.gradle.kts', 'clean', 'build')
+        }
+    }
+
+    private static BuildResult executeBuild(Path projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
-                .withProjectDir(projectDir)
+                .withProjectDir(projectDir.toFile())
                 .withArguments('--warning-mode', 'fail', *args)
                 .withPluginClasspath()
                 .forwardOutput()

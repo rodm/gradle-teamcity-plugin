@@ -1,0 +1,58 @@
+
+import java.time.LocalDateTime
+
+plugins {
+    id ("java")
+    id ("com.github.rodm.teamcity-server") version "1.4-beta-2"
+    id ("com.github.rodm.teamcity-environments") version "1.4-beta-2"
+}
+
+group = "com.github.rodm.teamcity"
+version = "1.0-SNAPSHOT"
+
+extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
+extra["serversDir"] = project.findProperty("servers.dir") ?: "${rootDir}/servers"
+extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92"
+
+tasks {
+    test {
+        useTestNG()
+    }
+}
+
+teamcity {
+    version = "2018.2"
+
+    server {
+        descriptor {
+            name = project.name
+            displayName = project.name
+            version = project.version as String
+            vendorName = "rodm"
+            vendorUrl = "http://example.com"
+            description = "TeamCity Example Server Plugin"
+
+            downloadUrl = "https://github.com/rodm/gradle-teamcity-plugin/"
+            email = "rod.n.mackenzie@gmail.com"
+
+            useSeparateClassloader = true
+            allowRuntimeReload = true
+
+            parameters {
+                parameter ("build-time", LocalDateTime.now())
+            }
+        }
+    }
+
+    environments {
+        downloadsDir = extra["downloadsDir"] as String
+        baseHomeDir = extra["serversDir"] as String
+        baseDataDir = "data"
+
+        register("teamcity2018.2") {
+            version = "2018.2"
+            javaHome = extra["java8Home"] as String
+//            serverOptions ("") // uncomment to disable super user token
+        }
+    }
+}
