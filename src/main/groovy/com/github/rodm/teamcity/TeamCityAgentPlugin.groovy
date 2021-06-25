@@ -46,7 +46,6 @@ class TeamCityAgentPlugin implements Plugin<Project> {
     public static final String GENERATE_AGENT_DESCRIPTOR_TASK_NAME = 'generateAgentDescriptor'
     public static final String AGENT_PLUGIN_TASK_NAME = 'agentPlugin'
 
-
     void apply(Project project) {
         project.plugins.apply(TeamCityPlugin)
 
@@ -92,8 +91,8 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, AgentPlugin) {
             group = TEAMCITY_GROUP
-            descriptor.set(descriptorFile)
             onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
+            descriptor.set(descriptorFile)
             lib.from(project.configurations.agent)
             project.plugins.withType(JavaPlugin) {
                 lib.from(project.tasks.named(JAR_TASK_NAME))

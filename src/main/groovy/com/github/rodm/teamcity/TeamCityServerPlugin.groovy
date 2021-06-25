@@ -128,8 +128,8 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, ServerPlugin) {
             group = TEAMCITY_GROUP
-            descriptor.set(descriptorFile)
             onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
+            descriptor.set(descriptorFile)
             server.from(project.configurations.server)
             project.plugins.withType(JavaPlugin) {
                 server.from(project.tasks.named(JAR_TASK_NAME))
@@ -187,7 +187,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
                 project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPluginTask) {
                     group = TEAMCITY_GROUP
-                    description = "Sign plugin before publishing."
                     classpath = project.configurations.marketplace
                     certificateChain.set(extension.server.sign.certificateChain)
                     privateKey.set(extension.server.sign.privateKey)
@@ -207,7 +206,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
                 project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
                     group = TEAMCITY_GROUP
-                    description = "Publish plugin distribution on plugins.jetbrains.com."
                     classpath = project.configurations.marketplace
                     channels.set(extension.server.publish.channels)
                     token.set(extension.server.publish.token)
