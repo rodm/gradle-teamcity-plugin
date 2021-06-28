@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.provider.Property
 
 interface TeamCityEnvironment {
 
@@ -29,7 +28,7 @@ interface TeamCityEnvironment {
     /**
      * The download URL used to download the TeamCity distribution for this environment.
      */
-    Property<String> getDownloadUrl()
+    String getDownloadUrl()
     void setDownloadUrl(String downloadUrl)
 
     /**

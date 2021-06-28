@@ -72,7 +72,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultInstallerFile() {
-        return environments.getDefaultDownloadsDir().map {it + '/' + toFilename(this.downloadUrl.get()) }
+        return environments.getDefaultDownloadsDir().map {it + '/' + toFilename(downloadUrl) }
     }
 
     private static String toFilename(String url) {
@@ -119,8 +119,8 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     /**
      * The download URL used to download the TeamCity distribution for this environment.
      */
-    Property<String> getDownloadUrl() {
-        return downloadUrl
+    String getDownloadUrl() {
+        return downloadUrl.get()
     }
 
     void setDownloadUrl(String downloadUrl) {
