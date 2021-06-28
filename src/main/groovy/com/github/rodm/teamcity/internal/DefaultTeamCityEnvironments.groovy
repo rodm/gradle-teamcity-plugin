@@ -157,7 +157,7 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         }
     }
 
-    private Provider<String> gradleProperty(String name) {
+    Provider<String> gradleProperty(String name) {
         def callable = { project.findProperty(name) ?: null }
         return project.<String>provider(callable)
     }

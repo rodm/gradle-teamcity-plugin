@@ -606,6 +606,37 @@ class EnvironmentsTest {
     }
 
     @Test
+    void 'ConfigureEnvironmentTasks configures environment using overrides from gradle properties'() {
+        project.ext['teamcity.environments.test.downloadUrl'] = 'https://alt-repository/TeamCity-9.1.7.tar.gz'
+        project.ext['teamcity.environments.test.javaHome'] = '/alt/java'
+        project.ext['teamcity.environments.test.homeDir'] = '/alt/servers/TeamCity-9.1.7'
+        project.ext['teamcity.environments.test.dataDir'] = '/alt/data/9.1'
+
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '9.1.7'
+                    downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
+                    javaHome = project.file('/tmp/java')
+                    homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
+                    dataDir = project.file('/tmp/data/teamcity9.1')
+                }
+            }
+        }
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+
+        configureEnvironmentTasks.execute(project)
+
+        def environment = extension.environments.getByName('test')
+        assertThat(environment.downloadUrl, equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
+        assertThat(normalize(environment.javaHome), endsWith('/alt/java'))
+        assertThat(normalize(environment.homeDir), endsWith('/alt/servers/TeamCity-9.1.7'))
+        assertThat(normalize(environment.dataDir), endsWith('/alt/data/9.1'))
+    }
+
+    @Test
     void 'ConfigureEnvironmentTasks adds tasks for an environment'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {

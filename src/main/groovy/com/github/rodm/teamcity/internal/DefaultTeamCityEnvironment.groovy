@@ -56,7 +56,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     DefaultTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name
         this.environments = environments
-        this.downloadUrl= factory.property(String).convention(defaultDownloadUrl())
+        this.downloadUrl = factory.property(String).convention(defaultDownloadUrl())
         this.installerFile = factory.property(String).value(defaultInstallerFile())
         this.homeDir = factory.property(String).convention(defaultHomeDir())
         this.dataDir = factory.property(String).convention(defaultDataDir())
@@ -120,7 +120,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      * The download URL used to download the TeamCity distribution for this environment.
      */
     String getDownloadUrl() {
-        return downloadUrl.get()
+        return environments.gradleProperty(propertyName('downloadUrl')).orElse(downloadUrl).get()
     }
 
     void setDownloadUrl(String downloadUrl) {
@@ -135,45 +135,45 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      * The home directory for this environment's TeamCity installation.
      */
     String getHomeDir() {
-        return homeDir.get()
+        return getHomeDirProperty().get()
     }
 
     void setHomeDir(String homeDir) {
         this.homeDir.set(homeDir)
     }
 
-    Property<String> getHomeDirProperty() {
-        return homeDir
+    Provider<String> getHomeDirProperty() {
+        return environments.gradleProperty(propertyName('homeDir')).orElse(homeDir)
     }
 
     /**
      * The data directory for this environment's TeamCity configuration.
      */
     String getDataDir() {
-        return dataDir.get()
+        return getDataDirProperty().get()
     }
 
     void setDataDir(String dataDir) {
         this.dataDir.set(dataDir)
     }
 
-    Property<String> getDataDirProperty() {
-        return dataDir
+    Provider<String> getDataDirProperty() {
+        return environments.gradleProperty(propertyName('dataDir')).orElse(dataDir)
     }
 
     /**
      * The Java home directory used to start the server and agent for this environment.
      */
     String getJavaHome() {
-        return javaHome.get()
+        return getJavaHomeProperty().get()
     }
 
     void setJavaHome(String javaHome) {
         this.javaHome.set(javaHome)
     }
 
-    Property<String> getJavaHomeProperty() {
-        return javaHome
+    Provider<String> getJavaHomeProperty() {
+        return environments.gradleProperty(propertyName('javaHome')).orElse(javaHome)
     }
 
     /**
@@ -240,5 +240,9 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     void agentOptions(String... options) {
         this.agentOptions.addAll(options)
+    }
+
+    private String propertyName(String property) {
+        return "teamcity.environments.${name}.${property}".toString()
     }
 }
