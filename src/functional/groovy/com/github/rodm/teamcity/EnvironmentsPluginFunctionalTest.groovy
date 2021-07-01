@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 import java.nio.file.Path
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static org.gradle.testkit.runner.TaskOutcome.NO_SOURCE
@@ -53,6 +55,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             teamcity {
                 environments {
                     teamcity {
+                        version = '9.1.6'
                         homeDir = file('${homeDir.toURI()}')
                         dataDir = file('${dataDir.toURI()}')
                         javaHome = file('${javaHome.toURI()}')
@@ -94,6 +97,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
                 }
                 environments {
                     teamcity {
+                        version = '9.1.6'
                         homeDir = file('${homeDir.toURI()}')
                         dataDir = file('${dataDir.toURI()}')
                         javaHome = file('${dataDir.toURI()}')
@@ -283,6 +287,23 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             @echo off
             echo "Fake TeamCity startup script"
         """
+
+        createCommonApiJar(homeDir.toPath(), version)
         return homeDir
+    }
+
+    private static void createCommonApiJar(Path folder, String version) {
+        Path jarPath = folder.resolve('webapps/ROOT/WEB-INF/lib/common-api.jar')
+        jarPath.toFile().parentFile.mkdirs()
+
+        Properties props = new Properties()
+        props.put('Display_Version', version)
+        FileOutputStream fos = new FileOutputStream(jarPath.toFile())
+        ZipOutputStream zos = new ZipOutputStream(fos)
+        ZipEntry ze = new ZipEntry('serverVersion.properties.xml')
+        zos.putNextEntry(ze)
+        props.storeToXML(zos, null)
+        zos.closeEntry()
+        zos.close()
     }
 }

@@ -65,6 +65,14 @@ class TeamCityVersionTest {
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
     }
 
+    @Test
+    void 'data version'() {
+        assertThat(version('9.0').dataVersion, equalTo('9.0'))
+        assertThat(version('9.0.3').dataVersion, equalTo('9.0'))
+        assertThat(version('2020.2.4').dataVersion, equalTo('2020.2'))
+        assertThat(version('2021.1.1').dataVersion, equalTo('2021.1'))
+    }
+
     private static void assertInvalidVersion(String version) {
         try {
             TeamCityVersionTest.version(version)
@@ -104,6 +112,14 @@ class TeamCityVersionTest {
             assertThat(version('9.0.1-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('10.0-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('SNAPSHOT'), greaterThan(version('2020.2-SNAPSHOT')))
+        }
+
+        @Test
+        void 'data version'() {
+            assertThat(version('9.0-SNAPSHOT').dataVersion, equalTo('9.0'))
+            assertThat(version('9.0.3-SNAPSHOT').dataVersion, equalTo('9.0'))
+            assertThat(version('2020.2-SNAPSHOT').dataVersion, equalTo('2020.2'))
+            assertThat(version('2020.2.4-SNAPSHOT').dataVersion, equalTo('2020.2'))
         }
 
         private static TeamCityVersion version(String version) {

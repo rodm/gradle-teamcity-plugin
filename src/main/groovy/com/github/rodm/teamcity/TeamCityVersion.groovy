@@ -20,6 +20,8 @@ import groovy.transform.CompileStatic
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import static groovy.transform.TypeCheckingMode.SKIP
+
 @CompileStatic
 class TeamCityVersion implements Comparable<TeamCityVersion> {
 
@@ -89,5 +91,10 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
 
     int hashCode() {
         return version.hashCode()
+    }
+
+    @CompileStatic(SKIP)
+    String getDataVersion() {
+        return (version =~ (/(\d+\.\d+).*/))[0][1]
     }
 }

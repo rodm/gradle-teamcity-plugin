@@ -21,6 +21,7 @@ import com.github.rodm.teamcity.tasks.StartAgent
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
+import com.github.rodm.teamcity.tasks.TeamCityTask
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
@@ -36,7 +37,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 
+import java.nio.file.Files
 import java.nio.file.Path
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.createDirectory
@@ -943,27 +947,6 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'teamcity task validates Java home directory'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.1' {
-                    version = '2020.1'
-                    javaHome = project.file('/tmp/opt/jdk1.8.0')
-                }
-            }
-        }
-
-        project.evaluate()
-        createDirectory(projectDir.resolve('servers/TeamCity-2020.1'))
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
-        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
-        assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
-    }
-
-    @Test
     void 'teamcity task validates home directory not a file'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -981,6 +964,89 @@ class EnvironmentsTest {
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
         assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
         assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
+    }
+
+    @Test
+    void 'teamcity task outputs no warning when environment version matches installed version'() {
+        createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.2' {
+                    version = '2020.2.3'
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+        startServer.validate()
+
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3')
+        assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
+    }
+
+    @Test
+    void 'teamcity task output a warning when environment version does not match at bugfix level'() {
+        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.2' {
+                    version = '2020.2.5'
+                    homeDir = fakeHomeDir.absolutePath
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+        startServer.validate()
+
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5')
+        assertThat(outputEventListener.toString(), containsString(expectedMessage))
+    }
+
+    @Test
+    void 'teamcity task fail when environment version is not data compatible with installed version'() {
+        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.2' {
+                    version = '2020.1.2'
+                    homeDir = fakeHomeDir.absolutePath
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+
+        String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2')
+        assertThat(e.message, containsString(expectedMessage))
+    }
+
+    @Test
+    void 'teamcity task validates Java home directory'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2020.1' {
+                    version = '2020.1'
+                    javaHome = project.file('/tmp/opt/jdk1.8.0')
+                }
+            }
+        }
+
+        project.evaluate()
+        createFakeTeamCityInstall(projectDir, 'servers', '2020.1')
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+        assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
+        assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
     }
 
     @Test
@@ -1301,5 +1367,30 @@ class EnvironmentsTest {
         action.execute(deploy)
 
         assertTrue(wasRequestSent)
+    }
+
+    private static File createFakeTeamCityInstall(Path folder, String baseDir, String version) {
+        File homeDir = createDirectory(folder, "${baseDir}/TeamCity-${version}".toString())
+        createCommonApiJar(homeDir.toPath(), version)
+        return homeDir
+    }
+
+    private static File createDirectory(Path folder, String name) {
+        Files.createDirectories(folder.resolve(name)).toFile()
+    }
+
+    private static void createCommonApiJar(Path folder, String version) {
+        Path jarPath = folder.resolve('webapps/ROOT/WEB-INF/lib/common-api.jar')
+        jarPath.toFile().parentFile.mkdirs()
+
+        Properties props = new Properties()
+        props.put('Display_Version', version)
+        FileOutputStream fos = new FileOutputStream(jarPath.toFile())
+        ZipOutputStream zos = new ZipOutputStream(fos)
+        ZipEntry ze = new ZipEntry('serverVersion.properties.xml')
+        zos.putNextEntry(ze)
+        props.storeToXML(zos, null)
+        zos.closeEntry()
+        zos.close()
     }
 }

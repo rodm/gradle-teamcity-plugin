@@ -103,6 +103,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def startServer = project.tasks.register("start${name}Server", StartServer) {
                     group = TEAMCITY_GROUP
+                    version.set(environment.version)
                     homeDir.set(environment.homeDirProperty)
                     dataDir.set(environment.dataDirProperty)
                     javaHome.set(environment.javaHomeProperty)
@@ -115,6 +116,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def stopServer = project.tasks.register("stop${name}Server", StopServer) {
                     group = TEAMCITY_GROUP
+                    version.set(environment.version)
                     homeDir.set(environment.homeDirProperty)
                     javaHome.set(environment.javaHomeProperty)
                     finalizedBy undeployPlugin
@@ -122,6 +124,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def startAgent = project.tasks.register("start${name}Agent", StartAgent) {
                     group = TEAMCITY_GROUP
+                    version.set(environment.version)
                     homeDir.set(environment.homeDirProperty)
                     javaHome.set(environment.javaHomeProperty)
                     agentOptions.set(environment.agentOptions.map({it.join(' ')}))
@@ -129,6 +132,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
                 def stopAgent = project.tasks.register("stop${name}Agent", StopAgent) {
                     group = TEAMCITY_GROUP
+                    version.set(environment.version)
                     homeDir.set(environment.homeDirProperty)
                     javaHome.set(environment.javaHomeProperty)
                 }
