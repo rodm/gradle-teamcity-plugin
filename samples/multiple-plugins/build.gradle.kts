@@ -6,13 +6,13 @@ plugins {
 group = "com.github.rodm.teamcity"
 version = "1.0-SNAPSHOT"
 
-extra["vendorName"] = "rodm"
-extra["teamcityVersion"] = "2019.1"
+val vendorName by extra("rodm")
+val teamcityVersion by extra("2019.1")
 
-extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
-extra["serversDir"] = project.findProperty("servers.dir") ?: "${rootDir}/servers"
-extra["java7Home"] = project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80"
-extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92"
+val downloadsDir by extra((project.findProperty("downloads.dir") ?: "${rootDir}/downloads") as String)
+val serversDir by extra((project.findProperty("servers.dir") ?: "${rootDir}/servers") as String)
+val java8Home by extra((project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92") as String)
+val java11Home by extra((project.findProperty("java11.home") ?: "/opt/jdk-11.0.2") as String)
 
 val teamcityPlugins by configurations.creating
 
@@ -22,22 +22,22 @@ dependencies {
 }
 
 teamcity {
-    version = extra["teamcityVersion"] as String
+    version = teamcityVersion
 
     environments {
         downloadsDir = extra["downloadsDir"] as String
-        baseHomeDir = extra["serversDir"] as String
+        baseHomeDir = serversDir
         baseDataDir = "data"
 
         register("teamcity2019.1") {
             version = "2019.1.5"
-            javaHome = extra["java8Home"] as String
+            javaHome = java8Home
             plugins.setFrom(configurations["teamcityPlugins"])
         }
 
         register("teamcity2020.1") {
             version = "2020.1"
-            javaHome = extra["java8Home"] as String
+            javaHome = java11Home
             plugins.setFrom(configurations["teamcityPlugins"])
         }
     }
