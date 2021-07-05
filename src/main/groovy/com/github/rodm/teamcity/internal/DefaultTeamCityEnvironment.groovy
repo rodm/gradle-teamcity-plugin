@@ -179,15 +179,11 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     /**
      * The list of plugins to be deployed to this environment.
      */
-    ConfigurableFileCollection getPlugins() {
+    Object getPlugins() {
         return plugins
     }
 
     void setPlugins(Object plugins) {
-        this.plugins.setFrom(plugins)
-    }
-
-    void setPlugins(List<Object> plugins) {
         this.plugins.setFrom(plugins)
     }
 

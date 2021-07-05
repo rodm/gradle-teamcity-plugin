@@ -15,8 +15,6 @@
  */
 package com.github.rodm.teamcity
 
-import org.gradle.api.file.ConfigurableFileCollection
-
 interface TeamCityEnvironment {
 
     /**
@@ -52,9 +50,8 @@ interface TeamCityEnvironment {
     /**
      * The list of plugins to be deployed to this environment.
      */
-    ConfigurableFileCollection getPlugins()
+    Object getPlugins()
     void setPlugins(Object plugins)
-    void setPlugins(List<Object> plugins)
     void plugins(Object plugin)
 
     /**

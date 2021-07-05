@@ -32,13 +32,13 @@ teamcity {
         register("teamcity2019.1") {
             version = "2019.1.5"
             javaHome = java8Home
-            plugins.setFrom(configurations["teamcityPlugins"])
+            plugins = configurations["teamcityPlugins"]
         }
 
         register("teamcity2020.1") {
             version = "2020.1"
             javaHome = java11Home
-            plugins.setFrom(configurations["teamcityPlugins"])
+            plugins = configurations["teamcityPlugins"]
         }
     }
 }
