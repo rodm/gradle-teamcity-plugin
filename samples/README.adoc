@@ -12,12 +12,21 @@ The following projects demonstrate the features of the Gradle TeamCity plugin.
 with scripts written in Kotlin using {uri-gradle-kotlin}[Gradle Kotlin DSL].
 * `multiple-plugins` : A sample demonstrating building and deploying multiple plugins to a TeamCity environment.
 * `reloadable-plugin` : A sample demonstrating reloading of a modified plugin without restarting the TeamCity environment.
+* `sakura-ui-plugin` : A sample demonstrating building a Sakura UI plugin.
+
+Each sample includes Gradle build scripts using the Groovy DSL and the Kotlin DSL,
+except `multi-project-plugin` and `kotlin-plugin` that are equivalent projects.
 
 == To build the plugins
 
 To build a sample plugin change into the plugin's directory then execute the following Gradle task
 
     ../../gradlew build
+
+By default, the Groovy DSL build scripts are used, to use the Kotlin DSL build scripts execute the
+following Gradle task
+
+    ../../gradlew -c settings.gradle.kts build
 
 The `server-plugin` sample contains an alternative build file the demonstrates using an external descriptor file.
 The plugin can be built by executing the following command.
