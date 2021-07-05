@@ -183,15 +183,15 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
         return plugins
     }
 
-    def setPlugins(Object plugins) {
+    void setPlugins(Object plugins) {
         this.plugins.setFrom(plugins)
     }
 
-    def setPlugins(List<Object> plugins) {
+    void setPlugins(List<Object> plugins) {
         this.plugins.setFrom(plugins)
     }
 
-    def plugins(Object plugin) {
+    void plugins(Object plugin) {
         this.plugins.from(plugin)
     }
 
@@ -208,7 +208,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     @CompileStatic(SKIP)
-    def setServerOptions(Object options) {
+    void setServerOptions(Object options) {
         this.serverOptions.empty()
         if (options instanceof List) {
             this.serverOptions.addAll(options)

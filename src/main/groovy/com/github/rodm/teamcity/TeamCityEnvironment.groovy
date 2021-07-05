@@ -53,9 +53,9 @@ interface TeamCityEnvironment {
      * The list of plugins to be deployed to this environment.
      */
     ConfigurableFileCollection getPlugins()
-    def setPlugins(Object plugins)
-    def setPlugins(List<Object> plugins)
-    def plugins(Object plugin)
+    void setPlugins(Object plugins)
+    void setPlugins(List<Object> plugins)
+    void plugins(Object plugin)
 
     /**
      * The Java command line options to be used when starting the TeamCity Server.
@@ -66,7 +66,7 @@ interface TeamCityEnvironment {
      *      '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
      */
     Object getServerOptions()
-    def setServerOptions(Object options)
+    void setServerOptions(Object options)
     void serverOptions(String... options)
 
     /**
