@@ -84,12 +84,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultDataDir() {
-        return environments.getDefaultBaseDataDir().map {it + "/${dataVersion(version)}" }
-    }
-
-    @CompileStatic(SKIP)
-    private String dataVersion(String version) {
-        return (version =~ (/(\d+\.\d+).*/))[0][1]
+        return environments.getDefaultBaseDataDir().map {it + "/${TeamCityVersion.version(version).dataVersion}" }
     }
 
     String getBaseHomeDir() {
