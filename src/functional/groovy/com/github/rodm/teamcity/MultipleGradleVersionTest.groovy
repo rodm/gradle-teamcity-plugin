@@ -37,6 +37,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
+    @SuppressWarnings('unused')
     static List<String> data() {
         return [
             '6.0.1', '6.1.1', '6.2.2', '6.3', '6.4.1', '6.5.1', '6.6.1', '6.7.1', '6.8.3', '6.9',
@@ -99,7 +100,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
                         description = 'Test plugin description'
                         version = '1.0'
                         vendorName = 'vendor name'
-                        vendorUrl = 'http://www.example.org'
+                        vendorUrl = 'https://www.example.org'
                     }
                 }
             }
