@@ -97,6 +97,7 @@ class TeamCityTask extends DefaultTask {
         }
         finally {
             is.close()
+            jarFile.close()
         }
     }
 }
