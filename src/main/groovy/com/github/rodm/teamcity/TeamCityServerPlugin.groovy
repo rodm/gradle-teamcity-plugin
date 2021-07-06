@@ -128,7 +128,6 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.register(SERVER_PLUGIN_TASK_NAME, ServerPlugin) {
             group = TEAMCITY_GROUP
-            onlyIf { extension.server.descriptor != null || extension.server.descriptorFile.isPresent() }
             descriptor.set(descriptorFile)
             server.from(project.configurations.server)
             project.plugins.withType(JavaPlugin) {

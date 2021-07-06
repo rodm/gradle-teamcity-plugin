@@ -91,7 +91,6 @@ class TeamCityAgentPlugin implements Plugin<Project> {
 
         def packagePlugin = project.tasks.register(AGENT_PLUGIN_TASK_NAME, AgentPlugin) {
             group = TEAMCITY_GROUP
-            onlyIf { extension.agent.descriptor != null || extension.agent.descriptorFile.isPresent() }
             descriptor.set(descriptorFile)
             lib.from(project.configurations.agent)
             project.plugins.withType(JavaPlugin) {
