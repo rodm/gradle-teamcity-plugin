@@ -72,10 +72,11 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultInstallerFile() {
-        return environments.getDefaultDownloadsDir().map {it + '/' + toFilename(downloadUrl) }
+        return environments.getDefaultDownloadsDir().map {it + '/' + filename() }
     }
 
-    private static String toFilename(String url) {
+    private String filename() {
+        def url = downloadUrl.get()
         return url[(url.lastIndexOf('/') + 1)..-1]
     }
 
