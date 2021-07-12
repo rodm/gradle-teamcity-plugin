@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rod MacKenzie
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  */
 package com.github.rodm.teamcity.tasks
 
-import org.gradle.api.tasks.TaskAction
+import com.github.rodm.teamcity.internal.TeamCityTask
+import org.gradle.process.ExecSpec
 
 class StopAgent extends TeamCityTask {
 
@@ -23,13 +24,11 @@ class StopAgent extends TeamCityTask {
         description = 'Stops the TeamCity Agent'
     }
 
-    @TaskAction
-    void stop() {
-        validate()
+    @Override
+    void configure(ExecSpec execSpec) {
         def name = isWindows() ? 'agent.bat' : 'agent.sh'
-        ant.exec(executable: "${getHomeDir().get()}/buildAgent/bin/$name") {
-            env key: 'JAVA_HOME', path: getJavaHome().get()
-            arg value: 'stop'
-        }
+        execSpec.executable("${getHomeDir().get()}/buildAgent/bin/${name}")
+        execSpec.environment('JAVA_HOME', getJavaHome().get())
+        execSpec.args('stop')
     }
 }

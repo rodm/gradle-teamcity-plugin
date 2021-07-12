@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rod MacKenzie
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import com.github.rodm.teamcity.internal.TeamCityTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecSpec
 
 class StartAgent extends TeamCityTask {
 
@@ -28,14 +29,12 @@ class StartAgent extends TeamCityTask {
         description = 'Starts the TeamCity Agent'
     }
 
-    @TaskAction
-    void start() {
-        validate()
+    @Override
+    void configure(ExecSpec execSpec) {
         def name = isWindows() ? 'agent.bat' : 'agent.sh'
-        ant.exec(executable: "${getHomeDir().get()}/buildAgent/bin/$name") {
-            env key: 'JAVA_HOME', path: getJavaHome().get()
-            env key: 'TEAMCITY_AGENT_OPTS', value: getAgentOptions().get()
-            arg value: 'start'
-        }
+        execSpec.executable("${getHomeDir().get()}/buildAgent/bin/${name}")
+        execSpec.environment('JAVA_HOME', getJavaHome().get())
+        execSpec.environment('TEAMCITY_AGENT_OPTS', getAgentOptions().get())
+        execSpec.args('start')
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rod MacKenzie
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
  */
 package com.github.rodm.teamcity.tasks
 
+import com.github.rodm.teamcity.internal.TeamCityTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecSpec
 
 class StartServer extends TeamCityTask {
 
@@ -31,17 +32,13 @@ class StartServer extends TeamCityTask {
         description = 'Starts the TeamCity Server'
     }
 
-    @TaskAction
-    void start() {
-        validate()
-        validDirectory('dataDir', getDataDir().get())
-
+    @Override
+    void configure(ExecSpec execSpec) {
         def name = isWindows() ? 'teamcity-server.bat' : 'teamcity-server.sh'
-        ant.exec(executable: "${getHomeDir().get()}/bin/$name") {
-            env key: 'JAVA_HOME', path: getJavaHome().get()
-            env key: 'TEAMCITY_DATA_PATH', path: getDataDir().get()
-            env key: 'TEAMCITY_SERVER_OPTS', value: getServerOptions().get()
-            arg value: 'start'
-        }
+        execSpec.executable("${getHomeDir().get()}/bin/$name")
+        execSpec.environment('JAVA_HOME', getJavaHome().get())
+        execSpec.environment('TEAMCITY_DATA_PATH', getDataDir().get())
+        execSpec.environment('TEAMCITY_SERVER_OPTS', getServerOptions().get())
+        execSpec.args('start')
     }
 }

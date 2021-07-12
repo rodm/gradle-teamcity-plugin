@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Rod MacKenzie
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.tasks
+package com.github.rodm.teamcity.internal
 
 import com.github.rodm.teamcity.TeamCityVersion
+import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecSpec
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.jar.JarFile
 
-class TeamCityTask extends DefaultTask {
+abstract class TeamCityTask extends DefaultTask {
 
     static final String VERSION_MISMATCH_WARNING = '%s: Environment version %s does not match the version of TeamCity installed at %s.'
     static final String VERSION_INCOMPATIBLE = 'Environment version %s is not compatible with the version of TeamCity installed at %s.'
@@ -41,6 +44,24 @@ class TeamCityTask extends DefaultTask {
 
     @Input
     final Property<String> javaHome = project.objects.property(String)
+
+    @TaskAction
+    void exec() {
+        validate()
+        def out = new ByteArrayOutputStream()
+        project.exec(new Action<ExecSpec>() {
+            @Override
+            void execute(ExecSpec execSpec) {
+                configure(execSpec)
+                execSpec.standardOutput = out
+                execSpec.errorOutput = out
+                execSpec.ignoreExitValue = true
+            }
+        })
+        logger.info(out.toString())
+    }
+
+    abstract void configure(ExecSpec execSpec)
 
     void validate() {
         validTeamCityHomeDirectory(getVersion().get(), getHomeDir().get())
