@@ -53,12 +53,12 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir = project.objects.property(String).convention(defaultHomePath)
         def defaultDataPath = project.layout.projectDirectory.dir(DEFAULT_BASE_DATA_DIR).toString()
         this.baseDataDir = project.objects.property(String).convention(defaultDataPath)
-        NamedDomainObjectFactory<TeamCityEnvironment> factory = new NamedDomainObjectFactory<TeamCityEnvironment>() {
+        def factory = new NamedDomainObjectFactory<TeamCityEnvironment>() {
             @Override
             TeamCityEnvironment create(String name) {
                 return new DefaultTeamCityEnvironment(name, DefaultTeamCityEnvironments.this, project.objects)
             }
-        }
+        } as NamedDomainObjectFactory<TeamCityEnvironment>
         this.environments = project.container(TeamCityEnvironment, factory)
     }
 
