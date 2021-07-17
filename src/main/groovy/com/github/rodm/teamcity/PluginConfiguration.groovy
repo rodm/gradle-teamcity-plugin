@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Action
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.file.CopySpec
 import org.gradle.api.file.RegularFileProperty
@@ -45,11 +46,11 @@ abstract class PluginConfiguration {
 
     void setDescriptor(Object descriptor) {
         if (descriptor instanceof CharSequence) {
-            this.descriptorFile.set(project.file(descriptor.toString()))
+            setDescriptorFile(project.file(descriptor.toString()))
         } else if (descriptor instanceof File) {
-            this.descriptorFile.set(descriptor)
+            setDescriptorFile(descriptor)
         } else {
-            this.@descriptor = descriptor
+            setDescriptorObject(descriptor)
         }
     }
 
@@ -90,5 +91,23 @@ abstract class PluginConfiguration {
      */
     def tokens(Map<String, Object> tokens) {
         this.tokens += tokens
+    }
+
+    Project getProject() {
+        return this.project
+    }
+
+    private void setDescriptorFile(File file) {
+        if (this.@descriptor != null) {
+            throw new InvalidUserDataException('An inline descriptor is already defined')
+        }
+        this.descriptorFile.set(file)
+    }
+
+    private void setDescriptorObject(descriptor) {
+        if (this.descriptorFile.isPresent()) {
+            throw new InvalidUserDataException('A file descriptor is already defined')
+        }
+        this.@descriptor = descriptor
     }
 }

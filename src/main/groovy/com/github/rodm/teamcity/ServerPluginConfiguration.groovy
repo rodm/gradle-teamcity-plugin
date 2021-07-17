@@ -30,7 +30,6 @@ import static groovy.transform.TypeCheckingMode.SKIP
 @CompileStatic
 class ServerPluginConfiguration extends PluginConfiguration {
 
-    private Project project
     private ConfigurableFileCollection web
     private PublishConfiguration publish
     private SignConfiguration sign
@@ -40,7 +39,6 @@ class ServerPluginConfiguration extends PluginConfiguration {
 
     ServerPluginConfiguration(Project project, TeamCityEnvironments environments) {
         super(project)
-        this.project = project
         this.web = project.objects.fileCollection()
         this.environments = environments
     }

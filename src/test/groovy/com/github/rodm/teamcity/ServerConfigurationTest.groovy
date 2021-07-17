@@ -76,6 +76,7 @@ import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.Matchers.not
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.ArgumentMatchers.isNull
@@ -144,6 +145,38 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(extension.server.descriptor, is(nullValue()))
         assertThat(extension.server.descriptorFile.isPresent(), is(true))
         assertThat(extension.server.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
+    void 'configuring a file descriptor after an inline descriptor throws an exception'() {
+        def e = assertThrows(InvalidUserDataException, {
+            project.teamcity {
+                server {
+                    descriptor {
+                        name = 'test'
+                    }
+                    descriptor = 'test-teamcity-plugin.xml'
+                }
+            }
+        })
+
+        assertThat(e.message, equalTo('An inline descriptor is already defined'))
+    }
+
+    @Test
+    void 'configuring an inline descriptor after a file descriptor throws an exception'() {
+        def e = assertThrows(InvalidUserDataException, {
+            project.teamcity {
+                server {
+                    descriptor = 'test-teamcity-plugin.xml'
+                    descriptor {
+                        name = 'test'
+                    }
+                }
+            }
+        })
+
+        assertThat(e.message, equalTo('A file descriptor is already defined'))
     }
 
     @Test
