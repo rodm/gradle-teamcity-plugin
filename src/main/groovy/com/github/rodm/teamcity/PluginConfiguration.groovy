@@ -35,13 +35,18 @@ abstract class PluginConfiguration {
 
     String archiveName
 
+    private final Project project
+
     PluginConfiguration(Project project) {
+        this.project = project
         this.descriptorFile = project.objects.fileProperty()
         this.files = project.copySpec()
     }
 
     void setDescriptor(Object descriptor) {
-        if (descriptor instanceof File) {
+        if (descriptor instanceof CharSequence) {
+            this.descriptorFile.set(project.file(descriptor.toString()))
+        } else if (descriptor instanceof File) {
             this.descriptorFile.set(descriptor)
         } else {
             this.@descriptor = descriptor

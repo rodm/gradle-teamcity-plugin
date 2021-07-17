@@ -236,6 +236,33 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'file plugin descriptor from string'() {
+        project.teamcity {
+            agent {
+                descriptor = 'test-teamcity-plugin.xml'
+            }
+        }
+
+        assertThat(extension.agent.descriptor, is(nullValue()))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(true))
+        assertThat(extension.agent.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
+    void 'file plugin descriptor from GString'() {
+        def name = 'test-teamcity-plugin'
+        project.teamcity {
+            agent {
+                descriptor = "${name}.xml"
+            }
+        }
+
+        assertThat(extension.agent.descriptor, is(nullValue()))
+        assertThat(extension.agent.descriptorFile.isPresent(), is(true))
+        assertThat(extension.agent.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
     void agentPluginTasks() {
         project.teamcity {
             agent {

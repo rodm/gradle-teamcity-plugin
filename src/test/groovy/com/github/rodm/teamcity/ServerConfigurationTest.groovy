@@ -120,6 +120,33 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'file plugin descriptor from string'() {
+        project.teamcity {
+            server {
+                descriptor = 'test-teamcity-plugin.xml'
+            }
+        }
+
+        assertThat(extension.server.descriptor, is(nullValue()))
+        assertThat(extension.server.descriptorFile.isPresent(), is(true))
+        assertThat(extension.server.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
+    void 'file plugin descriptor from GString'() {
+        def name = 'test-teamcity-plugin'
+        project.teamcity {
+            server {
+                descriptor = "${name}.xml"
+            }
+        }
+
+        assertThat(extension.server.descriptor, is(nullValue()))
+        assertThat(extension.server.descriptorFile.isPresent(), is(true))
+        assertThat(extension.server.descriptorFile.get().asFile.getPath(), endsWith("test-teamcity-plugin.xml"))
+    }
+
+    @Test
     void serverPluginTasks() {
         project.teamcity {
             server {
