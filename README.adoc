@@ -1,14 +1,17 @@
 = Gradle TeamCity plugin
-:uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity/
+:uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity
 :uri-teamcity-environment: {uri-teamcity-sdk-docs}/development-environment.html
 :uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor
 :uri-agent-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor2
-:uri-gradle-plugin-portal: https://plugins.gradle.org/
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
+:uri-jetbrains-teamcity-releases: https://www.jetbrains.com/teamcity/download/other.html
 :uri-github-project: https://github.com/rodm/gradle-teamcity-plugin
 :uri-github-actions: {uri-github-project}/actions
 :uri-github-status: {uri-github-project}/workflows/Build/badge.svg
+:uri-shields-gradle-portal: https://img.shields.io/gradle-plugin-portal/v
+:uri-gradle-plugin-portal: https://plugins.gradle.org/
+:uri-gradle-plugin: {uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2018.1
@@ -17,6 +20,7 @@ The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plug
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 image:{uri-github-status}?branch=master["Build Status", link="{uri-github-actions}"]
+image:{uri-shields-gradle-portal}/com.github.rodm.teamcity-server?label=Gradle%20Plugin%20Portal[Gradle Plugin Portal, link="{uri-gradle-plugin}"]
 
 == Supported Gradle and Java versions
 
@@ -179,8 +183,8 @@ Plugin descriptor defined in the build script.
                 nodeResponsibilitiesAware = true
 
                 // requirements properties
-                minimumBuild = '10'
-                maximumBuild = '20'
+                minimumBuild = '58245' // 2018.1
+                maximumBuild = '78938' // 2020.1.5
 
                 parameters {
                     parameter 'name1', 'value1'
@@ -204,6 +208,9 @@ Plugin descriptor defined in the build script.
         }
     }
 ----
+
+The build numbers for the properties `minimumBuild` and `maximumBuild` can be found on the
+{uri-jetbrains-teamcity-releases}[previous releases] page.
 
 Plugin descriptor defined in an external file at the root of the project. A map of tokens to be replaced in the
 descriptor file can be provided using the `tokens` property.
@@ -253,8 +260,8 @@ The following example uses the Kotlin DSL.
                 nodeResponsibilitiesAware = true
 
                 // requirements properties
-                minimumBuild = "10"
-                maximumBuild = "20"
+                minimumBuild = "58245" // 2018.1
+                maximumBuild = "78938" // 2020.1.5
 
                 parameters {
                     parameter("name1", "value1")
@@ -518,7 +525,9 @@ supports the following properties
 * `homeDir` : The path to a TeamCity install. Defaults to `${baseHomeDir}/TeamCity-${version}`
 * `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
 * `javaHome` : The path to the version of Java used to run the server and build agent. Defaults to the Java used to run Gradle.
-* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable. Default '-Dteamcity.development.mode=true -Dteamcity.development.shadowCopyClasses=true'
+* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable.
+Default `-Dteamcity.development.mode=true`, `-Dteamcity.development.shadowCopyClasses=true`,
+`-Dteamcity.superUser.token.saveToFile=true`, `-Dteamcity.kotlinConfigsDsl.generateDslDocs=false`
  these plugin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
 * `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
 * `plugins` : The collection of plugins to be deployed to the TeamCity server for this environment. Defaults to the
