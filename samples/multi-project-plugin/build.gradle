@@ -1,6 +1,6 @@
 
 ext {
-    teamcityVersion = '2019.1'
+    teamcityVersion = '2020.1'
 }
 
 subprojects {

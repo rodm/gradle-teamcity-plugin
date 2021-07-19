@@ -1,6 +1,8 @@
-= Sample TeamCity plugins using the Gradle TeamCity plugin.
 :uri-gradle-kotlin: https://docs.gradle.org/current/userguide/kotlin_dsl.html
-:uri-teamcity-version: 2019.1
+:teamcity-base-version: 2020.1
+:teamcity-later-version: 2021.1
+
+= Sample TeamCity plugins using the Gradle TeamCity plugin.
 
 The following projects demonstrate the features of the Gradle TeamCity plugin.
 
@@ -35,7 +37,10 @@ The plugin can be built by executing the following command.
 
 To download and install a TeamCity distribution to test the plugin execute the following Gradle task
 
-    ../../gradlew installTeamCity{uri-teamcity-version}
+[subs="attributes"]
+----
+    ../../gradlew installTeamCity{teamcity-base-version}
+----
 
 This command will take some time but only needs to be executed once. To have the samples use the same TeamCity
 installation set the `teamcity.environments.baseHomeDir` Gradle property in a `gradle.properties` file for each
@@ -43,28 +48,43 @@ project.
 
 To deploy the plugin to TeamCity execute the following task
 
-    ../../gradlew deployToTeamCity{uri-teamcity-version}
+[subs="attributes"]
+----
+    ../../gradlew deployToTeamCity{teamcity-base-version}
+----
 
 To start the TeamCity Server and Build Agent execute the following tasks
 
-    ../../gradlew startTeamcity{uri-teamcity-version}Server
-    ../../gradlew startTeamcity{uri-teamcity-version}Agent
+[subs="attributes"]
+----
+    ../../gradlew startTeamcity{teamcity-base-version}Server
+    ../../gradlew startTeamcity{teamcity-base-version}Agent
+----
 
 or you can start both with the following task
 
-    ../../gradlew startTeamcity{uri-teamcity-version}
+[subs="attributes"]
+----
+    ../../gradlew startTeamcity{teamcity-base-version}
+----
 
 To stop the TeamCity Server and Build Agent execute the following tasks
 
-    ../../gradlew stopTeamcity{uri-teamcity-version}Agent
-    ../../gradlew stopTeamcity{uri-teamcity-version}Server
+[subs="attributes"]
+----
+    ../../gradlew stopTeamcity{teamcity-base-version}Agent
+    ../../gradlew stopTeamcity{teamcity-base-version}Server
+----
 
 or you can stop both with the following task
 
-    ../../gradlew stopTeamcity{uri-teamcity-version}
+[subs="attributes"]
+----
+    ../../gradlew stopTeamcity{teamcity-base-version}
+----
 
-There are also tasks for TeamCity 2020.1, to use these versions replace the number `{uri-teamcity-version}` in the tasks
-above with `2020.1`.
+There are also tasks for TeamCity {teamcity-later-version}, to use these versions replace the number `{teamcity-base-version}` in the tasks
+above with `{teamcity-later-version}`.
 
 == To try the plugins
 

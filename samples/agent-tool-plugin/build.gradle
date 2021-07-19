@@ -9,7 +9,7 @@ group = 'com.github.rodm.teamcity'
 version = '1.0-SNAPSHOT'
 
 ext {
-    teamcityVersion = '2019.1'
+    teamcityVersion = '2020.1'
 
     downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
     serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
@@ -78,13 +78,13 @@ teamcity {
         baseHomeDir = project.serversDir
         baseDataDir = 'data'
 
-        'teamcity2019.1' {
-            version = '2019.1.5'
+        'teamcity2020.1' {
+            version = '2020.1.5'
             javaHome = file(java8Home)
         }
 
-        'teamcity2020.1' {
-            version = '2020.1'
+        'teamcity2021.1' {
+            version = '2021.1.1'
             javaHome = file(java8Home)
         }
     }
