@@ -464,10 +464,10 @@ The following example uses the Kotlin DSL.
 [subs="attributes"]
 .build.gradle.kts
 ----
-    extra["teamcityVersion"] = findProperty("teamcity.version") ?: "{example-api-version}"
+    val teamcityVersion by extra((findProperty("teamcity.api.version") ?: "{example-api-version}") as String)
 
     teamcity {
-        version = extra["teamcityVersion"] as String
+        version = teamcityVersion
 
         agent {
             descriptor {
@@ -606,10 +606,9 @@ The following example shows environments being configured using the Kotlin DSL.
 [subs="attributes"]
 .build.gradle.kts
 ----
-    extra["downloadsDir"] = project.findProperty("downloads.dir") ?: "${rootDir}/downloads"
-    extra["java7Home"] = project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80"
-    extra["java8Home"] = project.findProperty("java8.home") ?: "/opt/jdk1.8.0_202"
-
+    val downloadsDir by extra((project.findProperty("downloads.dir") ?: "${rootDir}/downloads") as String)
+    val java7Home by extra((project.findProperty("java7.home") ?: "/opt/jdk1.7.0_80") as String)
+    val java8Home by extra((project.findProperty("java8.home") ?: "/opt/jdk1.8.0_202") as String)
 
     teamcity {
         version = "{example-api-version}"
@@ -624,35 +623,27 @@ The following example shows environments being configured using the Kotlin DSL.
             baseHomeDir = "teamcity/servers"
             baseDataDir = "${rootDir}/data"
 
-            operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) {
-                environments.create(this, closureOf<TeamCityEnvironment>(block))
-            }
-
-            "teamcity9" {
+            create("teamcity9") {
                 version = "9.1.7"
-                javaHome = file(extra["java7Home"])
+                javaHome = java7Home
 
                 // Add to the default server options
                 serverOptions("-Dproperty=value")
                 serverOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            create("teamcity2017.2") {
+            register("teamcity2017.2") {
                 version = "2017.2.4"
-                javaHome = file(extra["java8Home"] as String)
+                javaHome = java8Home
 
                 // Replace the default server options
                 setServerOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
             }
 
-            register("teamcity2018.2") {
-                version = "2018.2.2"
+            register("teamcity2020.2") {
+                version = "2020.2.4"
             }
         }
-    }
-
-    fun Project.teamcity(configuration: TeamCityPluginExtension.() -> Unit) {
-        configure(configuration)
     }
 ----
 
