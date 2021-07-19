@@ -1,4 +1,5 @@
 :uri-gradle-kotlin: https://docs.gradle.org/current/userguide/kotlin_dsl.html
+:uri-docker-desktop: https://www.docker.com/products/docker-desktop
 :teamcity-base-version: 2020.1
 :teamcity-later-version: 2021.1
 
@@ -83,8 +84,8 @@ or you can stop both with the following task
     ../../gradlew stopTeamcity{teamcity-base-version}
 ----
 
-There are also tasks for TeamCity {teamcity-later-version}, to use these versions replace the number `{teamcity-base-version}` in the tasks
-above with `{teamcity-later-version}`.
+There are also tasks for TeamCity {teamcity-later-version}, to use these versions replace the
+number `{teamcity-base-version}` in the tasks above with `{teamcity-later-version}`.
 
 == To try the plugins
 
@@ -109,3 +110,7 @@ Running the build will show the version of Maven used in the `Maven Build Info` 
 The `reloadable-plugin` outputs a log message with a descriptor parameter, `build-time`, when it starts, check
 the `teamcity-server.log` for entries from the `ExampleServerPlugin`. Executing the Gradle `deploy` task updates
 the plugin descriptor and reloads the plugin without restarting the TeamCity server.
+
+The `sakura-ui-plugin` creates a plugin using the new Sakura UI built by webpack. The plugin adds a simple
+message to the top of the side-bar. Building the plugin requires {uri-docker-desktop}[Docker] to be installed
+to run the `webpack` task.
