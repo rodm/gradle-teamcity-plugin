@@ -117,7 +117,7 @@ class TeamCityServerPluginTest {
         project.evaluate()
 
         TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
-        assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.WARN))
+        assertThat(extension.validateBeanDefinition, equalTo(ValidationMode.WARN))
     }
 
     @Test
@@ -130,7 +130,7 @@ class TeamCityServerPluginTest {
         project.evaluate()
 
         TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
-        assertThat(extension.validateBeanDefinition.get(), equalTo(ValidationMode.IGNORE))
+        assertThat(extension.validateBeanDefinition, equalTo(ValidationMode.IGNORE))
     }
 
     @Test

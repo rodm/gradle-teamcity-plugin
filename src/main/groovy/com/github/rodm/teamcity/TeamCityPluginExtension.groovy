@@ -20,7 +20,6 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.Property
 
 /**
  * TeamCity Plugin extension.
@@ -29,11 +28,9 @@ class TeamCityPluginExtension {
 
     private String version
 
-    boolean defaultRepositories = true
-
-    private Property<Boolean> allowSnapshotVersions
-
-    private Property<ValidationMode> validateBeanDefinition
+    private boolean defaultRepositories = true
+    private boolean allowSnapshotVersions = false
+    private ValidationMode validateBeanDefinition = ValidationMode.WARN
 
     private AgentPluginConfiguration agent
 
@@ -45,8 +42,6 @@ class TeamCityPluginExtension {
 
     TeamCityPluginExtension(Project project) {
         this.project = project
-        this.allowSnapshotVersions = project.objects.property(Boolean).convention(false)
-        this.validateBeanDefinition = project.objects.property(ValidationMode).convention(ValidationMode.WARN)
     }
 
     void init() {
@@ -78,15 +73,28 @@ class TeamCityPluginExtension {
     }
 
     /**
+     * Use default repositories to resolve dependencies.
+     *
+     * @param useDefaultRepositories
+     */
+    void setDefaultRepositories(boolean useDefaultRepositories) {
+        defaultRepositories = useDefaultRepositories
+    }
+
+    boolean getDefaultRepositories() {
+        return defaultRepositories
+    }
+
+    /**
      * Allow version to include snapshot versions.
      *
      * @param allowSnapshots
      */
     void setAllowSnapshotVersions(boolean allowSnapshots) {
-        allowSnapshotVersions.set(allowSnapshots)
+        allowSnapshotVersions = allowSnapshots
     }
 
-    Property<Boolean> getAllowSnapshotVersions() {
+    boolean getAllowSnapshotVersions() {
         return allowSnapshotVersions
     }
 
@@ -96,14 +104,14 @@ class TeamCityPluginExtension {
      * @param mode
      */
     void setValidateBeanDefinition(ValidationMode mode) {
-        validateBeanDefinition.set(mode)
+        validateBeanDefinition = mode
     }
 
     void setValidateBeanDefinition(String mode) {
-        validateBeanDefinition.set(ValidationMode.valueOf(mode.toUpperCase()))
+        validateBeanDefinition = ValidationMode.valueOf(mode.toUpperCase())
     }
 
-    Property<ValidationMode> getValidateBeanDefinition() {
+    ValidationMode getValidateBeanDefinition() {
         return validateBeanDefinition
     }
 

@@ -98,7 +98,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static void validateVersion(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
-            TeamCityVersion.version(extension.version, extension.allowSnapshotVersions.get())
+            TeamCityVersion.version(extension.version, extension.allowSnapshotVersions)
         }
     }
 
@@ -106,7 +106,7 @@ class TeamCityPlugin implements Plugin<Project> {
         project.afterEvaluate {
             Jar jarTask = (Jar) project.tasks.findByName(JavaPlugin.JAR_TASK_NAME)
             if (jarTask) {
-                ValidationMode mode = extension.validateBeanDefinition.get()
+                ValidationMode mode = extension.validateBeanDefinition
                 List<PluginDefinition> pluginDefinitions = []
                 Set<String> classes = []
                 jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions))
