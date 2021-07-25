@@ -21,9 +21,9 @@ import com.github.rodm.teamcity.internal.PublishAction
 import com.github.rodm.teamcity.internal.SignAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
-import com.github.rodm.teamcity.tasks.PublishTask
+import com.github.rodm.teamcity.tasks.PublishPlugin
 import com.github.rodm.teamcity.tasks.ServerPlugin
-import com.github.rodm.teamcity.tasks.SignPluginTask
+import com.github.rodm.teamcity.tasks.SignPlugin
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationFail
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationResult
 import com.jetbrains.plugin.structure.base.plugin.PluginCreationSuccess
@@ -557,7 +557,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin, is(nullValue()))
         }
 
@@ -573,7 +573,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.certificateChain.get(), equalTo('certificate-chain'))
         }
 
@@ -589,7 +589,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.privateKey.get(), equalTo('private-key'))
             assertThat(signPlugin.password.orNull, is(nullValue()))
         }
@@ -607,7 +607,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.privateKey.get(), equalTo('private-key'))
             assertThat(signPlugin.password.orNull, equalTo('password'))
         }
@@ -624,7 +624,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             project.evaluate()
 
             ServerPlugin serverPlugin = (ServerPlugin) project.tasks.findByPath(':serverPlugin')
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.pluginFile.get(), equalTo(serverPlugin.archiveFile.get()))
         }
 
@@ -642,7 +642,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.signedPluginFile.get().asFile.name, equalTo('test-plugin-name-signed.zip'))
         }
 
@@ -664,7 +664,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.certificateChain.get(), equalTo('certificate-chain'))
         }
 
@@ -681,8 +681,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            SignPluginTask signPlugin = (SignPluginTask) project.tasks.findByPath(':signPlugin')
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.distributionFile.get(), equalTo(signPlugin.signedPluginFile.get()))
         }
     }
@@ -803,7 +803,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.token.get(), equalTo('token'))
         }
 
@@ -820,7 +820,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             project.evaluate()
 
             Zip serverPlugin = (Zip) project.tasks.findByPath(':serverPlugin')
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.distributionFile.get(), equalTo(serverPlugin.archiveFile.get()))
         }
 
@@ -836,7 +836,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.notes.get(), equalTo('change notes'))
         }
 
@@ -859,7 +859,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.channels.get(), equalTo(['Beta', 'Test']))
             assertThat(publishPlugin.token.get(), equalTo('token'))
         }
@@ -874,7 +874,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.channels.get(), equalTo(['default']))
         }
 
@@ -890,7 +890,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin.channels.get(), equalTo(['Beta', 'Test']))
         }
 
@@ -903,7 +903,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
             project.evaluate()
 
-            PublishTask publishPlugin = (PublishTask) project.tasks.findByPath(':publishPlugin')
+            PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
             assertThat(publishPlugin, is(nullValue()))
         }
     }
@@ -915,7 +915,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         void 'publish action logs successful uploaded to default channel'() {
             def pluginFile = project.file('test-plugin.zip')
             PublishAction publish = new MockPublishAction(project)
-            publish.parameters.host.set(PublishTask.DEFAULT_HOST)
+            publish.parameters.host.set(PublishPlugin.DEFAULT_HOST)
             publish.parameters.distributionFile.set(pluginFile)
             publish.parameters.channels.set(['default'])
 
@@ -973,7 +973,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                     }
                 }
             }
-            PublishTask task = project.tasks.findByPath(':publishPlugin') as PublishTask
+            PublishPlugin task = project.tasks.findByPath(':publishPlugin') as PublishPlugin
 
             try {
                 task.publishPlugin()
@@ -1022,7 +1022,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             Property<String> notes
             RegularFileProperty distributionFile
             TestPublishParameters(Project project) {
-                host = project.objects.property(String).convention(PublishTask.DEFAULT_HOST)
+                host = project.objects.property(String).convention(PublishPlugin.DEFAULT_HOST)
                 channels = project.objects.listProperty(String)
                 token = project.objects.property(String)
                 notes = project.objects.property(String)

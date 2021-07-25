@@ -33,7 +33,7 @@ import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
-class SignPluginTask extends DefaultTask {
+class SignPlugin extends DefaultTask {
 
     private RegularFileProperty pluginFile = project.objects.fileProperty()
     private RegularFileProperty signedPluginFile = project.objects.fileProperty()
@@ -44,7 +44,7 @@ class SignPluginTask extends DefaultTask {
     private final WorkerExecutor executor
 
     @Inject
-    SignPluginTask(WorkerExecutor executor) {
+    SignPlugin(WorkerExecutor executor) {
         description = "Signs the plugin"
         signedPluginFile.convention(pluginFile.map({signedName(it) }))
         this.executor = executor

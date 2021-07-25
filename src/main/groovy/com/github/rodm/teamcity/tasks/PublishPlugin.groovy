@@ -33,7 +33,7 @@ import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
-class PublishTask extends DefaultTask {
+class PublishPlugin extends DefaultTask {
 
     static final String DEFAULT_HOST = 'https://plugins.jetbrains.com'
 
@@ -60,7 +60,7 @@ class PublishTask extends DefaultTask {
     private final WorkerExecutor executor
 
     @Inject
-    PublishTask(WorkerExecutor executor) {
+    PublishPlugin(WorkerExecutor executor) {
         description = "Publishes the plugin to the TeamCity plugin repository"
         enabled = !project.gradle.startParameter.offline
         channels = project.objects.listProperty(String)

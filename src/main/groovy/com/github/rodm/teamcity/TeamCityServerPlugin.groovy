@@ -19,8 +19,8 @@ import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationActio
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
 import com.github.rodm.teamcity.tasks.ProcessDescriptor
-import com.github.rodm.teamcity.tasks.PublishTask
-import com.github.rodm.teamcity.tasks.SignPluginTask
+import com.github.rodm.teamcity.tasks.PublishPlugin
+import com.github.rodm.teamcity.tasks.SignPlugin
 import com.github.rodm.teamcity.tasks.ServerPlugin
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
@@ -184,7 +184,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
             if (extension.server.sign) {
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
 
-                project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPluginTask) {
+                project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPlugin) {
                     group = TEAMCITY_GROUP
                     classpath = project.configurations.marketplace
                     certificateChain.set(extension.server.sign.certificateChain)
@@ -200,10 +200,10 @@ class TeamCityServerPlugin implements Plugin<Project> {
     private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
-                SignPluginTask signTask = project.tasks.findByName(SIGN_PLUGIN_TASK_NAME) as SignPluginTask
+                SignPlugin signTask = project.tasks.findByName(SIGN_PLUGIN_TASK_NAME) as SignPlugin
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
 
-                project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishTask) {
+                project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishPlugin) {
                     group = TEAMCITY_GROUP
                     classpath = project.configurations.marketplace
                     channels.set(extension.server.publish.channels)
