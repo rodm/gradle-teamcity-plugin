@@ -67,39 +67,6 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
         this.agentOptions = factory.listProperty(String)
     }
 
-    private Provider<String> defaultDownloadUrl() {
-        return environments.getDefaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
-    }
-
-    private Provider<String> defaultInstallerFile() {
-        return environments.getDefaultDownloadsDir().map {it + '/' + filename() }
-    }
-
-    private String filename() {
-        def url = downloadUrl.get()
-        return url[(url.lastIndexOf('/') + 1)..-1]
-    }
-
-    private Provider<String> defaultHomeDir() {
-        return environments.getDefaultBaseHomeDir().map {it + "/TeamCity-${version}" }
-    }
-
-    private Provider<String> defaultDataDir() {
-        return environments.getDefaultBaseDataDir().map {it + "/${TeamCityVersion.version(version).dataVersion}" }
-    }
-
-    String getBaseHomeDir() {
-        this.environments.getDefaultBaseHomeDir().get()
-    }
-
-    String getBaseDataDir() {
-        this.environments.getDefaultBaseDataDir().get()
-    }
-
-    File getPluginsDir() {
-        return new File(dataDir.get(), 'plugins')
-    }
-
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
      */
@@ -108,8 +75,8 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     void setVersion(String version) {
-        this.version = version
         TeamCityVersion.version(version)
+        this.version = version
     }
 
     /**
@@ -232,6 +199,39 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     void agentOptions(String... options) {
         this.agentOptions.addAll(options)
+    }
+
+    String getBaseHomeDir() {
+        this.environments.getDefaultBaseHomeDir().get()
+    }
+
+    String getBaseDataDir() {
+        this.environments.getDefaultBaseDataDir().get()
+    }
+
+    File getPluginsDir() {
+        return new File(dataDir.get(), 'plugins')
+    }
+
+    private Provider<String> defaultDownloadUrl() {
+        return environments.getDefaultBaseDownloadUrl().map { it + "/TeamCity-${version}.tar.gz" }
+    }
+
+    private Provider<String> defaultInstallerFile() {
+        return environments.getDefaultDownloadsDir().map {it + '/' + filename() }
+    }
+
+    private String filename() {
+        def url = downloadUrl.get()
+        return url[(url.lastIndexOf('/') + 1)..-1]
+    }
+
+    private Provider<String> defaultHomeDir() {
+        return environments.getDefaultBaseHomeDir().map {it + "/TeamCity-${version}" }
+    }
+
+    private Provider<String> defaultDataDir() {
+        return environments.getDefaultBaseDataDir().map {it + "/${TeamCityVersion.version(version).dataVersion}" }
     }
 
     private String propertyName(String property) {

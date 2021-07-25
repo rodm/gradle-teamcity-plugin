@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,10 +49,8 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.project = project
         this.baseDownloadUrl = project.objects.property(String).convention(DEFAULT_BASE_DOWNLOAD_URL)
         this.downloadsDir = project.objects.property(String).convention(DEFAULT_DOWNLOADS_DIR)
-        def defaultHomePath = project.layout.projectDirectory.dir(DEFAULT_BASE_HOME_DIR).toString()
-        this.baseHomeDir = project.objects.property(String).convention(defaultHomePath)
-        def defaultDataPath = project.layout.projectDirectory.dir(DEFAULT_BASE_DATA_DIR).toString()
-        this.baseDataDir = project.objects.property(String).convention(defaultDataPath)
+        this.baseHomeDir = project.objects.property(String).convention(dir(DEFAULT_BASE_HOME_DIR))
+        this.baseDataDir = project.objects.property(String).convention(dir(DEFAULT_BASE_DATA_DIR))
         def factory = new NamedDomainObjectFactory<TeamCityEnvironment>() {
             @Override
             TeamCityEnvironment create(String name) {
@@ -60,14 +58,6 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
             }
         } as NamedDomainObjectFactory<TeamCityEnvironment>
         this.environments = project.container(TeamCityEnvironment, factory)
-    }
-
-    TeamCityEnvironment getByName(String name) {
-        return environments.getByName(name)
-    }
-
-    NamedDomainObjectProvider<TeamCityEnvironment> named(String name) throws UnknownDomainObjectException {
-        return environments.named(name)
     }
 
     /**
@@ -138,6 +128,14 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         return gradleProperty(BASE_DATA_DIR_PROPERTY).orElse(baseDataDir)
     }
 
+    TeamCityEnvironment getByName(String name) {
+        return environments.getByName(name)
+    }
+
+    NamedDomainObjectProvider<TeamCityEnvironment> named(String name) throws UnknownDomainObjectException {
+        return environments.named(name)
+    }
+
     TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
         return environments.create(name, action)
     }
@@ -160,5 +158,9 @@ class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     Provider<String> gradleProperty(String name) {
         def callable = { project.findProperty(name) ?: null }
         return project.<String>provider(callable)
+    }
+
+    private String dir(String path) {
+        project.layout.projectDirectory.dir(path).toString()
     }
 }

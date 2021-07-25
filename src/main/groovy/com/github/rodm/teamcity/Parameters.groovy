@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,11 +23,21 @@ import org.gradle.api.tasks.Input
  */
 @CompileStatic
 class Parameters {
-    Map<String, Object> parameters = [:]
+
+    private Map<String, Object> parameters = [:]
 
     @Input
     Map<String, Object> getParameters() {
         return parameters
+    }
+
+    /**
+     * Add a map of plugin parameters.
+     *
+     * @param parameters The map of parameters to add.
+     */
+    void parameters(Map<String, ?> parameters) {
+        this.parameters.putAll(parameters)
     }
 
     /**
@@ -38,14 +48,5 @@ class Parameters {
      */
     void parameter(String name, Object value) {
         parameters[name] = value
-    }
-
-    /**
-     * Add a map of plugin parameters.
-     *
-     * @param parameters The map of parameters to add.
-     */
-    void parameters(Map<String, ?> parameters) {
-        this.parameters.putAll(parameters)
     }
 }
