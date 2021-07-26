@@ -16,31 +16,16 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Project
-import org.gradle.api.provider.Property
 
 @CompileStatic
-class SignConfiguration {
+interface SignConfiguration {
 
-    private Property<String> certificateChain
-    private Property<String> privateKey
-    private Property<String> password
+    String getCertificateChain()
+    void setCertificateChain(String certificateChain)
 
-    SignConfiguration(Project project) {
-        this.certificateChain = project.objects.property(String)
-        this.privateKey = project.objects.property(String)
-        this.password = project.objects.property(String)
-    }
+    String getPrivateKey()
+    void setPrivateKey(String privateKey)
 
-    Property<String> getCertificateChain() {
-        return certificateChain
-    }
-
-    Property<String> getPrivateKey() {
-        return privateKey
-    }
-
-    Property<String> getPassword() {
-        return password
-    }
+    String getPassword()
+    void setPassword(String password)
 }

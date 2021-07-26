@@ -16,60 +16,28 @@
 package com.github.rodm.teamcity
 
 import groovy.transform.CompileStatic
-import org.gradle.api.Project
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
 
 /**
  * Configuration for publishing a plugin to a plugin repository.
  */
 @CompileStatic
-class PublishConfiguration {
-
-    public static final List<String> DEFAULT_CHANNELS = ['default'].asImmutable()
-
-    private ListProperty<String> channels
-
-    private Property<String> token
-
-    private Property<String> notes
-
-    PublishConfiguration(Project project) {
-        this.channels = project.objects.listProperty(String).convention(DEFAULT_CHANNELS)
-        this.token = project.objects.property(String)
-        this.notes = project.objects.property(String)
-    }
+interface PublishConfiguration {
 
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
      */
-    ListProperty<String> getChannels() {
-        return channels
-    }
-
-    void setChannels(List<String> channels) {
-        this.channels.set(channels)
-    }
+    List<String> getChannels()
+    void setChannels(List<String> channels)
 
     /**
      * The token for uploading the plugin to the plugin repository
      */
-    Property<String> getToken() {
-        return token
-    }
-
-    void setToken(String token) {
-        this.token.set(token)
-    }
+    String getToken()
+    void setToken(String token)
 
     /**
      * The notes describing the changes made to the plugin
      */
-    Property<String> getNotes() {
-        return notes
-    }
-
-    void setNotes(String notes) {
-        this.notes.set(notes)
-    }
+    String getNotes()
+    void setNotes(String notes)
 }

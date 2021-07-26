@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.DefaultPublishConfiguration
+import com.github.rodm.teamcity.internal.DefaultSignConfiguration
 import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor
@@ -182,14 +184,15 @@ class TeamCityServerPlugin implements Plugin<Project> {
     private static void configureSignPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.sign) {
+                DefaultSignConfiguration configuration = extension.server.sign as DefaultSignConfiguration
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
 
                 project.tasks.register(SIGN_PLUGIN_TASK_NAME, SignPlugin) {
                     group = TEAMCITY_GROUP
                     classpath = project.configurations.marketplace
-                    certificateChain.set(extension.server.sign.certificateChain)
-                    privateKey.set(extension.server.sign.privateKey)
-                    password.set(extension.server.sign.password)
+                    certificateChain.set(configuration.certificateChainProperty)
+                    privateKey.set(configuration.privateKeyProperty)
+                    password.set(configuration.passwordProperty)
                     pluginFile.set(packagePlugin.archiveFile)
                     dependsOn(packagePlugin)
                 }
@@ -200,15 +203,16 @@ class TeamCityServerPlugin implements Plugin<Project> {
     private static void configurePublishPluginTask(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate {
             if (extension.server.publish) {
+                DefaultPublishConfiguration configuration = extension.server.publish as DefaultPublishConfiguration
                 SignPlugin signTask = project.tasks.findByName(SIGN_PLUGIN_TASK_NAME) as SignPlugin
                 Zip packagePlugin = project.tasks.findByName(SERVER_PLUGIN_TASK_NAME) as Zip
 
                 project.tasks.register(PUBLISH_PLUGIN_TASK_NAME, PublishPlugin) {
                     group = TEAMCITY_GROUP
                     classpath = project.configurations.marketplace
-                    channels.set(extension.server.publish.channels)
-                    token.set(extension.server.publish.token)
-                    notes.set(extension.server.publish.notes)
+                    channels.set(configuration.channelsProperty)
+                    token.set(configuration.tokenProperty)
+                    notes.set(configuration.notesProperty)
                     distributionFile.set(signTask != null ? signTask.signedPluginFile : packagePlugin.archiveFile)
                     if (signTask != null) {
                         dependsOn(signTask)

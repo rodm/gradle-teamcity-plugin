@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.DefaultPublishConfiguration
+import com.github.rodm.teamcity.internal.DefaultSignConfiguration
 import groovy.transform.CompileStatic
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -80,7 +82,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
      */
     def publish(Action<PublishConfiguration> configuration) {
         if (!publish) {
-            publish = (this as ExtensionAware).extensions.create('publish', PublishConfiguration, project)
+            publish = (this as ExtensionAware).extensions.create(PublishConfiguration, 'publish', DefaultPublishConfiguration, project)
         }
         configuration.execute(publish)
     }
@@ -91,7 +93,7 @@ class ServerPluginConfiguration extends PluginConfiguration {
 
     void sign(Action<SignConfiguration> configuration) {
         if (!sign) {
-            sign = (this as ExtensionAware).extensions.create('sign', SignConfiguration, project)
+            sign = (this as ExtensionAware).extensions.create(SignConfiguration, 'sign', DefaultSignConfiguration, project)
         }
         configuration.execute(sign)
     }
