@@ -26,7 +26,7 @@ image:{uri-shields-gradle-portal}/com.github.rodm.teamcity-server?label=Gradle%2
 
 |===
 |Plugin version |Gradle version |Java version |Documentation
-|v1.4-beta-2
+|v1.4-rc-1
 |6.0+
 |Java 8 & later
 |{uri-github-project}/blob/master/README.adoc#using-the-plugin[README]
