@@ -31,8 +31,8 @@ import java.util.jar.JarFile
 
 abstract class TeamCityTask extends DefaultTask {
 
-    static final String VERSION_MISMATCH_WARNING = '%s: Environment version %s does not match the version of TeamCity installed at %s.'
-    static final String VERSION_INCOMPATIBLE = 'Environment version %s is not compatible with the version of TeamCity installed at %s.'
+    static final String VERSION_MISMATCH_WARNING = '%s: Version %s does not match the TeamCity version %s installed at %s.'
+    static final String VERSION_INCOMPATIBLE = 'Version %s is not compatible with the TeamCity version %s installed at %s.'
     static final String INVALID_HOME_DIR = 'Invalid TeamCity installation at %s.'
     static final String MISSING_VERSION = 'Unable to read version of TeamCity installation at %s'
 
@@ -71,14 +71,14 @@ abstract class TeamCityTask extends DefaultTask {
     void validTeamCityHomeDirectory(String version, String homeDir) {
         validDirectory('homeDir', homeDir)
         def installationVersion = getTeamCityVersion(homeDir)
-        if (TeamCityVersion.version(installationVersion) == TeamCityVersion.version(version)) {
+        if (installationVersion == version) {
             return
         }
-        if (TeamCityVersion.version(installationVersion).dataVersion == TeamCityVersion.version(version).dataVersion) {
-            logger.warn(String.format(VERSION_MISMATCH_WARNING, path, version, homeDir))
+        if (dataVersion(extractVersion(installationVersion)) == dataVersion(version)) {
+            logger.warn(String.format(VERSION_MISMATCH_WARNING, path, version, installationVersion, homeDir))
             return
         }
-        throw new InvalidUserDataException(String.format(VERSION_INCOMPATIBLE, version, homeDir))
+        throw new InvalidUserDataException(String.format(VERSION_INCOMPATIBLE, version, installationVersion, homeDir))
     }
 
     static void validDirectory(String propertyName, String value) {
@@ -96,6 +96,18 @@ abstract class TeamCityTask extends DefaultTask {
     static boolean isWindows() {
         def os = System.getProperty("os.name").toLowerCase()
         return os.contains("windows")
+    }
+
+    private static String dataVersion(String version) {
+        return TeamCityVersion.version(version).dataVersion
+    }
+
+    private static String extractVersion(String version) {
+        if (version.contains('EAP') || version.contains('RC')) {
+            return version.split(' ')[0]
+        } else {
+            return version
+        }
     }
 
     private static String getTeamCityVersion(String homeDir) {

@@ -982,12 +982,12 @@ class EnvironmentsTest {
         StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
         startServer.validate()
 
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3')
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3', '2020.2.3')
         assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
     }
 
     @Test
-    void 'teamcity task output a warning when environment version does not match at bugfix level'() {
+    void 'teamcity task outputs a warning when environment version does not match at bugfix level'() {
         File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -1003,7 +1003,49 @@ class EnvironmentsTest {
         StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
         startServer.validate()
 
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5')
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3')
+        assertThat(outputEventListener.toString(), containsString(expectedMessage))
+    }
+
+    @Test
+    void 'teamcity task outputs a warning when environment version does not match EAP level'() {
+        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 EAP1')
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2021.2' {
+                    version = '2021.2'
+                    homeDir = fakeHomeDir.absolutePath
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+        startServer.validate()
+
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1')
+        assertThat(outputEventListener.toString(), containsString(expectedMessage))
+    }
+
+    @Test
+    void 'teamcity task outputs a warning when environment version does not match RC level'() {
+        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 RC')
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                'teamcity2021.2' {
+                    version = '2021.2'
+                    homeDir = fakeHomeDir.absolutePath
+                }
+            }
+        }
+        project.evaluate()
+
+        StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+        startServer.validate()
+
+        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC')
         assertThat(outputEventListener.toString(), containsString(expectedMessage))
     }
 
@@ -1024,7 +1066,7 @@ class EnvironmentsTest {
         StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
         def e = assertThrows(InvalidUserDataException) { startServer.validate() }
 
-        String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2')
+        String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2', '2020.2.3')
         assertThat(e.message, containsString(expectedMessage))
     }
 
