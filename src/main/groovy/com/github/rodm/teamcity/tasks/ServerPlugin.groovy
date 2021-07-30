@@ -31,7 +31,6 @@ class ServerPlugin extends AbstractPluginTask {
 
     ServerPlugin() {
         description = 'Package TeamCity plugin'
-        onlyIf { descriptor.isPresent() }
         into('server') {
             from(getServer())
         }

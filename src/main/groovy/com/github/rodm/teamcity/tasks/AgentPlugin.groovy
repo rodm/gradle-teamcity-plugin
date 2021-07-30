@@ -28,7 +28,6 @@ class AgentPlugin extends AbstractPluginTask {
 
     AgentPlugin() {
         description = 'Package TeamCity Agent plugin'
-        onlyIf { descriptor.isPresent() }
         into("lib") {
             from(getLib())
         }

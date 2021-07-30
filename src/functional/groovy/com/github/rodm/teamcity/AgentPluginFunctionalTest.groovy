@@ -393,6 +393,26 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         assertThat(entries, hasItem('files/file2'))
     }
 
+    @Test
+    void 'agentPlugin is skipped if project is an agent-side library'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-agent'
+            }
+            teamcity {
+                version = '2020.2'
+            }
+        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":generateAgentDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":processAgentDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":agentPlugin").getOutcome(), is(SKIPPED))
+    }
+
     @Nested
     @DisplayName("with build cache")
     class WithBuildCache {

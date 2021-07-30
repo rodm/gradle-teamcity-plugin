@@ -247,7 +247,6 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.getOutput(), containsString("Plugin descriptor is invalid"))
     }
 
-
     @Test
     void 'plugin archive is updated when descriptor property changes'() {
         buildFile << """
@@ -510,5 +509,25 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         BuildResult result = executeBuild('--init-script', 'init.gradle', '--refresh-dependencies', 'serverPlugin')
 
         assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+    }
+
+    @Test
+    void 'serverPlugin is skipped if project is a server-side library'() {
+        buildFile << """
+            plugins {
+                id 'org.gradle.java'
+                id 'com.github.rodm.teamcity-server'
+            }
+            teamcity {
+                version = '2020.2'
+            }
+        """
+        settingsFile << SETTINGS_SCRIPT_DEFAULT
+
+        BuildResult result = executeBuild()
+
+        assertThat(result.task(":generateServerDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":processServerDescriptor").getOutcome(), is(SKIPPED))
+        assertThat(result.task(":serverPlugin").getOutcome(), is(SKIPPED))
     }
 }
