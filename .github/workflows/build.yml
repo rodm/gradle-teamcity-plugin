@@ -51,10 +51,20 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 8
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-test-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-test-
       - name: Build with Gradle
         run: |
           ./gradlew -v
           ./gradlew -s functionalTest
+          ./gradlew --stop
       - name: Upload reports
         uses: actions/upload-artifact@v2
         if: failure()
