@@ -1,8 +1,8 @@
 = Gradle TeamCity plugin
 :uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity
 :uri-teamcity-environment: {uri-teamcity-sdk-docs}/development-environment.html
-:uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor
-:uri-agent-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#PluginsPackaging-PluginDescriptor2
+:uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#Plugin+Descriptor
+:uri-agent-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#plugin-descriptor-1
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
 :uri-jetbrains-teamcity-releases: https://www.jetbrains.com/teamcity/download/other.html
@@ -68,12 +68,12 @@ To test the samples run
 
 The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains four plugins:
 
-* `com.github.rodm.teamcity-server` - Provides tasks to package a TeamCity plugin, deploy and undeploy the plugin to a
-TeamCity server, and tasks to start and stop the server and default agent.
-* `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent side of a TeamCity plugin.
-* `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project.
-* `com.github.rodm.teamcity-environments` - Adds tasks to download, install, start and stop a TeamCity Server and
- Build Agent.
+* `com.github.rodm.teamcity-server` - Provides tasks to package, sign and publish a TeamCity plugin.
+* `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent-side of a TeamCity plugin.
+* `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project to build a library used by both
+the agent-side and server-side plugin components.
+* `com.github.rodm.teamcity-environments` - Adds tasks to download and install a TeamCity Server, to deploy and
+un-deploy plugins to the server, and to start and stop a TeamCity Server and Build Agent.
 
 Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server[server],
@@ -333,7 +333,7 @@ Upload plugin link on the plugin repository website.
 The `publishPlugin` task requires a {uri-jetbrains-hub-token}[JetBrains Hub token] to publish a plugin to the
 repository as shown in the following examples.
 
-The following example configures the publish task.
+The following example configures the `publishPlugin` task.
 
 [source,groovy]
 [subs="attributes"]
@@ -349,7 +349,7 @@ The following example uses the Kotlin DSL.
 [source,groovy]
 .build.gradle.kts
 ----
-tasks.withType<PublishTask> {
+tasks.withType<PublishPlugin> {
     token = findProperty("jetbrains.token") as String?
 }
 ----
@@ -547,6 +547,15 @@ Default `-Dteamcity.development.mode=true`, `-Dteamcity.development.shadowCopyCl
 * `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
 * `plugins` : The collection of plugins to be deployed to the TeamCity server for this environment. Defaults to the
 plugin output by the `serverPlugin` task when the `com.github.rodm.teamcity-server` plugin is also applied.
+
+The following Gradle properties can be used to override the properties for a specific environment from
+the command line or by setting a value in a gradle.properties file. Replace `<environment>` with the name
+defined in the build script.
+
+* `teamcity.environments._<environment>_.downloadUrl`
+* `teamcity.environments._<environment>_.homeDir`
+* `teamcity.environments._<environment>_.dataDir`
+* `teamcity.environments._<environment>_.javaHome`
 
 ==== Tasks
 
