@@ -1,6 +1,6 @@
 
 plugins {
-    id ("com.github.rodm.teamcity-environments") version "1.4-rc-2"
+    id ("com.github.rodm.teamcity-environments") version "1.4"
 }
 
 group = "com.github.rodm.teamcity"
