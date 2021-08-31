@@ -24,20 +24,17 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
+      - name: Gradle version
+        uses: gradle/gradle-build-action@v1
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-build-
+          arguments: --version
       - name: Build with Gradle
-        run: |
-          ./gradlew -v
-          ./gradlew -s build
-          ./gradlew --stop
+        uses: gradle/gradle-build-action@v1
+        with:
+          arguments: -s build
+          distributions-cache-enabled: true
+          dependencies-cache-enabled: true
+          configuration-cache-enabled: false
 
   test:
     runs-on: ${{ matrix.os }}
