@@ -94,7 +94,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
             project.afterEvaluate {
                 project.dependencies {
                     provided "org.jetbrains.teamcity:server-api:${extension.version}"
-                    if (TeamCityVersion.version(extension.version) >= VERSION_9_0) {
+                    if (TeamCityVersion.version(extension.version, extension.allowSnapshotVersions) >= VERSION_9_0) {
                         provided "org.jetbrains.teamcity:server-web-api:${extension.version}"
                     }
 
@@ -124,6 +124,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
 
         def generateDescriptor = project.tasks.register(GENERATE_SERVER_DESCRIPTOR_TASK_NAME, GenerateServerPluginDescriptor) {
             version.set(project.providers.provider({ extension.version }))
+            allowSnapshotVersions.set(project.providers.provider({ extension.allowSnapshotVersions }))
             descriptor.set(project.providers.provider({ extension.server.descriptor }))
             destination.set(descriptorFile)
         }
@@ -147,7 +148,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
 
         project.tasks.withType(ServerPlugin).configureEach {
-            doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version)))
+            doLast(new PluginDescriptorValidationAction(getSchemaPath(extension.version, extension.allowSnapshotVersions)))
             doLast(new PluginDescriptorContentsValidationAction())
         }
 
@@ -164,10 +165,11 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
     }
 
-    private static String getSchemaPath(String version) {
-        if (TeamCityVersion.version(version) >= VERSION_2020_1) {
+    private static String getSchemaPath(String version, boolean allowSnapshots) {
+        def teamcityVersion = TeamCityVersion.version(version, allowSnapshots)
+        if (teamcityVersion >= VERSION_2020_1) {
             '2020.1/teamcity-server-plugin-descriptor.xsd'
-        } else if (TeamCityVersion.version(version) >= VERSION_2018_2) {
+        } else if (teamcityVersion >= VERSION_2018_2) {
             '2018.2/teamcity-server-plugin-descriptor.xsd'
         } else {
             'teamcity-server-plugin-descriptor.xsd'
