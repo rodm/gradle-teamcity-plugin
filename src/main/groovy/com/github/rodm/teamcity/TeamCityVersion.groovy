@@ -37,22 +37,34 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)')
     private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile('((\\d+)(\\.\\d+)+)-SNAPSHOT')
 
+    static final String INVALID_RELEASE_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')"
+    static final String INVALID_SNAPSHOT_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '10.0-SNAPSHOT', '2021.1' '2021.2.1-SNAPSHOT')"
+
     static TeamCityVersion version(String version) throws IllegalArgumentException {
-        return new TeamCityVersion(version, RELEASE_VERSION_PATTERN)
+        return new TeamCityVersion(version, false)
     }
 
     static TeamCityVersion version(String version, boolean allowSnapshots) throws IllegalArgumentException {
-        return new TeamCityVersion(version, (allowSnapshots ? SNAPSHOT_VERSION_PATTERN : RELEASE_VERSION_PATTERN))
+        return new TeamCityVersion(version, allowSnapshots)
     }
 
     private final String version
 
-    private TeamCityVersion(String version, Pattern versionPattern) {
-        this.version = version
-        Matcher matcher = versionPattern.matcher(version)
-        if (!matcher.matches() && 'SNAPSHOT' != version) {
-            throw new IllegalArgumentException("'${version}' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')")
+    private TeamCityVersion(String version, boolean allowSnapshots) throws IllegalArgumentException {
+        if (version != 'SNAPSHOT') {
+            Matcher releaseMatcher = RELEASE_VERSION_PATTERN.matcher(version)
+            if (allowSnapshots) {
+                Matcher snapshotMatcher = SNAPSHOT_VERSION_PATTERN.matcher(version)
+                if (!snapshotMatcher.matches() && !releaseMatcher.matches()) {
+                    throw new IllegalArgumentException(String.format(INVALID_SNAPSHOT_MESSAGE, version))
+                }
+            } else {
+                if (!releaseMatcher.matches()) {
+                    throw new IllegalArgumentException(String.format(INVALID_RELEASE_MESSAGE, version))
+                }
+            }
         }
+        this.version = version
     }
 
     String toString() {
