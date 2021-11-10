@@ -48,7 +48,7 @@ class ServerDescriptorGeneratorTest {
     }
 
     private ServerPluginDescriptorGenerator createGenerator(ServerPluginDescriptor descriptor) {
-        new ServerPluginDescriptorGenerator(descriptor, extension.getVersion())
+        new ServerPluginDescriptorGenerator(descriptor, TeamCityVersion.version(extension.getVersion()))
     }
 
     @BeforeEach

@@ -27,9 +27,9 @@ class ServerPluginDescriptorGenerator {
 
     private ServerPluginDescriptor descriptor
 
-    private String version
+    private TeamCityVersion version
 
-    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, String version) {
+    ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, TeamCityVersion version) {
         this.descriptor = descriptor
         this.version = version
     }
@@ -87,9 +87,9 @@ class ServerPluginDescriptorGenerator {
         Map<String, Boolean> attributes = [:]
         if (descriptor.getUseSeparateClassloader() != null)
             attributes << ['use-separate-classloader': descriptor.getUseSeparateClassloader()]
-        if (TeamCityVersion.version(version) >= VERSION_2018_2 && descriptor.getAllowRuntimeReload() != null)
+        if (version >= VERSION_2018_2 && descriptor.getAllowRuntimeReload() != null)
             attributes << ['allow-runtime-reload': descriptor.getAllowRuntimeReload()]
-        if (TeamCityVersion.version(version) >= VERSION_2020_1 && descriptor.getNodeResponsibilitiesAware() != null)
+        if (version >= VERSION_2020_1 && descriptor.getNodeResponsibilitiesAware() != null)
             attributes << ['node-responsibilities-aware': descriptor.getNodeResponsibilitiesAware()]
         if (attributes.size() > 0)
             root.appendNode('deployment', attributes)
@@ -105,7 +105,7 @@ class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (TeamCityVersion.version(version) >= VERSION_9_0) {
+        if (version >= VERSION_9_0) {
             if (descriptor.getDependencies().hasDependencies()) {
                 Node dependencies = root.appendNode('dependencies')
                 descriptor.getDependencies().plugins.each { name ->

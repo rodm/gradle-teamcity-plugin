@@ -37,6 +37,9 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
     @Input
     final Property<String> version = project.objects.property(String)
 
+    @Input
+    final Property<Boolean> allowSnapshotVersions = project.objects.property(Boolean)
+
     @Nested
     final Property<AgentPluginDescriptor> descriptor = project.objects.property(AgentPluginDescriptor)
 
@@ -50,7 +53,8 @@ class GenerateAgentPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        if (TeamCityVersion.version(version.get()) < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
+        def teamcityVersion = TeamCityVersion.version(version.get(), allowSnapshotVersions.get())
+        if (teamcityVersion < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
             logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
         AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor.get())

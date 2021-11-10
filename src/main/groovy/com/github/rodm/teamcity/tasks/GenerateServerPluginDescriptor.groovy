@@ -39,6 +39,9 @@ class GenerateServerPluginDescriptor extends DefaultTask {
     @Input
     final Property<String> version = project.objects.property(String)
 
+    @Input
+    final Property<Boolean> allowSnapshotVersions = project.objects.property(Boolean)
+
     @Nested
     final Property<ServerPluginDescriptor> descriptor = project.objects.property(ServerPluginDescriptor)
 
@@ -52,7 +55,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        TeamCityVersion teamcityVersion = TeamCityVersion.version(version.get())
+        TeamCityVersion teamcityVersion = TeamCityVersion.version(version.get(), allowSnapshotVersions.get())
         if (teamcityVersion < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
             logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
@@ -62,7 +65,7 @@ class GenerateServerPluginDescriptor extends DefaultTask {
         if (teamcityVersion < VERSION_2020_1 && descriptor.get().nodeResponsibilitiesAware != null) {
             logger.warn("${path}: Plugin descriptor does not support nodeResponsibilitiesAware for version ${version.get()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get())
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), teamcityVersion)
         destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }
