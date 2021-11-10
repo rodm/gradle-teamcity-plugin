@@ -99,7 +99,7 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'allow snapshot version with allow snapshots setting'() {
+    void 'accept snapshot version with allow snapshots setting'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
@@ -109,6 +109,19 @@ class TeamCityServerPluginTest {
         project.evaluate()
 
         assertEquals('2020.2-SNAPSHOT', project.extensions.getByName('teamcity').version)
+    }
+
+    @Test
+    void 'accept release version with allow snapshots setting'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+
+        project.teamcity {
+            version = '2020.2'
+            allowSnapshotVersions = true
+        }
+        project.evaluate()
+
+        assertEquals('2020.2', project.extensions.getByName('teamcity').version)
     }
 
     @Test

@@ -18,6 +18,8 @@ package com.github.rodm.teamcity
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
+import static com.github.rodm.teamcity.TeamCityVersion.INVALID_RELEASE_MESSAGE
+import static com.github.rodm.teamcity.TeamCityVersion.INVALID_SNAPSHOT_MESSAGE
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 import static org.hamcrest.MatcherAssert.assertThat
@@ -73,20 +75,6 @@ class TeamCityVersionTest {
         assertThat(version('2021.1.1').dataVersion, equalTo('2021.1'))
     }
 
-    private static void assertInvalidVersion(String version) {
-        try {
-            TeamCityVersionTest.version(version)
-            fail("Should throw exception for invalid version: " + version)
-        }
-        catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), endsWith("is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')"))
-        }
-    }
-
-    private static TeamCityVersion version(String version) {
-        TeamCityVersion.version(version)
-    }
-
     @Nested
     class TeamCityVersionAllowingSnapshots {
 
@@ -99,12 +87,24 @@ class TeamCityVersionTest {
         }
 
         @Test
+        void 'invalid TeamCity versions'() {
+            assertInvalidSnapshotVersion('10')
+            assertInvalidSnapshotVersion('10-SNAPSHOT')
+            assertInvalidSnapshotVersion('2018')
+            assertInvalidSnapshotVersion('A.B-SNAPSHOT')
+            assertInvalidSnapshotVersion('A.B.C-SNAPSHOT')
+        }
+
+        @Test
         void 'compare TeamCity versions allowing snapshots'() {
             assertThat(version('9.0-SNAPSHOT'), lessThan(version('9.0.1-SNAPSHOT')))
             assertThat(version('9.0-SNAPSHOT'), lessThan(version('10.0-SNAPSHOT')))
             assertThat(version('9.0-SNAPSHOT'), lessThan(version('2018.1-SNAPSHOT')))
             assertThat(version('2020.1.5-SNAPSHOT'), lessThan(version('2020.2-SNAPSHOT')))
             assertThat(version('2020.1.5-SNAPSHOT'), lessThan(version('SNAPSHOT')))
+
+            assertThat(version('2020.1.3'), lessThan(version('2020.1.3-SNAPSHOT')))
+            assertThat(version('2020.1.4'), greaterThan(version('2020.1.3-SNAPSHOT')))
 
             assertThat(version('10.0-SNAPSHOT'), equalTo(version('10.0-SNAPSHOT')))
             assertThat(version('2020.2-SNAPSHOT'), equalTo(version('2020.2-SNAPSHOT')))
@@ -122,8 +122,31 @@ class TeamCityVersionTest {
             assertThat(version('2020.2.4-SNAPSHOT').dataVersion, equalTo('2020.2'))
         }
 
+        private static assertInvalidSnapshotVersion(String version) {
+            assertInvalidVersion(version, true)
+        }
+
         private static TeamCityVersion version(String version) {
             TeamCityVersion.version(version, true)
         }
+    }
+
+    private static void assertInvalidVersion(String version) {
+        assertInvalidVersion(version, false)
+    }
+
+    private static void assertInvalidVersion(String version, boolean allowSnapshots) {
+        try {
+            TeamCityVersion.version(version, allowSnapshots)
+            fail("Should throw exception for invalid version: " + version)
+        }
+        catch (IllegalArgumentException expected) {
+            def expectedMessage = allowSnapshots ? INVALID_SNAPSHOT_MESSAGE : INVALID_RELEASE_MESSAGE
+            assertThat(expected.getMessage(), endsWith(String.format(expectedMessage, version)))
+        }
+    }
+
+    private static TeamCityVersion version(String version) {
+        TeamCityVersion.version(version)
     }
 }
