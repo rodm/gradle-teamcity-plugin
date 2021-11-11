@@ -10,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger.QuietPeriodMode.USE_DEFAULT
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
+import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
 version = "2020.2"
 
@@ -35,7 +36,7 @@ project {
             +:refs/tags/(*)
         """.trimIndent()
         useTagsAsBranches = true
-        useMirrors = false
+        checkoutPolicy = NO_MIRRORS
     }
     vcsRoot(vcs)
 
