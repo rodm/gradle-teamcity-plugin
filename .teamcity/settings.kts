@@ -14,7 +14,12 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 version = "2020.2"
 
 fun supportedGradleVersion(javaVersion: String?): String? {
-    val versionsMap = mapOf("14" to "6.3", "15" to "6.7.1", "16" to "7.0.2")
+    val versionsMap = mapOf(
+        "14" to "6.3",
+        "15" to "6.7.1",
+        "16" to "7.0.2",
+        "17" to "7.3"
+    )
     return versionsMap[javaVersion]
 }
 
@@ -161,7 +166,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("14", "15", "16")
+                    "Java"("14", "15", "16", "17")
                 }
                 build {
                     val javaVersion = axes["Java"]
