@@ -37,10 +37,7 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0
 class GenerateServerPluginDescriptor extends DefaultTask {
 
     @Input
-    final Property<String> version = project.objects.property(String)
-
-    @Input
-    final Property<Boolean> allowSnapshotVersions = project.objects.property(Boolean)
+    final Property<TeamCityVersion> version = project.objects.property(TeamCityVersion)
 
     @Nested
     final Property<ServerPluginDescriptor> descriptor = project.objects.property(ServerPluginDescriptor)
@@ -55,17 +52,16 @@ class GenerateServerPluginDescriptor extends DefaultTask {
 
     @TaskAction
     void generateDescriptor() {
-        TeamCityVersion teamcityVersion = TeamCityVersion.version(version.get(), allowSnapshotVersions.get())
-        if (teamcityVersion < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
+        if (version.get() < VERSION_9_0 && descriptor.get().dependencies.hasDependencies()) {
             logger.warn("${path}: Plugin descriptor does not support dependencies for version ${version.get()}")
         }
-        if (teamcityVersion < VERSION_2018_2 && descriptor.get().allowRuntimeReload != null) {
+        if (version.get() < VERSION_2018_2 && descriptor.get().allowRuntimeReload != null) {
             logger.warn("${path}: Plugin descriptor does not support allowRuntimeReload for version ${version.get()}")
         }
-        if (teamcityVersion < VERSION_2020_1 && descriptor.get().nodeResponsibilitiesAware != null) {
+        if (version.get() < VERSION_2020_1 && descriptor.get().nodeResponsibilitiesAware != null) {
             logger.warn("${path}: Plugin descriptor does not support nodeResponsibilitiesAware for version ${version.get()}")
         }
-        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), teamcityVersion)
+        ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get())
         destination.get().asFile.withPrintWriter('UTF-8') { writer -> generator.writeTo(writer) }
     }
 }

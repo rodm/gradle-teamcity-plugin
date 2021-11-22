@@ -84,8 +84,7 @@ class TeamCityAgentPlugin implements Plugin<Project> {
         }
 
         def generateDescriptor = project.tasks.register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor) {
-            version.set(project.providers.provider({ extension.version }))
-            allowSnapshotVersions.set(project.providers.provider({ extension.allowSnapshotVersions }))
+            version.set(project.providers.provider({ TeamCityVersion.version(extension.version, extension.allowSnapshotVersions) }))
             descriptor.set(project.providers.provider({ extension.agent.descriptor }))
             destination.set(descriptorFile)
         }

@@ -68,7 +68,7 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     }
 
     String toString() {
-        return 'TeamCity ' + this.version
+        return this.version
     }
 
     int compareTo(TeamCityVersion teamcityVersion) {

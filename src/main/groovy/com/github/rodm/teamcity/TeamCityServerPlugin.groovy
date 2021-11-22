@@ -123,8 +123,7 @@ class TeamCityServerPlugin implements Plugin<Project> {
         }
 
         def generateDescriptor = project.tasks.register(GENERATE_SERVER_DESCRIPTOR_TASK_NAME, GenerateServerPluginDescriptor) {
-            version.set(project.providers.provider({ extension.version }))
-            allowSnapshotVersions.set(project.providers.provider({ extension.allowSnapshotVersions }))
+            version.set(project.providers.provider({ TeamCityVersion.version(extension.version, extension.allowSnapshotVersions) }))
             descriptor.set(project.providers.provider({ extension.server.descriptor }))
             destination.set(descriptorFile)
         }
