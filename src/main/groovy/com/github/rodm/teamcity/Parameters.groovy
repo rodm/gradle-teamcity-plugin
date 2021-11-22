@@ -24,10 +24,10 @@ import org.gradle.api.tasks.Input
 @CompileStatic
 class Parameters {
 
-    private Map<String, Object> parameters = [:]
+    private Map<String, String> parameters = [:]
 
     @Input
-    Map<String, Object> getParameters() {
+    Map<String, String> getParameters() {
         return parameters
     }
 
@@ -36,7 +36,7 @@ class Parameters {
      *
      * @param parameters The map of parameters to add.
      */
-    void parameters(Map<String, ?> parameters) {
+    void parameters(Map<String, String> parameters) {
         this.parameters.putAll(parameters)
     }
 
@@ -46,7 +46,7 @@ class Parameters {
      * @param name The name of the parameter
      * @param value The value of the parameter
      */
-    void parameter(String name, Object value) {
+    void parameter(String name, String value) {
         parameters[name] = value
     }
 }
