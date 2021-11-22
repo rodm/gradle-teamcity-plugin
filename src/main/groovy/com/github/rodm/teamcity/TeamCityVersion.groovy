@@ -41,16 +41,10 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
     static final String INVALID_SNAPSHOT_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '10.0-SNAPSHOT', '2021.1' '2021.2.1-SNAPSHOT')"
 
     static TeamCityVersion version(String version) throws IllegalArgumentException {
-        return new TeamCityVersion(version, false)
+        return TeamCityVersion.version(version, false)
     }
 
     static TeamCityVersion version(String version, boolean allowSnapshots) throws IllegalArgumentException {
-        return new TeamCityVersion(version, allowSnapshots)
-    }
-
-    private final String version
-
-    private TeamCityVersion(String version, boolean allowSnapshots) throws IllegalArgumentException {
         if (version != 'SNAPSHOT') {
             Matcher releaseMatcher = RELEASE_VERSION_PATTERN.matcher(version)
             if (allowSnapshots) {
@@ -64,6 +58,12 @@ class TeamCityVersion implements Comparable<TeamCityVersion> {
                 }
             }
         }
+        return new TeamCityVersion(version)
+    }
+
+    private final String version
+
+    private TeamCityVersion(String version) {
         this.version = version
     }
 
