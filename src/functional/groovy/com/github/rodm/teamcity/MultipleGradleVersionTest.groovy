@@ -45,6 +45,28 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         ]
     }
 
+    static List<String> releasedJavaVersions() {
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17']
+    }
+
+    static List<String> supportedByGradle(String version) {
+        def gradleVersion = GradleVersion.version(version)
+        def javaVersions = releasedJavaVersions()
+        if (gradleVersion < GradleVersion.version('6.3')) {
+            javaVersions.remove('14')
+        }
+        if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
+            javaVersions.remove('15')
+        }
+        if (gradleVersion < GradleVersion.version('7.0-rc-1')) {
+            javaVersions.remove('16')
+        }
+        if (gradleVersion < GradleVersion.version('7.3')) {
+            javaVersions.remove('17')
+        }
+        return javaVersions
+    }
+
     @BeforeEach
     void setup() throws IOException {
         buildFile << """
@@ -188,25 +210,6 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
         BuildResult result = executeBuild(gradleVersion)
         checkBuild(result)
-    }
-
-    static List<String> supportedByGradle(String version) {
-        def gradleVersion = GradleVersion.version(version)
-        def javaVersions = releasedJavaVersions()
-        if (gradleVersion < GradleVersion.version('6.3')) {
-            javaVersions.remove('14')
-        }
-        if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
-            javaVersions.remove('15')
-        }
-        if (gradleVersion < GradleVersion.version('7.0-rc-1')) {
-            javaVersions.remove('16')
-        }
-        return javaVersions
-    }
-
-    static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16']
     }
 
     private BuildResult executeBuild(String version) {
