@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 import static groovy.transform.TypeCheckingMode.SKIP
 
 @CompileStatic
-class TeamCityVersion implements Comparable<TeamCityVersion> {
+class TeamCityVersion implements Comparable<TeamCityVersion>, Serializable {
 
     public static final TeamCityVersion VERSION_9_0
     public static final TeamCityVersion VERSION_2018_2
