@@ -39,7 +39,7 @@ teamcity {
             allowRuntimeReload = true
 
             parameters {
-                parameter ("build-time", LocalDateTime.now())
+                parameter ("build-time", "${LocalDateTime.now()}")
             }
         }
     }
