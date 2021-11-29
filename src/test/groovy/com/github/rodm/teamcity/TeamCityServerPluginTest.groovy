@@ -27,11 +27,12 @@ import org.junit.jupiter.api.io.TempDir
 import static com.github.rodm.teamcity.GradleMatchers.hasDefaultDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
+import static com.github.rodm.teamcity.ValidationMode.IGNORE
+import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static org.hamcrest.CoreMatchers.anyOf
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
-import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
@@ -144,7 +145,7 @@ class TeamCityServerPluginTest {
         project.evaluate()
 
         TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
-        assertThat(extension.validateBeanDefinition, equalTo(ValidationMode.IGNORE))
+        assertThat(extension.validateBeanDefinition, equalTo(IGNORE))
     }
 
     @Test
@@ -178,31 +179,39 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'sub-project inherits allowSnapshotVersions from root project'() {
+    void 'sub-project inherits properties from root project'() {
         Project rootProject = project
         rootProject.apply plugin: 'com.github.rodm.teamcity-server'
         rootProject.teamcity {
+            defaultRepositories = false
             allowSnapshotVersions = true
+            validateBeanDefinition = IGNORE
         }
 
         Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
         subproject.apply plugin: 'com.github.rodm.teamcity-server'
 
+        assertThat(subproject.extensions.getByName('teamcity').defaultRepositories, is(false))
         assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
+        assertThat(subproject.extensions.getByName('teamcity').validateBeanDefinition, is(IGNORE))
     }
 
     @Test
-    void 'sub-project lazily inherits allowSnapshotVersions from root project'() {
+    void 'sub-project lazily inherits properties from root project'() {
         Project rootProject = project
         Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
         subproject.apply plugin: 'com.github.rodm.teamcity-server'
 
         rootProject.apply plugin: 'com.github.rodm.teamcity-server'
         rootProject.teamcity {
+            defaultRepositories = false
             allowSnapshotVersions = true
+            validateBeanDefinition = FAIL
         }
 
+        assertThat(subproject.extensions.getByName('teamcity').defaultRepositories, is(false))
         assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
+        assertThat(subproject.extensions.getByName('teamcity').validateBeanDefinition, is(FAIL))
     }
 
     @Test

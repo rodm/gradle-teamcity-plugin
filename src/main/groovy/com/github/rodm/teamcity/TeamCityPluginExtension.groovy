@@ -28,9 +28,9 @@ class TeamCityPluginExtension {
 
     private String version
 
-    private boolean defaultRepositories = true
+    private Boolean defaultRepositories
     private Boolean allowSnapshotVersions
-    private ValidationMode validateBeanDefinition = ValidationMode.WARN
+    private ValidationMode validateBeanDefinition
 
     private AgentPluginConfiguration agent
 
@@ -80,7 +80,13 @@ class TeamCityPluginExtension {
     }
 
     boolean getDefaultRepositories() {
-        return defaultRepositories
+        if (defaultRepositories == null) {
+            def rootExtension = getRootExtension(project)
+            if (rootExtension) {
+                defaultRepositories = rootExtension.defaultRepositories
+            }
+        }
+        return (defaultRepositories != null) ? defaultRepositories : true
     }
 
     /**
@@ -93,13 +99,13 @@ class TeamCityPluginExtension {
     }
 
     boolean getAllowSnapshotVersions() {
-        if (!allowSnapshotVersions) {
+        if (allowSnapshotVersions == null) {
             def rootExtension = getRootExtension(project)
             if (rootExtension) {
                 allowSnapshotVersions = rootExtension.allowSnapshotVersions
             }
         }
-        return (allowSnapshotVersions) ?: false
+        return (allowSnapshotVersions != null) ? allowSnapshotVersions : false
     }
 
     /**
@@ -116,7 +122,13 @@ class TeamCityPluginExtension {
     }
 
     ValidationMode getValidateBeanDefinition() {
-        return validateBeanDefinition
+        if (validateBeanDefinition == null) {
+            def rootExtension = getRootExtension(project)
+            if (rootExtension) {
+                validateBeanDefinition = rootExtension.validateBeanDefinition
+            }
+        }
+        return (validateBeanDefinition != null) ? validateBeanDefinition : ValidationMode.WARN
     }
 
     def getAgent() {
