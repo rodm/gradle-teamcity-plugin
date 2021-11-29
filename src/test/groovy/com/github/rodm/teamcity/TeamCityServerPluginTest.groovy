@@ -36,6 +36,7 @@ import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasSize
+import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.startsWith
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertTrue
@@ -147,7 +148,7 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'sub-project inherits version from root poject'() {
+    void 'sub-project inherits version from root project'() {
         Project rootProject = project
 
         rootProject.apply plugin: 'com.github.rodm.teamcity-server'
@@ -162,7 +163,7 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'sub-project lazily inherits version '() {
+    void 'sub-project lazily inherits version from root project'() {
         Project rootProject = project
 
         Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
@@ -174,6 +175,34 @@ class TeamCityServerPluginTest {
         }
 
         assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
+    }
+
+    @Test
+    void 'sub-project inherits allowSnapshotVersions from root project'() {
+        Project rootProject = project
+        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+        rootProject.teamcity {
+            allowSnapshotVersions = true
+        }
+
+        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
+        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+        assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
+    }
+
+    @Test
+    void 'sub-project lazily inherits allowSnapshotVersions from root project'() {
+        Project rootProject = project
+        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
+        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+        rootProject.teamcity {
+            allowSnapshotVersions = true
+        }
+
+        assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
     }
 
     @Test

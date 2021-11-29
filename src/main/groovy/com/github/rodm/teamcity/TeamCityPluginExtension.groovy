@@ -29,7 +29,7 @@ class TeamCityPluginExtension {
     private String version
 
     private boolean defaultRepositories = true
-    private boolean allowSnapshotVersions = false
+    private Boolean allowSnapshotVersions
     private ValidationMode validateBeanDefinition = ValidationMode.WARN
 
     private AgentPluginConfiguration agent
@@ -62,11 +62,9 @@ class TeamCityPluginExtension {
 
     String getVersion() {
         if (!version) {
-            if (!isRootProject(project)) {
-                def rootExtension = project.rootProject.extensions.findByType(TeamCityPluginExtension)
-                if (rootExtension) {
-                    version = rootExtension.version
-                }
+            def rootExtension = getRootExtension(project)
+            if (rootExtension) {
+                version = rootExtension.version
             }
         }
         (version) ?: '9.0'
@@ -95,7 +93,13 @@ class TeamCityPluginExtension {
     }
 
     boolean getAllowSnapshotVersions() {
-        return allowSnapshotVersions
+        if (!allowSnapshotVersions) {
+            def rootExtension = getRootExtension(project)
+            if (rootExtension) {
+                allowSnapshotVersions = rootExtension.allowSnapshotVersions
+            }
+        }
+        return (allowSnapshotVersions) ?: false
     }
 
     /**
@@ -210,6 +214,10 @@ class TeamCityPluginExtension {
             project.logger.warn('Configuring environments with the teamcity-server plugin is deprecated. Please use the teamcity-environments plugin.')
         }
         configuration.execute(environments)
+    }
+
+    private static TeamCityPluginExtension getRootExtension(Project project) {
+        return !isRootProject(project) ? project.rootProject.extensions.findByType(TeamCityPluginExtension) : null
     }
 
     private static boolean isRootProject(Project project) {
