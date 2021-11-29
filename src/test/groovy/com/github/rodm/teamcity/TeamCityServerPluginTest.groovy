@@ -21,6 +21,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -148,70 +149,75 @@ class TeamCityServerPluginTest {
         assertThat(extension.validateBeanDefinition, equalTo(IGNORE))
     }
 
-    @Test
-    void 'sub-project inherits version from root project'() {
-        Project rootProject = project
+    @Nested
+    class SubProjects {
 
-        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-        rootProject.teamcity {
-            version = '8.1.5'
+        private Project rootProject
+        private Project subproject
+
+        @BeforeEach
+        void setup() {
+            rootProject = project
+            subproject = ProjectBuilder.builder().withParent(rootProject).build()
         }
 
-        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
-        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+        @Test
+        void 'sub-project inherits version from root project'() {
+            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+            rootProject.teamcity {
+                version = '8.1.5'
+            }
 
-        assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
-    }
+            subproject.apply plugin: 'com.github.rodm.teamcity-server'
 
-    @Test
-    void 'sub-project lazily inherits version from root project'() {
-        Project rootProject = project
-
-        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
-        subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-        rootProject.teamcity {
-            version = '8.1.5'
+            assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
         }
 
-        assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
-    }
+        @Test
+        void 'sub-project lazily inherits version from root project'() {
+            subproject.apply plugin: 'com.github.rodm.teamcity-server'
 
-    @Test
-    void 'sub-project inherits properties from root project'() {
-        Project rootProject = project
-        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-        rootProject.teamcity {
-            defaultRepositories = false
-            allowSnapshotVersions = true
-            validateBeanDefinition = IGNORE
+            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+            rootProject.teamcity {
+                version = '8.1.5'
+            }
+
+            assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
         }
 
-        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
-        subproject.apply plugin: 'com.github.rodm.teamcity-server'
+        @Test
+        void 'sub-project inherits properties from root project'() {
+            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+            rootProject.teamcity {
+                defaultRepositories = false
+                allowSnapshotVersions = true
+                validateBeanDefinition = IGNORE
+            }
 
-        assertThat(subproject.extensions.getByName('teamcity').defaultRepositories, is(false))
-        assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
-        assertThat(subproject.extensions.getByName('teamcity').validateBeanDefinition, is(IGNORE))
-    }
+            subproject.apply plugin: 'com.github.rodm.teamcity-server'
 
-    @Test
-    void 'sub-project lazily inherits properties from root project'() {
-        Project rootProject = project
-        Project subproject = ProjectBuilder.builder().withParent(rootProject).build()
-        subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-        rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-        rootProject.teamcity {
-            defaultRepositories = false
-            allowSnapshotVersions = true
-            validateBeanDefinition = FAIL
+            def extension = subproject.extensions.getByName('teamcity')
+            assertThat(extension.defaultRepositories, is(false))
+            assertThat(extension.allowSnapshotVersions, is(true))
+            assertThat(extension.validateBeanDefinition, is(IGNORE))
         }
 
-        assertThat(subproject.extensions.getByName('teamcity').defaultRepositories, is(false))
-        assertThat(subproject.extensions.getByName('teamcity').allowSnapshotVersions, is(true))
-        assertThat(subproject.extensions.getByName('teamcity').validateBeanDefinition, is(FAIL))
+        @Test
+        void 'sub-project lazily inherits properties from root project'() {
+            subproject.apply plugin: 'com.github.rodm.teamcity-server'
+
+            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
+            rootProject.teamcity {
+                defaultRepositories = false
+                allowSnapshotVersions = true
+                validateBeanDefinition = FAIL
+            }
+
+            def extension = subproject.extensions.getByName('teamcity')
+            assertThat(extension.defaultRepositories, is(false))
+            assertThat(extension.allowSnapshotVersions, is(true))
+            assertThat(extension.validateBeanDefinition, is(FAIL))
+        }
     }
 
     @Test
