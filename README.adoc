@@ -556,6 +556,8 @@ defined in the build script.
 * `teamcity.environments._<environment>_.homeDir`
 * `teamcity.environments._<environment>_.dataDir`
 * `teamcity.environments._<environment>_.javaHome`
+* `teamcity.environments._<environment>_.serverOptions`
+* `teamcity.environments._<environment>_.agentOptions`
 
 ==== Tasks
 
