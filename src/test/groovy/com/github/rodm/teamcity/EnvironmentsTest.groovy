@@ -28,7 +28,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.logging.Logger
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.testfixtures.ProjectBuilder
@@ -81,15 +80,6 @@ class EnvironmentsTest {
     ].join(' ')
 
     private Project project
-
-    static String optionsAsString(def options) {
-        if (options instanceof ListProperty) {
-            ListProperty<String> optionsList = (ListProperty) options
-            return optionsList.get().join(' ').trim()
-        } else {
-            return ''
-        }
-    }
 
     @BeforeEach
     void setup() {
@@ -222,8 +212,8 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions))
-        assertThat(optionsAsString(environment.agentOptions), equalTo(''))
+        assertThat(environment.serverOptions, equalTo(defaultOptions))
+        assertThat(environment.agentOptions, equalTo(''))
     }
 
     @Test
@@ -260,7 +250,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.serverOptions), equalTo('-DnewOption=test'))
+        assertThat(environment.serverOptions, equalTo('-DnewOption=test'))
     }
 
     @Test
@@ -278,7 +268,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.serverOptions), equalTo('-Doption1=value1 -Doption2=value2'))
+        assertThat(environment.serverOptions, equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
     @Test
@@ -296,7 +286,8 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions + ' -DadditionalOption=test'))
+        def expectedOptions = defaultOptions + ' -DadditionalOption=test'
+        assertThat(environment.serverOptions, equalTo(expectedOptions))
     }
 
     @Test
@@ -314,7 +305,8 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.serverOptions), equalTo(defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'))
+        def expectedOptions = defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'
+        assertThat(environment.serverOptions, equalTo(expectedOptions))
     }
 
     @Test
@@ -333,7 +325,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.agentOptions), equalTo('-DnewOption2=value2'))
+        assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
     }
 
     @Test
@@ -351,7 +343,7 @@ class EnvironmentsTest {
         TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
 
         def environment = extension.environments.getByName('test')
-        assertThat(optionsAsString(environment.agentOptions), equalTo('-Doption1=value1 -Doption2=value2'))
+        assertThat(environment.agentOptions, equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
     @Test
@@ -371,7 +363,7 @@ class EnvironmentsTest {
 
         def environment = extension.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        assertThat(optionsAsString(environment.agentOptions), equalTo(expectedOptions))
+        assertThat(environment.agentOptions, equalTo(expectedOptions))
     }
 
     @Test
@@ -390,7 +382,7 @@ class EnvironmentsTest {
 
         def environment = extension.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        assertThat(optionsAsString(environment.agentOptions), equalTo(expectedOptions))
+        assertThat(environment.agentOptions, equalTo(expectedOptions))
     }
 
     @Test
@@ -615,6 +607,8 @@ class EnvironmentsTest {
         project.ext['teamcity.environments.test.javaHome'] = '/alt/java'
         project.ext['teamcity.environments.test.homeDir'] = '/alt/servers/TeamCity-9.1.7'
         project.ext['teamcity.environments.test.dataDir'] = '/alt/data/9.1'
+        project.ext['teamcity.environments.test.serverOptions'] = '-DserverOption1=value1 -DserverOption2=value2'
+        project.ext['teamcity.environments.test.agentOptions'] = '-DagentOption1=value1 -DagentOption2=value2'
 
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -638,6 +632,8 @@ class EnvironmentsTest {
         assertThat(normalize(environment.javaHome), endsWith('/alt/java'))
         assertThat(normalize(environment.homeDir), endsWith('/alt/servers/TeamCity-9.1.7'))
         assertThat(normalize(environment.dataDir), endsWith('/alt/data/9.1'))
+        assertThat(environment.serverOptions, equalTo('-DserverOption1=value1 -DserverOption2=value2'))
+        assertThat(environment.agentOptions, equalTo('-DagentOption1=value1 -DagentOption2=value2'))
     }
 
     @Test

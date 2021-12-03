@@ -107,7 +107,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     homeDir.set(environment.homeDirProperty)
                     dataDir.set(environment.dataDirProperty)
                     javaHome.set(environment.javaHomeProperty)
-                    serverOptions.set(environment.serverOptions.map({it.join(' ')}))
+                    serverOptions.set(environment.serverOptionsProvider)
                     doFirst {
                         project.mkdir(getDataDir())
                     }
@@ -127,7 +127,7 @@ class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     version.set(environment.version)
                     homeDir.set(environment.homeDirProperty)
                     javaHome.set(environment.javaHomeProperty)
-                    agentOptions.set(environment.agentOptions.map({it.join(' ')}))
+                    agentOptions.set(environment.agentOptionsProvider)
                 }
 
                 def stopAgent = project.tasks.register("stop${name}Agent", StopAgent) {

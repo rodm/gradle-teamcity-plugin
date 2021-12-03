@@ -18,6 +18,7 @@ package com.github.rodm.teamcity.internal
 import com.github.rodm.teamcity.TeamCityEnvironment
 import com.github.rodm.teamcity.TeamCityVersion
 import groovy.transform.CompileStatic
+import org.gradle.api.Transformer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
@@ -163,7 +164,7 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      *      '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
      */
     Object getServerOptions() {
-        return serverOptions
+        return getServerOptionsProvider().get()
     }
 
     @CompileStatic(SKIP)
@@ -180,11 +181,15 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
         this.serverOptions.addAll(options)
     }
 
+    Provider<String> getServerOptionsProvider() {
+        return optionsAsStringProvider('serverOptions', serverOptions)
+    }
+
     /**
      * The Java command line options to be used when starting the TeamCity Agent.
      */
     Object getAgentOptions() {
-        return agentOptions
+        return getAgentOptionsProvider().get()
     }
 
     @CompileStatic(SKIP)
@@ -199,6 +204,10 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     void agentOptions(String... options) {
         this.agentOptions.addAll(options)
+    }
+
+    Provider<String> getAgentOptionsProvider() {
+        return optionsAsStringProvider('agentOptions', agentOptions)
     }
 
     String getBaseHomeDir() {
@@ -232,6 +241,14 @@ class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     private Provider<String> defaultDataDir() {
         return environments.getDefaultBaseDataDir().map {it + "/${TeamCityVersion.version(version).dataVersion}" }
+    }
+
+    private Provider<String> optionsAsStringProvider(String property, ListProperty<String> options) {
+        environments.gradleProperty(propertyName(property)).
+            orElse(options.map(new Transformer<String, List<String>>() {
+                @Override
+                String transform(List<String> strings) { return strings.join(' ') }
+            }))
     }
 
     private String propertyName(String property) {

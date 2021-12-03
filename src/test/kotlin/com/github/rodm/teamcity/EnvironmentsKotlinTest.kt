@@ -17,7 +17,6 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
-import org.gradle.api.provider.ListProperty
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -33,14 +32,6 @@ class EnvironmentsKotlinTest {
 
     private lateinit var project: Project
     private lateinit var teamcity: TeamCityPluginExtension
-
-    private fun optionsAsString(options: Any): String {
-        if (options is ListProperty<*>) {
-            return options.get().joinToString(" ").trim()
-        } else {
-            return ""
-        }
-    }
 
     @BeforeEach
     fun setup() {
@@ -65,7 +56,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(optionsAsString(environment.agentOptions), equalTo("-DnewOption2=value2"))
+        assertThat(environment.agentOptions, equalTo("-DnewOption2=value2"))
     }
 
     @Test
@@ -81,7 +72,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(optionsAsString(environment.agentOptions), equalTo("-Doption1=value1 -Doption2=value2"))
+        assertThat(environment.agentOptions, equalTo("-Doption1=value1 -Doption2=value2"))
     }
 
     @Test
@@ -97,7 +88,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(optionsAsString(environment.serverOptions), equalTo(""))
+        assertThat(environment.serverOptions, equalTo(""))
     }
 
     @Test
@@ -113,7 +104,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(optionsAsString(environment.serverOptions), equalTo("-DnewOption=test"))
+        assertThat(environment.serverOptions, equalTo("-DnewOption=test"))
     }
 
     @Test
@@ -129,7 +120,7 @@ class EnvironmentsKotlinTest {
         }
 
         val environment = teamcity.environments.getByName("test")
-        assertThat(optionsAsString(environment.serverOptions), equalTo("-Doption1=value1 -Doption2=value2"))
+        assertThat(environment.serverOptions, equalTo("-Doption1=value1 -Doption2=value2"))
     }
 
     @Test
