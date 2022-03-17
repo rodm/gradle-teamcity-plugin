@@ -41,6 +41,7 @@ import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+import static com.github.rodm.teamcity.GradleMatchers.hasAction
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
@@ -681,9 +682,8 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
-        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name))
+        assertThat(deployPlugin, hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction))
+        assertThat(deployPlugin, hasAction(TeamCityEnvironmentsPlugin.EnablePluginAction))
     }
 
     @Test
@@ -702,9 +702,8 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        List<String> taskActionClassNames = deployPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
-        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.EnablePluginAction.name)))
+        assertThat(deployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction)))
+        assertThat(deployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.EnablePluginAction)))
     }
 
     @Test
@@ -723,8 +722,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name))
+        assertThat(undeployPlugin, hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction))
     }
 
     @Test
@@ -743,8 +741,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        List<String> taskActionClassNames = undeployPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, not(hasItem(TeamCityEnvironmentsPlugin.DisablePluginAction.name)))
+        assertThat(undeployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction)))
     }
 
     @Test

@@ -25,12 +25,12 @@ import org.gradle.api.tasks.bundling.Zip
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+import static com.github.rodm.teamcity.GradleMatchers.hasAction
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
-import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
@@ -540,8 +540,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         AgentPlugin agentPlugin = project.tasks.getByName('alternativeAgentPlugin') as AgentPlugin
-        List<String> taskActionClassNames = agentPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDescriptorValidationAction.name))
-        assertThat(taskActionClassNames, hasItem(PluginExecutableFilesValidationAction.name))
+        assertThat(agentPlugin, hasAction(PluginDescriptorValidationAction))
+        assertThat(agentPlugin, hasAction(PluginExecutableFilesValidationAction))
     }
 }

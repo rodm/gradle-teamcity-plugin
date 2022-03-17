@@ -59,6 +59,7 @@ import java.time.LocalDate
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+import static com.github.rodm.teamcity.GradleMatchers.hasAction
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalizePath
@@ -66,7 +67,6 @@ import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
-import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.greaterThan
@@ -540,9 +540,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         project.evaluate()
 
         ServerPlugin serverPlugin = project.tasks.getByName('alternativeServerPlugin') as ServerPlugin
-        List<String> taskActionClassNames = serverPlugin.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDescriptorValidationAction.name))
-        assertThat(taskActionClassNames, hasItem(PluginDescriptorContentsValidationAction.name))
+        assertThat(serverPlugin, hasAction(PluginDescriptorValidationAction))
+        assertThat(serverPlugin, hasAction(PluginDescriptorContentsValidationAction))
     }
 
     @Nested

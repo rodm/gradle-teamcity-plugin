@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 
+import static com.github.rodm.teamcity.GradleMatchers.hasAction
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 import static com.github.rodm.teamcity.ValidationMode.WARN
@@ -250,8 +251,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
+        assertThat(jar, hasAction(PluginDefinitionValidationAction))
     }
 
     @Test
@@ -261,8 +261,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
+        assertThat(jar, hasAction(PluginDefinitionValidationAction))
     }
 
     @Test
@@ -288,8 +287,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
+        assertThat(jar, hasAction(PluginDefinitionValidationAction))
     }
 
     @Test
@@ -299,8 +297,7 @@ class ValidateDefinitionActionTest {
         project.evaluate()
 
         Jar jar = project.tasks.getByName('jar') as Jar
-        List<String> taskActionClassNames = jar.taskActions.collect { it.action.getClass().name }
-        assertThat(taskActionClassNames, hasItem(PluginDefinitionValidationAction.name))
+        assertThat(jar, hasAction(PluginDefinitionValidationAction))
     }
 
     @Test

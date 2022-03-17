@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskContainer
 import org.hamcrest.Description
@@ -42,6 +43,22 @@ class GradleMatchers {
             protected boolean matchesSafely(final TaskContainer item, final Description mismatchDescription) {
                 mismatchDescription.appendText(" was ").appendValue(item)
                 return item.findByName(name)
+            }
+        }
+    }
+
+    static Matcher<Task> hasAction(Class<?> type) {
+        return new TypeSafeDiagnosingMatcher<Task>() {
+            @Override
+            protected boolean matchesSafely(final Task task, Description mismatchDescription) {
+                return task.taskActions
+                    .collect { it.action.getClass().name }
+                    .contains(type.name)
+            }
+
+            @Override
+            void describeTo(Description description) {
+                description.appendText("Task should have an action of type ").appendValue(type.simpleName)
             }
         }
     }
