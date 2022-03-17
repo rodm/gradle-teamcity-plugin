@@ -52,6 +52,7 @@ class GradleMatchers {
             @Override
             protected boolean matchesSafely(final Task task, Description mismatchDescription) {
                 return task.taskActions
+                    .findAll { it.hasProperty('action') }
                     .collect { it.action.getClass().name }
                     .contains(type.name)
             }

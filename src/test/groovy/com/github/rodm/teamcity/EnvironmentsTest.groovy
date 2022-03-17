@@ -1290,7 +1290,7 @@ class EnvironmentsTest {
         new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), plugins , unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
-                wasRequestSent = true
+                EnvironmentsTest.this.wasRequestSent = true
             }
         }
     }
@@ -1302,7 +1302,7 @@ class EnvironmentsTest {
         new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), plugins, unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
-                wasRequestSent = true
+                EnvironmentsTest.this.wasRequestSent = true
             }
         }
     }

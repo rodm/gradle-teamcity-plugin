@@ -332,7 +332,7 @@ class ValidateDefinitionActionTest {
         return task
     }
 
-    private static class SpyJar extends Jar {
+    static class SpyJar extends Jar {
 
         Map<String, Action> filesMatching = new HashMap()
 

@@ -45,7 +45,7 @@ class TeamCityPlugin implements Plugin<Project> {
 
     static final String CLASSES_PATTERN = "**/*.class"
 
-    private final String MINIMUM_SUPPORTED_VERSION = '6.0'
+    private final String MINIMUM_SUPPORTED_VERSION = '7.0'
 
     void apply(Project project) {
         project.plugins.apply(BasePlugin)
