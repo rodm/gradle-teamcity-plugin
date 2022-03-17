@@ -2,10 +2,10 @@
 import com.github.rodm.teamcity.pipeline
 import com.github.rodm.teamcity.gradle.switchGradleBuildStep
 import com.github.rodm.teamcity.project.githubIssueTracker
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.perfmon
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.version
 import jetbrains.buildServer.configs.kotlin.v2019_2.project
-import jetbrains.buildServer.configs.kotlin.v2019_2.Template
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger.QuietPeriodMode.USE_DEFAULT
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -52,7 +52,7 @@ project {
         param("teamcity.ui.settings.readOnly", "true")
     }
 
-    val buildTemplate = Template {
+    val buildTemplate = template {
         id("Build")
         name = "build"
 
@@ -84,31 +84,26 @@ project {
         }
 
         features {
-            feature {
-                id = "perfmon"
-                type = "perfmon"
-            }
+            perfmon {}
         }
 
         requirements {
             doesNotContain("teamcity.agent.jvm.os.name", "Windows", "RQ_Not_Windows")
         }
     }
-    template(buildTemplate)
 
     pipeline {
         stage ("Build") {
-
             build {
-                templates(buildTemplate)
                 id("BuildJava8")
                 name = "Build - Java 8"
+                templates(buildTemplate)
             }
 
             build {
-                templates(buildTemplate)
                 id("BuildJava11")
                 name = "Build - Java 11"
+                templates(buildTemplate)
 
                 params {
                     param("java.home", "%java11.home%")
@@ -116,9 +111,9 @@ project {
             }
 
             build {
-                templates(buildTemplate)
                 id("BuildJava11Windows")
                 name = "Build - Java 11 - Windows"
+                templates(buildTemplate)
 
                 params {
                     param("java.home", "%java11.home%")
@@ -130,9 +125,9 @@ project {
             }
 
             build {
-                templates(buildTemplate)
                 id("ReportCodeQuality")
                 name = "Report - Code Quality"
+                templates(buildTemplate)
 
                 params {
                     param("gradle.opts", "%sonar.opts%")
@@ -150,7 +145,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("8", "11", "12", "13")
+                    "Java"("8", "11")
                 }
                 build {
                     val javaVersion = axes["Java"]
@@ -167,7 +162,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("14", "15", "16", "17")
+                    "Java"("16", "17")
                 }
                 build {
                     val javaVersion = axes["Java"]
