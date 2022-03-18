@@ -49,8 +49,9 @@ sourceSets {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 jacoco {
@@ -84,28 +85,6 @@ gradlePlugin {
     }
 }
 
-tasks {
-    test {
-        useJUnitPlatform()
-    }
-
-    register("functionalTest", Test::class.java) {
-        description = "Runs the functional tests."
-        group = "verification"
-        useJUnitPlatform()
-        testClassesDirs = sourceSets["functional"].output.classesDirs
-        classpath = sourceSets["functional"].runtimeClasspath
-    }
-
-    register("samplesTest", Test::class.java) {
-        description = "Runs the sample builds."
-        group = "verification"
-        useJUnitPlatform()
-        testClassesDirs = sourceSets["samples"].output.classesDirs
-        classpath = sourceSets["samples"].runtimeClasspath
-    }
-}
-
 publishing {
     publications {
         create<MavenPublication>("plugin") {
@@ -119,4 +98,26 @@ pluginBundle {
     vcsUrl = "https://github.com/rodm/gradle-teamcity-plugin"
     description = "Gradle plugin for developing TeamCity plugins"
     tags = listOf("teamcity")
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+
+    register<Test>("functionalTest") {
+        description = "Runs the functional tests."
+        group = "verification"
+        useJUnitPlatform()
+        testClassesDirs = sourceSets["functional"].output.classesDirs
+        classpath = sourceSets["functional"].runtimeClasspath
+    }
+
+    register<Test>("samplesTest") {
+        description = "Runs the sample builds."
+        group = "verification"
+        useJUnitPlatform()
+        testClassesDirs = sourceSets["samples"].output.classesDirs
+        classpath = sourceSets["samples"].runtimeClasspath
+    }
 }
