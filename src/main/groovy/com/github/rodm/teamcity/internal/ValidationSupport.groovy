@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity.internal
 
 import groovy.transform.CompileStatic
+import groovy.xml.XmlParser
 import org.xml.sax.SAXNotRecognizedException
 
 import javax.xml.XMLConstants
