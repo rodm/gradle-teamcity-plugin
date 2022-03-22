@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal
+package com.github.rodm.teamcity.internal;
 
-import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.Action;
+import org.gradle.api.file.FileCopyDetails;
 
-abstract class AbstractPluginTask extends Zip {
+import java.util.Set;
 
-    @InputFile
-    final RegularFileProperty descriptor = project.objects.fileProperty()
+public class ClassCollectorAction implements Action<FileCopyDetails> {
+
+    private final Set<String> classes;
+
+    public ClassCollectorAction(Set<String> classes) {
+        this.classes = classes;
+    }
+
+    @Override
+    public void execute(FileCopyDetails fileCopyDetails) {
+        classes.add(fileCopyDetails.getRelativePath().toString());
+    }
 }

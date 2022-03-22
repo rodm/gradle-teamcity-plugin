@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal
+package com.github.rodm.teamcity.internal;
 
-import org.gradle.api.Action
-import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.bundling.Zip;
 
-class PluginDefinitionCollectorAction implements Action<FileCopyDetails> {
+public abstract class AbstractPluginTask extends Zip {
 
-    List<PluginDefinition> pluginDefinitions
+    @InputFile
+    private final RegularFileProperty descriptor = getProject().getObjects().fileProperty();
 
-    PluginDefinitionCollectorAction(List<PluginDefinition> pluginDefinitions) {
-        this.pluginDefinitions = pluginDefinitions
-    }
-    @Override
-    void execute(FileCopyDetails fileCopyDetails) {
-        pluginDefinitions << new PluginDefinition(fileCopyDetails.file)
+    public final RegularFileProperty getDescriptor() {
+        return descriptor;
     }
 }

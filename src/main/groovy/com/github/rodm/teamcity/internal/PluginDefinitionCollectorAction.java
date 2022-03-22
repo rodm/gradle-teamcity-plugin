@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal
+package com.github.rodm.teamcity.internal;
 
-import org.gradle.api.Action
-import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.Action;
+import org.gradle.api.file.FileCopyDetails;
 
-class FileCollectorAction implements Action<FileCopyDetails> {
+import java.util.List;
 
-    private Set<FileCopyDetails> files
+public class PluginDefinitionCollectorAction implements Action<FileCopyDetails> {
 
-    FileCollectorAction(Set<FileCopyDetails> files) {
-        this.files = files
+    private final List<PluginDefinition> pluginDefinitions;
+
+    public PluginDefinitionCollectorAction(List<PluginDefinition> pluginDefinitions) {
+        this.pluginDefinitions = pluginDefinitions;
     }
 
     @Override
-    void execute(FileCopyDetails fileCopyDetails) {
-        files << fileCopyDetails
+    public void execute(FileCopyDetails fileCopyDetails) {
+        pluginDefinitions.add(new PluginDefinition(fileCopyDetails.getFile()));
     }
 }

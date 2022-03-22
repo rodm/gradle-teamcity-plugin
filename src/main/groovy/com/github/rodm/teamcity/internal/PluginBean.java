@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal
+package com.github.rodm.teamcity.internal;
 
-import org.gradle.api.Action
-import org.gradle.api.file.FileCopyDetails
+public class PluginBean {
 
-class ClassCollectorAction implements Action<FileCopyDetails> {
+    private final String id;
+    private final String className;
 
-    private Set<String> classes
-
-    ClassCollectorAction(Set<String> classes) {
-        this.classes = classes
+    PluginBean(String id, String className) {
+        this.id = id;
+        this.className = className;
     }
 
-    @Override
-    void execute(FileCopyDetails fileCopyDetails) {
-        classes << fileCopyDetails.relativePath.toString()
+    public String getId() {
+        return id;
+    }
+
+    public String getClassName() {
+        return className;
     }
 }
