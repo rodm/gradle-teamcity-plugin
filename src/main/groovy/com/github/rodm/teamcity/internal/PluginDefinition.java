@@ -18,6 +18,7 @@ package com.github.rodm.teamcity.internal;
 import groovy.util.Node;
 import groovy.xml.XmlParser;
 import org.gradle.api.GradleException;
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -41,14 +42,17 @@ public class PluginDefinition {
         XmlParser parser = ValidationSupport.createXmlParser(offline);
         try {
             Node beans = parser.parse(definitionFile);
-            List<PluginBean> pluginBeans = ((List<Node>) beans.children()).stream()
-                .filter((Node node) -> node.name().equals("bean"))
-                .map((Node node) -> new PluginBean((String) node.attribute("id"), (String) node.attribute("class")))
+            return ((List<Node>) beans.get("bean")).stream()
+                .map(this::createPluginBean)
                 .collect(Collectors.toList());
-            return pluginBeans;
         }
         catch (SAXException e) {
             throw new GradleException("Failure parsing bean definition file", e);
         }
+    }
+
+    @NotNull
+    private PluginBean createPluginBean(Node node) {
+        return new PluginBean((String) node.attribute("id"), (String) node.attribute("class"));
     }
 }
