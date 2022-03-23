@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
+import java.util.List;
 
 /**
  * Configuration for publishing a plugin to a plugin repository.
  */
-@CompileStatic
-interface PublishConfiguration {
-
+public interface PublishConfiguration {
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
      */
-    List<String> getChannels()
-    void setChannels(List<String> channels)
+    List<String> getChannels();
+    void setChannels(List<String> channels);
 
     /**
      * The token for uploading the plugin to the plugin repository
      */
-    String getToken()
-    void setToken(String token)
+    String getToken();
+    void setToken(String token);
 
     /**
      * The notes describing the changes made to the plugin
      */
-    String getNotes()
-    void setNotes(String notes)
+    String getNotes();
+    void setNotes(String notes);
 }

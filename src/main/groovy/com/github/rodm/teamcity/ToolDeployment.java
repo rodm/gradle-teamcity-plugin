@@ -13,35 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
-import org.gradle.api.Action
-import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.Nested
+import org.gradle.api.Action;
+import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.tasks.Nested;
 
 /**
  * Agent-side plugin tool deployment configuration
  */
-@CompileStatic
-class ToolDeployment {
+public class ToolDeployment {
 
     @Nested
-    ExecutableFiles executableFiles
+    private ExecutableFiles executableFiles;
 
-    void init () {
-        executableFiles = (this as ExtensionAware).extensions.create('executableFiles', ExecutableFiles)
+    public void init() {
+        executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
     }
 
     /**
      * Configures the executable files for the agent-side tool plugin.
      *
      * <p>The given action is executed to configure the executable files.</p>
-
+     *
      * @param configuration The action
      * @return
      */
-    def executableFiles(Action<ExecutableFiles> configuration) {
-        configuration.execute(executableFiles)
+    public void executableFiles(Action<ExecutableFiles> configuration) {
+        configuration.execute(executableFiles);
+    }
+
+    public ExecutableFiles getExecutableFiles() {
+        return executableFiles;
+    }
+
+    public void setExecutableFiles(ExecutableFiles executableFiles) {
+        this.executableFiles = executableFiles;
     }
 }

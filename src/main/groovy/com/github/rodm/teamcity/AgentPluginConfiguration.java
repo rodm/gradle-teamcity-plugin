@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import org.gradle.api.Action
-import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.Action;
+import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtensionAware;
 
 /**
  * Agent-side plugin configuration
  */
-class AgentPluginConfiguration extends PluginConfiguration {
+public class AgentPluginConfiguration extends PluginConfiguration {
 
-    AgentPluginConfiguration(Project project) {
-        super(project)
+    public AgentPluginConfiguration(Project project) {
+        super(project);
     }
 
     /**
@@ -35,11 +35,12 @@ class AgentPluginConfiguration extends PluginConfiguration {
      *
      * @param configuration The action.
      */
-    def descriptor(Action<AgentPluginDescriptor> configuration) {
-        if (!descriptor) {
-            descriptor = (this as ExtensionAware).extensions.create('descriptor', AgentPluginDescriptor)
-            descriptor.init()
+    public void descriptor(Action<AgentPluginDescriptor> configuration) {
+        if (getDescriptor() == null) {
+            AgentPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", AgentPluginDescriptor.class);
+            descriptor.init();
+            setDescriptor(descriptor);
         }
-        configuration.execute(descriptor)
+        configuration.execute((AgentPluginDescriptor) getDescriptor());
     }
 }

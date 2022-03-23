@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
+public interface SignConfiguration {
 
-@CompileStatic
-interface SignConfiguration {
+    String getCertificateChain();
+    void setCertificateChain(String certificateChain);
 
-    String getCertificateChain()
-    void setCertificateChain(String certificateChain)
+    String getPrivateKey();
+    void setPrivateKey(String privateKey);
 
-    String getPrivateKey()
-    void setPrivateKey(String privateKey)
-
-    String getPassword()
-    void setPassword(String password)
+    String getPassword();
+    void setPassword(String password);
 }

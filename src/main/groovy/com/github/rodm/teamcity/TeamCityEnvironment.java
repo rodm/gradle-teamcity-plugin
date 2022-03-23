@@ -13,46 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-interface TeamCityEnvironment {
+public interface TeamCityEnvironment {
 
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
      */
-    String getVersion()
-    void setVersion(String version)
+    String getVersion();
+    void setVersion(String version);
 
     /**
      * The download URL used to download the TeamCity distribution for this environment.
      */
-    String getDownloadUrl()
-    void setDownloadUrl(String downloadUrl)
+    String getDownloadUrl();
+    void setDownloadUrl(String downloadUrl);
 
     /**
      * The home directory for this environment's TeamCity installation.
      */
-    String getHomeDir()
-    void setHomeDir(String homeDir)
+    String getHomeDir();
+    void setHomeDir(String homeDir);
 
     /**
      * The data directory for this environment's TeamCity configuration.
      */
-    String getDataDir()
-    void setDataDir(String dataDir)
+    String getDataDir();
+    void setDataDir(String dataDir);
 
     /**
      * The Java home directory used to start the server and agent for this environment.
      */
-    String getJavaHome()
-    void setJavaHome(String javaHome)
+    String getJavaHome();
+    void setJavaHome(String javaHome);
 
     /**
      * The list of plugins to be deployed to this environment.
      */
-    Object getPlugins()
-    void setPlugins(Object plugins)
-    void plugins(Object plugin)
+    Object getPlugins();
+    void setPlugins(Object plugins);
+    void plugins(Object plugin);
 
     /**
      * The Java command line options to be used when starting the TeamCity Server.
@@ -62,20 +62,20 @@ interface TeamCityEnvironment {
      *      '-Dteamcity.superUser.token.saveToFile=true'
      *      '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
      */
-    Object getServerOptions()
-    void setServerOptions(Object options)
-    void serverOptions(String... options)
+    Object getServerOptions();
+    void setServerOptions(Object options);
+    void serverOptions(String... options);
 
     /**
      * The Java command line options to be used when starting the TeamCity Agent.
      */
-    Object getAgentOptions()
-    void setAgentOptions(Object options)
-    void agentOptions(String... options)
+    Object getAgentOptions();
+    void setAgentOptions(Object options);
+    void agentOptions(String... options);
 
     /**
      * Convenience accessors for base properties
      */
-    String getBaseHomeDir()
-    String getBaseDataDir()
+    String getBaseHomeDir();
+    String getBaseDataDir();
 }

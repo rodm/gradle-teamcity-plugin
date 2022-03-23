@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Input;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * TeamCity plugin parameters
  */
-@CompileStatic
-class Parameters {
+public class Parameters {
 
-    private Map<String, String> parameters = [:]
+    private Map<String, String> parameters = new LinkedHashMap<>();
 
     @Input
-    Map<String, String> getParameters() {
-        return parameters
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 
     /**
@@ -36,17 +37,17 @@ class Parameters {
      *
      * @param parameters The map of parameters to add.
      */
-    void parameters(Map<String, String> parameters) {
-        this.parameters.putAll(parameters)
+    public void parameters(Map<String, String> parameters) {
+        this.parameters.putAll(parameters);
     }
 
     /**
      * Add a plugin parameter.
      *
-     * @param name The name of the parameter
+     * @param name  The name of the parameter
      * @param value The value of the parameter
      */
-    void parameter(String name, String value) {
-        parameters[name] = value
+    public void parameter(String name, String value) {
+        parameters.put(name, value);
     }
 }

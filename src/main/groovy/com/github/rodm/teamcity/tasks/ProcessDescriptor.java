@@ -18,7 +18,7 @@ package com.github.rodm.teamcity.tasks;
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.MapProperty;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
@@ -29,7 +29,6 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 @CacheableTask
 public class ProcessDescriptor extends DefaultTask {
@@ -39,7 +38,7 @@ public class ProcessDescriptor extends DefaultTask {
     private final RegularFileProperty descriptor = getProject().getObjects().fileProperty();
 
     @Input
-    private final Provider<Map<String, Object>> tokens = getProject().getObjects().mapProperty(String.class, Object.class).convention(new LinkedHashMap<>());
+    private final MapProperty<String, Object> tokens = getProject().getObjects().mapProperty(String.class, Object.class).convention(new LinkedHashMap<>());
 
     @OutputFile
     private final RegularFileProperty destination = getProject().getObjects().fileProperty();
@@ -53,7 +52,7 @@ public class ProcessDescriptor extends DefaultTask {
         return descriptor;
     }
 
-    public final Provider<Map<String, Object>> getTokens() {
+    public final MapProperty<String, Object> getTokens() {
         return tokens;
     }
 

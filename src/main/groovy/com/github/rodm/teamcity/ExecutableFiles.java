@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
-import org.gradle.api.tasks.Input
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.gradle.api.tasks.Input;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Executable files
  */
-@CompileStatic
-class ExecutableFiles {
+public class ExecutableFiles {
 
-    List<String> includes = []
+    private List<String> includes = new ArrayList<>();
 
     @Input
-    List<String> getIncludes() {
-        return includes
+    public List<String> getIncludes() {
+        return includes;
     }
 
     /**
@@ -36,11 +38,11 @@ class ExecutableFiles {
      *
      * @param path The relative path of a file to be set as executable after unpacking.
      */
-    void include(String path) {
-        includes << path
+    public void include(String path) {
+        includes.add(path);
     }
 
-    boolean hasFiles() {
-        return includes.size() > 0
+    public boolean hasFiles() {
+        return includes.size() > 0;
     }
 }

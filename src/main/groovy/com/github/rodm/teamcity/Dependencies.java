@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity
+package com.github.rodm.teamcity;
 
-import groovy.transform.CompileStatic
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Input;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Plugin dependencies
  */
-@CompileStatic
-class Dependencies {
+public class Dependencies {
 
-    List<String> plugins = []
+    private List<String> plugins = new ArrayList<>();
 
     @Input
-    List<String> getPlugins() {
-        return plugins
+    public List<String> getPlugins() {
+        return plugins;
     }
 
     /**
@@ -36,15 +37,15 @@ class Dependencies {
      *
      * @param name The name of the plugin to add as a dependency.
      */
-    void plugin(String name) {
-        plugins << name
+    public void plugin(String name) {
+        plugins.add(name);
     }
 
-    List<String> tools = []
+    private List<String> tools = new ArrayList<>();
 
     @Input
-    List<String> getTools() {
-        return tools
+    public List<String> getTools() {
+        return tools;
     }
 
     /**
@@ -52,11 +53,11 @@ class Dependencies {
      *
      * @param name The name of the tool to add as a dependency.
      */
-    void tool(String name) {
-        tools << name
+    public void tool(String name) {
+        tools.add(name);
     }
 
-    boolean hasDependencies() {
-        return plugins.size() > 0 || tools.size() > 0
+    public boolean hasDependencies() {
+        return plugins.size() > 0 || tools.size() > 0;
     }
 }
