@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.tasks
+package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.TeamCityTask
-import org.gradle.process.ExecSpec
+import com.github.rodm.teamcity.internal.TeamCityTask;
+import org.gradle.process.ExecSpec;
 
-class StopAgent extends TeamCityTask {
+public class StopServer extends TeamCityTask {
 
-    StopAgent() {
-        description = 'Stops the TeamCity Agent'
+    public StopServer() {
+        setDescription("Stops the TeamCity Server");
     }
 
     @Override
-    void configure(ExecSpec execSpec) {
-        def name = isWindows() ? 'agent.bat' : 'agent.sh'
-        execSpec.executable("${getHomeDir().get()}/buildAgent/bin/${name}")
-        execSpec.environment('JAVA_HOME', getJavaHome().get())
-        execSpec.args('stop')
+    public void configure(ExecSpec execSpec) {
+        String name = TeamCityTask.isWindows() ? "teamcity-server.bat" : "teamcity-server.sh";
+        execSpec.executable(getHomeDir().get() + "/bin/" + name);
+        execSpec.environment("JAVA_HOME", getJavaHome().get());
+        execSpec.args("stop");
     }
 }

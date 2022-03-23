@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.tasks
+package com.github.rodm.teamcity.tasks;
 
-import de.undercouch.gradle.tasks.download.Download
+import de.undercouch.gradle.tasks.download.Download;
 
-class DownloadTeamCity extends Download {
-
-    DownloadTeamCity() {
-        description = 'Downloads a TeamCity distribution'
-        onlyIfModified(true)
+public class DownloadTeamCity extends Download {
+    public DownloadTeamCity() {
+        setDescription("Downloads a TeamCity distribution");
+        onlyIfModified(true);
     }
 }

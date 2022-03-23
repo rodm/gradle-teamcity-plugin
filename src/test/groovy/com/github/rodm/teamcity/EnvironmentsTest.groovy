@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.StartAgent
@@ -22,6 +23,7 @@ import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.internal.TeamCityTask
+import com.github.rodm.teamcity.tasks.Undeploy
 import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
@@ -782,17 +784,17 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
-        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call().toList()
+        Deploy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Deploy
+        Set<File> deployFiles = deployPlugin.plugins.files
         assertThat(deployFiles, hasSize(1))
-        assertThat(deployFiles, hasItem(new File(project.rootDir, 'build/distributions/test.zip')))
-        assertThat(normalizePath(deployPlugin.rootSpec.destinationDir), endsWith('data/10.0/plugins'))
+        assertThat(deployFiles, hasItem(project.file('build/distributions/test.zip')))
+        assertThat(normalizePath(deployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
 
-        Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
-        ConfigurableFileTree fileTree = undeployPlugin.delete[0].call()
-        assertThat(normalizePath(fileTree.dir), endsWith('data/10.0/plugins'))
-        assertThat(fileTree.patterns.includes, hasSize(1))
-        assertThat(fileTree.patterns.includes, hasItem('test.zip'))
+        Undeploy undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Undeploy
+        Set<File> undeployFiles = undeployPlugin.plugins.files
+        assertThat(undeployFiles, hasSize(1))
+        assertThat(undeployFiles, hasItem(project.file('build/distributions/test.zip')))
+        assertThat(normalizePath(undeployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
     }
 
     @Test
@@ -812,17 +814,17 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        Copy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Copy
-        List deployFiles = deployPlugin.mainSpec.sourcePaths[0].call().toList()
+        Deploy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Deploy
+        Set<File> deployFiles = deployPlugin.plugins.files
         assertThat(deployFiles, hasSize(2))
         assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
         assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
 
-        Delete undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Delete
-        ConfigurableFileTree fileTree = undeployPlugin.delete[0].call()
-        assertThat(fileTree.patterns.includes, hasSize(2))
-        assertThat(fileTree.patterns.includes, hasItem('plugin1.zip'))
-        assertThat(fileTree.patterns.includes, hasItem('plugin2.zip'))
+        Undeploy undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Undeploy
+        Set<File> undeployFiles = undeployPlugin.plugins.files
+        assertThat(undeployFiles, hasSize(2))
+        assertThat(undeployFiles, hasItem(project.file('plugin1.zip')))
+        assertThat(undeployFiles, hasItem(project.file('plugin2.zip')))
     }
 
     @Test

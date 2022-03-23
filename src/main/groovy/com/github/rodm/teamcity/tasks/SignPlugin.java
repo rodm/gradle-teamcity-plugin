@@ -1,0 +1,112 @@
+/*
+ * Copyright 2021 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.rodm.teamcity.tasks;
+
+import com.github.rodm.teamcity.internal.SignAction;
+import org.apache.commons.io.FilenameUtils;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.RegularFile;
+import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Classpath;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
+
+import javax.inject.Inject;
+
+public class SignPlugin extends DefaultTask {
+
+    private RegularFileProperty pluginFile = getProject().getObjects().fileProperty();
+    private RegularFileProperty signedPluginFile = getProject().getObjects().fileProperty();
+    private Property<String> certificateChain = getProject().getObjects().property(String.class);
+    private Property<String> privateKey = getProject().getObjects().property(String.class);
+    private Property<String> password = getProject().getObjects().property(String.class);
+    private FileCollection classpath;
+    private final WorkerExecutor executor;
+
+    @Inject
+    public SignPlugin(WorkerExecutor executor) {
+        setDescription("Signs the plugin");
+        signedPluginFile.convention(pluginFile.map(this::signedName));
+        this.executor = executor;
+    }
+
+    @Classpath
+    public FileCollection getClasspath() {
+        return classpath;
+    }
+
+    public void setClasspath(FileCollection classpath) {
+        this.classpath = classpath;
+    }
+
+    /**
+     * @return the plugin file that will be signed
+     */
+    @InputFile
+    public RegularFileProperty getPluginFile() {
+        return pluginFile;
+    }
+
+    /**
+     * @return signed plugin file
+     */
+    @OutputFile
+    public RegularFileProperty getSignedPluginFile() {
+        return signedPluginFile;
+    }
+
+    @Input
+    public Property<String> getCertificateChain() {
+        return certificateChain;
+    }
+
+    @Input
+    public Property<String> getPrivateKey() {
+        return privateKey;
+    }
+
+    @Input
+    @Optional
+    public Property<String> getPassword() {
+        return password;
+    }
+
+    @TaskAction
+    protected void signPlugin() {
+        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(classpath));
+        queue.submit(SignAction.class, params -> {
+            params.getPluginFile().set(getPluginFile());
+            params.getCertificateChain().set(getCertificateChain());
+            params.getPrivateKey().set(getPrivateKey());
+            params.getPassword().set(getPassword());
+            params.getSignedPluginFile().set(getSignedPluginFile());
+        });
+        queue.await();
+    }
+
+    public RegularFile signedName(RegularFile file) {
+        final String path = FilenameUtils.removeExtension(file.getAsFile().getPath());
+        final String extension = FilenameUtils.getExtension(file.getAsFile().getName());
+        return getProject().getLayout().getProjectDirectory().file(path + "-signed." + extension);
+    }
+}

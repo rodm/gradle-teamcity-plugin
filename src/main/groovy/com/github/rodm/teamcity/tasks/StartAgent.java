@@ -20,33 +20,25 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.process.ExecSpec;
 
-public class StartServer extends TeamCityTask {
+public class StartAgent extends TeamCityTask {
 
     @Input
-    private final Property<String> dataDir = getProject().getObjects().property(String.class);
+    private final Property<String> agentOptions = getProject().getObjects().property(String.class);
 
-    @Input
-    private final Property<String> serverOptions = getProject().getObjects().property(String.class);
-
-    public StartServer() {
-        setDescription("Starts the TeamCity Server");
+    public StartAgent() {
+        setDescription("Starts the TeamCity Agent");
     }
 
     @Override
     public void configure(ExecSpec execSpec) {
-        String name = TeamCityTask.isWindows() ? "teamcity-server.bat" : "teamcity-server.sh";
-        execSpec.executable(getHomeDir().get() + "/bin/" + name);
+        final String name = TeamCityTask.isWindows() ? "agent.bat" : "agent.sh";
+        execSpec.executable(getHomeDir().get() + "/buildAgent/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
-        execSpec.environment("TEAMCITY_DATA_PATH", getDataDir().get());
-        execSpec.environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
+        execSpec.environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());
         execSpec.args("start");
     }
 
-    public final Property<String> getDataDir() {
-        return dataDir;
-    }
-
-    public final Property<String> getServerOptions() {
-        return serverOptions;
+    public final Property<String> getAgentOptions() {
+        return agentOptions;
     }
 }
