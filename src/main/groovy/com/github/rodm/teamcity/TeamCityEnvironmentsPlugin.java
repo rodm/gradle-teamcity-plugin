@@ -115,7 +115,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     }
                 });
 
-                if (TeamCityVersion.version(environment.getVersion()).compareTo(VERSION_2018_2) >= 0) {
+                if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
                     final File dataDir = project.file(environment.getDataDirProperty().get());
                     deployPlugin.configure(task -> {
                         Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();

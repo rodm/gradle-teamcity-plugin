@@ -97,10 +97,10 @@ public class ServerPluginDescriptorGenerator {
         if (descriptor.getUseSeparateClassloader() != null) {
             attributes.put("use-separate-classloader", descriptor.getUseSeparateClassloader());
         }
-        if (version.compareTo(VERSION_2018_2) >= 0 && descriptor.getAllowRuntimeReload() != null) {
+        if (version.equalOrGreaterThan(VERSION_2018_2) && descriptor.getAllowRuntimeReload() != null) {
             attributes.put("allow-runtime-reload", descriptor.getAllowRuntimeReload());
         }
-        if (version.compareTo(VERSION_2020_1) >= 0 && descriptor.getNodeResponsibilitiesAware() != null) {
+        if (version.equalOrGreaterThan(VERSION_2020_1) && descriptor.getNodeResponsibilitiesAware() != null) {
             attributes.put("node-responsibilities-aware", descriptor.getNodeResponsibilitiesAware());
         }
         if (attributes.size() > 0) {
@@ -118,7 +118,7 @@ public class ServerPluginDescriptorGenerator {
     }
 
     private void buildDependenciesNode(Node root) {
-        if (version.compareTo(VERSION_9_0) >= 0) {
+        if (version.equalOrGreaterThan(VERSION_9_0)) {
             if (descriptor.getDependencies().hasDependencies()) {
                 final Node dependencies = root.appendNode("dependencies");
                 descriptor.getDependencies().getPlugins().forEach(name -> {

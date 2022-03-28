@@ -57,7 +57,7 @@ public abstract class GenerateAgentPluginDescriptor extends DefaultTask {
     public void generateDescriptor() {
         final TeamCityVersion version = getVersion().get();
         final AgentPluginDescriptor descriptor = getDescriptor().get();
-        if (version.compareTo(VERSION_9_0) < 0 && descriptor.getDependencies().hasDependencies()) {
+        if (version.lessThan(VERSION_9_0) && descriptor.getDependencies().hasDependencies()) {
             getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
         }
 

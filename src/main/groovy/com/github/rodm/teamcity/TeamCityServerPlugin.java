@@ -178,9 +178,9 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
     private static String getSchemaPath(String version, boolean allowSnapshots) {
         TeamCityVersion teamcityVersion = TeamCityVersion.version(version, allowSnapshots);
-        if (teamcityVersion.compareTo(VERSION_2020_1) >= 0) {
+        if (teamcityVersion.equalOrGreaterThan(VERSION_2020_1)) {
             return "2020.1/teamcity-server-plugin-descriptor.xsd";
-        } else if (teamcityVersion.compareTo(VERSION_2018_2) >= 0) {
+        } else if (teamcityVersion.equalOrGreaterThan(VERSION_2018_2)) {
             return "2018.2/teamcity-server-plugin-descriptor.xsd";
         } else {
             return "teamcity-server-plugin-descriptor.xsd";

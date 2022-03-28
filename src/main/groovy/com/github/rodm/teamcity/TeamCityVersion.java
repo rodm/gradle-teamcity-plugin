@@ -104,6 +104,14 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
         return version.hashCode();
     }
 
+    public boolean lessThan(TeamCityVersion teamcityVersion) {
+        return compareTo(teamcityVersion) < 0;
+    }
+
+    public boolean equalOrGreaterThan(TeamCityVersion teamcityVersion) {
+        return compareTo(teamcityVersion) >= 0;
+    }
+
     public String getDataVersion() {
         Matcher matcher = DATA_VERSION_PATTERN.matcher(version);
         if (matcher.find()) {

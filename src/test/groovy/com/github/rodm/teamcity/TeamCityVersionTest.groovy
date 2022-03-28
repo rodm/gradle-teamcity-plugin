@@ -27,6 +27,8 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.lessThan
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.core.StringEndsWith.endsWith
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertTrue
 import static org.junit.jupiter.api.Assertions.fail
 
 class TeamCityVersionTest {
@@ -65,6 +67,20 @@ class TeamCityVersionTest {
         assertThat(version('9.0.1'), greaterThan(version('9.0')))
         assertThat(version('10.0'), greaterThan(version('9.0')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
+    }
+
+    @Test
+    void 'compare TeamCity version less than'() {
+        assertTrue(version("9.0.1").lessThan(version("9.0.2")))
+        assertFalse(version("9.0.1").lessThan(version("9.0.1")))
+        assertFalse(version("9.0.1").lessThan(version("8.1")))
+    }
+
+    @Test
+    void 'compare TeamCity version equal or greater than'() {
+        assertTrue(version("9.0.1").equalOrGreaterThan(version("9.0.1")))
+        assertTrue(version("9.0.1").equalOrGreaterThan(version("8.1")))
+        assertFalse(version("9.0.1").equalOrGreaterThan(version("9.0.2")))
     }
 
     @Test

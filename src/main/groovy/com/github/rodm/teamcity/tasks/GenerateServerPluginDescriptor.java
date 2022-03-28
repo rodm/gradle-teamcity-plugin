@@ -59,15 +59,15 @@ public abstract class GenerateServerPluginDescriptor extends DefaultTask {
     public void generateDescriptor() {
         final TeamCityVersion version = getVersion().get();
         final ServerPluginDescriptor descriptor = getDescriptor().get();
-        if (version.compareTo(VERSION_9_0) < 0 && descriptor.getDependencies().hasDependencies()) {
+        if (version.lessThan(VERSION_9_0) && descriptor.getDependencies().hasDependencies()) {
             getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
         }
 
-        if (version.compareTo(VERSION_2018_2) < 0 && descriptor.getAllowRuntimeReload() != null) {
+        if (version.lessThan(VERSION_2018_2) && descriptor.getAllowRuntimeReload() != null) {
             getLogger().warn(getPath() + ": Plugin descriptor does not support allowRuntimeReload for version " + version);
         }
 
-        if (version.compareTo(VERSION_2020_1) < 0 && descriptor.getNodeResponsibilitiesAware() != null) {
+        if (version.lessThan(VERSION_2020_1) && descriptor.getNodeResponsibilitiesAware() != null) {
             getLogger().warn(getPath() + ": Plugin descriptor does not support nodeResponsibilitiesAware for version " + version);
         }
 
