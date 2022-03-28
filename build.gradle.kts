@@ -103,6 +103,13 @@ pluginBundle {
 tasks {
     test {
         useJUnitPlatform()
+        finalizedBy (jacocoTestReport)
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required.set(true)
+        }
     }
 
     register<Test>("functionalTest") {
