@@ -33,67 +33,47 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
-public class SignPlugin extends DefaultTask {
+public abstract class SignPlugin extends DefaultTask {
 
-    private RegularFileProperty pluginFile = getProject().getObjects().fileProperty();
-    private RegularFileProperty signedPluginFile = getProject().getObjects().fileProperty();
-    private Property<String> certificateChain = getProject().getObjects().property(String.class);
-    private Property<String> privateKey = getProject().getObjects().property(String.class);
-    private Property<String> password = getProject().getObjects().property(String.class);
-    private FileCollection classpath;
     private final WorkerExecutor executor;
 
     @Inject
     public SignPlugin(WorkerExecutor executor) {
         setDescription("Signs the plugin");
-        signedPluginFile.convention(pluginFile.map(this::signedName));
+        getSignedPluginFile().convention(getPluginFile().map(this::signedName));
         this.executor = executor;
     }
 
     @Classpath
-    public FileCollection getClasspath() {
-        return classpath;
-    }
+    public abstract FileCollection getClasspath();
 
-    public void setClasspath(FileCollection classpath) {
-        this.classpath = classpath;
-    }
+    public abstract void setClasspath(FileCollection classpath);
 
     /**
      * @return the plugin file that will be signed
      */
     @InputFile
-    public RegularFileProperty getPluginFile() {
-        return pluginFile;
-    }
+    public abstract RegularFileProperty getPluginFile();
 
     /**
      * @return signed plugin file
      */
     @OutputFile
-    public RegularFileProperty getSignedPluginFile() {
-        return signedPluginFile;
-    }
+    public abstract RegularFileProperty getSignedPluginFile();
 
     @Input
-    public Property<String> getCertificateChain() {
-        return certificateChain;
-    }
+    public abstract Property<String> getCertificateChain();
 
     @Input
-    public Property<String> getPrivateKey() {
-        return privateKey;
-    }
+    public abstract Property<String> getPrivateKey();
 
     @Input
     @Optional
-    public Property<String> getPassword() {
-        return password;
-    }
+    public abstract Property<String> getPassword();
 
     @TaskAction
     protected void signPlugin() {
-        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(classpath));
+        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
         queue.submit(SignAction.class, params -> {
             params.getPluginFile().set(getPluginFile());
             params.getCertificateChain().set(getCertificateChain());

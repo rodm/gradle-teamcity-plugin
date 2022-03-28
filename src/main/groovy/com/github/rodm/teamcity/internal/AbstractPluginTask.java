@@ -22,9 +22,5 @@ import org.gradle.api.tasks.bundling.Zip;
 public abstract class AbstractPluginTask extends Zip {
 
     @InputFile
-    private final RegularFileProperty descriptor = getProject().getObjects().fileProperty();
-
-    public final RegularFileProperty getDescriptor() {
-        return descriptor;
-    }
+    public abstract RegularFileProperty getDescriptor();
 }

@@ -18,7 +18,7 @@ package com.github.rodm.teamcity.tasks;
 import com.github.rodm.teamcity.internal.TeamCityTask;
 import org.gradle.process.ExecSpec;
 
-public class StopAgent extends TeamCityTask {
+public abstract class StopAgent extends TeamCityTask {
 
     public StopAgent() {
         setDescription("Stops the TeamCity Agent");

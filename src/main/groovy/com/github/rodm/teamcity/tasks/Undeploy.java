@@ -23,13 +23,7 @@ import org.gradle.api.tasks.Internal;
 import java.io.File;
 import java.util.stream.Collectors;
 
-public class Undeploy extends Delete {
-
-    @Internal
-    private final ConfigurableFileCollection plugins = getProject().getObjects().fileCollection();
-
-    @Internal
-    private final DirectoryProperty pluginsDir = getProject().getObjects().directoryProperty();
+public abstract class Undeploy extends Delete {
 
     public Undeploy() {
         setDescription("Un-deploys plugins from the TeamCity Server");
@@ -40,11 +34,9 @@ public class Undeploy extends Delete {
         }));
     }
 
-    public final ConfigurableFileCollection getPlugins() {
-        return plugins;
-    }
+    @Internal
+    public abstract ConfigurableFileCollection getPlugins();
 
-    public final DirectoryProperty getPluginsDir() {
-        return pluginsDir;
-    }
+    @Internal
+    public abstract DirectoryProperty getPluginsDir();
 }

@@ -38,37 +38,39 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2020_1;
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0;
 
 @CacheableTask
-public class GenerateServerPluginDescriptor extends DefaultTask {
-
-    @Input
-    private final Property<TeamCityVersion> version = getProject().getObjects().property(TeamCityVersion.class);
-
-    @Nested
-    private final Property<ServerPluginDescriptor> descriptor = getProject().getObjects().property(ServerPluginDescriptor.class);
-
-    @OutputFile
-    private final RegularFileProperty destination = getProject().getObjects().fileProperty();
+public abstract class GenerateServerPluginDescriptor extends DefaultTask {
 
     public GenerateServerPluginDescriptor() {
         setDescription("Generates the Server-side plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
     }
 
+    @Input
+    public abstract Property<TeamCityVersion> getVersion();
+
+    @Nested
+    public abstract Property<ServerPluginDescriptor> getDescriptor();
+
+    @OutputFile
+    public abstract RegularFileProperty getDestination();
+
     @TaskAction
     public void generateDescriptor() {
-        if (version.get().compareTo(VERSION_9_0) < 0 && descriptor.get().getDependencies().hasDependencies()) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + getVersion().get());
+        TeamCityVersion version = getVersion().get();
+        ServerPluginDescriptor descriptor = getDescriptor().get();
+        if (version.compareTo(VERSION_9_0) < 0 && descriptor.getDependencies().hasDependencies()) {
+            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
         }
 
-        if (version.get().compareTo(VERSION_2018_2) < 0 && descriptor.get().getAllowRuntimeReload() != null) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support allowRuntimeReload for version " + getVersion().get());
+        if (version.compareTo(VERSION_2018_2) < 0 && descriptor.getAllowRuntimeReload() != null) {
+            getLogger().warn(getPath() + ": Plugin descriptor does not support allowRuntimeReload for version " + version);
         }
 
-        if (version.get().compareTo(VERSION_2020_1) < 0 && descriptor.get().getNodeResponsibilitiesAware() != null) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support nodeResponsibilitiesAware for version " + getVersion().get());
+        if (version.compareTo(VERSION_2020_1) < 0 && descriptor.getNodeResponsibilitiesAware() != null) {
+            getLogger().warn(getPath() + ": Plugin descriptor does not support nodeResponsibilitiesAware for version " + version);
         }
 
-        final ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor.get(), version.get());
+        final ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, version);
         try {
             Writer writer = Files.newBufferedWriter(getDestination().get().getAsFile().toPath(), StandardCharsets.UTF_8);
             generator.writeTo(writer);
@@ -76,17 +78,5 @@ public class GenerateServerPluginDescriptor extends DefaultTask {
         catch (IOException e) {
             throw new GradleException("Failure writing descriptor", e);
         }
-    }
-
-    public final Property<TeamCityVersion> getVersion() {
-        return version;
-    }
-
-    public final Property<ServerPluginDescriptor> getDescriptor() {
-        return descriptor;
-    }
-
-    public final RegularFileProperty getDestination() {
-        return destination;
     }
 }

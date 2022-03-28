@@ -20,14 +20,14 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.process.ExecSpec;
 
-public class StartAgent extends TeamCityTask {
-
-    @Input
-    private final Property<String> agentOptions = getProject().getObjects().property(String.class);
+public abstract class StartAgent extends TeamCityTask {
 
     public StartAgent() {
         setDescription("Starts the TeamCity Agent");
     }
+
+    @Input
+    public abstract Property<String> getAgentOptions();
 
     @Override
     public void configure(ExecSpec execSpec) {
@@ -36,9 +36,5 @@ public class StartAgent extends TeamCityTask {
         execSpec.environment("JAVA_HOME", getJavaHome().get());
         execSpec.environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());
         execSpec.args("start");
-    }
-
-    public final Property<String> getAgentOptions() {
-        return agentOptions;
     }
 }

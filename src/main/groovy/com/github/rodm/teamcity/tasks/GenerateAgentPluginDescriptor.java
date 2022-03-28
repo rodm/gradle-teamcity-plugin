@@ -36,29 +36,29 @@ import java.nio.file.Files;
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0;
 
 @CacheableTask
-public class GenerateAgentPluginDescriptor extends DefaultTask {
-
-    @Input
-    private final Property<TeamCityVersion> version = getProject().getObjects().property(TeamCityVersion.class);
-
-    @Nested
-    private final Property<AgentPluginDescriptor> descriptor = getProject().getObjects().property(AgentPluginDescriptor.class);
-
-    @OutputFile
-    private final RegularFileProperty destination = getProject().getObjects().fileProperty();
+public abstract class GenerateAgentPluginDescriptor extends DefaultTask {
 
     public GenerateAgentPluginDescriptor() {
         setDescription("Generates the Agent-side plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
     }
 
+    @Input
+    public abstract Property<TeamCityVersion> getVersion();
+
+    @Nested
+    public abstract Property<AgentPluginDescriptor> getDescriptor();
+
+    @OutputFile
+    public abstract RegularFileProperty getDestination();
+
     @TaskAction
     public void generateDescriptor() {
-        if (version.get().compareTo(VERSION_9_0) < 0 && descriptor.get().getDependencies().hasDependencies()) {
+        if (getVersion().get().compareTo(VERSION_9_0) < 0 && getDescriptor().get().getDependencies().hasDependencies()) {
             getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + getVersion().get());
         }
 
-        final AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor.get());
+        final AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor().get());
         try {
             Writer writer = Files.newBufferedWriter(getDestination().get().getAsFile().toPath(), StandardCharsets.UTF_8);
             generator.writeTo(writer);
@@ -66,17 +66,5 @@ public class GenerateAgentPluginDescriptor extends DefaultTask {
         catch (IOException e) {
             throw new GradleException("Failure writing descriptor", e);
         }
-    }
-
-    public final Property<TeamCityVersion> getVersion() {
-        return version;
-    }
-
-    public final Property<AgentPluginDescriptor> getDescriptor() {
-        return descriptor;
-    }
-
-    public final RegularFileProperty getDestination() {
-        return destination;
     }
 }

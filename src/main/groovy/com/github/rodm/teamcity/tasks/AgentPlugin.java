@@ -21,10 +21,7 @@ import org.gradle.api.tasks.InputFiles;
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
 
-public class AgentPlugin extends AbstractPluginTask {
-
-    @InputFiles
-    private final ConfigurableFileCollection lib = getProject().getObjects().fileCollection();
+public abstract class AgentPlugin extends AbstractPluginTask {
 
     public AgentPlugin() {
         setDescription("Package TeamCity Agent plugin");
@@ -37,7 +34,6 @@ public class AgentPlugin extends AbstractPluginTask {
         });
     }
 
-    public final ConfigurableFileCollection getLib() {
-        return lib;
-    }
+    @InputFiles
+    public abstract ConfigurableFileCollection getLib();
 }

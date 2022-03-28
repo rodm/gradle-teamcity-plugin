@@ -42,7 +42,7 @@ class ValidateDescriptorSchemaActionTest {
     private AbstractPluginTask stubTask
     private File descriptorFile
 
-    static class DummyPluginTask extends AbstractPluginTask {}
+    static abstract class DummyPluginTask extends AbstractPluginTask {}
 
     @BeforeEach
     void setup(@TempDir File projectDir) {

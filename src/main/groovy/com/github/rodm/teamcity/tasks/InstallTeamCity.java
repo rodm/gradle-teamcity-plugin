@@ -22,17 +22,17 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
-public class InstallTeamCity extends DefaultTask {
-
-    @InputFile
-    private final RegularFileProperty source = getProject().getObjects().fileProperty();
-
-    @OutputDirectory
-    private final DirectoryProperty target = getProject().getObjects().directoryProperty();
+public abstract class InstallTeamCity extends DefaultTask {
 
     public InstallTeamCity() {
         setDescription("Installs a TeamCity distribution");
     }
+
+    @InputFile
+    public abstract RegularFileProperty getSource();
+
+    @OutputDirectory
+    public abstract DirectoryProperty getTarget();
 
     @TaskAction
     public void install() {
@@ -45,13 +45,5 @@ public class InstallTeamCity extends DefaultTask {
             });
             copySpec.into(getTarget().get().getAsFile().getParentFile());
         });
-    }
-
-    public final RegularFileProperty getSource() {
-        return source;
-    }
-
-    public final DirectoryProperty getTarget() {
-        return target;
     }
 }

@@ -43,25 +43,13 @@ public abstract class TeamCityTask extends DefaultTask {
     private static final String MISSING_VERSION = "Unable to read version of TeamCity installation at %s";
 
     @Input
-    private final Property<String> version = getProject().getObjects().property(String.class);
+    public abstract Property<String> getVersion();
 
     @Input
-    private final Property<String> homeDir = getProject().getObjects().property(String.class);
+    public abstract Property<String> getHomeDir();
 
     @Input
-    private final Property<String> javaHome = getProject().getObjects().property(String.class);
-
-    public final Property<String> getVersion() {
-        return version;
-    }
-
-    public final Property<String> getHomeDir() {
-        return homeDir;
-    }
-
-    public final Property<String> getJavaHome() {
-        return javaHome;
-    }
+    public abstract Property<String> getJavaHome();
 
     @TaskAction
     public void exec() {

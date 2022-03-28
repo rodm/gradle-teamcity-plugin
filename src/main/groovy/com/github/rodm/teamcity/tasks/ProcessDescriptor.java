@@ -28,37 +28,24 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 
 @CacheableTask
-public class ProcessDescriptor extends DefaultTask {
-
-    @InputFile
-    @PathSensitive(PathSensitivity.RELATIVE)
-    private final RegularFileProperty descriptor = getProject().getObjects().fileProperty();
-
-    @Input
-    private final MapProperty<String, Object> tokens = getProject().getObjects().mapProperty(String.class, Object.class).convention(new LinkedHashMap<>());
-
-    @OutputFile
-    private final RegularFileProperty destination = getProject().getObjects().fileProperty();
+public abstract class ProcessDescriptor extends DefaultTask {
 
     public ProcessDescriptor() {
         setDescription("Processes the plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
     }
 
-    public final RegularFileProperty getDescriptor() {
-        return descriptor;
-    }
+    @InputFile
+    @PathSensitive(PathSensitivity.RELATIVE)
+    public abstract RegularFileProperty getDescriptor();
 
-    public final MapProperty<String, Object> getTokens() {
-        return tokens;
-    }
+    @Input
+    public abstract MapProperty<String, Object> getTokens();
 
-    public final RegularFileProperty getDestination() {
-        return destination;
-    }
+    @OutputFile
+    public abstract RegularFileProperty getDestination();
 
     @TaskAction
     public void process() {
@@ -66,7 +53,7 @@ public class ProcessDescriptor extends DefaultTask {
             copySpec.into(getDestination().get().getAsFile().getParentFile());
             copySpec.from(getDescriptor().get().getAsFile());
             copySpec.rename(name -> getDestination().get().getAsFile().getName());
-            if (!tokens.get().isEmpty()) {
+            if (!getTokens().get().isEmpty()) {
                 copySpec.filter(Collections.singletonMap("tokens", getTokens().get()), ReplaceTokens.class);
             }
         });

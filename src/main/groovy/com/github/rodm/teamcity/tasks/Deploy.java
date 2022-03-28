@@ -21,13 +21,7 @@ import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 
-public class Deploy extends Copy {
-
-    @InputFiles
-    private final ConfigurableFileCollection plugins = getProject().getObjects().fileCollection();
-
-    @OutputDirectory
-    private final DirectoryProperty pluginsDir = getProject().getObjects().directoryProperty();
+public abstract class Deploy extends Copy {
 
     public Deploy() {
         setDescription("Deploys plugins to the TeamCity Server");
@@ -35,11 +29,9 @@ public class Deploy extends Copy {
         into(getPluginsDir());
     }
 
-    public final ConfigurableFileCollection getPlugins() {
-        return plugins;
-    }
+    @InputFiles
+    public abstract ConfigurableFileCollection getPlugins();
 
-    public final DirectoryProperty getPluginsDir() {
-        return pluginsDir;
-    }
+    @OutputDirectory
+    public abstract DirectoryProperty getPluginsDir();
 }

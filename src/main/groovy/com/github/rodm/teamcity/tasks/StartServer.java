@@ -20,17 +20,17 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.process.ExecSpec;
 
-public class StartServer extends TeamCityTask {
-
-    @Input
-    private final Property<String> dataDir = getProject().getObjects().property(String.class);
-
-    @Input
-    private final Property<String> serverOptions = getProject().getObjects().property(String.class);
+public abstract class StartServer extends TeamCityTask {
 
     public StartServer() {
         setDescription("Starts the TeamCity Server");
     }
+
+    @Input
+    public abstract Property<String> getDataDir();
+
+    @Input
+    public abstract Property<String> getServerOptions();
 
     @Override
     public void configure(ExecSpec execSpec) {
@@ -40,13 +40,5 @@ public class StartServer extends TeamCityTask {
         execSpec.environment("TEAMCITY_DATA_PATH", getDataDir().get());
         execSpec.environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
         execSpec.args("start");
-    }
-
-    public final Property<String> getDataDir() {
-        return dataDir;
-    }
-
-    public final Property<String> getServerOptions() {
-        return serverOptions;
     }
 }
