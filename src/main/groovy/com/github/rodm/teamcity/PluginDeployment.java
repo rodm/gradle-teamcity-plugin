@@ -46,7 +46,6 @@ public class PluginDeployment {
      * <p>The given action is executed to configure the executable files.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void executableFiles(Action<ExecutableFiles> configuration) {
         configuration.execute(executableFiles);

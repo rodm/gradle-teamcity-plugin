@@ -169,7 +169,6 @@ public class ServerPluginDescriptor {
      * <p>The given action is executed to configure the plugin's parameters.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void parameters(Action<Parameters> configuration) {
         configuration.execute(parameters);
@@ -181,7 +180,6 @@ public class ServerPluginDescriptor {
      * <p>The given action is executed to configure the plugin's dependencies.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void dependencies(Action<Dependencies> configuration) {
         configuration.execute(dependencies);

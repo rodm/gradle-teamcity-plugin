@@ -41,7 +41,6 @@ public class AgentPluginDescriptor {
      * <p>The given action is executed to configure the agent-side plugin deployment.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void pluginDeployment(Action<PluginDeployment> configuration) {
         if (toolDeployment != null)
@@ -63,7 +62,6 @@ public class AgentPluginDescriptor {
      * <p>The given action is executed to configure the agent-side plugin deployment.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void toolDeployment(Action<ToolDeployment> configuration) {
         if (pluginDeployment != null)
@@ -97,7 +95,6 @@ public class AgentPluginDescriptor {
      * <p>The given action is executed to configure the plugin's dependencies.</p>
      *
      * @param configuration The action
-     * @return
      */
     public void dependencies(Action<Dependencies> configuration) {
         configuration.execute(dependencies);
