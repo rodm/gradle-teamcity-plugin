@@ -28,6 +28,7 @@ import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -54,13 +55,15 @@ public abstract class GenerateAgentPluginDescriptor extends DefaultTask {
 
     @TaskAction
     public void generateDescriptor() {
-        if (getVersion().get().compareTo(VERSION_9_0) < 0 && getDescriptor().get().getDependencies().hasDependencies()) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + getVersion().get());
+        final TeamCityVersion version = getVersion().get();
+        final AgentPluginDescriptor descriptor = getDescriptor().get();
+        if (version.compareTo(VERSION_9_0) < 0 && descriptor.getDependencies().hasDependencies()) {
+            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
         }
 
-        final AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(getDescriptor().get());
-        try {
-            Writer writer = Files.newBufferedWriter(getDestination().get().getAsFile().toPath(), StandardCharsets.UTF_8);
+        final AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor);
+        final File destinationFile = getDestination().get().getAsFile();
+        try (Writer writer = Files.newBufferedWriter(destinationFile.toPath(), StandardCharsets.UTF_8)) {
             generator.writeTo(writer);
         }
         catch (IOException e) {
