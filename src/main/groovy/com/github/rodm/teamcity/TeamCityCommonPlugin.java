@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,10 +24,8 @@ public class TeamCityCommonPlugin implements Plugin<Project> {
         project.getPlugins().apply(TeamCityPlugin.class);
 
         final TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        project.getPlugins().withType(JavaPlugin.class, javaPlugin -> {
-            project.afterEvaluate(p -> {
-                p.getDependencies().add("provided", "org.jetbrains.teamcity:common-api:" + extension.getVersion());
-            });
-        });
+        project.getPlugins().withType(JavaPlugin.class, javaPlugin ->
+            project.afterEvaluate(p ->
+                p.getDependencies().add("provided", "org.jetbrains.teamcity:common-api:" + extension.getVersion())));
     }
 }
