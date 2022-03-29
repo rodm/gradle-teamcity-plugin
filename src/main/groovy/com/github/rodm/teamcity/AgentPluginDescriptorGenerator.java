@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,61 +36,51 @@ public class AgentPluginDescriptorGenerator {
         attributes.put("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         attributes.put("xsi:noNamespaceSchemaLocation", "urn:schemas-jetbrains-com:teamcity-agent-plugin-v1-xml");
         Node root = new Node(null, "teamcity-agent-plugin", attributes);
-        buildDeploymentNode(root);
-        buildDependenciesNode(root);
+        buildDeploymentNode(root, descriptor.getDeployment());
+        buildDependenciesNode(root, descriptor.getDependencies());
         XmlUtil.serialize(root, writer);
     }
 
-    private void buildDeploymentNode(Node root) {
-        if (descriptor.getDeployment() != null) {
-            if (descriptor.getDeployment() instanceof PluginDeployment) {
-                buildPluginDeploymentNode(root);
+    private void buildDeploymentNode(Node root, Deployment deployment) {
+        if (deployment != null) {
+            if (deployment instanceof PluginDeployment) {
+                buildPluginDeploymentNode(root, (PluginDeployment) deployment);
             } else {
-                buildToolDeploymentNode(root);
+                buildToolDeploymentNode(root, deployment);
             }
         }
     }
 
-    private void buildPluginDeploymentNode(Node root) {
-        Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-        PluginDeployment deployment = (PluginDeployment) descriptor.getDeployment();
+    private void buildPluginDeploymentNode(Node root, PluginDeployment deployment) {
+        Map<String, Object> attributes = new LinkedHashMap<>();
         if (deployment.getUseSeparateClassloader() != null) {
             attributes.put("use-separate-classloader", deployment.getUseSeparateClassloader());
         }
         Node deploymentNode = root.appendNode("plugin-deployment", attributes);
-        buildLayoutNode(deploymentNode);
+        buildLayoutNode(deploymentNode, deployment.getExecutableFiles());
     }
 
-    private void buildToolDeploymentNode(Node root) {
-        Node tool = root.appendNode("tool-deployment");
-        buildLayoutNode(tool);
+    private void buildToolDeploymentNode(Node root, Deployment deployment) {
+        Node toolNode = root.appendNode("tool-deployment");
+        buildLayoutNode(toolNode, deployment.getExecutableFiles());
     }
 
-    private void buildLayoutNode(Node deployment) {
-        ExecutableFiles executableFiles;
-        if (descriptor.getDeployment() instanceof PluginDeployment) {
-            executableFiles = ((PluginDeployment) descriptor.getDeployment()).getExecutableFiles();
-        } else {
-            executableFiles = ((ToolDeployment) descriptor.getDeployment()).getExecutableFiles();
-        }
+    private void buildLayoutNode(Node deploymentNode, ExecutableFiles executableFiles) {
         if (executableFiles.hasFiles()) {
-            Node layout = deployment.appendNode("layout");
-            final Node executableFilesNode = layout.appendNode("executable-files");
-            executableFiles.getIncludes().forEach(name -> {
-                executableFilesNode.appendNode("include", Collections.singletonMap("name", name));
-            });
+            Node layoutNode = deploymentNode.appendNode("layout");
+            final Node executableFilesNode = layoutNode.appendNode("executable-files");
+            executableFiles.getIncludes().forEach(name ->
+                executableFilesNode.appendNode("include", Collections.singletonMap("name", name)));
         }
     }
 
-    private void buildDependenciesNode(Node root) {
-        if (descriptor.getDependencies().hasDependencies()) {
-            Node dependencies = root.appendNode("dependencies");
-            descriptor.getDependencies().getPlugins().forEach(name -> {
-                dependencies.appendNode("plugin", Collections.singletonMap("name", name));
-            });
-            descriptor.getDependencies().getTools().forEach(name -> {
-                dependencies.appendNode("tool", Collections.singletonMap("name", name));
-            });
+    private void buildDependenciesNode(Node root, Dependencies dependencies) {
+        if (dependencies.hasDependencies()) {
+            Node dependenciesNode = root.appendNode("dependencies");
+            dependencies.getPlugins().forEach(name ->
+                dependenciesNode.appendNode("plugin", Collections.singletonMap("name", name)));
+            dependencies.getTools().forEach(name ->
+                dependenciesNode.appendNode("tool", Collections.singletonMap("name", name)));
         }
     }
 }

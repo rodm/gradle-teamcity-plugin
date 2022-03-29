@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@ import org.gradle.api.tasks.Nested;
 /**
  * Agent-side plugin tool deployment configuration
  */
-public class ToolDeployment {
+public class ToolDeployment implements Deployment {
 
     @Nested
     private ExecutableFiles executableFiles;
@@ -31,22 +31,13 @@ public class ToolDeployment {
         executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
     }
 
-    /**
-     * Configures the executable files for the agent-side tool plugin.
-     *
-     * <p>The given action is executed to configure the executable files.</p>
-     *
-     * @param configuration The action
-     */
+    @Override
     public void executableFiles(Action<ExecutableFiles> configuration) {
         configuration.execute(executableFiles);
     }
 
+    @Override
     public ExecutableFiles getExecutableFiles() {
         return executableFiles;
-    }
-
-    public void setExecutableFiles(ExecutableFiles executableFiles) {
-        this.executableFiles = executableFiles;
     }
 }
