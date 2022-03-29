@@ -29,9 +29,8 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0;
 
 public class ServerPluginDescriptorGenerator {
 
-    private ServerPluginDescriptor descriptor;
-
-    private TeamCityVersion version;
+    private final ServerPluginDescriptor descriptor;
+    private final TeamCityVersion version;
 
     public ServerPluginDescriptorGenerator(ServerPluginDescriptor descriptor, TeamCityVersion version) {
         this.descriptor = descriptor;
@@ -46,36 +45,36 @@ public class ServerPluginDescriptorGenerator {
         buildInfoNode(root);
         buildRequirementsNode(root);
         buildDeploymentNode(root);
-        buildParametersNode(root);
-        buildDependenciesNode(root);
+        buildParametersNode(root, descriptor.getParameters());
+        buildDependenciesNode(root, descriptor.getDependencies());
         XmlUtil.serialize(root, writer);
     }
 
     private void buildInfoNode(Node root) {
-        Node info = root.appendNode("info");
-        info.appendNode("name", descriptor.getName());
-        info.appendNode("display-name", descriptor.getDisplayName());
-        info.appendNode("version", descriptor.getVersion());
+        Node infoNode = root.appendNode("info");
+        infoNode.appendNode("name", descriptor.getName());
+        infoNode.appendNode("display-name", descriptor.getDisplayName());
+        infoNode.appendNode("version", descriptor.getVersion());
         if (descriptor.getDescription() != null) {
-            info.appendNode("description", descriptor.getDescription());
+            infoNode.appendNode("description", descriptor.getDescription());
         }
         if (descriptor.getDownloadUrl() != null) {
-            info.appendNode("download-url", descriptor.getDownloadUrl());
+            infoNode.appendNode("download-url", descriptor.getDownloadUrl());
         }
         if (descriptor.getEmail() != null) {
-            info.appendNode("email", descriptor.getEmail());
+            infoNode.appendNode("email", descriptor.getEmail());
         }
-        buildVendorNode(info);
+        buildVendorNode(infoNode);
     }
 
     private void buildVendorNode(Node info) {
-        Node vendor = info.appendNode("vendor");
-        vendor.appendNode("name", descriptor.getVendorName());
+        Node vendorNode = info.appendNode("vendor");
+        vendorNode.appendNode("name", descriptor.getVendorName());
         if (descriptor.getVendorUrl() != null) {
-            vendor.appendNode("url", descriptor.getVendorUrl());
+            vendorNode.appendNode("url", descriptor.getVendorUrl());
         }
         if (descriptor.getVendorLogo() != null) {
-            vendor.appendNode("logo", descriptor.getVendorLogo());
+            vendorNode.appendNode("logo", descriptor.getVendorLogo());
         }
     }
 
@@ -108,26 +107,21 @@ public class ServerPluginDescriptorGenerator {
         }
     }
 
-    private void buildParametersNode(Node root) {
-        if (descriptor.getParameters().getParameters().size() > 0) {
-            final Node parameters = root.appendNode("parameters");
-            descriptor.getParameters().getParameters().forEach((name, value) -> {
-                parameters.appendNode("parameter", Collections.singletonMap("name", name),value);
-            });
+    private void buildParametersNode(Node root, Parameters parameters) {
+        if (parameters.hasParameters()) {
+            final Node parametersNode = root.appendNode("parameters");
+            parameters.getParameters().forEach((name, value) ->
+                parametersNode.appendNode("parameter", Collections.singletonMap("name", name),value));
         }
     }
 
-    private void buildDependenciesNode(Node root) {
-        if (version.equalOrGreaterThan(VERSION_9_0)) {
-            if (descriptor.getDependencies().hasDependencies()) {
-                final Node dependencies = root.appendNode("dependencies");
-                descriptor.getDependencies().getPlugins().forEach(name -> {
-                    dependencies.appendNode("plugin", Collections.singletonMap("name", name));
-                });
-                descriptor.getDependencies().getTools().forEach(name -> {
-                    dependencies.appendNode("tool", Collections.singletonMap("name", name));
-                });
-            }
+    private void buildDependenciesNode(Node root, Dependencies dependencies) {
+        if (version.equalOrGreaterThan(VERSION_9_0) && dependencies.hasDependencies()) {
+            final Node dependenciesNode = root.appendNode("dependencies");
+            dependencies.getPlugins().forEach(name ->
+                dependenciesNode.appendNode("plugin", Collections.singletonMap("name", name)));
+            descriptor.getDependencies().getTools().forEach(name ->
+                dependenciesNode.appendNode("tool", Collections.singletonMap("name", name)));
         }
     }
 }

@@ -25,11 +25,11 @@ import java.util.Map;
  */
 public class Parameters {
 
-    private Map<String, String> parameters = new LinkedHashMap<>();
+    private final Map<String, String> entries = new LinkedHashMap<>();
 
     @Input
     public Map<String, String> getParameters() {
-        return parameters;
+        return entries;
     }
 
     /**
@@ -38,7 +38,7 @@ public class Parameters {
      * @param parameters The map of parameters to add.
      */
     public void parameters(Map<String, String> parameters) {
-        this.parameters.putAll(parameters);
+        this.entries.putAll(parameters);
     }
 
     /**
@@ -48,6 +48,10 @@ public class Parameters {
      * @param value The value of the parameter
      */
     public void parameter(String name, String value) {
-        parameters.put(name, value);
+        entries.put(name, value);
+    }
+
+    public boolean hasParameters() {
+        return !entries.isEmpty();
     }
 }

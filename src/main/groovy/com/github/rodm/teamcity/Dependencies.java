@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class Dependencies {
 
-    private List<String> plugins = new ArrayList<>();
+    private final List<String> plugins = new ArrayList<>();
 
     @Input
     public List<String> getPlugins() {
@@ -41,7 +41,7 @@ public class Dependencies {
         plugins.add(name);
     }
 
-    private List<String> tools = new ArrayList<>();
+    private final List<String> tools = new ArrayList<>();
 
     @Input
     public List<String> getTools() {
@@ -58,6 +58,6 @@ public class Dependencies {
     }
 
     public boolean hasDependencies() {
-        return plugins.size() > 0 || tools.size() > 0;
+        return !plugins.isEmpty() || !tools.isEmpty();
     }
 }
