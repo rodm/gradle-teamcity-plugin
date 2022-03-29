@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,7 @@ public class TeamCityPluginExtension {
 
     private TeamCityEnvironments environments;
 
-    private Project project;
+    private final Project project;
 
     public TeamCityPluginExtension(Project project) {
         this.project = project;
@@ -90,7 +90,7 @@ public class TeamCityPluginExtension {
                 defaultRepositories = rootExtension.getDefaultRepositories();
             }
         }
-        return (defaultRepositories != null) ? defaultRepositories : true;
+        return defaultRepositories == null || defaultRepositories;
     }
 
     /**
@@ -109,7 +109,7 @@ public class TeamCityPluginExtension {
                 allowSnapshotVersions = rootExtension.getAllowSnapshotVersions();
             }
         }
-        return (allowSnapshotVersions != null) ? allowSnapshotVersions : false;
+        return allowSnapshotVersions != null && allowSnapshotVersions;
     }
 
     /**
@@ -169,14 +169,12 @@ public class TeamCityPluginExtension {
         configuration.execute(server);
     }
 
-    public Object setDescriptor(Object descriptor) {
+    public void setDescriptor(Object descriptor) {
         project.getLogger().warn("descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.");
         if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
             agent.setDescriptor(descriptor);
-            return descriptor;
         } else {
             server.setDescriptor(descriptor);
-            return descriptor;
         }
     }
 
@@ -198,23 +196,21 @@ public class TeamCityPluginExtension {
         }
     }
 
-    public Map<String, Object> setTokens(Map<String, Object> tokens) {
+    public void setTokens(Map<String, Object> tokens) {
         project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
         if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
             agent.setTokens(tokens);
-            return tokens;
         } else {
             server.setTokens(tokens);
-            return tokens;
         }
     }
 
-    public Map<String, Object> tokens(Map<String, Object> tokens) {
+    public void tokens(Map<String, Object> tokens) {
         project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
         if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            return agent.tokens(tokens);
+            agent.tokens(tokens);
         } else {
-            return server.tokens(tokens);
+            server.tokens(tokens);
         }
     }
 

@@ -15,8 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-import org.codehaus.groovy.runtime.StringGroovyMethods;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
@@ -115,7 +113,7 @@ public class ServerPluginDescriptor {
     @Nested
     private Dependencies dependencies;
 
-    private Project project;
+    private final Project project;
 
     public ServerPluginDescriptor(Project project) {
         this.project = project;
@@ -143,13 +141,12 @@ public class ServerPluginDescriptor {
      */
     @Input
     public String getDisplayName() {
-        return StringGroovyMethods.asBoolean(displayName) ? displayName : project.getName();
+        return (displayName != null) ? displayName : project.getName();
     }
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-
 
     /**
      * The version of the plugin.
@@ -277,15 +274,7 @@ public class ServerPluginDescriptor {
         return parameters;
     }
 
-//    public void setParameters(Parameters parameters) {
-//        this.parameters = parameters;
-//    }
-
     public Dependencies getDependencies() {
         return dependencies;
     }
-
-//    public void setDependencies(Dependencies dependencies) {
-//        this.dependencies = dependencies;
-//    }
 }

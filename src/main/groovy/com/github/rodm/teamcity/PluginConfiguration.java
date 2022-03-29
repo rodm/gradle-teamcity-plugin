@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,9 +32,9 @@ public abstract class PluginConfiguration {
 
     private Object descriptor;
 
-    private RegularFileProperty descriptorFile;
+    private final RegularFileProperty descriptorFile;
 
-    private CopySpec files;
+    private final CopySpec files;
 
     private Map<String, Object> tokens = new LinkedHashMap<>();
 
@@ -42,7 +42,7 @@ public abstract class PluginConfiguration {
 
     private final Project project;
 
-    public PluginConfiguration(Project project) {
+    protected PluginConfiguration(Project project) {
         this.project = project;
         this.descriptorFile = project.getObjects().fileProperty();
         this.files = project.copySpec();
@@ -96,8 +96,8 @@ public abstract class PluginConfiguration {
         return tokens;
     }
 
-    public Map<String, Object> setTokens(Map<String, Object> tokens) {
-        return this.tokens = tokens;
+    public void setTokens(Map<String, Object> tokens) {
+        this.tokens = tokens;
     }
 
     /**
@@ -105,9 +105,8 @@ public abstract class PluginConfiguration {
      *
      * @param tokens The map of tokens.
      */
-    public Map<String, Object> tokens(Map<String, Object> tokens) {
+    public void tokens(Map<String, Object> tokens) {
         this.tokens.putAll(tokens);
-        return this.tokens;
     }
 
     public Project getProject() {
