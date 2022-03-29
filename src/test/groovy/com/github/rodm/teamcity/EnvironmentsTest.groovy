@@ -15,6 +15,9 @@
  */
 package com.github.rodm.teamcity
 
+import com.github.rodm.teamcity.internal.DisablePluginAction
+import com.github.rodm.teamcity.internal.EnablePluginAction
+import com.github.rodm.teamcity.internal.PluginAction
 import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
@@ -28,7 +31,6 @@ import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
@@ -684,8 +686,8 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        assertThat(deployPlugin, hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction))
-        assertThat(deployPlugin, hasAction(TeamCityEnvironmentsPlugin.EnablePluginAction))
+        assertThat(deployPlugin, hasAction(DisablePluginAction))
+        assertThat(deployPlugin, hasAction(EnablePluginAction))
     }
 
     @Test
@@ -704,8 +706,8 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        assertThat(deployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction)))
-        assertThat(deployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.EnablePluginAction)))
+        assertThat(deployPlugin, not(hasAction(DisablePluginAction)))
+        assertThat(deployPlugin, not(hasAction(EnablePluginAction)))
     }
 
     @Test
@@ -724,7 +726,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        assertThat(undeployPlugin, hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction))
+        assertThat(undeployPlugin, hasAction(DisablePluginAction))
     }
 
     @Test
@@ -743,7 +745,7 @@ class EnvironmentsTest {
         configureEnvironmentTasks.execute(project)
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        assertThat(undeployPlugin, not(hasAction(TeamCityEnvironmentsPlugin.DisablePluginAction)))
+        assertThat(undeployPlugin, not(hasAction(DisablePluginAction)))
     }
 
     @Test
@@ -1125,7 +1127,7 @@ class EnvironmentsTest {
         assertThat(environments, isA(TeamCityEnvironments))
     }
 
-    class TestPluginAction extends TeamCityEnvironmentsPlugin.PluginAction {
+    class TestPluginAction extends PluginAction {
 
         HttpURLConnection request
         String pluginName
@@ -1228,7 +1230,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unload response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
+        def action = new DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1243,7 +1245,7 @@ class EnvironmentsTest {
 
     @Test
     void 'disabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
+        def action = new DisablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1256,7 +1258,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin loaded response logs success'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
+        def action = new EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1269,7 +1271,7 @@ class EnvironmentsTest {
 
     @Test
     void 'enabling plugin unexpected response logs failure'() {
-        def action = new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
+        def action = new EnablePluginAction(project.logger, projectDir.toFile(), [] as Set, [])
         createMaintenanceTokenFile()
 
         def request = mock(HttpURLConnection)
@@ -1282,14 +1284,14 @@ class EnvironmentsTest {
 
     boolean wasRequestSent = false
 
-    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded) {
+    private DisablePluginAction createDisablePluginAction(def plugins, def unloaded) {
         createDisablePluginAction(plugins, unloaded, 'Plugin unloaded successfully')
     }
 
-    private TeamCityEnvironmentsPlugin.DisablePluginAction createDisablePluginAction(def plugins, def unloaded, String response) {
+    private DisablePluginAction createDisablePluginAction(def plugins, def unloaded, String response) {
         def request = mock(HttpURLConnection)
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
-        new TeamCityEnvironmentsPlugin.DisablePluginAction(project.logger, projectDir.toFile(), plugins , unloaded) {
+        new DisablePluginAction(project.logger, projectDir.toFile(), plugins , unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 EnvironmentsTest.this.wasRequestSent = true
@@ -1297,11 +1299,11 @@ class EnvironmentsTest {
         }
     }
 
-    private TeamCityEnvironmentsPlugin.EnablePluginAction createEnablePluginAction(def plugins, def unloaded) {
+    private EnablePluginAction createEnablePluginAction(def plugins, def unloaded) {
         def request = mock(HttpURLConnection)
         def response = 'Plugin loaded successfully'
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
-        new TeamCityEnvironmentsPlugin.EnablePluginAction(project.logger, projectDir.toFile(), plugins, unloaded) {
+        new EnablePluginAction(project.logger, projectDir.toFile(), plugins, unloaded) {
             void executeAction(String pluginName) {
                 sendRequest(request, pluginName)
                 EnvironmentsTest.this.wasRequestSent = true
