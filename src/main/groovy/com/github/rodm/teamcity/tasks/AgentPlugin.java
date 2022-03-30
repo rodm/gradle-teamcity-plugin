@@ -25,9 +25,9 @@ public abstract class AgentPlugin extends AbstractPluginTask {
 
     public AgentPlugin() {
         setDescription("Package TeamCity Agent plugin");
-        into("lib", copySpec -> {
-            copySpec.from(getLib());
-        });
+        into("lib", copySpec ->
+            copySpec.from(getLib())
+        );
         into("", copySpec -> {
             copySpec.from(getDescriptor());
             copySpec.rename(name -> PLUGIN_DESCRIPTOR_FILENAME);

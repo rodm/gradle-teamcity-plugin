@@ -25,12 +25,12 @@ public abstract class ServerPlugin extends AbstractPluginTask {
 
     public ServerPlugin() {
         setDescription("Package TeamCity plugin");
-        into("server", copySpec -> {
-            copySpec.from(getServer());
-        });
-        into("agent", copySpec -> {
-            copySpec.from(getAgent());
-        });
+        into("server", copySpec ->
+            copySpec.from(getServer())
+        );
+        into("agent", copySpec ->
+            copySpec.from(getAgent())
+        );
         into("", copySpec -> {
             copySpec.from(getDescriptor());
             copySpec.rename(name -> PLUGIN_DESCRIPTOR_FILENAME);

@@ -39,6 +39,8 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0;
 @CacheableTask
 public abstract class GenerateAgentPluginDescriptor extends DefaultTask {
 
+    private static final String DEPENDENCIES_NOT_SUPPORTED = "{}: Plugin descriptor does not support dependencies for version {}";
+
     public GenerateAgentPluginDescriptor() {
         setDescription("Generates the Agent-side plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
@@ -58,7 +60,7 @@ public abstract class GenerateAgentPluginDescriptor extends DefaultTask {
         final TeamCityVersion version = getVersion().get();
         final AgentPluginDescriptor descriptor = getDescriptor().get();
         if (version.lessThan(VERSION_9_0) && descriptor.getDependencies().hasDependencies()) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
+            getLogger().warn(DEPENDENCIES_NOT_SUPPORTED, getPath(), version);
         }
 
         final AgentPluginDescriptorGenerator generator = new AgentPluginDescriptorGenerator(descriptor);

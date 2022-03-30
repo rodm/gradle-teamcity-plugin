@@ -29,7 +29,7 @@ import java.io.IOException;
 
 public class PluginDescriptorContentsValidationAction implements Action<Task> {
 
-    private static final String EMPTY_VALUE_WARNING_MESSAGE = "%s: Plugin descriptor value for %s must not be empty.";
+    private static final String EMPTY_VALUE_WARNING_MESSAGE = "{}: Plugin descriptor value for {} must not be empty.";
 
     @Override
     public void execute(Task task) {
@@ -39,33 +39,34 @@ public class PluginDescriptorContentsValidationAction implements Action<Task> {
             Node descriptor = parser.parse(pluginTask.getDescriptor().get().getAsFile());
             NodeList info = descriptor.getAt(QName.valueOf("info"));
 
+            final String path = task.getPath();
             NodeList name = info.getAt("name");
             if (name.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "name"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "name");
             }
             NodeList display = info.getAt("display-name");
             if (display.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "display name"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "display name");
             }
             NodeList version = info.getAt("version");
             if (version.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "version"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "version");
             }
 
             NodeList vendor = info.getAt("vendor");
             NodeList vendorName = vendor.getAt("name");
             if (vendorName.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "vendor name"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "vendor name");
             }
 
             NodeList description = info.getAt("description");
             if (description.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "description"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "description");
             }
 
             NodeList vendorUrl = vendor.getAt("url");
             if (vendorUrl.text().trim().isEmpty()) {
-                task.getLogger().warn(String.format(EMPTY_VALUE_WARNING_MESSAGE, task.getPath(), "vendor url"));
+                task.getLogger().warn(EMPTY_VALUE_WARNING_MESSAGE, path, "vendor url");
             }
         }
         catch (IOException | SAXException e) {

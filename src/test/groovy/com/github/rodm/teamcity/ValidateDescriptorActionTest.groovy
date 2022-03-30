@@ -137,6 +137,6 @@ class ValidateDescriptorActionTest {
     }
 
     private static String warningFor(String name) {
-        return String.format(EMPTY_VALUE_WARNING, name)
+        return EMPTY_VALUE_WARNING.replace("{}", name)
     }
 }

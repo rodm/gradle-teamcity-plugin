@@ -41,6 +41,8 @@ import static com.github.rodm.teamcity.TeamCityVersion.VERSION_9_0;
 @CacheableTask
 public abstract class GenerateServerPluginDescriptor extends DefaultTask {
 
+    private static final String UNSUPPORTED_FEATURE = "{}: Plugin descriptor does not support {} for version {}";
+
     public GenerateServerPluginDescriptor() {
         setDescription("Generates the Server-side plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
@@ -60,15 +62,15 @@ public abstract class GenerateServerPluginDescriptor extends DefaultTask {
         final TeamCityVersion version = getVersion().get();
         final ServerPluginDescriptor descriptor = getDescriptor().get();
         if (version.lessThan(VERSION_9_0) && descriptor.getDependencies().hasDependencies()) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support dependencies for version " + version);
+            getLogger().warn(UNSUPPORTED_FEATURE, getPath(), "dependencies", version);
         }
 
         if (version.lessThan(VERSION_2018_2) && descriptor.getAllowRuntimeReload() != null) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support allowRuntimeReload for version " + version);
+            getLogger().warn(UNSUPPORTED_FEATURE, getPath(), "allowRuntimeReload", version);
         }
 
         if (version.lessThan(VERSION_2020_1) && descriptor.getNodeResponsibilitiesAware() != null) {
-            getLogger().warn(getPath() + ": Plugin descriptor does not support nodeResponsibilitiesAware for version " + version);
+            getLogger().warn(UNSUPPORTED_FEATURE, getPath(), "nodeResponsibilitiesAware", version);
         }
 
         final ServerPluginDescriptorGenerator generator = new ServerPluginDescriptorGenerator(descriptor, version);
