@@ -79,7 +79,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
      */
     public void publish(Action<PublishConfiguration> configuration) {
         if (publish == null) {
-            publish = ((ExtensionAware) this).getExtensions().create(PublishConfiguration.class, "publish", DefaultPublishConfiguration.class, getProject());
+            publish = ((ExtensionAware) this).getExtensions().create(PublishConfiguration.class, "publish", DefaultPublishConfiguration.class);
         }
         configuration.execute(publish);
     }
@@ -90,7 +90,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
 
     public void sign(Action<SignConfiguration> configuration) {
         if (sign == null) {
-            sign = ((ExtensionAware) this).getExtensions().create(SignConfiguration.class, "sign", DefaultSignConfiguration.class, getProject());
+            sign = ((ExtensionAware) this).getExtensions().create(SignConfiguration.class, "sign", DefaultSignConfiguration.class);
         }
         configuration.execute(sign);
     }

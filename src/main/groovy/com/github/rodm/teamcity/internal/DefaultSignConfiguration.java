@@ -16,9 +16,11 @@
 package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.SignConfiguration;
-import org.gradle.api.Project;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+
+import javax.inject.Inject;
 
 public class DefaultSignConfiguration implements SignConfiguration {
 
@@ -26,10 +28,11 @@ public class DefaultSignConfiguration implements SignConfiguration {
     private final Property<String> privateKey;
     private final Property<String> password;
 
-    public DefaultSignConfiguration(Project project) {
-        this.certificateChain = project.getObjects().property(String.class);
-        this.privateKey = project.getObjects().property(String.class);
-        this.password = project.getObjects().property(String.class);
+    @Inject
+    public DefaultSignConfiguration(ObjectFactory objectFactory) {
+        this.certificateChain = objectFactory.property(String.class);
+        this.privateKey = objectFactory.property(String.class);
+        this.password = objectFactory.property(String.class);
     }
 
     public String getCertificateChain() {

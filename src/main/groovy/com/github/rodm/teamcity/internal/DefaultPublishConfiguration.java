@@ -16,11 +16,12 @@
 package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.PublishConfiguration;
-import org.gradle.api.Project;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,10 +36,11 @@ public class DefaultPublishConfiguration implements PublishConfiguration {
     private final Property<String> token;
     private final Property<String> notes;
 
-    public DefaultPublishConfiguration(Project project) {
-        this.channels = project.getObjects().listProperty(String.class).convention(DEFAULT_CHANNELS);
-        this.token = project.getObjects().property(String.class);
-        this.notes = project.getObjects().property(String.class);
+    @Inject
+    public DefaultPublishConfiguration(ObjectFactory objectFactory) {
+        this.channels = objectFactory.listProperty(String.class).convention(DEFAULT_CHANNELS);
+        this.token = objectFactory.property(String.class);
+        this.notes = objectFactory.property(String.class);
     }
 
     /**
