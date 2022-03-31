@@ -25,12 +25,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.Zip;
-import org.gradle.util.GradleVersion;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -43,39 +41,24 @@ public class TeamCityPlugin implements Plugin<Project> {
 
     public static final String PLUGIN_DESCRIPTOR_DIR = "descriptor";
 
-    private static final String TEAMCITY_EXTENSION_NAME = "teamcity";
-
     public static final String TEAMCITY_GROUP = "TeamCity";
 
     private static final String JETBRAINS_MAVEN_REPOSITORY = "https://download.jetbrains.com/teamcity-repository";
 
     private static final String CLASSES_PATTERN = "**/*.class";
 
-    private final String MINIMUM_SUPPORTED_VERSION = "7.0";
-
     public void apply(Project project) {
         PluginContainer plugins = project.getPlugins();
-        plugins.apply(BasePlugin.class);
-
-        if (GradleVersion.current().compareTo(GradleVersion.version(MINIMUM_SUPPORTED_VERSION)) < 0) {
-            throw new GradleException("Gradle TeamCity plugin requires Gradle version " + MINIMUM_SUPPORTED_VERSION + " or later");
-        }
+        plugins.apply(TeamCityBasePlugin.class);
 
         if (plugins.hasPlugin(JavaPlugin.class) &&
             (plugins.hasPlugin(TeamCityAgentPlugin.class) || plugins.hasPlugin(TeamCityServerPlugin.class))) {
             throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin");
         }
 
-        TeamCityPluginExtension extension;
-        if (project.getExtensions().findByType(TeamCityPluginExtension.class) != null) {
-            extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        } else {
-            extension = project.getExtensions().create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension.class, project);
-            extension.init();
-        }
+        TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
         configureRepositories(project, extension);
         configureConfigurations(project);
-        validateVersion(project, extension);
     }
 
     private static void configureRepositories(Project project, TeamCityPluginExtension extension) {
@@ -100,12 +83,6 @@ public class TeamCityPlugin implements Plugin<Project> {
                 .setDescription("Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.");
             configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(providedConfiguration);
             configurations.getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(providedConfiguration);
-        });
-    }
-
-    public static void validateVersion(Project project, final TeamCityPluginExtension extension) {
-        project.afterEvaluate(p -> {
-            TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions());
         });
     }
 

@@ -16,20 +16,15 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
-import org.gradle.api.ProjectConfigurationException
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.plugins.BasePlugin
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDefaultDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.TestSupport.normalizePath
-import static com.github.rodm.teamcity.ValidationMode.IGNORE
-import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static org.hamcrest.CoreMatchers.anyOf
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
@@ -39,10 +34,6 @@ import static org.hamcrest.CoreMatchers.notNullValue
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
-import static org.hamcrest.Matchers.startsWith
-import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.assertTrue
-import static org.junit.jupiter.api.Assertions.fail
 
 class TeamCityServerPluginTest {
 
@@ -51,173 +42,6 @@ class TeamCityServerPluginTest {
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
-    }
-
-    @Test
-    void applyBasePlugin() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        assertTrue(project.plugins.hasPlugin(BasePlugin))
-    }
-
-    @Test
-    void addTeamCityPluginExtension() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        assertTrue(project.extensions.getByName('teamcity') instanceof TeamCityPluginExtension)
-    }
-
-    @Test
-    void defaultVersion() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        assertEquals('9.0', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    void specifiedVersion() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        project.teamcity {
-            version = '8.1.5'
-        }
-        assertEquals('8.1.5', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    void 'reject snapshot version without allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        try {
-            project.teamcity {
-                version = '2020.2-SNAPSHOT'
-            }
-            project.evaluate()
-            fail('Invalid version not rejected')
-        }
-        catch (ProjectConfigurationException expected) {
-            def cause = expected.cause
-            assertThat(cause.message, startsWith("'2020.2-SNAPSHOT' is not a valid TeamCity version"))
-        }
-    }
-
-    @Test
-    void 'accept snapshot version with allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        project.teamcity {
-            version = '2020.2-SNAPSHOT'
-            allowSnapshotVersions = true
-        }
-        project.evaluate()
-
-        assertEquals('2020.2-SNAPSHOT', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    void 'accept release version with allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        project.teamcity {
-            version = '2020.2'
-            allowSnapshotVersions = true
-        }
-        project.evaluate()
-
-        assertEquals('2020.2', project.extensions.getByName('teamcity').version)
-    }
-
-    @Test
-    void 'default mode for bean definition validation'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.evaluate()
-
-        TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
-        assertThat(extension.validateBeanDefinition, equalTo(ValidationMode.WARN))
-    }
-
-    @Test
-    void 'set ignore mode for bean definition validation'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
-        project.teamcity {
-            validateBeanDefinition = 'ignore'
-        }
-        project.evaluate()
-
-        TeamCityPluginExtension extension = (TeamCityPluginExtension) project.extensions.getByName('teamcity')
-        assertThat(extension.validateBeanDefinition, equalTo(IGNORE))
-    }
-
-    @Nested
-    class SubProjects {
-
-        private Project rootProject
-        private Project subproject
-
-        @BeforeEach
-        void setup() {
-            rootProject = project
-            subproject = ProjectBuilder.builder().withParent(rootProject).build()
-        }
-
-        @Test
-        void 'sub-project inherits version from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-            rootProject.teamcity {
-                version = '8.1.5'
-            }
-
-            subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-            assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
-        }
-
-        @Test
-        void 'sub-project lazily inherits version from root project'() {
-            subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-            rootProject.teamcity {
-                version = '8.1.5'
-            }
-
-            assertEquals('8.1.5', subproject.extensions.getByName('teamcity').version)
-        }
-
-        @Test
-        void 'sub-project inherits properties from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-            rootProject.teamcity {
-                defaultRepositories = false
-                allowSnapshotVersions = true
-                validateBeanDefinition = IGNORE
-            }
-
-            subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-            def extension = subproject.extensions.getByName('teamcity')
-            assertThat(extension.defaultRepositories, is(false))
-            assertThat(extension.allowSnapshotVersions, is(true))
-            assertThat(extension.validateBeanDefinition, is(IGNORE))
-        }
-
-        @Test
-        void 'sub-project lazily inherits properties from root project'() {
-            subproject.apply plugin: 'com.github.rodm.teamcity-server'
-
-            rootProject.apply plugin: 'com.github.rodm.teamcity-server'
-            rootProject.teamcity {
-                defaultRepositories = false
-                allowSnapshotVersions = true
-                validateBeanDefinition = FAIL
-            }
-
-            def extension = subproject.extensions.getByName('teamcity')
-            assertThat(extension.defaultRepositories, is(false))
-            assertThat(extension.allowSnapshotVersions, is(true))
-            assertThat(extension.validateBeanDefinition, is(FAIL))
-        }
     }
 
     @Test

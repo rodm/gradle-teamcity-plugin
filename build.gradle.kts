@@ -62,6 +62,11 @@ gradlePlugin {
     testSourceSets (sourceSets["functional"], sourceSets["samples"])
 
     plugins {
+        create("teamcityBasePlugin") {
+            id = "com.github.rodm.teamcity-base"
+            displayName = "Gradle TeamCity base plugin"
+            implementationClass = "com.github.rodm.teamcity.TeamCityBasePlugin"
+        }
         create("teamcityServerPlugin") {
             id = "com.github.rodm.teamcity-server"
             displayName = "Gradle TeamCity Server plugin"
