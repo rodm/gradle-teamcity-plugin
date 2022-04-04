@@ -28,6 +28,10 @@ image:{uri-gradle-plugin-version}?label=Gradle%20Plugin%20Portal[Gradle Plugin P
 
 |===
 |Plugin version |Gradle version |Java version |Documentation
+|v1.5
+|7.0+
+|Java 8 & later
+|{uri-github-project}/blob/master/README.adoc#using-the-plugin[README]
 |v1.4
 |6.0+
 |Java 8 & later
@@ -70,6 +74,8 @@ To test the samples run
 
 The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains four plugins:
 
+* `com.github.rodm.teamcity-base` - Allows extension properties `version`, `allowSnapshotVersions`,
+`validateBeanDefinition`, and `defaultRepositories` to be set and shared to sub-projects applying the other plugins.
 * `com.github.rodm.teamcity-server` - Provides tasks to package, sign and publish a TeamCity plugin.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent-side of a TeamCity plugin.
 * `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project to build a library used by both
@@ -101,8 +107,7 @@ server plugin archives.
 === Extension Properties
 
 The following properties are defined in the `teamcity` configuration block. The version property controls the version
-of the TeamCity API dependencies added to the `provided` configuration. The plugin descriptor can be specified as a
-path to a file or by a configuration block within the build script.
+of the TeamCity API dependencies added to the `provided` configuration.
 
 * `version` : The version of the TeamCity API to build against. Default is '{default-api-version}'.
 * `allowSnapshotVersions` : Allow a snapshot version to be specified in the `version` property. Default is false.
@@ -113,6 +118,26 @@ Set to `fail` to log all warnings and fail the build if there are any.
 * `defaultRepositories` : The defaultRepositories flag controls adding the default repositories to the build. By
 default, Maven Central and the TeamCity repository, https://download.jetbrains.com/teamcity-repository, are configured
 for resolving dependencies. Setting this flag to false allows a local repository to be used for resolving dependencies.
+
+=== TeamCity Base Plugin
+
+Applying the base plugin allows the extension properties `version`, `allowSnapshotVersions`, `validateBeanDefinition`
+and `defaultRepositories` to be inherited by sub-projects applying the other plugins.
+
+==== Example
+
+Plugin descriptor defined in the build script.
+
+[source,groovy]
+[subs="attributes"]
+----
+    teamcity {
+        version = '2021.2-SNAPSHOT'
+        allowSnapshotVersions = true            // allow snapshot versions
+        validateBeanDefinition = "fail"         // fail build on any plugin validation erros
+        defaultRepositories = true              // use default repositories to resolve dependencies
+    }
+----
 
 === TeamCity Server Plugin
 
