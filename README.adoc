@@ -1,4 +1,5 @@
 = Gradle TeamCity plugin
+:plugin-id: com.github.rodm.teamcity-server
 :uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity
 :uri-teamcity-environment: {uri-teamcity-sdk-docs}/development-environment.html
 :uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#Plugin+Descriptor
@@ -10,8 +11,9 @@
 :uri-github-actions: {uri-github-project}/actions
 :uri-github-status: {uri-github-project}/workflows/Build/badge.svg
 :uri-shields-gradle-portal: https://img.shields.io/gradle-plugin-portal/v
-:uri-gradle-plugin-portal: https://plugins.gradle.org/
-:uri-gradle-plugin: {uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server
+:uri-gradle-plugin-portal: https://plugins.gradle.org
+:uri-gradle-plugin: {uri-gradle-plugin-portal}/plugin/{plugin-id}
+:uri-gradle-plugin-version: {uri-shields-gradle-portal}/{plugin-id}
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2018.1
@@ -20,7 +22,7 @@ The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plug
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
 image:{uri-github-status}?branch=master["Build Status", link="{uri-github-actions}"]
-image:{uri-shields-gradle-portal}/com.github.rodm.teamcity-server?label=Gradle%20Plugin%20Portal[Gradle Plugin Portal, link="{uri-gradle-plugin}"]
+image:{uri-gradle-plugin-version}?label=Gradle%20Plugin%20Portal[Gradle Plugin Portal, link="{uri-gradle-plugin}"]
 
 == Supported Gradle and Java versions
 
