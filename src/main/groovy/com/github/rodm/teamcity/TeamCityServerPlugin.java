@@ -96,14 +96,15 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     public void configureDependencies(final Project project, final TeamCityPluginExtension extension) {
-        project.getPlugins().withType(JavaPlugin.class, plugin -> project.afterEvaluate(p -> {
-            p.getDependencies().add("provided", "org.jetbrains.teamcity:server-api:" + extension.getVersion());
-            TeamCityVersion version = TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions());
-            if (version.equalOrGreaterThan(VERSION_9_0)) {
-                p.getDependencies().add("provided", "org.jetbrains.teamcity:server-web-api:" + extension.getVersion());
-            }
-            p.getDependencies().add("testImplementation", "org.jetbrains.teamcity:tests-support:" + extension.getVersion());
-        }));
+        Provider<String> version = project.provider(extension::getVersion);
+        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:server-api:" + v));
+            project.getDependencies().add("provided", version.map(v -> {
+                TeamCityVersion teamCityVersion = TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions());
+                return teamCityVersion.equalOrGreaterThan(VERSION_9_0) ? "org.jetbrains.teamcity:server-web-api:" + v : null;
+            }));
+            project.getDependencies().add("testImplementation", version.map(v -> "org.jetbrains.teamcity:tests-support:" + v));
+        });
     }
 
     public void configureServerPluginTasks(final Project project, final TeamCityPluginExtension extension) {
@@ -155,9 +156,8 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
         project.getArtifacts().add("plugin", packagePlugin);
 
-        project.afterEvaluate(p ->
-            p.getTasks().named(SERVER_PLUGIN_TASK_NAME, task ->
-                configurePluginArchiveTask((Zip) task, extension.getServer().getArchiveName())));
+        tasks.named(SERVER_PLUGIN_TASK_NAME, Zip.class, task ->
+            configurePluginArchiveTask(task, extension.getServer().getArchiveName()));
     }
 
     private static String getSchemaPath(String version, boolean allowSnapshots) {

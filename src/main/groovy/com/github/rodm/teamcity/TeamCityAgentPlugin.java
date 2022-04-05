@@ -38,6 +38,7 @@ import java.util.Set;
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR;
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP;
+import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask;
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask;
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME;
@@ -63,14 +64,15 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
         configureDependencies(project, extension);
-        TeamCityPlugin.configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
+        configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureTasks(project, extension);
     }
 
     public void configureDependencies(final Project project, final TeamCityPluginExtension extension) {
+        Provider<String> version = project.provider(extension::getVersion);
         project.getPlugins().withType(JavaPlugin.class, plugin -> {
-            project.getDependencies().add("provided", "org.jetbrains.teamcity:agent-api:" + extension.getVersion());
-            project.getDependencies().add("testImplementation", "org.jetbrains.teamcity:tests-support:" + extension.getVersion());
+            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:agent-api:" + v));
+            project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
         });
     }
 
@@ -123,10 +125,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
 
         project.getArtifacts().add("plugin", packagePlugin);
 
-        project.afterEvaluate(p -> {
-            tasks.named(AGENT_PLUGIN_TASK_NAME, task -> {
-                configurePluginArchiveTask((Zip) task, extension.getAgent().getArchiveName());
-            });
-        });
+        tasks.named(AGENT_PLUGIN_TASK_NAME, Zip.class, task ->
+            configurePluginArchiveTask(task, extension.getAgent().getArchiveName()));
     }
 }

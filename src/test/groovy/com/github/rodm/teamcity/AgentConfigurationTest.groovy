@@ -450,6 +450,20 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
+    void 'apply adds agent-api with specified version to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.teamcity {
+            version = '2021.2'
+        }
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'agent-api', '2021.2'))
+    }
+
+    @Test
     void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-agent'

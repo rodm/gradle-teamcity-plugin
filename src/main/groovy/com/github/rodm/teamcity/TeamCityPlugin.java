@@ -87,16 +87,15 @@ public class TeamCityPlugin implements Plugin<Project> {
     }
 
     public static void configureJarTask(final Project project, final TeamCityPluginExtension extension, final String pattern) {
-        project.afterEvaluate(p -> {
-            Jar jarTask = (Jar) p.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
-            if (jarTask != null) {
+        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+            project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> {
                 ValidationMode mode = extension.getValidateBeanDefinition();
                 List<PluginDefinition> pluginDefinitions = new ArrayList<>();
                 Set<String> classes = new LinkedHashSet<>();
-                jarTask.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions));
-                jarTask.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes));
-                jarTask.doLast(new PluginDefinitionValidationAction(mode, pluginDefinitions, classes));
-            }
+                task.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions));
+                task.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes));
+                task.doLast(new PluginDefinitionValidationAction(mode, pluginDefinitions, classes));
+            });
         });
     }
 

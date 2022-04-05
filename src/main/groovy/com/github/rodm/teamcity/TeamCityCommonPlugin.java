@@ -18,14 +18,15 @@ package com.github.rodm.teamcity;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.provider.Provider;
 
 public class TeamCityCommonPlugin implements Plugin<Project> {
     public void apply(final Project project) {
         project.getPlugins().apply(TeamCityPlugin.class);
 
         final TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        project.getPlugins().withType(JavaPlugin.class, javaPlugin ->
-            project.afterEvaluate(p ->
-                p.getDependencies().add("provided", "org.jetbrains.teamcity:common-api:" + extension.getVersion())));
+        Provider<String> version = project.provider(extension::getVersion);
+        project.getPlugins().withType(JavaPlugin.class, plugin ->
+            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:common-api:" + v)));
     }
 }

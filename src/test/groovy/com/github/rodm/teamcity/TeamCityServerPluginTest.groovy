@@ -162,6 +162,20 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    void 'apply adds server-api with specified version to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.teamcity {
+            version = '2021.2'
+        }
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'server-api', '2021.2'))
+    }
+
+    @Test
     void 'apply adds server-web-api to the provided configuration'() {
         project.apply plugin: 'java'
         project.apply plugin: 'com.github.rodm.teamcity-server'

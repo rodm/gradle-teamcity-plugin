@@ -44,4 +44,18 @@ class TeamCityCommonPluginTest {
         Configuration configuration = project.configurations.getByName('provided')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'common-api', '9.0'))
     }
+
+    @Test
+    void 'apply adds common-api with specified version to the provided configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-common'
+        project.teamcity {
+            version = '2021.2'
+        }
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('provided')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'common-api', '2021.2'))
+    }
 }
