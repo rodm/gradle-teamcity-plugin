@@ -126,6 +126,8 @@ public class ServerPluginDescriptor {
 
     /**
      * The internal name of the plugin.
+     *
+     * @return the plugin name
      */
     @Input
     public String getName() {
@@ -138,6 +140,8 @@ public class ServerPluginDescriptor {
 
     /**
      * The display name of the plugin. The display name is shown in TeamCity's Plugins List.
+     *
+     * @return the plugin display name
      */
     @Input
     public String getDisplayName() {
@@ -150,6 +154,8 @@ public class ServerPluginDescriptor {
 
     /**
      * The version of the plugin.
+     *
+     * @return the plugin version
      */
     @Input
     public String getVersion() {

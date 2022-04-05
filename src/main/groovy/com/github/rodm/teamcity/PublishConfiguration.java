@@ -23,18 +23,24 @@ import java.util.List;
 public interface PublishConfiguration {
     /**
      * The list of channel names that the plugin will be published to on the plugin repository
+     *
+     * @return the list of channels
      */
     List<String> getChannels();
     void setChannels(List<String> channels);
 
     /**
      * The token for uploading the plugin to the plugin repository
+     *
+     * @return the authentication token
      */
     String getToken();
     void setToken(String token);
 
     /**
      * The notes describing the changes made to the plugin
+     *
+     * @return the release notes
      */
     String getNotes();
     void setNotes(String notes);

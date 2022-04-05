@@ -77,7 +77,7 @@ public class TeamCityPluginExtension {
     /**
      * Use default repositories to resolve dependencies.
      *
-     * @param useDefaultRepositories
+     * @param useDefaultRepositories Configure default repositories
      */
     public void setDefaultRepositories(boolean useDefaultRepositories) {
         defaultRepositories = useDefaultRepositories;
@@ -96,7 +96,7 @@ public class TeamCityPluginExtension {
     /**
      * Allow version to include snapshot versions.
      *
-     * @param allowSnapshots
+     * @param allowSnapshots Allow snapshot versions
      */
     public void setAllowSnapshotVersions(boolean allowSnapshots) {
         allowSnapshotVersions = allowSnapshots;
@@ -115,7 +115,7 @@ public class TeamCityPluginExtension {
     /**
      * Set the validation mode for validating plugin bean definition files
      *
-     * @param mode
+     * @param mode The validation mode
      */
     public void setValidateBeanDefinition(ValidationMode mode) {
         validateBeanDefinition = mode;

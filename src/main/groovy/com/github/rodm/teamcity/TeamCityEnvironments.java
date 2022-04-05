@@ -26,18 +26,24 @@ public interface TeamCityEnvironments {
 
     /**
      * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".
+     *
+     * @return the downloads directory
      */
     String getDownloadsDir();
     void setDownloadsDir(String downloadsDir);
 
     /**
      * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
+     *
+     * @return the base download URL
      */
     String getBaseDownloadUrl();
     void setBaseDownloadUrl(String baseDownloadUrl);
 
     /**
      * The base home directory used to install TeamCity distributions. Defaults to "servers"
+     *
+     * @return the base directory
      */
     String getBaseHomeDir();
     void setBaseHomeDir(String baseHomeDir);
@@ -45,6 +51,8 @@ public interface TeamCityEnvironments {
 
     /**
      * The base data directory used to store TeamCity configurations. Defaults to "data"
+     *
+     * @return the base data directory
      */
     String getBaseDataDir();
     void setBaseDataDir(String baseDataDir);

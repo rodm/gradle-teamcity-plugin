@@ -19,36 +19,48 @@ public interface TeamCityEnvironment {
 
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
+     *
+     * @return the TeamCity version
      */
     String getVersion();
     void setVersion(String version);
 
     /**
      * The download URL used to download the TeamCity distribution for this environment.
+     *
+     * @return the download URL
      */
     String getDownloadUrl();
     void setDownloadUrl(String downloadUrl);
 
     /**
      * The home directory for this environment's TeamCity installation.
+     *
+     * @return the home directory
      */
     String getHomeDir();
     void setHomeDir(String homeDir);
 
     /**
      * The data directory for this environment's TeamCity configuration.
+     *
+     * @return the data directory
      */
     String getDataDir();
     void setDataDir(String dataDir);
 
     /**
      * The Java home directory used to start the server and agent for this environment.
+     *
+     * @return the Java home directory
      */
     String getJavaHome();
     void setJavaHome(String javaHome);
 
     /**
      * The list of plugins to be deployed to this environment.
+     *
+     * @return the list of plugins
      */
     Object getPlugins();
     void setPlugins(Object plugins);
@@ -61,6 +73,8 @@ public interface TeamCityEnvironment {
      *      '-Dteamcity.development.shadowCopyClasses=true'
      *      '-Dteamcity.superUser.token.saveToFile=true'
      *      '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
+     *
+     * @return the list of server options
      */
     Object getServerOptions();
     void setServerOptions(Object options);
@@ -68,14 +82,14 @@ public interface TeamCityEnvironment {
 
     /**
      * The Java command line options to be used when starting the TeamCity Agent.
+     *
+     * @return the list of agent options
      */
     Object getAgentOptions();
     void setAgentOptions(Object options);
     void agentOptions(String... options);
 
-    /**
-     * Convenience accessors for base properties
-     */
+    // Convenience accessors for base properties
     String getBaseHomeDir();
     String getBaseDataDir();
 }
