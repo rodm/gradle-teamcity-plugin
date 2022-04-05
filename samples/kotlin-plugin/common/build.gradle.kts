@@ -7,7 +7,3 @@ plugins {
 dependencies {
     implementation (kotlin("stdlib"))
 }
-
-teamcity {
-    version = rootProject.extra["teamcityVersion"] as String
-}

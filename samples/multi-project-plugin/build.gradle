@@ -1,9 +1,14 @@
 
-ext {
-    teamcityVersion = '2020.1'
+plugins {
+    id 'com.github.rodm.teamcity-base'
 }
 
 subprojects {
     group = 'com.github.rodm.teamcity'
     version = '1.0-SNAPSHOT'
+}
+
+teamcity {
+    version = '2020.1'
+    validateBeanDefinition = 'fail'
 }

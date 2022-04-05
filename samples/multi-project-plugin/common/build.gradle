@@ -3,7 +3,3 @@ plugins {
     id 'java'
     id 'com.github.rodm.teamcity-common'
 }
-
-teamcity {
-    version = teamcityVersion
-}

@@ -10,8 +10,6 @@ dependencies {
 }
 
 teamcity {
-    version = rootProject.extra["teamcityVersion"] as String
-
     agent {
         descriptor {
             pluginDeployment {

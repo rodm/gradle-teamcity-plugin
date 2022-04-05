@@ -19,8 +19,6 @@ dependencies {
 }
 
 teamcity {
-    version = rootProject.extra["teamcityVersion"] as String
-
     server {
         descriptor {
             name = "Example TeamCity Plugin"
