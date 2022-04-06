@@ -52,7 +52,12 @@ public class ValidationSupport {
         try {
             parser.setProperty(uri, value);
         }
-        catch (SAXNotRecognizedException | SAXNotSupportedException ignore) {
+        catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            // ignore
         }
+    }
+
+    private ValidationSupport() {
+        throw new IllegalStateException("Utility class");
     }
 }

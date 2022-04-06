@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class PluginExecutableFilesValidationAction implements Action<Task> {
 
-    private static final String MISSING_EXECUTABLE_FILE_WARNING = "%s: Executable file %s is missing.";
+    private static final String MISSING_EXECUTABLE_FILE_WARNING = "{}: Executable file {} is missing.";
 
     private final Set<FileCopyDetails> files;
 
@@ -49,7 +49,7 @@ public class PluginExecutableFilesValidationAction implements Action<Task> {
         List<String> executableFiles = getExecutableFiles(pluginTask.getDescriptor().get().getAsFile());
         for (String executableFile : executableFiles) {
             if (!paths.contains(executableFile)) {
-                task.getLogger().warn(String.format(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile));
+                task.getLogger().warn(MISSING_EXECUTABLE_FILE_WARNING, task.getPath(), executableFile);
             }
         }
     }
@@ -60,8 +60,8 @@ public class PluginExecutableFilesValidationAction implements Action<Task> {
             Node descriptor = parser.parse(descriptorFile);
             List<Node> nodes = descriptor.breadthFirst();
             return nodes.stream()
-                .filter((node) -> node.name().equals("include"))
-                .map((node) -> (String) node.attribute("name"))
+                .filter(node -> node.name().equals("include"))
+                .map(node -> (String) node.attribute("name"))
                 .collect(Collectors.toList());
         }
         catch (IOException | SAXException e) {

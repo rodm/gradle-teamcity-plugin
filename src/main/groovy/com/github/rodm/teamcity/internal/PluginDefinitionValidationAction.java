@@ -80,7 +80,7 @@ public class PluginDefinitionValidationAction implements Action<Task> {
             report(task, String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.getName()));
         } else {
             for (PluginBean bean : beans) {
-                String fqcn = bean.getClassName().replaceAll("\\.", "/") + ".class";
+                String fqcn = bean.getClassName().replace(".", "/") + ".class";
                 if (!classes.contains(fqcn)) {
                     report(task, String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.getName(), bean.getClassName()));
                 }

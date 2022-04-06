@@ -19,6 +19,8 @@ import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Task;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -31,19 +33,20 @@ import java.net.URL;
 
 public class PluginDescriptorValidationAction implements Action<Task> {
 
-    private String schema;
+    private final String name;
 
-    public PluginDescriptorValidationAction(String schema) {
-        this.schema = schema;
+    public PluginDescriptorValidationAction(String name) {
+        this.name = name;
     }
 
     @Override
     public void execute(Task task) {
         AbstractPluginTask pluginTask = (AbstractPluginTask) task;
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        URL url = this.getClass().getResource("/schema/" + schema);
-
         try {
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            setProperty(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
+            setProperty(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
+            URL url = this.getClass().getResource("/schema/" + name);
             Schema schema = factory.newSchema(url);
             Validator validator = schema.newValidator();
             PluginDescriptorErrorHandler errorHandler = new PluginDescriptorErrorHandler(task);
@@ -52,6 +55,15 @@ public class PluginDescriptorValidationAction implements Action<Task> {
         }
         catch (IOException | SAXException e) {
             throw new GradleException("Failure validating descriptor", e);
+        }
+    }
+
+    private static void setProperty(SchemaFactory factory, String uri) {
+        try {
+            factory.setProperty(uri, "");
+        }
+        catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+            // ignore
         }
     }
 }

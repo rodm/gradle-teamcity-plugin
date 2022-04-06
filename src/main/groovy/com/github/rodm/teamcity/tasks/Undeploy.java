@@ -27,11 +27,10 @@ public abstract class Undeploy extends Delete {
 
     public Undeploy() {
         setDescription("Un-deploys plugins from the TeamCity Server");
-        delete(getProject().fileTree(getPluginsDir(), files -> {
+        delete(getProject().fileTree(getPluginsDir(), files ->
             files.include(getPlugins().getFiles().stream()
                 .map(File::getName)
-                .collect(Collectors.toList()));
-        }));
+                .collect(Collectors.toList()))));
     }
 
     @Internal

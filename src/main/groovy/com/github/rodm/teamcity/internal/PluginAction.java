@@ -45,8 +45,8 @@ public abstract class PluginAction implements Action<Task> {
     private final boolean enable;
     private String path;
 
-    private final String host = "localhost";
-    private final int port = 8111;
+    private static final String host = "localhost";
+    private static final int port = 8111;
 
     protected PluginAction(Logger logger, File dataDir, Set<File> plugins, List<String> unloadedPlugins, boolean enable) {
         this.logger = logger;

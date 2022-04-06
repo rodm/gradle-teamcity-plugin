@@ -87,16 +87,15 @@ public class TeamCityPlugin implements Plugin<Project> {
     }
 
     public static void configureJarTask(final Project project, final TeamCityPluginExtension extension, final String pattern) {
-        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+        project.getPlugins().withType(JavaPlugin.class, plugin ->
             project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> {
-                ValidationMode mode = extension.getValidateBeanDefinition();
-                List<PluginDefinition> pluginDefinitions = new ArrayList<>();
-                Set<String> classes = new LinkedHashSet<>();
-                task.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions));
-                task.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes));
-                task.doLast(new PluginDefinitionValidationAction(mode, pluginDefinitions, classes));
-            });
-        });
+            ValidationMode mode = extension.getValidateBeanDefinition();
+            List<PluginDefinition> pluginDefinitions = new ArrayList<>();
+            Set<String> classes = new LinkedHashSet<>();
+            task.filesMatching(pattern, new PluginDefinitionCollectorAction(pluginDefinitions));
+            task.filesMatching(CLASSES_PATTERN, new ClassCollectorAction(classes));
+            task.doLast(new PluginDefinitionValidationAction(mode, pluginDefinitions, classes));
+        }));
     }
 
     public static void configurePluginArchiveTask(Zip task, String archiveName) {
@@ -119,9 +118,7 @@ public class TeamCityPlugin implements Plugin<Project> {
             project.getPlugins().withType(JavaPlugin.class, plugin -> {
                 if (extension.getDefaultRepositories()) {
                     project.getRepositories().mavenCentral();
-                    project.getRepositories().maven(repository -> {
-                        repository.setUrl(JETBRAINS_MAVEN_REPOSITORY);
-                    });
+                    project.getRepositories().maven(repository -> repository.setUrl(JETBRAINS_MAVEN_REPOSITORY));
                 }
             });
         }

@@ -58,9 +58,9 @@ public abstract class PublishAction implements WorkAction<PublishAction.PublishP
         PluginCreationResult<TeamcityPlugin> creationResult = createPlugin(distributionFile);
         if (creationResult instanceof PluginCreationSuccess) {
             final String pluginId = ((PluginCreationSuccess<TeamcityPlugin>) creationResult).getPlugin().getPluginId();
-            LOGGER.info("Uploading plugin " + pluginId + " from " + distributionFile.getAbsolutePath() + " to " + parameters.getHost().get());
+            LOGGER.info("Uploading plugin {} from {} to {}", pluginId, distributionFile.getAbsolutePath(), parameters.getHost().get());
             for (String channel : parameters.getChannels().get()) {
-                LOGGER.info("Uploading plugin to " + channel + " channel");
+                LOGGER.info("Uploading plugin to {} channel", channel);
                 try {
                     String uploadChannel = ("default".equals(channel)) ? "" : channel;
                     PluginUploader uploader = createRepositoryUploader(parameters.getHost().get(), parameters.getToken().getOrNull());
@@ -74,7 +74,7 @@ public abstract class PublishAction implements WorkAction<PublishAction.PublishP
         } else if (creationResult instanceof PluginCreationFail) {
             PluginCreationFail<TeamcityPlugin> fail = (PluginCreationFail<TeamcityPlugin>) creationResult;
             List<String> problems = fail.getErrorsAndWarnings().stream()
-                .filter((problem) -> problem.getLevel().equals(PluginProblem.Level.ERROR))
+                .filter(problem -> problem.getLevel().equals(PluginProblem.Level.ERROR))
                 .map(PluginProblem::getMessage)
                 .collect(Collectors.toList());
             throw new GradleException("Cannot upload plugin. " + String.join(", ", problems));

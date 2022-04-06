@@ -42,8 +42,7 @@ public class TeamCityBasePlugin implements Plugin<Project> {
     }
 
     private static void validateVersion(Project project, final TeamCityPluginExtension extension) {
-        project.afterEvaluate(p -> {
-            TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions());
-        });
+        project.afterEvaluate(p ->
+            TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions()));
     }
 }

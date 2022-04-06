@@ -115,11 +115,9 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
             task.doLast(new PluginExecutableFilesValidationAction(files));
         });
 
-        project.getPlugins().withType(TeamCityServerPlugin.class, serverPlugin -> {
-            packagePlugin.configure(agentPlugin -> {
-                agentPlugin.getArchiveAppendix().convention("agent");
-            });
-        });
+        project.getPlugins().withType(TeamCityServerPlugin.class, serverPlugin ->
+            packagePlugin.configure(agentPlugin ->
+                agentPlugin.getArchiveAppendix().convention("agent")));
 
         tasks.named(ASSEMBLE_TASK_NAME, task -> task.dependsOn(packagePlugin));
 

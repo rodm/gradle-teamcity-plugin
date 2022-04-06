@@ -38,7 +38,7 @@ public class ServerPluginDescriptorGenerator {
     }
 
     public void writeTo(Writer writer) {
-        LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>(2);
+        LinkedHashMap<String, String> attributes = new LinkedHashMap<>(2);
         attributes.put("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         attributes.put("xsi:noNamespaceSchemaLocation", "urn:schemas-jetbrains-com:teamcity-plugin-v1-xml");
         Node root = new Node(null, "teamcity-plugin", attributes);

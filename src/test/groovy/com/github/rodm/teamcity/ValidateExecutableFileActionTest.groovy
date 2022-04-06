@@ -88,7 +88,7 @@ class ValidateExecutableFileActionTest {
 
         validationAction.execute(stubTask)
 
-        String message = String.format(MISSING_EXECUTABLE_FILE_WARNING, 'bin/test2')
+        String message = MISSING_EXECUTABLE_FILE_WARNING.replace('{}', 'bin/test2')
         assertThat(outputEventListener.toString(), containsString(message))
     }
 
