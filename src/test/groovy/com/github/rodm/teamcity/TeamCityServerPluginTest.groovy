@@ -116,13 +116,10 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'ConfigureRepositories adds MavenCentral and JetBrains repositories'() {
+    void 'adds MavenCentral and JetBrains repositories when Java plugin is applied'() {
         project.apply plugin: 'java'
-
-        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
-        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
-
-        configureRepositories.execute(project)
+        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.evaluate()
 
         List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
         assertThat(urls, anyOf(hasItem('https://repo1.maven.org/maven2/'), hasItem('https://repo.maven.apache.org/maven2/')))
@@ -130,22 +127,23 @@ class TeamCityServerPluginTest {
     }
 
     @Test
-    void 'ConfigureRepositories adds no repositories when Java plugin is not applied'() {
-        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
-        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
+    void 'adds no repositories when defaultRepositories is false'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-server'
 
-        configureRepositories.execute(project)
+        project.teamcity {
+            defaultRepositories = false
+        }
+        project.evaluate()
 
         assertThat(project.repositories.size(), equalTo(0))
     }
 
     @Test
-    void 'ConfigureRepositories adds no repositories when defaultRepositories is false'() {
-        TeamCityPluginExtension extension = project.extensions.create('teamcity', TeamCityPluginExtension, project)
-        TeamCityPlugin.ConfigureRepositories configureRepositories = new TeamCityPlugin.ConfigureRepositories(extension)
-        extension.defaultRepositories = false
+    void 'adds no repositories when Java plugin is not applied'() {
+        project.apply plugin: 'com.github.rodm.teamcity-server'
 
-        configureRepositories.execute(project)
+        project.evaluate()
 
         assertThat(project.repositories.size(), equalTo(0))
     }

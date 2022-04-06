@@ -62,7 +62,14 @@ public class TeamCityPlugin implements Plugin<Project> {
     }
 
     private static void configureRepositories(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate(new ConfigureRepositories(extension));
+        project.afterEvaluate(p ->
+            project.getPlugins().withType(JavaPlugin.class, plugin -> {
+                if (extension.getDefaultRepositories()) {
+                    project.getRepositories().mavenCentral();
+                    project.getRepositories().maven(repository -> repository.setUrl(JETBRAINS_MAVEN_REPOSITORY));
+                }
+            })
+        );
     }
 
     public static void configureConfigurations(final Project project) {
@@ -102,25 +109,6 @@ public class TeamCityPlugin implements Plugin<Project> {
         if (archiveName != null) {
             String name = archiveName.endsWith(".zip") ? archiveName : archiveName + ".zip";
             task.getArchiveFileName().set(name);
-        }
-    }
-
-    public static class ConfigureRepositories implements Action<Project> {
-
-        private TeamCityPluginExtension extension;
-
-        public ConfigureRepositories(TeamCityPluginExtension extension) {
-            this.extension = extension;
-        }
-
-        @Override
-        public void execute(final Project project) {
-            project.getPlugins().withType(JavaPlugin.class, plugin -> {
-                if (extension.getDefaultRepositories()) {
-                    project.getRepositories().mavenCentral();
-                    project.getRepositories().maven(repository -> repository.setUrl(JETBRAINS_MAVEN_REPOSITORY));
-                }
-            });
         }
     }
 }
