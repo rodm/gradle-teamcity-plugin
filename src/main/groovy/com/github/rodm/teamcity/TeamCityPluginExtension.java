@@ -42,7 +42,7 @@ public class TeamCityPluginExtension {
 
     private TeamCityEnvironments environments;
 
-    private final Project project;
+    private transient final Project project;
 
     public TeamCityPluginExtension(Project project) {
         this.project = project;

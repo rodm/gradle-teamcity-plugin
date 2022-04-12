@@ -26,9 +26,12 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.UnknownDomainObjectException;
+import org.gradle.api.file.ProjectLayout;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.util.concurrent.Callable;
 
@@ -44,23 +47,26 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     public static final String DEFAULT_BASE_DATA_DIR = "data";
     public static final String DEFAULT_BASE_HOME_DIR = "servers";
 
-    private Property<String> baseDownloadUrl;
-    private Property<String> downloadsDir;
-    private Property<String> baseHomeDir;
-    private Property<String> baseDataDir;
+    private final Property<String> baseDownloadUrl;
+    private final Property<String> downloadsDir;
+    private final Property<String> baseHomeDir;
+    private final Property<String> baseDataDir;
 
-    private final Project project;
+    private transient final Project project;
+    private final ProjectLayout layout;
     private final NamedDomainObjectContainer<TeamCityEnvironment> environments;
 
-    public DefaultTeamCityEnvironments(final Project project) {
+    @Inject
+    public DefaultTeamCityEnvironments(Project project, ObjectFactory objects,ProjectLayout layout) {
         this.project = project;
-        this.baseDownloadUrl = project.getObjects().property(String.class).convention(DEFAULT_BASE_DOWNLOAD_URL);
-        this.downloadsDir = project.getObjects().property(String.class).convention(DEFAULT_DOWNLOADS_DIR);
-        this.baseHomeDir = project.getObjects().property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
-        this.baseDataDir = project.getObjects().property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
+        this.layout = layout;
+        this.baseDownloadUrl = objects.property(String.class).convention(DEFAULT_BASE_DOWNLOAD_URL);
+        this.downloadsDir = objects.property(String.class).convention(DEFAULT_DOWNLOADS_DIR);
+        this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
+        this.baseDataDir = objects.property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
         NamedDomainObjectFactory<TeamCityEnvironment> factory = name ->
-            new DefaultTeamCityEnvironment(name, DefaultTeamCityEnvironments.this, project.getObjects());
-        this.environments = project.container(TeamCityEnvironment.class, factory);
+            new DefaultTeamCityEnvironment(name, DefaultTeamCityEnvironments.this, objects);
+        this.environments = objects.domainObjectContainer(TeamCityEnvironment.class, factory);
     }
 
     /**
@@ -101,7 +107,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     public void setBaseHomeDir(String baseHomeDir) {
-        this.baseHomeDir.set(project.getLayout().getProjectDirectory().dir(baseHomeDir).toString());
+        this.baseHomeDir.set(dir(baseHomeDir));
     }
 
     public void setBaseHomeDir(File baseHomeDir) {
@@ -120,7 +126,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     public void setBaseDataDir(String baseDataDir) {
-        this.baseDataDir.set(project.getLayout().getProjectDirectory().dir(baseDataDir).toString());
+        this.baseDataDir.set(dir(baseDataDir));
     }
 
     public void setBaseDataDir(File baseDataDir) {
@@ -169,6 +175,6 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     private String dir(String path) {
-        return project.getLayout().getProjectDirectory().dir(path).toString();
+        return layout.getProjectDirectory().dir(path).toString();
     }
 }
