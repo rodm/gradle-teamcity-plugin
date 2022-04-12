@@ -16,15 +16,25 @@
 package com.github.rodm.teamcity.tasks;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.ArchiveOperations;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
+import javax.inject.Inject;
+
 public abstract class InstallTeamCity extends DefaultTask {
 
-    public InstallTeamCity() {
+    private final FileSystemOperations fileSystemOperations;
+    private final ArchiveOperations archiveOperations;
+
+    @Inject
+    public InstallTeamCity(FileSystemOperations fileSystemOperations, ArchiveOperations archiveOperations) {
+        this.fileSystemOperations = fileSystemOperations;
+        this.archiveOperations = archiveOperations;
         setDescription("Installs a TeamCity distribution");
     }
 
@@ -38,8 +48,8 @@ public abstract class InstallTeamCity extends DefaultTask {
     public void install() {
         getLogger().info("Installing TeamCity from {} into {}", getSource().get(), getTarget().get());
         final String targetName = getTarget().get().getAsFile().getName();
-        getProject().copy(copySpec -> {
-            copySpec.from(getProject().tarTree(getSource().get()), copySpec1 -> {
+        fileSystemOperations.copy(copySpec -> {
+            copySpec.from(archiveOperations.tarTree(getSource().get()), copySpec1 -> {
                 copySpec1.setIncludeEmptyDirs(false);
                 copySpec1.eachFile(file -> file.setPath(targetName + "/" + getPath().split("/", 2)[1]));
             });

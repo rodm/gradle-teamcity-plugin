@@ -22,6 +22,7 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
 
 import java.io.ByteArrayOutputStream;
@@ -42,6 +43,12 @@ public abstract class TeamCityTask extends DefaultTask {
     private static final String INVALID_HOME_DIR = "Invalid TeamCity installation at %s.";
     private static final String MISSING_VERSION = "Unable to read version of TeamCity installation at %s";
 
+    private final ExecOperations execOperations;
+
+    protected TeamCityTask(ExecOperations execOperations) {
+        this.execOperations = execOperations;
+    }
+
     @Input
     public abstract Property<String> getVersion();
 
@@ -55,7 +62,7 @@ public abstract class TeamCityTask extends DefaultTask {
     public void exec() {
         validate();
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        getProject().exec(execSpec -> {
+        execOperations.exec(execSpec -> {
             configure(execSpec);
             execSpec.setStandardOutput(out);
             execSpec.setErrorOutput(out);

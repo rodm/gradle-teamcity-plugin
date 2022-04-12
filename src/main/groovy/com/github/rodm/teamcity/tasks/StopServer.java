@@ -16,11 +16,16 @@
 package com.github.rodm.teamcity.tasks;
 
 import com.github.rodm.teamcity.internal.TeamCityTask;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
+
+import javax.inject.Inject;
 
 public abstract class StopServer extends TeamCityTask {
 
-    public StopServer() {
+    @Inject
+    public StopServer(ExecOperations execOperations) {
+        super(execOperations);
         setDescription("Stops the TeamCity Server");
     }
 

@@ -17,6 +17,8 @@ package com.github.rodm.teamcity.tasks;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.ArchiveOperations;
+import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.tasks.CacheableTask;
@@ -27,12 +29,17 @@ import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 
+import javax.inject.Inject;
 import java.util.Collections;
 
 @CacheableTask
 public abstract class ProcessDescriptor extends DefaultTask {
 
-    public ProcessDescriptor() {
+    private final FileSystemOperations fileSystemOperations;
+
+    @Inject
+    public ProcessDescriptor(FileSystemOperations fileSystemOperations) {
+        this.fileSystemOperations = fileSystemOperations;
         setDescription("Processes the plugin descriptor");
         onlyIf(task -> getDescriptor().isPresent());
     }
@@ -49,7 +56,7 @@ public abstract class ProcessDescriptor extends DefaultTask {
 
     @TaskAction
     public void process() {
-        getProject().copy(copySpec -> {
+        fileSystemOperations.copy(copySpec -> {
             copySpec.into(getDestination().get().getAsFile().getParentFile());
             copySpec.from(getDescriptor().get().getAsFile());
             copySpec.rename(name -> getDestination().get().getAsFile().getName());

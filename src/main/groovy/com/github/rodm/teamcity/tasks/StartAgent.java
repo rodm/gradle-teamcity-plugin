@@ -18,11 +18,16 @@ package com.github.rodm.teamcity.tasks;
 import com.github.rodm.teamcity.internal.TeamCityTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
+
+import javax.inject.Inject;
 
 public abstract class StartAgent extends TeamCityTask {
 
-    public StartAgent() {
+    @Inject
+    public StartAgent(ExecOperations execOperations) {
+        super(execOperations);
         setDescription("Starts the TeamCity Agent");
     }
 

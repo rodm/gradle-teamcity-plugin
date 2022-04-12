@@ -19,6 +19,7 @@ import com.github.rodm.teamcity.internal.SignAction;
 import org.apache.commons.io.FilenameUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.Property;
@@ -36,12 +37,14 @@ import javax.inject.Inject;
 public abstract class SignPlugin extends DefaultTask {
 
     private final WorkerExecutor executor;
+    private final ProjectLayout layout;
 
     @Inject
-    public SignPlugin(WorkerExecutor executor) {
+    public SignPlugin(WorkerExecutor executor, ProjectLayout layout) {
         setDescription("Signs the plugin");
         getSignedPluginFile().convention(getPluginFile().map(this::signedName));
         this.executor = executor;
+        this.layout = layout;
     }
 
     @Classpath
@@ -87,6 +90,6 @@ public abstract class SignPlugin extends DefaultTask {
     public RegularFile signedName(RegularFile file) {
         final String path = FilenameUtils.removeExtension(file.getAsFile().getPath());
         final String extension = FilenameUtils.getExtension(file.getAsFile().getName());
-        return getProject().getLayout().getProjectDirectory().file(path + "-signed." + extension);
+        return layout.getProjectDirectory().file(path + "-signed." + extension);
     }
 }
