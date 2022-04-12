@@ -32,8 +32,6 @@ import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
 
 class ValidateDefinitionActionOfflineTest {
 
@@ -52,17 +50,13 @@ class ValidateDefinitionActionOfflineTest {
 
     private Project project
     private Task stubTask
-    private List<PluginDefinition> definitions
-    private Set<String> classes
+    private List<PluginDefinition> definitions = []
+    private Set<String> classes = new HashSet<>()
 
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
-        stubTask = mock(Task)
-        definitions = []
-        classes = new HashSet<String>()
-        when(stubTask.getProject()).thenReturn(project)
-        when(stubTask.getLogger()).thenReturn(project.logger)
+        stubTask = project.tasks.create('stub')
 
         File definitionFile = project.file('build-server-plugin.xml')
         definitionFile << BEAN_DEFINITION_FILE
@@ -100,7 +94,7 @@ class ValidateDefinitionActionOfflineTest {
     void 'no warning message on failed bean definition parsing failure with offline option'() {
         Action<Task> validationAction = createValidationAction()
 
-        project.gradle.startParameter.offline = true
+        stubTask.inputs.property('gradle-offline', true)
         validationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), not(containsString(NO_BEANS_PARSING_MESSAGE)))

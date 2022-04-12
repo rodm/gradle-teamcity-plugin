@@ -96,6 +96,7 @@ public class TeamCityPlugin implements Plugin<Project> {
     public static void configureJarTask(final Project project, final TeamCityPluginExtension extension, final String pattern) {
         project.getPlugins().withType(JavaPlugin.class, plugin ->
             project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> {
+            task.getInputs().property("gradle-offline", project.getGradle().getStartParameter().isOffline());
             ValidationMode mode = extension.getValidateBeanDefinition();
             List<PluginDefinition> pluginDefinitions = new ArrayList<>();
             Set<String> classes = new LinkedHashSet<>();

@@ -78,17 +78,13 @@ class ValidateDefinitionActionTest {
 
     private Project project
     private Task stubTask
-    private List<PluginDefinition> definitions
-    private Set<String> classes
+    private List<PluginDefinition> definitions = []
+    private Set<String> classes = new HashSet<>()
 
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
-        stubTask = mock(Task)
-        definitions = []
-        classes = new HashSet<String>()
-        when(stubTask.getProject()).thenReturn(project)
-        when(stubTask.getLogger()).thenReturn(project.logger)
+        stubTask = project.tasks.create('stub')
     }
 
     private PluginDefinitionValidationAction createValidationAction(ValidationMode mode = WARN) {

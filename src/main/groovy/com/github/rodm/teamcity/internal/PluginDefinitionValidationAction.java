@@ -66,7 +66,8 @@ public class PluginDefinitionValidationAction implements Action<Task> {
     }
 
     private void validateDefinition(PluginDefinition definition, Task task) {
-        boolean offline = task.getProject().getGradle().getStartParameter().isOffline();
+        Object value = task.getInputs().getProperties().getOrDefault("gradle-offline", false);
+        boolean offline = Boolean.parseBoolean(value.toString());
         List<PluginBean> beans;
         try {
             beans = definition.getBeans(offline);
