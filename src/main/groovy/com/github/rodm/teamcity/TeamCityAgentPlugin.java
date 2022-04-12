@@ -97,7 +97,6 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
         final TaskProvider<AgentPlugin> packagePlugin =
             project.getTasks().register(AGENT_PLUGIN_TASK_NAME, AgentPlugin.class, task -> {
             task.setDescription(TEAMCITY_GROUP);
-            task.onlyIf(element -> extension.getAgent().getDescriptor() != null || extension.getAgent().getDescriptorFile().isPresent());
             task.getDescriptor().set(descriptorFile);
             task.getLib().from(project.getConfigurations().getByName("agent"));
             project.getPlugins().withType(JavaPlugin.class, plugin -> {

@@ -130,7 +130,6 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
         final TaskProvider<ServerPlugin> packagePlugin = tasks.register(SERVER_PLUGIN_TASK_NAME, ServerPlugin.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
-            task.onlyIf(element -> extension.getServer().getDescriptor() != null || extension.getServer().getDescriptorFile().isPresent());
             task.getDescriptor().set(descriptorFile);
             task.getServer().from(project.getConfigurations().getByName("server"));
             project.getPlugins().withType(JavaPlugin.class, plugin -> {

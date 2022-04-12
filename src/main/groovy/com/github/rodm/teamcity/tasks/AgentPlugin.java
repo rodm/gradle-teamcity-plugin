@@ -25,6 +25,7 @@ public abstract class AgentPlugin extends AbstractPluginTask {
 
     public AgentPlugin() {
         setDescription("Package TeamCity Agent plugin");
+        onlyIf(task -> getDescriptor().get().getAsFile().exists());
         into("lib", copySpec ->
             copySpec.from(getLib())
         );

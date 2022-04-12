@@ -25,6 +25,7 @@ public abstract class ServerPlugin extends AbstractPluginTask {
 
     public ServerPlugin() {
         setDescription("Package TeamCity plugin");
+        onlyIf(task -> getDescriptor().get().getAsFile().exists());
         into("server", copySpec ->
             copySpec.from(getServer())
         );
