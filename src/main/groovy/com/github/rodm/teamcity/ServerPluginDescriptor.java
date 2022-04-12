@@ -16,7 +16,6 @@
 package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
-import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Nested;
@@ -113,12 +112,6 @@ public class ServerPluginDescriptor {
     @Nested
     private Dependencies dependencies;
 
-    private final Project project;
-
-    public ServerPluginDescriptor(Project project) {
-        this.project = project;
-    }
-
     public void init() {
         parameters = ((ExtensionAware) this).getExtensions().create("parameters", Parameters.class);
         dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
@@ -131,7 +124,7 @@ public class ServerPluginDescriptor {
      */
     @Input
     public String getName() {
-        return (name != null) ? name : project.getName();
+        return (name != null) ? name : "";
     }
 
     public void setName(String name) {
@@ -145,7 +138,7 @@ public class ServerPluginDescriptor {
      */
     @Input
     public String getDisplayName() {
-        return (displayName != null) ? displayName : project.getName();
+        return (displayName != null) ? displayName : "";
     }
 
     public void setDisplayName(String displayName) {
@@ -159,7 +152,7 @@ public class ServerPluginDescriptor {
      */
     @Input
     public String getVersion() {
-        return (version != null) ? version : String.valueOf(project.getVersion());
+        return (version != null) ? version : "";
     }
 
     public void setVersion(String version) {

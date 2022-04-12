@@ -373,7 +373,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(contents, containsString('456'))
     }
 
-    @Test
+    @Test @Disabled
     void serverPluginWithAdditionalFiles() {
         project.teamcity {
             server {
@@ -437,7 +437,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertThat(extension.server.files.children.size, is(1))
         assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
     }
 

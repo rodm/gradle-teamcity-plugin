@@ -19,6 +19,7 @@ import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFileProperty;
 
 import java.io.File;
@@ -40,17 +41,17 @@ public abstract class PluginConfiguration {
 
     private String archiveName;
 
-    private final Project project;
+    private final ProjectLayout layout;
 
     protected PluginConfiguration(Project project) {
-        this.project = project;
         this.descriptorFile = project.getObjects().fileProperty();
         this.files = project.copySpec();
+        this.layout = project.getLayout();
     }
 
     public void setDescriptor(Object descriptor) {
         if (descriptor instanceof CharSequence) {
-            setDescriptorFile(project.file(descriptor.toString()));
+            setDescriptorFile(layout.getProjectDirectory().file(descriptor.toString()).getAsFile());
         } else if (descriptor instanceof File) {
             setDescriptorFile((File) descriptor);
         } else {
@@ -83,9 +84,8 @@ public abstract class PluginConfiguration {
      * @return The created {@code CopySpec}
      */
     public CopySpec files(Action<? super CopySpec> configuration) {
-        CopySpec copySpec = project.copySpec(configuration);
-        files.with(copySpec);
-        return copySpec;
+        configuration.execute(files);
+        return files;
     }
 
     public CopySpec getFiles() {
@@ -107,10 +107,6 @@ public abstract class PluginConfiguration {
      */
     public void tokens(Map<String, Object> tokens) {
         this.tokens.putAll(tokens);
-    }
-
-    public Project getProject() {
-        return this.project;
     }
 
     private void setDescriptorFile(File file) {

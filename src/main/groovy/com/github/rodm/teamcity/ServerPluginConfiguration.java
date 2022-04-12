@@ -21,6 +21,8 @@ import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtensionAware;
 
 import java.io.File;
@@ -29,6 +31,8 @@ import java.io.File;
  * Server-side plugin configuration
  */
 public class ServerPluginConfiguration extends PluginConfiguration implements TeamCityEnvironments {
+
+    private static final Logger LOGGER = Logging.getLogger(ServerPluginConfiguration.class);
 
     private final ConfigurableFileCollection web;
     private PublishConfiguration publish;
@@ -51,7 +55,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
      */
     public void descriptor(Action<ServerPluginDescriptor> configuration) {
         if (getDescriptor() == null) {
-            ServerPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", ServerPluginDescriptor.class, getProject());
+            ServerPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", ServerPluginDescriptor.class);
             descriptor.init();
             setDescriptor(descriptor);
         }
@@ -100,7 +104,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     }
 
     public void setDownloadsDir(String downloadsDir) {
-        getProject().getLogger().warn("downloadsDir property in server configuration is deprecated");
+        LOGGER.warn("downloadsDir property in server configuration is deprecated");
         environments.setDownloadsDir(downloadsDir);
     }
 
@@ -109,7 +113,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     }
 
     public void setBaseDownloadUrl(String baseDownloadUrl) {
-        getProject().getLogger().warn("baseDownloadUrl property in server configuration is deprecated");
+        LOGGER.warn("baseDownloadUrl property in server configuration is deprecated");
         environments.setBaseDownloadUrl(baseDownloadUrl);
     }
 
@@ -118,12 +122,12 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     }
 
     public void setBaseHomeDir(String baseHomeDir) {
-        getProject().getLogger().warn("baseHomeDir property in server configuration is deprecated");
+        LOGGER.warn("baseHomeDir property in server configuration is deprecated");
         environments.setBaseHomeDir(baseHomeDir);
     }
 
     public void setBaseHomeDir(File baseHomeDir) {
-        getProject().getLogger().warn("baseHomeDir property in server configuration is deprecated");
+        LOGGER.warn("baseHomeDir property in server configuration is deprecated");
         environments.setBaseHomeDir(baseHomeDir);
     }
 
@@ -132,12 +136,12 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     }
 
     public void setBaseDataDir(String baseDataDir) {
-        getProject().getLogger().warn("baseDataDir property in server configuration is deprecated");
+        LOGGER.warn("baseDataDir property in server configuration is deprecated");
         environments.setBaseDataDir(baseDataDir);
     }
 
     public void setBaseDataDir(File baseDataDir) {
-        getProject().getLogger().warn("baseDataDir property in server configuration is deprecated");
+        LOGGER.warn("baseDataDir property in server configuration is deprecated");
         environments.setBaseDataDir(baseDataDir);
     }
 
@@ -146,7 +150,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     }
 
     public void environments(Action<TeamCityEnvironments> configuration) {
-        getProject().getLogger().warn("environments configuration in server configuration is deprecated");
+        LOGGER.warn("environments configuration in server configuration is deprecated");
         configuration.execute(environments);
     }
 
