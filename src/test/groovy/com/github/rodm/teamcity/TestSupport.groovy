@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.rodm.teamcity
 
 import org.gradle.api.file.DirectoryProperty
@@ -21,15 +20,16 @@ import org.gradle.api.file.RegularFileProperty
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.zip.ZipFile
 
 class TestSupport {
 
-    static File createFile(Path folder) {
-        Files.createFile(folder).toFile()
+    static File createFile(Path path) {
+        Files.createFile(path).toFile()
     }
 
-    static File createDirectory(Path folder) {
-        Files.createDirectories(folder).toFile()
+    static File createDirectory(Path path) {
+        Files.createDirectories(path).toFile()
     }
 
     static String normalizePath(DirectoryProperty directoryProperty) {
@@ -46,5 +46,11 @@ class TestSupport {
 
     static String normalize(String path) {
         path.replace('\\', '/')
+    }
+
+    static List<String> archiveEntries(Path path) {
+        try (ZipFile archiveFile = new ZipFile(path.toFile())) {
+            return archiveFile.entries().collect { it.name }
+        }
     }
 }

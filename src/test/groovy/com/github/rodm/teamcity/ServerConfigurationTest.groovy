@@ -61,6 +61,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 import static com.github.rodm.teamcity.GradleMatchers.hasAction
+import static com.github.rodm.teamcity.TestSupport.archiveEntries
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalizePath
@@ -68,6 +69,7 @@ import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
+import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.greaterThan
@@ -373,16 +375,30 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(contents, containsString('456'))
     }
 
-    @Test @Disabled
-    void serverPluginWithAdditionalFiles() {
+    @Test
+    void 'server plugin archive includes additional files'() {
         project.teamcity {
             server {
                 files {
+                    into('files') {
+                        from('srcdir')
+                    }
                 }
             }
         }
 
-        assertThat(extension.server.files.children.size, is(1))
+        createDirectory(projectDir.resolve('srcdir'))
+        createFile(projectDir.resolve('srcdir/file1.txt'))
+        createFile(projectDir.resolve('srcdir/file2.txt'))
+        createDirectory(projectDir.resolve('build/distributions'))
+
+        ServerPlugin task = (ServerPlugin) project.tasks.findByName('serverPlugin')
+        task.copy()
+
+        def entries = archiveEntries(projectDir.resolve('build/distributions/test.zip'))
+        assertThat(entries, hasItem('files/'))
+        assertThat(entries, hasItem('files/file1.txt'))
+        assertThat(entries, hasItem('files/file2.txt'))
     }
 
     @Test
