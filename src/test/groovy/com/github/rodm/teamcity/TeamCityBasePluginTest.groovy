@@ -176,9 +176,9 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project lazily inherits version from root project'() {
+            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
             subproject.apply plugin: 'com.github.rodm.teamcity-base'
 
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
             rootProject.teamcity {
                 version = '8.1.5'
             }
@@ -206,9 +206,9 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project lazily inherits properties from root project'() {
+            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
             subproject.apply plugin: 'com.github.rodm.teamcity-base'
 
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
             rootProject.teamcity {
                 defaultRepositories = false
                 allowSnapshotVersions = true
