@@ -15,129 +15,48 @@
  */
 package com.github.rodm.teamcity;
 
-import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import org.gradle.api.Action;
-import org.gradle.api.InvalidUserDataException;
-import org.gradle.api.Project;
 import org.gradle.api.file.CopySpec;
-import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.plugins.ExtensionContainer;
 
 import java.util.Map;
 
 /**
  * TeamCity Plugin extension.
  */
-public class TeamCityPluginExtension {
-
-    private String version;
-
-    private Boolean defaultRepositories;
-    private Boolean allowSnapshotVersions;
-    private ValidationMode validateBeanDefinition;
-
-    private AgentPluginConfiguration agent;
-
-    private ServerPluginConfiguration server;
-
-    private TeamCityEnvironments environments;
-
-    private transient final Project project;
-
-    public TeamCityPluginExtension(Project project) {
-        this.project = project;
-    }
-
-    public void init() {
-        ExtensionContainer extensions = ((ExtensionAware) this).getExtensions();
-        this.environments = extensions.create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class, project);
-        this.agent = extensions.create("agent", AgentPluginConfiguration.class, project);
-        this.server = extensions.create("server", ServerPluginConfiguration.class, project, environments);
-    }
+public interface TeamCityPluginExtension {
 
     /**
      * The version of the TeamCity API.
      *
      * @param version The API version.
      */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getVersion() {
-        if (version == null) {
-            TeamCityPluginExtension rootExtension = getRootExtension(project);
-            if (rootExtension != null) {
-                version = rootExtension.getVersion();
-            }
-        }
-        return (version != null) ? version : "9.0";
-    }
+    void setVersion(String version);
+    String getVersion();
 
     /**
      * Use default repositories to resolve dependencies.
      *
      * @param useDefaultRepositories Configure default repositories
      */
-    public void setDefaultRepositories(boolean useDefaultRepositories) {
-        defaultRepositories = useDefaultRepositories;
-    }
-
-    public boolean getDefaultRepositories() {
-        if (defaultRepositories == null) {
-            TeamCityPluginExtension rootExtension = getRootExtension(project);
-            if (rootExtension != null) {
-                defaultRepositories = rootExtension.getDefaultRepositories();
-            }
-        }
-        return defaultRepositories == null || defaultRepositories;
-    }
+    void setDefaultRepositories(boolean useDefaultRepositories);
+    boolean getDefaultRepositories();
 
     /**
      * Allow version to include snapshot versions.
      *
      * @param allowSnapshots Allow snapshot versions
      */
-    public void setAllowSnapshotVersions(boolean allowSnapshots) {
-        allowSnapshotVersions = allowSnapshots;
-    }
-
-    public boolean getAllowSnapshotVersions() {
-        if (allowSnapshotVersions == null) {
-            TeamCityPluginExtension rootExtension = getRootExtension(project);
-            if (rootExtension != null) {
-                allowSnapshotVersions = rootExtension.getAllowSnapshotVersions();
-            }
-        }
-        return allowSnapshotVersions != null && allowSnapshotVersions;
-    }
+    void setAllowSnapshotVersions(boolean allowSnapshots);
+    boolean getAllowSnapshotVersions();
 
     /**
      * Set the validation mode for validating plugin bean definition files
      *
      * @param mode The validation mode
      */
-    public void setValidateBeanDefinition(ValidationMode mode) {
-        validateBeanDefinition = mode;
-    }
-
-    public void setValidateBeanDefinition(String mode) {
-        validateBeanDefinition = ValidationMode.valueOf(mode.toUpperCase());
-    }
-
-    public ValidationMode getValidateBeanDefinition() {
-        if (validateBeanDefinition == null) {
-            TeamCityPluginExtension rootExtension = getRootExtension(project);
-            if (rootExtension != null) {
-                validateBeanDefinition = rootExtension.getValidateBeanDefinition();
-            }
-        }
-        return (validateBeanDefinition != null) ? validateBeanDefinition : ValidationMode.WARN;
-    }
-
-    public AgentPluginConfiguration getAgent() {
-        return agent;
-    }
+    void setValidateBeanDefinition(ValidationMode mode);
+    void setValidateBeanDefinition(String mode);
+    ValidationMode getValidateBeanDefinition();
 
     /**
      * Configures the agent-side plugin.
@@ -146,15 +65,8 @@ public class TeamCityPluginExtension {
      *
      * @param configuration The action.
      */
-    public void agent(Action<AgentPluginConfiguration> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityAgentPlugin.class))
-            throw new InvalidUserDataException("Agent plugin configuration is invalid for a project without the teamcity-agent plugin");
-        configuration.execute(agent);
-    }
-
-    public ServerPluginConfiguration getServer() {
-        return server;
-    }
+    void agent(Action<AgentPluginConfiguration> configuration);
+    AgentPluginConfiguration getAgent();
 
     /**
      * Configures the server-side plugin.
@@ -163,60 +75,16 @@ public class TeamCityPluginExtension {
      *
      * @param configuration The action.
      */
-    public void server(Action<ServerPluginConfiguration> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityServerPlugin.class))
-            throw new InvalidUserDataException("Server plugin configuration is invalid for a project without the teamcity-server plugin");
-        configuration.execute(server);
-    }
+    void server(Action<ServerPluginConfiguration> configuration);
+    ServerPluginConfiguration getServer();
 
-    public void setDescriptor(Object descriptor) {
-        project.getLogger().warn("descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.setDescriptor(descriptor);
-        } else {
-            server.setDescriptor(descriptor);
-        }
-    }
+    void setDescriptor(Object descriptor);
+    void descriptor(Action<?> configuration);
 
-    public void descriptor(Action<?> configuration) {
-        project.getLogger().warn("descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.descriptor((Action<AgentPluginDescriptor>) configuration);
-        } else {
-            server.descriptor((Action<ServerPluginDescriptor>) configuration);
-        }
-    }
+    CopySpec files(Action<CopySpec> configuration);
 
-    public CopySpec files(Action<CopySpec> configuration) {
-        project.getLogger().warn("files property is deprecated. Please use the files property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            return agent.files(configuration);
-        } else {
-            return server.files(configuration);
-        }
-    }
-
-    public void setTokens(Map<String, Object> tokens) {
-        project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.setTokens(tokens);
-        } else {
-            server.setTokens(tokens);
-        }
-    }
-
-    public void tokens(Map<String, Object> tokens) {
-        project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.tokens(tokens);
-        } else {
-            server.tokens(tokens);
-        }
-    }
-
-    public TeamCityEnvironments getEnvironments() {
-        return environments;
-    }
+    void setTokens(Map<String, Object> tokens);
+    void tokens(Map<String, Object> tokens);
 
     /**
      * Configures the TeamCity environments.
@@ -225,18 +93,6 @@ public class TeamCityPluginExtension {
      *
      * @param configuration The action.
      */
-    public void environments(Action<TeamCityEnvironments> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityEnvironmentsPlugin.class)) {
-            project.getLogger().warn("Configuring environments with the teamcity-server plugin is deprecated. Please use the teamcity-environments plugin.");
-        }
-        configuration.execute(environments);
-    }
-
-    private static TeamCityPluginExtension getRootExtension(Project project) {
-        return !isRootProject(project) ? project.getRootProject().getExtensions().findByType(TeamCityPluginExtension.class) : null;
-    }
-
-    private static boolean isRootProject(Project project) {
-        return project.getRootProject().equals(project);
-    }
+    void environments(Action<TeamCityEnvironments> configuration);
+    TeamCityEnvironments getEnvironments();
 }

@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity;
 
+import com.github.rodm.teamcity.internal.DefaultTeamCityPluginExtension;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -36,13 +37,35 @@ public class TeamCityBasePlugin implements Plugin<Project> {
             throw new GradleException("Gradle TeamCity plugin requires Gradle version " + MINIMUM_SUPPORTED_VERSION + " or later");
         }
 
-        TeamCityPluginExtension extension = project.getExtensions().create(TEAMCITY_EXTENSION_NAME, TeamCityPluginExtension.class, project);
-        extension.init();
+        TeamCityPluginExtension extension = project.getExtensions()
+            .create(TeamCityPluginExtension.class, TEAMCITY_EXTENSION_NAME, DefaultTeamCityPluginExtension.class, project);
+        ((DefaultTeamCityPluginExtension) extension).init();
         validateVersion(project, extension);
+        applyInheritedProperties(project, (DefaultTeamCityPluginExtension) extension);
     }
 
     private static void validateVersion(Project project, final TeamCityPluginExtension extension) {
         project.afterEvaluate(p ->
             TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions()));
+    }
+
+    private static void applyInheritedProperties(Project project, final DefaultTeamCityPluginExtension extension) {
+        if (isNotRootProject(project)) {
+            DefaultTeamCityPluginExtension rootExtension = (DefaultTeamCityPluginExtension) getRootExtension(project);
+            if (rootExtension != null) {
+                extension.getVersionProperty().set(rootExtension.getVersionProperty());
+                extension.getAllowSnapshotVersionsProperty().set(rootExtension.getAllowSnapshotVersionsProperty());
+                extension.getValidateBeanDefinitionProperty().set(rootExtension.getValidateBeanDefinitionProperty());
+                extension.getDefaultRepositoriesProperty().set(rootExtension.getDefaultRepositoriesProperty());
+            }
+        }
+    }
+
+    private static TeamCityPluginExtension getRootExtension(Project project) {
+        return project.getRootProject().getExtensions().findByType(TeamCityPluginExtension.class);
+    }
+
+    private static boolean isNotRootProject(Project project) {
+        return !project.getRootProject().equals(project);
     }
 }
