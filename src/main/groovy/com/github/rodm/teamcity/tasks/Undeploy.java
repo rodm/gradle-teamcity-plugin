@@ -17,20 +17,27 @@ package com.github.rodm.teamcity.tasks;
 
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.Internal;
 
+import javax.inject.Inject;
 import java.io.File;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Undeploy extends Delete {
 
-    public Undeploy() {
+    @Inject
+    public Undeploy(ObjectFactory objects, ProviderFactory providers) {
         setDescription("Un-deploys plugins from the TeamCity Server");
-        delete(getProject().fileTree(getPluginsDir(), files ->
-            files.include(getPlugins().getFiles().stream()
-                .map(File::getName)
-                .collect(Collectors.toList()))));
+        Provider<List<File>> files = providers.provider(() ->
+            getPlugins().getFiles().stream()
+                .map(file -> getPluginsDir().file(file.getName()).get().getAsFile())
+                .collect(Collectors.toList()));
+        delete(objects.fileCollection().from(files));
     }
 
     @Internal
