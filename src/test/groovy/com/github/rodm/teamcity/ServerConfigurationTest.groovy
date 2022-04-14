@@ -41,12 +41,12 @@ import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.internal.tasks.TaskExecutionOutcome
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.intellij.pluginRepository.PluginUploader
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -643,7 +643,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             assertThat(signPlugin.pluginFile.get(), equalTo(serverPlugin.archiveFile.get()))
         }
 
-        @Test @Disabled
+        @Test
         void 'signed plugin file name defaults to server plugin task output with -signed appended'() {
             project.teamcity {
                 server {
@@ -656,6 +656,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
 
             project.evaluate()
+            ServerPlugin serverPlugin = (ServerPlugin) project.tasks.findByPath(':serverPlugin')
+            serverPlugin.state.outcome = TaskExecutionOutcome.EXECUTED
 
             SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             assertThat(signPlugin.signedPluginFile.get().asFile.name, equalTo('test-plugin-name-signed.zip'))
@@ -683,7 +685,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             assertThat(signPlugin.certificateChain.get(), equalTo('certificate-chain'))
         }
 
-        @Test @Disabled
+        @Test
         void 'publish task is configured with output of sign task'() {
             project.teamcity {
                 server {
@@ -695,6 +697,8 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
 
             project.evaluate()
+            ServerPlugin serverPlugin = (ServerPlugin) project.tasks.findByPath(':serverPlugin')
+            serverPlugin.state.outcome = TaskExecutionOutcome.EXECUTED
 
             SignPlugin signPlugin = (SignPlugin) project.tasks.findByPath(':signPlugin')
             PublishPlugin publishPlugin = (PublishPlugin) project.tasks.findByPath(':publishPlugin')
