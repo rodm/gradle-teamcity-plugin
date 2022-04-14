@@ -354,46 +354,6 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
     }
 
     @Test
-    void 'plugin archive includes additional files'() {
-        buildFile << """
-            plugins {
-                id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-agent'
-            }
-            teamcity {
-                version = '8.1.5'
-                agent {
-                    archiveName = 'test-plugin-agent.zip'
-                    descriptor {
-                        pluginDeployment {}
-                    }
-                    files {
-                        into('files') {
-                            from('srcdir')
-                        }
-                    }
-                }
-            }
-        """
-        settingsFile << SETTINGS_SCRIPT_DEFAULT
-
-        File srcdir = createDirectory('srcdir')
-        File file1 = new File(srcdir, 'file1')
-        file1 << "file1"
-        File file2 = new File(srcdir, 'file2')
-        file2 << "file2"
-
-        BuildResult result = executeBuild()
-
-        assertThat(result.task(":agentPlugin").getOutcome(), is(SUCCESS))
-
-        List<String> entries = archiveEntries('build/distributions/test-plugin-agent.zip')
-        assertThat(entries, hasItem('files/'))
-        assertThat(entries, hasItem('files/file1'))
-        assertThat(entries, hasItem('files/file2'))
-    }
-
-    @Test
     void 'agentPlugin is skipped if project is an agent-side library'() {
         buildFile << """
             plugins {
