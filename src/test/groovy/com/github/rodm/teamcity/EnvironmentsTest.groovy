@@ -27,7 +27,6 @@ import com.github.rodm.teamcity.tasks.StopAgent
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.internal.TeamCityTask
 import com.github.rodm.teamcity.tasks.Undeploy
-import org.gradle.api.Action
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -89,10 +88,6 @@ class EnvironmentsTest {
     @BeforeEach
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
-    }
-
-    private static Action<Project>  createConfigureAction(TeamCityPluginExtension extension) {
-        new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension)
     }
 
     @Test
@@ -170,12 +165,22 @@ class EnvironmentsTest {
         project.ext['teamcity.environments.baseDataDir'] = '/alt/data'
 
         project.apply plugin: 'com.github.rodm.teamcity-environments'
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        project.teamcity {
+            environments {
+                test {
+                    version = '2021.2.3'
+                }
+            }
+        }
+        project.evaluate()
 
-        assertThat(extension.environments.getDefaultDownloadsDir().get(), equalTo('/alt/downloads'))
-        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
-        assertThat(extension.environments.getDefaultBaseHomeDir().get(), equalTo('/alt/servers'))
-        assertThat(extension.environments.getDefaultBaseDataDir().get(), equalTo('/alt/data'))
+        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+        assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
+        assertThat(downloadTest.dest.toString(), startsWith('/alt/downloads/'))
+
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
+        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
     }
 
     @Test
@@ -192,15 +197,21 @@ class EnvironmentsTest {
                 baseDownloadUrl = 'http://local-repository'
                 baseHomeDir = '/tmp/servers'
                 baseDataDir = '/tmp/data'
+
+                test {
+                    version = '2021.2.3'
+                }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+        assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
+        assertThat(downloadTest.dest.toString(), startsWith('/alt/downloads/'))
 
-        assertThat(extension.environments.getDefaultDownloadsDir().get(), equalTo('/alt/downloads'))
-        assertThat(extension.environments.getDefaultBaseDownloadUrl().get(), equalTo('http://alt-repository'))
-        assertThat(extension.environments.getDefaultBaseHomeDir().get(), equalTo('/alt/servers'))
-        assertThat(extension.environments.getDefaultBaseDataDir().get(), equalTo('/alt/data'))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
+        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
     }
 
     @Test
@@ -213,12 +224,12 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo(defaultOptions))
-        assertThat(environment.agentOptions, equalTo(''))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.serverOptions.get(), equalTo(defaultOptions))
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo(''))
     }
 
     @Test
@@ -251,11 +262,10 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo('-DnewOption=test'))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.serverOptions.get(), equalTo('-DnewOption=test'))
     }
 
     @Test
@@ -269,11 +279,10 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.serverOptions, equalTo('-Doption1=value1 -Doption2=value2'))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.serverOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
     @Test
@@ -287,12 +296,11 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
         def expectedOptions = defaultOptions + ' -DadditionalOption=test'
-        assertThat(environment.serverOptions, equalTo(expectedOptions))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
     }
 
     @Test
@@ -306,12 +314,11 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
         def expectedOptions = defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'
-        assertThat(environment.serverOptions, equalTo(expectedOptions))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
     }
 
     @Test
@@ -326,11 +333,10 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.agentOptions, equalTo('-DnewOption2=value2'))
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo('-DnewOption2=value2'))
     }
 
     @Test
@@ -344,11 +350,10 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.agentOptions, equalTo('-Doption1=value1 -Doption2=value2'))
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
     }
 
     @Test
@@ -363,12 +368,11 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        assertThat(environment.agentOptions, equalTo(expectedOptions))
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
     }
 
     @Test
@@ -382,70 +386,11 @@ class EnvironmentsTest {
                 }
             }
         }
+        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        def environment = extension.environments.getByName('test')
         String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        assertThat(environment.agentOptions, equalTo(expectedOptions))
-    }
-
-    @Test
-    void 'configure multiple plugins for an environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    plugins 'plugin1.zip'
-                    plugins 'plugin2.zip'
-                }
-            }
-        }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        TeamCityEnvironment environment = extension.environments.getByName('test')
-        List<File> plugins = environment.plugins.toList()
-        assertThat(plugins, hasSize(2))
-        assertThat(plugins, hasItem(project.file('plugin1.zip')))
-        assertThat(plugins, hasItem(project.file('plugin2.zip')))
-    }
-
-    @Test
-    void 'configure plugin with assignment replaces'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    plugins = 'plugin1.zip'
-                    plugins = 'plugin2.zip'
-                }
-            }
-        }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        TeamCityEnvironment environment = extension.environments.getByName('test')
-        List<File> plugins = environment.plugins.toList()
-        assertThat(plugins, hasSize(1))
-        assertThat(plugins, hasItem(project.file('plugin2.zip')))
-    }
-
-    @Test
-    void 'configure multiple plugins for an environment with a list'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    plugins = ['plugin1.zip', 'plugin2.zip']
-                }
-            }
-        }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-
-        TeamCityEnvironment environment = extension.environments.getByName('test')
-        def plugins = environment.plugins.toList()
-        assertThat(plugins, hasSize(2))
-        assertThat(plugins, hasItem(project.file('plugin1.zip')))
-        assertThat(plugins, hasItem(project.file('plugin2.zip')))
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
     }
 
     private String ENVIRONMENTS_WARNING = 'Configuring environments with the teamcity-server plugin is deprecated'
@@ -494,7 +439,7 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures environments with default properties'() {
+    void 'environments plugin configures environments with default properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -506,26 +451,25 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
+        assertThat(downloadTest1.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
+        def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+        assertThat(startTest1Server.homeDir.get(), endsWith('/servers/TeamCity-9.1.7'))
+        assertThat(startTest1Server.dataDir.get(), endsWith('/data/9.1'))
+        assertThat(startTest1Server.javaHome.get(), equalTo(System.getProperty('java.home')))
 
-        def environment1 = extension.environments.getByName('test1')
-        assertThat(environment1.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
-        assertThat(normalize(environment1.homeDir), endsWith('/servers/TeamCity-9.1.7'))
-        assertThat(normalize(environment1.dataDir), endsWith('/data/9.1'))
-        assertThat(normalize(environment1.javaHome), equalTo(normalize(System.getProperty('java.home'))))
-
-        def environment2 = extension.environments.getByName('test2')
-        assertThat(environment2.downloadUrl, equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalize(environment2.homeDir), endsWith('/servers/TeamCity-10.0.4'))
-        assertThat(normalize(environment2.dataDir), endsWith('/data/10.0'))
-        assertThat(normalize(environment2.javaHome), equalTo(normalize(System.getProperty('java.home'))))
+        def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
+        assertThat(downloadTest2.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
+        def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+        assertThat(startTest2Server.homeDir.get(), endsWith('/servers/TeamCity-10.0.4'))
+        assertThat(startTest2Server.dataDir.get(), endsWith('/data/10.0'))
+        assertThat(startTest2Server.javaHome.get(), equalTo(System.getProperty('java.home')))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures environments using shared properties'() {
+    void 'environments plugin configures environments using shared properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -540,24 +484,25 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
+        assertThat(downloadTest1.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
-        def environment1 = extension.environments.getByName('test1')
-        assertThat(environment1.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
-        assertThat(normalize(environment1.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(normalize(environment1.dataDir), endsWith('/tmp/data/9.1'))
+        def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+        assertThat(startTest1Server.homeDir.get(), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(startTest1Server.dataDir.get(), endsWith('/tmp/data/9.1'))
 
-        def environment2 = extension.environments.getByName('test2')
-        assertThat(environment2.downloadUrl, equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalize(environment2.homeDir), endsWith('/tmp/servers/TeamCity-10.0.4'))
-        assertThat(normalize(environment2.dataDir), endsWith('/tmp/data/10.0'))
+        def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
+        assertThat(downloadTest2.src.toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+
+        def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+        assertThat(startTest2Server.homeDir.get(), endsWith('/tmp/servers/TeamCity-10.0.4'))
+        assertThat(startTest2Server.dataDir.get(), endsWith('/tmp/data/10.0'))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures environments composed with shared properties'() {
+    void 'environments plugin configures environments composed with shared properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -570,18 +515,16 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        def startTest2Server = project.tasks.getByName('startTest1Server') as StartServer
+        assertThat(startTest2Server.homeDir.get(), endsWith('/tmp/servers/Test1'))
+        assertThat(startTest2Server.dataDir.get(), endsWith('/tmp/data/Test1'))
 
-        def environment1 = extension.environments.getByName('test1')
-        assertThat(normalize(environment1.homeDir), endsWith('/tmp/servers/Test1'))
-        assertThat(normalize(environment1.dataDir), endsWith('/tmp/data/Test1'))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures environment using environment properties'() {
+    void 'environments plugin configures environment tasks using environment properties'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -594,20 +537,19 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+        assertThat(downloadTest.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.downloadUrl, equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
-        assertThat(normalize(environment.homeDir), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(normalize(environment.dataDir), endsWith('/tmp/data/teamcity9.1'))
-        assertThat(normalize(environment.javaHome), endsWith('/tmp/java'))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.homeDir.get(), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(startTestServer.dataDir.get(), endsWith('/tmp/data/teamcity9.1'))
+        assertThat(startTestServer.javaHome.get(), endsWith('/tmp/java'))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures environment using overrides from gradle properties'() {
+    void 'environments plugin configures environment tasks using overrides from gradle properties'() {
         project.ext['teamcity.environments.test.downloadUrl'] = 'https://alt-repository/TeamCity-9.1.7.tar.gz'
         project.ext['teamcity.environments.test.javaHome'] = '/alt/java'
         project.ext['teamcity.environments.test.homeDir'] = '/alt/servers/TeamCity-9.1.7'
@@ -627,18 +569,19 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+        assertThat(downloadTest.src.toString(), equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
 
-        def environment = extension.environments.getByName('test')
-        assertThat(environment.downloadUrl, equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
-        assertThat(normalize(environment.javaHome), endsWith('/alt/java'))
-        assertThat(normalize(environment.homeDir), endsWith('/alt/servers/TeamCity-9.1.7'))
-        assertThat(normalize(environment.dataDir), endsWith('/alt/data/9.1'))
-        assertThat(environment.serverOptions, equalTo('-DserverOption1=value1 -DserverOption2=value2'))
-        assertThat(environment.agentOptions, equalTo('-DagentOption1=value1 -DagentOption2=value2'))
+        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-9.1.7'))
+        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/9.1'))
+        assertThat(startTestServer.javaHome.get(), equalTo('/alt/java'))
+        assertThat(startTestServer.serverOptions.get(), equalTo('-DserverOption1=value1 -DserverOption2=value2'))
+
+        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+        assertThat(startTestAgent.agentOptions.get(), equalTo('-DagentOption1=value1 -DagentOption2=value2'))
     }
 
     @Test
@@ -677,10 +620,7 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
-
-        configureEnvironmentTasks.execute(project)
+        project.evaluate()
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
         assertThat(deployPlugin, hasAction(DisablePluginAction))
@@ -697,10 +637,7 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
-
-        configureEnvironmentTasks.execute(project)
+        project.evaluate()
 
         Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
         assertThat(deployPlugin, not(hasAction(DisablePluginAction)))
@@ -717,10 +654,7 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
-
-        configureEnvironmentTasks.execute(project)
+        project.evaluate()
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
         assertThat(undeployPlugin, hasAction(DisablePluginAction))
@@ -736,17 +670,14 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
-
-        configureEnvironmentTasks.execute(project)
+        project.evaluate()
 
         Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
         assertThat(undeployPlugin, not(hasAction(DisablePluginAction)))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks adds tasks for each separate environment'() {
+    void 'environments plugin adds tasks for each separate environment'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -758,38 +689,32 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
-
-        configureEnvironmentTasks.execute(project)
+        project.evaluate()
 
         assertThat(project, hasTask('startTeamcity9Server'))
         assertThat(project, hasTask('startTeamcity10Server'))
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with project plugin'() {
+    void 'environments plugin configures deploy and undeploy tasks with project plugin'() {
         project.apply plugin: 'com.github.rodm.teamcity-server'
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
-                teamcity10 {
+                test {
                     version = '10.0.3'
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
-
-        Deploy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Deploy
+        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
         Set<File> deployFiles = deployPlugin.plugins.files
         assertThat(deployFiles, hasSize(1))
         assertThat(deployFiles, hasItem(project.file('build/distributions/test.zip')))
         assertThat(normalizePath(deployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
 
-        Undeploy undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Undeploy
+        def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
         Set<File> undeployFiles = undeployPlugin.plugins.files
         assertThat(undeployFiles, hasSize(1))
         assertThat(undeployFiles, hasItem(project.file('build/distributions/test.zip')))
@@ -797,33 +722,68 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks configures deploy and undeploy tasks with environment plugins'() {
+    void 'environments plugin configures deploy and undeploy tasks with multiple plugins'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
-                teamcity10 {
+                test {
                     version = '10.0.3'
                     plugins 'plugin1.zip'
                     plugins 'plugin2.zip'
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
-
-        Deploy deployPlugin = project.tasks.getByName('deployToTeamcity10') as Deploy
+        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
         Set<File> deployFiles = deployPlugin.plugins.files
         assertThat(deployFiles, hasSize(2))
         assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
         assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
 
-        Undeploy undeployPlugin = project.tasks.getByName('undeployFromTeamcity10') as Undeploy
+        def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
         Set<File> undeployFiles = undeployPlugin.plugins.files
         assertThat(undeployFiles, hasSize(2))
         assertThat(undeployFiles, hasItem(project.file('plugin1.zip')))
         assertThat(undeployFiles, hasItem(project.file('plugin2.zip')))
+    }
+
+    @Test
+    void 'configure plugin with assignment replaces'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    plugins = 'plugin1.zip'
+                    plugins = 'plugin2.zip'
+                }
+            }
+        }
+        project.evaluate()
+
+        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+        Set<File> deployFiles = deployPlugin.plugins.files
+        assertThat(deployFiles, hasSize(1))
+        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
+    }
+
+    @Test
+    void 'configure multiple plugins for an environment with a list'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    plugins = ['plugin1.zip', 'plugin2.zip']
+                }
+            }
+        }
+        project.evaluate()
+
+        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+        Set<File> deployFiles = deployPlugin.plugins.files
+        assertThat(deployFiles, hasSize(2))
+        assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
+        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
     }
 
     @Test
