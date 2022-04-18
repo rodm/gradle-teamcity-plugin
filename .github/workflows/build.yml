@@ -3,12 +3,12 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - '.teamcity/**'
       - 'README.adoc'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
