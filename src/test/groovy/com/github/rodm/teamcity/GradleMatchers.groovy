@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.TaskContainer
@@ -32,17 +33,17 @@ class GradleMatchers {
         return new HasDefaultDependency(group, name, version)
     }
 
-    static Matcher<TaskContainer> hasTask(String name) {
-        return new TypeSafeDiagnosingMatcher<TaskContainer>() {
+    static Matcher<Project> hasTask(String name) {
+        return new TypeSafeDiagnosingMatcher<Project>() {
             @Override
             void describeTo(final Description description) {
-                description.appendText("TaskContainer should contain task ").appendValue(name)
+                description.appendText("Project should have task ").appendValue(name)
             }
 
             @Override
-            protected boolean matchesSafely(final TaskContainer item, final Description mismatchDescription) {
-                mismatchDescription.appendText(" was ").appendValue(item)
-                return item.findByName(name)
+            protected boolean matchesSafely(final Project project, final Description mismatchDescription) {
+                mismatchDescription.appendText(" was ").appendValue(project.tasks.names)
+                return project.tasks.findByName(name)
             }
         }
     }

@@ -61,6 +61,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 import static com.github.rodm.teamcity.GradleMatchers.hasAction
+import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.archiveEntries
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
@@ -78,7 +79,6 @@ import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.Matchers.not
 import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.ArgumentMatchers.eq
@@ -190,9 +190,9 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertNotNull(project.tasks.findByName('processServerDescriptor'))
-        assertNotNull(project.tasks.findByName('generateServerDescriptor'))
-        assertNotNull(project.tasks.findByName('serverPlugin'))
+        assertThat(project, hasTask('processServerDescriptor'))
+        assertThat(project, hasTask('generateServerDescriptor'))
+        assertThat(project, hasTask('serverPlugin'))
     }
 
     @Test
@@ -203,9 +203,9 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertNotNull(project.tasks.findByName('processServerDescriptor'))
-        assertNotNull(project.tasks.findByName('generateServerDescriptor'))
-        assertNotNull(project.tasks.findByName('serverPlugin'))
+        assertThat(project, hasTask('processServerDescriptor'))
+        assertThat(project, hasTask('generateServerDescriptor'))
+        assertThat(project, hasTask('serverPlugin'))
     }
 
     @Test

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test
 
 import static com.github.rodm.teamcity.GradleMatchers.hasAction
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
+import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.archiveEntries
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
@@ -42,7 +43,6 @@ import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
 import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.fail
 
 class AgentConfigurationTest extends ConfigurationTestCase {
@@ -273,9 +273,9 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('processAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('agentPlugin'))
+        assertThat(project, hasTask('generateAgentDescriptor'))
+        assertThat(project, hasTask('processAgentDescriptor'))
+        assertThat(project, hasTask('agentPlugin'))
     }
 
     @Test
@@ -286,9 +286,9 @@ class AgentConfigurationTest extends ConfigurationTestCase {
             }
         }
 
-        assertNotNull(project.tasks.findByName('generateAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('processAgentDescriptor'))
-        assertNotNull(project.tasks.findByName('agentPlugin'))
+        assertThat(project, hasTask('generateAgentDescriptor'))
+        assertThat(project, hasTask('processAgentDescriptor'))
+        assertThat(project, hasTask('agentPlugin'))
     }
 
     @Test

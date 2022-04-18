@@ -642,7 +642,7 @@ class EnvironmentsTest {
     }
 
     @Test
-    void 'ConfigureEnvironmentTasks adds tasks for an environment'() {
+    void 'environments plugin adds tasks for an environment'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
             environments {
@@ -651,23 +651,20 @@ class EnvironmentsTest {
                 }
             }
         }
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        Action<Project> configureEnvironmentTasks = createConfigureAction(extension)
+        project.evaluate()
 
-        configureEnvironmentTasks.execute(project)
+        assertThat(project, hasTask('downloadTeamcity9'))
+        assertThat(project, hasTask('installTeamcity9'))
 
-        assertThat(project.tasks, hasTask('downloadTeamcity9'))
-        assertThat(project.tasks, hasTask('installTeamcity9'))
+        assertThat(project, hasTask('deployToTeamcity9'))
+        assertThat(project, hasTask('undeployFromTeamcity9'))
 
-        assertThat(project.tasks, hasTask('deployToTeamcity9'))
-        assertThat(project.tasks, hasTask('undeployFromTeamcity9'))
-
-        assertThat(project.tasks, hasTask('startTeamcity9Server'))
-        assertThat(project.tasks, hasTask('stopTeamcity9Server'))
-        assertThat(project.tasks, hasTask('startTeamcity9Agent'))
-        assertThat(project.tasks, hasTask('stopTeamcity9Agent'))
-        assertThat(project.tasks, hasTask('startTeamcity9'))
-        assertThat(project.tasks, hasTask('stopTeamcity9'))
+        assertThat(project, hasTask('startTeamcity9Server'))
+        assertThat(project, hasTask('stopTeamcity9Server'))
+        assertThat(project, hasTask('startTeamcity9Agent'))
+        assertThat(project, hasTask('stopTeamcity9Agent'))
+        assertThat(project, hasTask('startTeamcity9'))
+        assertThat(project, hasTask('stopTeamcity9'))
     }
 
     @Test
@@ -766,8 +763,8 @@ class EnvironmentsTest {
 
         configureEnvironmentTasks.execute(project)
 
-        assertThat(project.tasks, hasTask('startTeamcity9Server'))
-        assertThat(project.tasks, hasTask('startTeamcity10Server'))
+        assertThat(project, hasTask('startTeamcity9Server'))
+        assertThat(project, hasTask('startTeamcity10Server'))
     }
 
     @Test
@@ -842,7 +839,7 @@ class EnvironmentsTest {
         }
         project.evaluate()
 
-        assertThat(project.tasks, hasTask('downloadTest'))
+        assertThat(project, hasTask('downloadTest'))
     }
 
     @Test
@@ -858,7 +855,7 @@ class EnvironmentsTest {
         }
         project.evaluate()
 
-        assertThat(project.tasks, hasTask('downloadTest'))
+        assertThat(project, hasTask('downloadTest'))
     }
 
     private Closure TEAMCITY10_ENVIRONMENT = {
