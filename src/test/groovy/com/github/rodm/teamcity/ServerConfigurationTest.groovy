@@ -215,7 +215,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
                 descriptor {}
             }
         }
-        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        def task = project.tasks.getByName('generateServerDescriptor') as GenerateServerPluginDescriptor
 
         assertThat(task.version.get(), equalTo(TeamCityVersion.VERSION_9_0))
         assertThat(task.descriptor.get(), isA(ServerPluginDescriptor))
@@ -236,7 +236,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         createDirectory(projectDir.resolve('build/descriptor/server'))
 
-        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        def task = project.tasks.getByName('generateServerDescriptor') as GenerateServerPluginDescriptor
         task.generateDescriptor()
 
         String output = outputEventListener.toString()
@@ -255,7 +255,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         createDirectory(projectDir.resolve('build/descriptor/server'))
 
-        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        def task = project.tasks.getByName('generateServerDescriptor') as GenerateServerPluginDescriptor
         task.generateDescriptor()
 
         String output = outputEventListener.toString()
@@ -274,7 +274,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         createDirectory(projectDir.resolve('build/descriptor/server'))
 
-        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        def task = project.tasks.getByName('generateServerDescriptor') as GenerateServerPluginDescriptor
         task.generateDescriptor()
 
         String output = outputEventListener.toString()
@@ -293,7 +293,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         }
         File outputDir = createDirectory(projectDir.resolve('build/descriptor/server'))
 
-        GenerateServerPluginDescriptor task = (GenerateServerPluginDescriptor) project.tasks.findByName('generateServerDescriptor')
+        def task = project.tasks.getByName('generateServerDescriptor') as GenerateServerPluginDescriptor
         task.generateDescriptor()
 
         File descriptorFile = new File(outputDir, 'teamcity-plugin.xml')
@@ -364,7 +364,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         """
 
         File outputDir = createDirectory(projectDir.resolve('build/descriptor/server'))
-        ProcessDescriptor task = (ProcessDescriptor) project.tasks.findByName('processServerDescriptor')
+        def task = project.tasks.getByName('processServerDescriptor') as ProcessDescriptor
         task.process()
 
         File outputFile = new File(outputDir, 'teamcity-plugin.xml')
@@ -392,7 +392,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         createFile(projectDir.resolve('srcdir/file2.txt'))
         createDirectory(projectDir.resolve('build/distributions'))
 
-        ServerPlugin task = (ServerPlugin) project.tasks.findByName('serverPlugin')
+        def task = project.tasks.getByName('serverPlugin') as ServerPlugin
         task.copy()
 
         def entries = archiveEntries(projectDir.resolve('build/distributions/test.zip'))

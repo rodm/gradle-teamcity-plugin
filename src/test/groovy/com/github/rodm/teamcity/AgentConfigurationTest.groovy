@@ -298,7 +298,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
                 descriptor {}
             }
         }
-        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+        def task = project.tasks.getByName('generateAgentDescriptor') as GenerateAgentPluginDescriptor
 
         assertThat(task.version.get(), equalTo(TeamCityVersion.VERSION_9_0))
         assertThat(task.descriptor.get(), isA(AgentPluginDescriptor))
@@ -319,7 +319,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         }
         createDirectory(projectDir.resolve('build/descriptor/agent'))
 
-        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+        def task = project.tasks.getByName('generateAgentDescriptor') as GenerateAgentPluginDescriptor
         task.generateDescriptor()
 
         String output = outputEventListener.toString()
@@ -340,7 +340,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         }
         File outputDir = createDirectory(projectDir.resolve('build/descriptor/agent'))
 
-        GenerateAgentPluginDescriptor task = (GenerateAgentPluginDescriptor) project.tasks.findByName('generateAgentDescriptor')
+        def task = project.tasks.getByName('generateAgentDescriptor') as GenerateAgentPluginDescriptor
         task.generateDescriptor()
 
         File descriptorFile = new File(outputDir, 'teamcity-plugin.xml')
@@ -380,7 +380,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         createFile(projectDir.resolve('srcdir/file2.txt'))
         createDirectory(projectDir.resolve('build/distributions'))
 
-        AgentPlugin task = (AgentPlugin) project.tasks.findByName('agentPlugin')
+        def task = project.tasks.getByName('agentPlugin') as AgentPlugin
         task.copy()
 
         def entries = archiveEntries(projectDir.resolve('build/distributions/test.zip'))
