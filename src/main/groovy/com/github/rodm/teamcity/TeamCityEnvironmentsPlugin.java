@@ -71,93 +71,78 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             container.all(env -> {
                 final DefaultTeamCityEnvironment environment = (DefaultTeamCityEnvironment) env;
 
-                Provider<String> downloadUrl = gradleProperty(project, environment.propertyName("downloadUrl"))
-                    .orElse(environment.getDownloadUrl());
-                Provider<String> installerFile = environment.getInstallerFile();
-                Provider<String> homeDir = gradleProperty(project, environment.propertyName("homeDir"))
-                    .orElse(environment.getHomeDirProperty());
-                Provider<String> dataDir = gradleProperty(project, environment.propertyName("dataDir"))
-                    .orElse(environment.getDataDirProperty());
-                Provider<String> pluginsDir = dataDir.map(path -> path + "/plugins");
-                Provider<String> javaHome = gradleProperty(project, environment.propertyName("javaHome"))
-                    .orElse(environment.getJavaHomeProperty());
-                Provider<String> serverOptions = gradleProperty(project, environment.propertyName("serverOptions"))
-                    .orElse(environment.getServerOptionsProvider());
-                Provider<String> agentOptions = gradleProperty(project, environment.propertyName("agentOptions"))
-                    .orElse(environment.getAgentOptionsProvider());
-
                 final String name = capitalize(environment.getName());
                 final TaskProvider<DownloadTeamCity> download = project.getTasks().register("download" + name, DownloadTeamCity.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
-                    task.src(downloadUrl);
-                    task.dest(project.file(installerFile));
+                    task.src(environment.getDownloadUrl());
+                    task.dest(project.file(environment.getInstallerFile()));
                 });
                 project.getTasks().register("install" + name, InstallTeamCity.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
-                    task.getSource().set(project.file(installerFile));
-                    task.getTarget().set(project.file(homeDir));
+                    task.getSource().set(project.file(environment.getInstallerFile()));
+                    task.getTarget().set(project.file(environment.getHomeDirProperty()));
                     task.dependsOn(download);
                 });
 
                 final TaskProvider<Deploy> deployPlugin = project.getTasks().register("deployTo" + name, Deploy.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getPlugins().from(environment.getPlugins());
-                    task.getPluginsDir().set(project.file(pluginsDir));
+                    task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
                     task.dependsOn(project.getTasks().named(BUILD_TASK_NAME));
                 });
 
                 final TaskProvider<Undeploy> undeployPlugin = project.getTasks().register("undeployFrom" + name, Undeploy.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getPlugins().from(environment.getPlugins());
-                    task.getPluginsDir().set(project.file(pluginsDir));
+                    task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
                 });
 
                 if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
-                    final File dataDirAsFile = project.file(environment.getDataDirProperty().get());
+                    final File dataDir = project.file(environment.getDataDirProperty().get());
                     deployPlugin.configure(task -> {
                         Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
                         List<String> disabledPlugins = new ArrayList<>();
-                        task.doFirst(new DisablePluginAction(project.getLogger(), dataDirAsFile, plugins, disabledPlugins));
-                        task.doLast(new EnablePluginAction(project.getLogger(), dataDirAsFile, plugins, disabledPlugins));
+                        task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
+                        task.doLast(new EnablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
                     });
                     undeployPlugin.configure(task -> {
                         Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
-                        task.doFirst(new DisablePluginAction(project.getLogger(), dataDirAsFile, plugins, new ArrayList<>()));
+                        task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, new ArrayList<>()));
                     });
                 }
 
                 final TaskProvider<StartServer> startServer = project.getTasks().register("start" + name + "Server", StartServer.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getVersion().set(environment.getVersion());
-                    task.getHomeDir().set(homeDir);
-                    task.getDataDir().set(dataDir);
-                    task.getJavaHome().set(javaHome);
-                    task.getServerOptions().set(serverOptions);
-                    task.doFirst(t -> project.mkdir(dataDir));
+                    task.getHomeDir().set(environment.getHomeDirProperty());
+                    task.getDataDir().set(environment.getDataDirProperty());
+                    task.getJavaHome().set(environment.getJavaHomeProperty());
+                    task.getServerOptions().set(environment.getServerOptionsProvider());
+                    task.doFirst(t -> project.mkdir(environment.getDataDirProperty()));
                     task.dependsOn(deployPlugin);
                 });
 
                 final TaskProvider<StopServer> stopServer = project.getTasks().register("stop" + name + "Server", StopServer.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getVersion().set(environment.getVersion());
-                    task.getHomeDir().set(homeDir);
-                    task.getJavaHome().set(javaHome);
+                    task.getHomeDir().set(environment.getHomeDirProperty());
+                    task.getJavaHome().set(environment.getJavaHomeProperty());
                     task.finalizedBy(undeployPlugin);
                 });
 
                 final TaskProvider<StartAgent> startAgent = project.getTasks().register("start" + name + "Agent", StartAgent.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getVersion().set(environment.getVersion());
-                    task.getHomeDir().set(homeDir);
-                    task.getJavaHome().set(javaHome);
-                    task.getAgentOptions().set(agentOptions);
+                    task.getHomeDir().set(environment.getHomeDirProperty());
+                    task.getJavaHome().set(environment.getJavaHomeProperty());
+                    task.getAgentOptions().set(environment.getAgentOptionsProvider());
                 });
 
                 final TaskProvider<StopAgent> stopAgent = project.getTasks().register("stop" + name + "Agent", StopAgent.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getVersion().set(environment.getVersion());
-                    task.getHomeDir().set(homeDir);
-                    task.getJavaHome().set(javaHome);
+                    task.getHomeDir().set(environment.getHomeDirProperty());
+                    task.getJavaHome().set(environment.getJavaHomeProperty());
                 });
 
                 project.getTasks().register("start" + name, task -> {

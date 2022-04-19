@@ -88,7 +88,7 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
      * The download URL used to download the TeamCity distribution for this environment.
      */
     public String getDownloadUrl() {
-        return downloadUrl.get();
+        return gradleProperty(propertyName("downloadUrl")).orElse(downloadUrl).get();
     }
 
     public void setDownloadUrl(String downloadUrl) {
@@ -111,7 +111,7 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public Provider<String> getHomeDirProperty() {
-        return homeDir;
+        return gradleProperty(propertyName("homeDir")).orElse(homeDir);
     }
 
     /**
@@ -126,7 +126,11 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public Provider<String> getDataDirProperty() {
-        return dataDir;
+        return gradleProperty(propertyName("dataDir")).orElse(dataDir);
+    }
+
+    public Provider<String> getPluginsDirProperty() {
+        return getDataDirProperty().map(path -> path + "/plugins");
     }
 
     /**
@@ -141,7 +145,7 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public Provider<String> getJavaHomeProperty() {
-        return javaHome;
+        return gradleProperty(propertyName("javaHome")).orElse(javaHome);
     }
 
     /**
@@ -185,7 +189,7 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public Provider<String> getServerOptionsProvider() {
-        return asStringProvider(serverOptions);
+        return gradleProperty(propertyName("serverOptions")).orElse(asStringProvider(serverOptions));
     }
 
     /**
@@ -209,7 +213,7 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public Provider<String> getAgentOptionsProvider() {
-        return asStringProvider(agentOptions);
+        return gradleProperty(propertyName("agentOptions")).orElse(asStringProvider(agentOptions));
     }
 
     public String getBaseHomeDir() {
@@ -218,10 +222,6 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     public String getBaseDataDir() {
         return environments.getBaseDataDirProperty().get();
-    }
-
-    public String propertyName(final String property) {
-        return "teamcity.environments." + getName() + "." + property;
     }
 
     private Provider<String> defaultDownloadUrl() {
@@ -245,6 +245,14 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     private Provider<String> defaultDataDir() {
         return environments.getBaseDataDirProperty()
             .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
+    }
+
+    private Provider<String> gradleProperty(final String name) {
+        return environments.gradleProperty(name);
+    }
+
+    private String propertyName(final String property) {
+        return "teamcity.environments." + getName() + "." + property;
     }
 
     private Provider<String> asStringProvider(ListProperty<String> options) {

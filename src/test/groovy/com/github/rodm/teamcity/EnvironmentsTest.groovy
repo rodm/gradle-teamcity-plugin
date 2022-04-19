@@ -563,12 +563,17 @@ class EnvironmentsTest {
 
     @Test
     void 'environments plugin configures environment tasks using overrides from gradle properties'() {
-        project.ext['teamcity.environments.test.downloadUrl'] = 'https://alt-repository/TeamCity-9.1.7.tar.gz'
-        project.ext['teamcity.environments.test.javaHome'] = '/alt/java'
-        project.ext['teamcity.environments.test.homeDir'] = '/alt/servers/TeamCity-9.1.7'
-        project.ext['teamcity.environments.test.dataDir'] = '/alt/data/9.1'
-        project.ext['teamcity.environments.test.serverOptions'] = '-DserverOption1=value1 -DserverOption2=value2'
-        project.ext['teamcity.environments.test.agentOptions'] = '-DagentOption1=value1 -DagentOption2=value2'
+        projectDir.resolve('gradle.properties').toFile() << """
+        teamcity.environments.test.downloadUrl = https://alt-repository/TeamCity-9.1.7.tar.gz
+        teamcity.environments.test.javaHome = /alt/java
+        teamcity.environments.test.homeDir = /alt/servers/TeamCity-9.1.7
+        teamcity.environments.test.dataDir = /alt/data/9.1
+        teamcity.environments.test.serverOptions = -DserverOption1=value1 -DserverOption2=value2
+        teamcity.environments.test.agentOptions = -DagentOption1=value1 -DagentOption2=value2
+        """
+        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
 
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {

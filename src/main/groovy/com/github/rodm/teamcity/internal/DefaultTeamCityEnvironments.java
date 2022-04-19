@@ -163,7 +163,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         }
     }
 
-    private Provider<String> gradleProperty(final String name) {
+    Provider<String> gradleProperty(final String name) {
         return providers.gradleProperty(name).forUseAtConfigurationTime();
     }
 

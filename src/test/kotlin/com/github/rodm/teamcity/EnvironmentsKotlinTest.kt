@@ -17,6 +17,8 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.Project
+import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -36,6 +38,9 @@ class EnvironmentsKotlinTest {
     @BeforeEach
     fun setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController::class.java).loadGradlePropertiesFrom(projectDir)
+
         project.plugins.apply("com.github.rodm.teamcity-environments")
         teamcity = project.extensions.getByType(TeamCityPluginExtension::class.java)
     }
