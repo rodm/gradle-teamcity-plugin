@@ -17,7 +17,6 @@ package com.github.rodm.teamcity.tasks;
 
 import org.apache.tools.ant.filters.ReplaceTokens;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.file.ArchiveOperations;
 import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.MapProperty;

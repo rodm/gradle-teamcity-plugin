@@ -19,7 +19,6 @@ import com.github.rodm.teamcity.internal.ClassCollectorAction;
 import com.github.rodm.teamcity.internal.PluginDefinition;
 import com.github.rodm.teamcity.internal.PluginDefinitionCollectorAction;
 import com.github.rodm.teamcity.internal.PluginDefinitionValidationAction;
-import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
