@@ -176,7 +176,7 @@ class EnvironmentsTest {
 
         def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
         assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
-        assertThat(downloadTest.dest.toString(), startsWith('/alt/downloads/'))
+        assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
 
         def startTestServer = project.tasks.getByName('startTestServer') as StartServer
         assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
@@ -207,10 +207,10 @@ class EnvironmentsTest {
 
         def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
         assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
-        assertThat(downloadTest.dest.toString(), startsWith('/alt/downloads/'))
+        assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
 
         def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
+        assertThat(normalize(startTestServer.homeDir.get()), endsWith('/alt/servers/TeamCity-2021.2.3'))
         assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
     }
 
@@ -456,15 +456,15 @@ class EnvironmentsTest {
         def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
         assertThat(downloadTest1.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
         def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(startTest1Server.homeDir.get(), endsWith('/servers/TeamCity-9.1.7'))
-        assertThat(startTest1Server.dataDir.get(), endsWith('/data/9.1'))
+        assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/servers/TeamCity-9.1.7'))
+        assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/data/9.1'))
         assertThat(startTest1Server.javaHome.get(), equalTo(System.getProperty('java.home')))
 
         def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
         assertThat(downloadTest2.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
         def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
-        assertThat(startTest2Server.homeDir.get(), endsWith('/servers/TeamCity-10.0.4'))
-        assertThat(startTest2Server.dataDir.get(), endsWith('/data/10.0'))
+        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/servers/TeamCity-10.0.4'))
+        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/data/10.0'))
         assertThat(startTest2Server.javaHome.get(), equalTo(System.getProperty('java.home')))
     }
 
@@ -490,15 +490,15 @@ class EnvironmentsTest {
         assertThat(downloadTest1.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
         def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(startTest1Server.homeDir.get(), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(startTest1Server.dataDir.get(), endsWith('/tmp/data/9.1'))
+        assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/tmp/data/9.1'))
 
         def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
         assertThat(downloadTest2.src.toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
 
         def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
-        assertThat(startTest2Server.homeDir.get(), endsWith('/tmp/servers/TeamCity-10.0.4'))
-        assertThat(startTest2Server.dataDir.get(), endsWith('/tmp/data/10.0'))
+        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-10.0.4'))
+        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/10.0'))
     }
 
     @Test
@@ -518,9 +518,8 @@ class EnvironmentsTest {
         project.evaluate()
 
         def startTest2Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(startTest2Server.homeDir.get(), endsWith('/tmp/servers/Test1'))
-        assertThat(startTest2Server.dataDir.get(), endsWith('/tmp/data/Test1'))
-
+        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/Test1'))
+        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/Test1'))
     }
 
     @Test
@@ -543,9 +542,9 @@ class EnvironmentsTest {
         assertThat(downloadTest.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
         def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.homeDir.get(), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(startTestServer.dataDir.get(), endsWith('/tmp/data/teamcity9.1'))
-        assertThat(startTestServer.javaHome.get(), endsWith('/tmp/java'))
+        assertThat(normalize(startTestServer.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
+        assertThat(normalize(startTestServer.dataDir.get()), endsWith('/tmp/data/teamcity9.1'))
+        assertThat(normalize(startTestServer.javaHome.get()), endsWith('/tmp/java'))
     }
 
     @Test
