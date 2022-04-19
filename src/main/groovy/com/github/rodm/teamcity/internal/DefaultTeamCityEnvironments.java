@@ -24,16 +24,15 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.NamedDomainObjectProvider;
-import org.gradle.api.Project;
 import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.ProviderFactory;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.concurrent.Callable;
 
 public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
 
@@ -52,14 +51,14 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     private final Property<String> baseHomeDir;
     private final Property<String> baseDataDir;
 
-    private transient final Project project;
     private final ProjectLayout layout;
+    private final ProviderFactory providers;
     private final NamedDomainObjectContainer<TeamCityEnvironment> environments;
 
     @Inject
-    public DefaultTeamCityEnvironments(Project project, ObjectFactory objects,ProjectLayout layout) {
-        this.project = project;
+    public DefaultTeamCityEnvironments(ProjectLayout layout, ProviderFactory providers, ObjectFactory objects) {
         this.layout = layout;
+        this.providers = providers;
         this.baseDownloadUrl = objects.property(String.class).convention(DEFAULT_BASE_DOWNLOAD_URL);
         this.downloadsDir = objects.property(String.class).convention(DEFAULT_DOWNLOADS_DIR);
         this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
@@ -164,10 +163,8 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         }
     }
 
-    public Provider<String> gradleProperty(final String name) {
-        Callable<String> callable = () ->
-            project.findProperty(name) == null ? null : (String) project.property(name);
-        return project.provider(callable);
+    private Provider<String> gradleProperty(final String name) {
+        return providers.gradleProperty(name).forUseAtConfigurationTime();
     }
 
     public final NamedDomainObjectContainer<TeamCityEnvironment> getEnvironments() {

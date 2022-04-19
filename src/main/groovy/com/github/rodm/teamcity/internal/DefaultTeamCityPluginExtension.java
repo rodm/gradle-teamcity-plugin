@@ -56,7 +56,7 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
 
     public void init() {
         ExtensionContainer extensions = ((ExtensionAware) this).getExtensions();
-        this.environments = extensions.create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class, project);
+        this.environments = extensions.create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         this.agent = extensions.create("agent", AgentPluginConfiguration.class, project);
         this.server = extensions.create("server", ServerPluginConfiguration.class, project, environments);
     }

@@ -30,9 +30,11 @@ import com.github.rodm.teamcity.tasks.Undeploy
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
+import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,6 +90,8 @@ class EnvironmentsTest {
     @BeforeEach
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
     }
 
     @Test
@@ -159,10 +163,15 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override default shared properties'() {
-        project.ext['teamcity.environments.downloadsDir'] = '/alt/downloads'
-        project.ext['teamcity.environments.baseDownloadUrl'] = 'http://alt-repository'
-        project.ext['teamcity.environments.baseHomeDir'] = '/alt/servers'
-        project.ext['teamcity.environments.baseDataDir'] = '/alt/data'
+        projectDir.resolve('gradle.properties').toFile() << """
+        teamcity.environments.downloadsDir = /alt/downloads
+        teamcity.environments.baseDownloadUrl = http://alt-repository
+        teamcity.environments.baseHomeDir = /alt/servers
+        teamcity.environments.baseDataDir = /alt/data
+        """
+        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
 
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
@@ -185,10 +194,15 @@ class EnvironmentsTest {
 
     @Test
     void 'gradle properties should override shared properties'() {
-        project.ext['teamcity.environments.downloadsDir'] = '/alt/downloads'
-        project.ext['teamcity.environments.baseDownloadUrl'] = 'http://alt-repository'
-        project.ext['teamcity.environments.baseHomeDir'] = '/alt/servers'
-        project.ext['teamcity.environments.baseDataDir'] = '/alt/data'
+        projectDir.resolve('gradle.properties').toFile() << """
+        teamcity.environments.downloadsDir = /alt/downloads
+        teamcity.environments.baseDownloadUrl = http://alt-repository
+        teamcity.environments.baseHomeDir = /alt/servers
+        teamcity.environments.baseDataDir = /alt/data
+        """
+        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
 
         project.apply plugin: 'com.github.rodm.teamcity-environments'
         project.teamcity {
