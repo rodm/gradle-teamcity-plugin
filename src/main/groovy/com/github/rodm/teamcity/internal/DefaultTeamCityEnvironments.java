@@ -72,14 +72,14 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
      * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".
      */
     public String getDownloadsDir() {
-        return downloadsDir.get();
+        return getDownloadsDirProperty().get();
     }
 
     public void setDownloadsDir(String downloadsDir) {
         this.downloadsDir.set(downloadsDir);
     }
 
-    public Provider<String> getDefaultDownloadsDir() {
+    public Provider<String> getDownloadsDirProperty() {
         return gradleProperty(DOWNLOADS_DIR_PROPERTY).orElse(downloadsDir);
     }
 
@@ -87,14 +87,14 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
      * The base download URL used to download TeamCity distributions. Defaults to "https://download.jetbrains.com/teamcity"
      */
     public String getBaseDownloadUrl() {
-        return baseDownloadUrl.get();
+        return getBaseDownloadUrlProperty().get();
     }
 
     public void setBaseDownloadUrl(String baseDownloadUrl) {
         this.baseDownloadUrl.set(baseDownloadUrl);
     }
 
-    public Provider<String> getDefaultBaseDownloadUrl() {
+    public Provider<String> getBaseDownloadUrlProperty() {
         return gradleProperty(BASE_DOWNLOAD_URL_PROPERTY).orElse(baseDownloadUrl);
     }
 
@@ -102,7 +102,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
      * The base home directory used to install TeamCity distributions. Defaults to "servers"
      */
     public String getBaseHomeDir() {
-        return baseHomeDir.get();
+        return getBaseHomeDirProperty().get();
     }
 
     public void setBaseHomeDir(String baseHomeDir) {
@@ -113,7 +113,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir.set(baseHomeDir.getAbsolutePath());
     }
 
-    public Provider<String> getDefaultBaseHomeDir() {
+    public Provider<String> getBaseHomeDirProperty() {
         return gradleProperty(BASE_HOME_DIR_PROPERTY).orElse(baseHomeDir);
     }
 
@@ -121,7 +121,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
      * The base data directory used to store TeamCity configurations. Defaults to "data"
      */
     public String getBaseDataDir() {
-        return baseDataDir.get();
+        return getBaseDataDirProperty().get();
     }
 
     public void setBaseDataDir(String baseDataDir) {
@@ -132,7 +132,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseDataDir.set(baseDataDir.getAbsolutePath());
     }
 
-    public Provider<String> getDefaultBaseDataDir() {
+    public Provider<String> getBaseDataDirProperty() {
         return gradleProperty(BASE_DATA_DIR_PROPERTY).orElse(baseDataDir);
     }
 

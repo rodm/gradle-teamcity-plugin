@@ -213,11 +213,11 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public String getBaseHomeDir() {
-        return this.environments.getDefaultBaseHomeDir().get();
+        return environments.getBaseHomeDirProperty().get();
     }
 
     public String getBaseDataDir() {
-        return this.environments.getDefaultBaseDataDir().get();
+        return environments.getBaseDataDirProperty().get();
     }
 
     public String propertyName(final String property) {
@@ -225,11 +225,11 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultDownloadUrl() {
-        return environments.getDefaultBaseDownloadUrl().map(baseUrl -> baseUrl + "/TeamCity-" + version + ".tar.gz");
+        return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + version + ".tar.gz");
     }
 
     private Provider<String> defaultInstallerFile() {
-        return environments.getDefaultDownloadsDir().map(dir -> dir + "/" + filename());
+        return environments.getDownloadsDirProperty().map(dir -> dir + "/" + filename());
     }
 
     private String filename() {
@@ -239,11 +239,11 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultHomeDir() {
-        return environments.getDefaultBaseHomeDir().map(dir -> dir + "/TeamCity-" + getVersion());
+        return environments.getBaseHomeDirProperty().map(dir -> dir + "/TeamCity-" + getVersion());
     }
 
     private Provider<String> defaultDataDir() {
-        return environments.getDefaultBaseDataDir()
+        return environments.getBaseDataDirProperty()
             .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
     }
 
