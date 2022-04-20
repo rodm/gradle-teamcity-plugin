@@ -21,6 +21,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.PluginContainer;
+import org.gradle.api.provider.Property;
 import org.gradle.util.GradleVersion;
 
 public class TeamCityBasePlugin implements Plugin<Project> {
@@ -40,13 +41,14 @@ public class TeamCityBasePlugin implements Plugin<Project> {
         TeamCityPluginExtension extension = project.getExtensions()
             .create(TeamCityPluginExtension.class, TEAMCITY_EXTENSION_NAME, DefaultTeamCityPluginExtension.class, project);
         ((DefaultTeamCityPluginExtension) extension).init();
-        validateVersion(project, extension);
+        validateVersion(project, (DefaultTeamCityPluginExtension) extension);
         applyInheritedProperties(project, (DefaultTeamCityPluginExtension) extension);
     }
 
-    private static void validateVersion(Project project, final TeamCityPluginExtension extension) {
-        project.afterEvaluate(p ->
-            TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions()));
+    private static void validateVersion(Project project, final DefaultTeamCityPluginExtension extension) {
+        Property<String> version = extension.getVersionProperty();
+        Property<Boolean> allowSnapshotVersions = extension.getAllowSnapshotVersionsProperty();
+        project.afterEvaluate(p -> TeamCityVersion.version(version.get(), allowSnapshotVersions.get()));
     }
 
     private static void applyInheritedProperties(Project project, final DefaultTeamCityPluginExtension extension) {

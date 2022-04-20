@@ -17,6 +17,7 @@ package com.github.rodm.teamcity;
 
 import com.github.rodm.teamcity.internal.DefaultPublishConfiguration;
 import com.github.rodm.teamcity.internal.DefaultSignConfiguration;
+import com.github.rodm.teamcity.internal.DefaultTeamCityPluginExtension;
 import com.github.rodm.teamcity.internal.PluginDescriptorContentsValidationAction;
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction;
 import com.github.rodm.teamcity.tasks.GenerateServerPluginDescriptor;
@@ -30,6 +31,7 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
@@ -74,7 +76,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         configureConfigurations(project);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        configureDependencies(project, extension);
+        configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureServerPluginTasks(project, extension);
         configureSignPluginTask(project, extension);
@@ -95,12 +97,13 @@ public class TeamCityServerPlugin implements Plugin<Project> {
             });
     }
 
-    public void configureDependencies(final Project project, final TeamCityPluginExtension extension) {
-        Provider<String> version = project.provider(extension::getVersion);
+    public void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
+        Provider<String> version = extension.getVersionProperty();
+        Property<Boolean> allowSnapshotVersions = extension.getAllowSnapshotVersionsProperty();
         project.getPlugins().withType(JavaPlugin.class, plugin -> {
             project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:server-api:" + v));
             project.getDependencies().add("provided", version.map(v -> {
-                TeamCityVersion teamCityVersion = TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions());
+                TeamCityVersion teamCityVersion = TeamCityVersion.version(version.get(), allowSnapshotVersions.get());
                 return teamCityVersion.equalOrGreaterThan(VERSION_9_0) ? "org.jetbrains.teamcity:server-web-api:" + v : null;
             }));
             project.getDependencies().add("testImplementation", version.map(v -> "org.jetbrains.teamcity:tests-support:" + v));
@@ -109,22 +112,24 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
     public void configureServerPluginTasks(final Project project, final TeamCityPluginExtension extension) {
         final TaskContainer tasks = project.getTasks();
+        final ServerPluginConfiguration server = extension.getServer();
+
         project.getPlugins().withType(JavaPlugin.class, plugin ->
             tasks.named(JAR_TASK_NAME, Jar.class).configure(task ->
                 task.into("buildServerResources", copySpec ->
-                    copySpec.from(extension.getServer().getWeb()))));
+                    copySpec.from(server.getWeb()))));
 
         final Provider<RegularFile> descriptorFile = project.getLayout().getBuildDirectory().file(SERVER_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME);
 
         final TaskProvider<ProcessDescriptor> processDescriptor = tasks.register(PROCESS_SERVER_DESCRIPTOR_TASK_NAME, ProcessDescriptor.class, task -> {
-            task.getDescriptor().set(extension.getServer().getDescriptorFile());
-            task.getTokens().set(extension.getServer().getTokens());
+            task.getDescriptor().set(server.getDescriptorFile());
+            task.getTokens().set(server.getTokens());
             task.getDestination().set(descriptorFile);
         });
 
         final TaskProvider<GenerateServerPluginDescriptor> generateDescriptor = tasks.register(GENERATE_SERVER_DESCRIPTOR_TASK_NAME, GenerateServerPluginDescriptor.class, task -> {
             task.getVersion().set(project.getProviders().provider(() -> TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions())));
-            task.getDescriptor().set(project.getProviders().provider(() -> (ServerPluginDescriptor) extension.getServer().getDescriptor()));
+            task.getDescriptor().set(project.getProviders().provider(() -> (ServerPluginDescriptor) server.getDescriptor()));
             task.getDestination().set(descriptorFile);
         });
 
@@ -141,7 +146,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
             } else {
                 task.getAgent().from((project.getConfigurations().getByName("agent")));
             }
-            task.with(extension.getServer().getFiles());
+            task.with(server.getFiles());
             task.dependsOn(processDescriptor, generateDescriptor);
         });
 
@@ -156,7 +161,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         project.getArtifacts().add("plugin", packagePlugin);
 
         tasks.named(SERVER_PLUGIN_TASK_NAME, Zip.class, task ->
-            configurePluginArchiveTask(task, extension.getServer().getArchiveName()));
+            configurePluginArchiveTask(task, server.getArchiveName()));
     }
 
     private static String getSchemaPath(String version, boolean allowSnapshots) {

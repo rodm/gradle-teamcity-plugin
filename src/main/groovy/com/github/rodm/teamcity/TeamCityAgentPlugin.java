@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity;
 
+import com.github.rodm.teamcity.internal.DefaultTeamCityPluginExtension;
 import com.github.rodm.teamcity.internal.FileCollectorAction;
 import com.github.rodm.teamcity.internal.PluginDescriptorValidationAction;
 import com.github.rodm.teamcity.internal.PluginExecutableFilesValidationAction;
@@ -63,13 +64,13 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
         });
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        configureDependencies(project, extension);
+        configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureTasks(project, extension);
     }
 
-    public void configureDependencies(final Project project, final TeamCityPluginExtension extension) {
-        Provider<String> version = project.provider(extension::getVersion);
+    public void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
+        Provider<String> version = extension.getVersionProperty();
         project.getPlugins().withType(JavaPlugin.class, plugin -> {
             project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:agent-api:" + v));
             project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
@@ -77,20 +78,21 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
     }
 
     public void configureTasks(final Project project, final TeamCityPluginExtension extension) {
+        final TaskContainer tasks = project.getTasks();
+        final AgentPluginConfiguration agent = extension.getAgent();
         final Provider<RegularFile> descriptorFile = project.getLayout().getBuildDirectory().file(AGENT_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME);
 
-        TaskContainer tasks = project.getTasks();
         final TaskProvider<ProcessDescriptor> processDescriptor =
             tasks.register(PROCESS_AGENT_DESCRIPTOR_TASK_NAME, ProcessDescriptor.class, task -> {
-                task.getDescriptor().set(extension.getAgent().getDescriptorFile());
-                task.getTokens().set(extension.getAgent().getTokens());
+                task.getDescriptor().set(agent.getDescriptorFile());
+                task.getTokens().set(agent.getTokens());
                 task.getDestination().set(descriptorFile);
             });
 
         final TaskProvider<GenerateAgentPluginDescriptor> generateDescriptor =
             project.getTasks().register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor.class, task -> {
                 task.getVersion().set(project.getProviders().provider(() -> TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions())));
-                task.getDescriptor().set(project.getProviders().provider(() -> (AgentPluginDescriptor) extension.getAgent().getDescriptor()));
+                task.getDescriptor().set(project.getProviders().provider(() -> (AgentPluginDescriptor) agent.getDescriptor()));
                 task.getDestination().set(descriptorFile);
             });
 
@@ -103,7 +105,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
                 task.getLib().from(project.getTasks().named(JAR_TASK_NAME));
                 task.getLib().from(project.getConfigurations().getByName("runtimeClasspath"));
             });
-            task.with(extension.getAgent().getFiles());
+            task.with(agent.getFiles());
             task.dependsOn(processDescriptor, generateDescriptor);
         });
 
@@ -123,6 +125,6 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
         project.getArtifacts().add("plugin", packagePlugin);
 
         tasks.named(AGENT_PLUGIN_TASK_NAME, Zip.class, task ->
-            configurePluginArchiveTask(task, extension.getAgent().getArchiveName()));
+            configurePluginArchiveTask(task, agent.getArchiveName()));
     }
 }
