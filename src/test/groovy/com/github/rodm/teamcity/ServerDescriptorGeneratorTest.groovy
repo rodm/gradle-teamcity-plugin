@@ -122,19 +122,6 @@ class ServerDescriptorGeneratorTest {
         assertThat(writer.toString(), hasXPath('//info/vendor/name'))
     }
 
-    @Test @Disabled
-    void writesRequiredInfoPropertiesUsingDefaults() {
-        project.version = '1.2.3'
-        ServerPluginDescriptor descriptor = createDescriptor()
-        ServerPluginDescriptorGenerator generator = createGenerator(descriptor)
-
-        generator.writeTo(writer)
-
-        assertThat(writer.toString(), hasXPath('//info/name', equalTo('test-plugin')))
-        assertThat(writer.toString(), hasXPath('//info/display-name', equalTo('test-plugin')))
-        assertThat(writer.toString(), hasXPath('//info/version', equalTo('1.2.3')))
-    }
-
     @Test
     void writesOptionalInfoProperties() {
         project.teamcity {
