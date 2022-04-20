@@ -19,8 +19,6 @@ import com.github.rodm.teamcity.internal.AbstractPluginTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.tasks.InputFiles;
 
-import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
-
 public abstract class AgentPlugin extends AbstractPluginTask {
 
     public AgentPlugin() {
@@ -31,7 +29,7 @@ public abstract class AgentPlugin extends AbstractPluginTask {
         );
         into("", copySpec -> {
             copySpec.from(getDescriptor());
-            copySpec.rename(name -> PLUGIN_DESCRIPTOR_FILENAME);
+            copySpec.rename(PLUGIN_DESCRIPTOR_RENAMER);
         });
     }
 

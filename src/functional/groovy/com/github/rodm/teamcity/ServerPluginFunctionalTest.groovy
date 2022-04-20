@@ -369,6 +369,39 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         }
     }
 
+    @Nested
+    @DisplayName("with configuration cache")
+    class WithConfigurationCache {
+
+        @Test
+        void 'check generateServerDescriptor task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+            executeBuild('--configuration-cache', 'generateServerDescriptor')
+            BuildResult result = executeBuild('--configuration-cache', 'generateServerDescriptor')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check processServerDescriptor task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+            createFile("teamcity-plugin.xml") << SERVER_DESCRIPTOR_FILE
+
+            executeBuild('--configuration-cache', 'processServerDescriptor')
+            BuildResult result = executeBuild('--configuration-cache', 'processServerDescriptor')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check serverPlugin task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+            executeBuild('--configuration-cache', 'serverPlugin')
+            BuildResult result = executeBuild('--configuration-cache', 'serverPlugin')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+    }
+
     @Test
     void 'plugin archive contains 3rd party libraries but not TeamCity libraries'() {
         buildFile << """

@@ -15,11 +15,21 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import org.gradle.api.Transformer;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.bundling.Zip;
 
+import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
+
 public abstract class AbstractPluginTask extends Zip {
+
+    public static final Transformer<String, String> PLUGIN_DESCRIPTOR_RENAMER = new Transformer<String, String>() {
+        @Override
+        public String transform(String ignore) {
+            return PLUGIN_DESCRIPTOR_FILENAME;
+        }
+    };
 
     @InputFile
     public abstract RegularFileProperty getDescriptor();

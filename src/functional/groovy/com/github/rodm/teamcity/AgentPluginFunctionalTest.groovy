@@ -405,8 +405,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         @Test
         void 'process agent descriptor task should be cacheable'() {
             buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
-            File descriptorFile = createFile("teamcity-plugin.xml")
-            descriptorFile << AGENT_DESCRIPTOR_FILE
+            createFile("teamcity-plugin.xml") << AGENT_DESCRIPTOR_FILE
 
             BuildResult result
             result = executeBuild('--build-cache', 'clean', 'assemble')
@@ -414,6 +413,39 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
 
             result = executeBuild('--build-cache', 'clean', 'assemble')
             assertThat(result.task(":processAgentDescriptor").getOutcome(), is(FROM_CACHE))
+        }
+    }
+
+    @Nested
+    @DisplayName("with configuration cache")
+    class WithConfigurationCache {
+
+        @Test
+        void 'check generateAgentDescriptor task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+            executeBuild('--configuration-cache', 'generateAgentDescriptor')
+            BuildResult result = executeBuild('--configuration-cache', 'generateAgentDescriptor')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check processAgentDescriptor task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_FILE_DESCRIPTOR
+            createFile("teamcity-plugin.xml") << AGENT_DESCRIPTOR_FILE
+
+            executeBuild('--configuration-cache', 'processAgentDescriptor')
+            BuildResult result = executeBuild('--configuration-cache', 'processAgentDescriptor')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check agentPlugin task can be loaded from the configuration cache'() {
+            buildFile << BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR
+
+            executeBuild('--configuration-cache', 'agentPlugin')
+            BuildResult result = executeBuild('--configuration-cache', 'agentPlugin')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
         }
     }
 }
