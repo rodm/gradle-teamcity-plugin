@@ -15,11 +15,16 @@
  */
 package com.github.rodm.teamcity
 
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -265,6 +270,70 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
 
         result = executeBuild('undeployFromTeamcity')
         assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(UP_TO_DATE))
+    }
+
+    @Nested
+    @DisplayName("with configuration cache")
+    class WithConfigurationCache {
+
+        @BeforeEach
+        void init() {
+            File installerDir = createDirectory('installers')
+            File installerFile = createFakeTeamCityInstaller(installerDir.toPath().resolve('FakeTeamCity-2021.2.3.tar.gz'))
+            createFile('plugin1.zip')
+
+            buildFile << """
+                plugins {
+                    id 'com.github.rodm.teamcity-environments'
+                }
+                teamcity {
+                    version = '2021.2'
+                    environments {
+                        teamcity {
+                            version = '2021.2.3'
+                            downloadUrl = '${installerFile.toURI()}'
+                            plugins 'plugin1.zip'
+                        }
+                    }
+                }
+            """
+        }
+
+        @Test
+        void 'check download task can be loaded from the configuration cache'() {
+            executeBuild('--configuration-cache', 'downloadTeamcity')
+            BuildResult result = executeBuild('--configuration-cache', 'downloadTeamcity')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check install task can be loaded from the configuration cache'() {
+            executeBuild('--configuration-cache', 'installTeamcity')
+            BuildResult result = executeBuild('--configuration-cache', 'installTeamcity')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check deployTo task can be loaded from the configuration cache'() {
+            executeBuild('--configuration-cache', 'deployToTeamcity')
+            BuildResult result = executeBuild('--configuration-cache', 'deployToTeamcity')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        @Test
+        void 'check undeployFrom task can be loaded from the configuration cache'() {
+            executeBuild('--configuration-cache', 'undeployFromTeamcity')
+            BuildResult result = executeBuild('--configuration-cache', 'undeployFromTeamcity')
+            assertThat(result.output, containsString('Reusing configuration cache.'))
+        }
+
+        private File createFakeTeamCityInstaller(Path file) {
+            OutputStream os = Files.newOutputStream(file)
+            GzipCompressorOutputStream gzos = new GzipCompressorOutputStream(os)
+            TarArchiveOutputStream taos = new TarArchiveOutputStream(gzos)
+            taos.close()
+            file.toFile()
+        }
     }
 
     private File createFakeTeamCityInstall(String baseDir, String version) {
