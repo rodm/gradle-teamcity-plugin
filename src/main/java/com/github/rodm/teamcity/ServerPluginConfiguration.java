@@ -56,7 +56,6 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     public void descriptor(Action<ServerPluginDescriptor> configuration) {
         if (getDescriptor() == null) {
             ServerPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", ServerPluginDescriptor.class);
-            descriptor.init();
             setDescriptor(descriptor);
         }
         configuration.execute((ServerPluginDescriptor) getDescriptor());

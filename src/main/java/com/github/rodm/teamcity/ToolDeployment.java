@@ -25,9 +25,9 @@ import org.gradle.api.tasks.Nested;
 public class ToolDeployment implements Deployment {
 
     @Nested
-    private ExecutableFiles executableFiles;
+    private final ExecutableFiles executableFiles;
 
-    public void init() {
+    public ToolDeployment() {
         executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
     }
 

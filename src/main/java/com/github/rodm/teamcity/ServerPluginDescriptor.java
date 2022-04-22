@@ -107,12 +107,12 @@ public class ServerPluginDescriptor {
     private Boolean nodeResponsibilitiesAware;
 
     @Nested
-    private Parameters parameters;
+    private final Parameters parameters;
 
     @Nested
-    private Dependencies dependencies;
+    private final Dependencies dependencies;
 
-    public void init() {
+    public ServerPluginDescriptor() {
         parameters = ((ExtensionAware) this).getExtensions().create("parameters", Parameters.class);
         dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
     }

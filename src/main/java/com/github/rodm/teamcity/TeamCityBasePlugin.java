@@ -40,7 +40,6 @@ public class TeamCityBasePlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.getExtensions()
             .create(TeamCityPluginExtension.class, TEAMCITY_EXTENSION_NAME, DefaultTeamCityPluginExtension.class, project);
-        ((DefaultTeamCityPluginExtension) extension).init();
         validateVersion(project, (DefaultTeamCityPluginExtension) extension);
         applyInheritedProperties(project, (DefaultTeamCityPluginExtension) extension);
     }

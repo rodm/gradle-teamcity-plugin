@@ -40,9 +40,9 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
     private final Property<Boolean> allowSnapshotVersions;
     private final Property<ValidationMode> validateBeanDefinition;
 
-    private AgentPluginConfiguration agent;
-    private ServerPluginConfiguration server;
-    private TeamCityEnvironments environments;
+    private final AgentPluginConfiguration agent;
+    private final ServerPluginConfiguration server;
+    private final TeamCityEnvironments environments;
 
     private transient final Project project;
 
@@ -52,9 +52,6 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
         this.defaultRepositories = project.getObjects().property(Boolean.class).convention(true);
         this.allowSnapshotVersions = project.getObjects().property(Boolean.class).convention(false);
         this.validateBeanDefinition = project.getObjects().property(ValidationMode.class).convention(WARN);
-    }
-
-    public void init() {
         ExtensionContainer extensions = ((ExtensionAware) this).getExtensions();
         this.environments = extensions.create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         this.agent = extensions.create("agent", AgentPluginConfiguration.class, project);

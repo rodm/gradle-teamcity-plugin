@@ -34,9 +34,9 @@ public class PluginDeployment implements Deployment {
     private Boolean useSeparateClassloader;
 
     @Nested
-    private ExecutableFiles executableFiles;
+    private final ExecutableFiles executableFiles;
 
-    public void init() {
+    public PluginDeployment() {
         executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
     }
 

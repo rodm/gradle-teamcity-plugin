@@ -38,7 +38,6 @@ public class AgentPluginConfiguration extends PluginConfiguration {
     public void descriptor(Action<AgentPluginDescriptor> configuration) {
         if (getDescriptor() == null) {
             AgentPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", AgentPluginDescriptor.class);
-            descriptor.init();
             setDescriptor(descriptor);
         }
         configuration.execute((AgentPluginDescriptor) getDescriptor());

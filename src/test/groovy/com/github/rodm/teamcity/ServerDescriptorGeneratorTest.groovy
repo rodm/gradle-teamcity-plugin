@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -39,12 +38,11 @@ class ServerDescriptorGeneratorTest {
 
     private ServerPluginDescriptor createDescriptor() {
         ServerPluginDescriptor descriptor = project.extensions.create('descriptor', ServerPluginDescriptor)
-        descriptor.init()
         return descriptor
     }
 
     private ServerPluginDescriptorGenerator createGenerator() {
-        ServerPluginDescriptor descriptor = extension.server.getDescriptor()
+        ServerPluginDescriptor descriptor = extension.server.getDescriptor() as ServerPluginDescriptor
         createGenerator(descriptor)
     }
 

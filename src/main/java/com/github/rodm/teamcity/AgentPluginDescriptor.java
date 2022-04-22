@@ -35,6 +35,13 @@ public class AgentPluginDescriptor {
     @Optional
     private ToolDeployment toolDeployment;
 
+    @Nested
+    private final Dependencies dependencies;
+
+    public AgentPluginDescriptor() {
+        dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
+    }
+
     /**
      * Configures the agent-side plugin for plugin deployment.
      *
@@ -47,7 +54,6 @@ public class AgentPluginDescriptor {
             throw new InvalidUserDataException("Agent plugin cannot be configured for plugin deployment and tool deployment");
         if (pluginDeployment == null) {
             pluginDeployment = ((ExtensionAware) this).getExtensions().create("deployment", PluginDeployment.class);
-            pluginDeployment.init();
         }
         configuration.execute(pluginDeployment);
     }
@@ -68,7 +74,6 @@ public class AgentPluginDescriptor {
             throw new InvalidUserDataException("Agent plugin cannot be configured for plugin deployment and tool deployment");
         if (toolDeployment == null) {
             toolDeployment = ((ExtensionAware) this).getExtensions().create("deployment", ToolDeployment.class);
-            toolDeployment.init();
         }
         configuration.execute(toolDeployment);
     }
@@ -80,13 +85,6 @@ public class AgentPluginDescriptor {
     @Internal
     public Deployment getDeployment() {
         return (pluginDeployment != null) ? pluginDeployment : toolDeployment;
-    }
-
-    @Nested
-    private Dependencies dependencies;
-
-    public void init() {
-        dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
     }
 
     /**
