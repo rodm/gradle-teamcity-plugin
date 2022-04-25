@@ -87,7 +87,7 @@ Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-server[server],
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-agent[agent],
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common] and
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-environments[environments] plugins.
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations
 
