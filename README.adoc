@@ -84,9 +84,9 @@ the agent-side and server-side plugin components.
 un-deploy plugins to the server, and to start and stop a TeamCity Server and Build Agent.
 
 Refer to the Gradle Plugin Portal for instructions on how to apply the
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-server[server],
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-agent[agent],
-{uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-common[common] and
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-server[server],
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-agent[agent],
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common] and
 {uri-gradle-plugin-portal}plugin/com.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations
