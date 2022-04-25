@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 
 public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializable {
 
-    private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile("^((\\d+)(\\.\\d+)+)");
-    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^((\\d+)(\\.\\d+)+)-SNAPSHOT");
+    private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+");
+    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+-SNAPSHOT");
     private static final Pattern DATA_VERSION_PATTERN = Pattern.compile("^(\\d+\\.\\d+).*");
 
     private static final String INVALID_RELEASE_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')";
@@ -67,17 +67,20 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
         return this.version;
     }
 
-    public int compareTo(TeamCityVersion teamcityVersion) {
-        if (version.equals(SNAPSHOT) && !teamcityVersion.version.equals(SNAPSHOT)) {
+    public int compareTo(TeamCityVersion other) {
+        if (version.equals(SNAPSHOT) && !other.version.equals(SNAPSHOT)) {
             return 1;
-        } else if (teamcityVersion.version.equals(SNAPSHOT) && !version.equals(SNAPSHOT)) {
+        } else if (other.version.equals(SNAPSHOT) && !version.equals(SNAPSHOT)) {
             return -1;
-        } else if (version.equals(teamcityVersion.version)) {
+        } else if (version.equals(other.version)) {
             return 0;
         }
         String[] versionParts = version.split("[.|-]");
-        String[] otherVersionParts = teamcityVersion.version.split("[.|-]");
+        String[] otherVersionParts = other.version.split("[.|-]");
+        return compareVersionParts(versionParts, otherVersionParts);
+    }
 
+    private int compareVersionParts(String[] versionParts, String[] otherVersionParts) {
         for (int diff = 0; diff < versionParts.length && diff < otherVersionParts.length; ++diff){
             if (versionParts[diff].equals(SNAPSHOT)) continue;
             if (otherVersionParts[diff].equals(SNAPSHOT)) continue;
