@@ -15,16 +15,14 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Action;
-import org.gradle.api.plugins.ExtensionAware;
+import com.github.rodm.teamcity.internal.AbstractDeployment;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.Optional;
 
 /**
  * Agent-side plugin deployment configuration
  */
-public class PluginDeployment implements Deployment {
+public class PluginDeployment extends AbstractDeployment {
 
     /**
      * Use a separate classloader to load the agent-side plugin's classes.
@@ -32,30 +30,6 @@ public class PluginDeployment implements Deployment {
     @Input
     @Optional
     private Boolean useSeparateClassloader;
-
-    @Nested
-    private final ExecutableFiles executableFiles;
-
-    public PluginDeployment() {
-        executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
-    }
-
-    /**
-     * Configures the executable files for the agent-side tool plugin.
-     *
-     * <p>The given action is executed to configure the executable files.</p>
-     *
-     * @param configuration The action
-     */
-    @Override
-    public void executableFiles(Action<ExecutableFiles> configuration) {
-        configuration.execute(executableFiles);
-    }
-
-    @Override
-    public ExecutableFiles getExecutableFiles() {
-        return executableFiles;
-    }
 
     public Boolean getUseSeparateClassloader() {
         return useSeparateClassloader;

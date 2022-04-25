@@ -15,29 +15,10 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Action;
-import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.tasks.Nested;
+import com.github.rodm.teamcity.internal.AbstractDeployment;
 
 /**
  * Agent-side plugin tool deployment configuration
  */
-public class ToolDeployment implements Deployment {
-
-    @Nested
-    private final ExecutableFiles executableFiles;
-
-    public ToolDeployment() {
-        executableFiles = ((ExtensionAware) this).getExtensions().create("executableFiles", ExecutableFiles.class);
-    }
-
-    @Override
-    public void executableFiles(Action<ExecutableFiles> configuration) {
-        configuration.execute(executableFiles);
-    }
-
-    @Override
-    public ExecutableFiles getExecutableFiles() {
-        return executableFiles;
-    }
+public class ToolDeployment extends AbstractDeployment {
 }
