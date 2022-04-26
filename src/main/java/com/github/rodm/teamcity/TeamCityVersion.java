@@ -75,23 +75,16 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
         } else if (version.equals(other.version)) {
             return 0;
         }
-        String[] versionParts = version.split("[.|-]");
-        String[] otherVersionParts = other.version.split("[.|-]");
-        return compareVersionParts(versionParts, otherVersionParts);
+        return compareVersionParts(version.split("[.|-]"), other.version.split("[.|-]"));
     }
 
     private int compareVersionParts(String[] versionParts, String[] otherVersionParts) {
-        for (int diff = 0; diff < versionParts.length && diff < otherVersionParts.length; ++diff){
-            if (versionParts[diff].equals(SNAPSHOT)) continue;
-            if (otherVersionParts[diff].equals(SNAPSHOT)) continue;
-            int part = Integer.parseInt(versionParts[diff]);
-            int otherPart = Integer.parseInt(otherVersionParts[diff]);
-            if (part > otherPart) {
-                return 1;
-            }
-            if (otherPart > part) {
-                return -1;
-            }
+        for (int part = 0; part < versionParts.length && part < otherVersionParts.length; ++part){
+            if (versionParts[part].equals(SNAPSHOT) || otherVersionParts[part].equals(SNAPSHOT)) continue;
+            int partValue = Integer.parseInt(versionParts[part]);
+            int otherPartValue = Integer.parseInt(otherVersionParts[part]);
+            if (partValue > otherPartValue) return 1;
+            if (otherPartValue > partValue) return -1;
         }
         return (versionParts.length > otherVersionParts.length) ? 1 : -1;
     }
@@ -101,8 +94,8 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TeamCityVersion that = (TeamCityVersion) o;
-        return version.equals(that.version);
+        TeamCityVersion other = (TeamCityVersion) o;
+        return version.equals(other.version);
     }
 
     public int hashCode() {

@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.GradleException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
@@ -28,6 +29,7 @@ import static org.hamcrest.Matchers.lessThan
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.core.StringEndsWith.endsWith
 import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
 import static org.junit.jupiter.api.Assertions.fail
 
@@ -39,6 +41,8 @@ class TeamCityVersionTest {
         version('10.0.5')
         version('2017.1.2')
         version('2018.2')
+        version('2022.04')
+        version('2023.10')
         version('SNAPSHOT')
     }
 
@@ -89,6 +93,15 @@ class TeamCityVersionTest {
         assertThat(version('9.0.3').dataVersion, equalTo('9.0'))
         assertThat(version('2020.2.4').dataVersion, equalTo('2020.2'))
         assertThat(version('2021.1.1').dataVersion, equalTo('2021.1'))
+        assertThat(version('2022.04.1').dataVersion, equalTo('2022.04'))
+    }
+
+    @Test
+    void 'data version cannot be determined for snapshot'() {
+        def e =assertThrows(GradleException, () -> {
+            version('SNAPSHOT').dataVersion
+        })
+        assertThat(e.message, equalTo('Invalid version'))
     }
 
     @Nested
@@ -100,6 +113,7 @@ class TeamCityVersionTest {
             version('10.0.5-SNAPSHOT')
             version('2020.1.5-SNAPSHOT')
             version('2020.2-SNAPSHOT')
+            version('2022.04-SNAPSHOT')
         }
 
         @Test
