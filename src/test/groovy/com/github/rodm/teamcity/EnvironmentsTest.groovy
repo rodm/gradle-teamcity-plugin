@@ -22,8 +22,12 @@ import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
 import com.github.rodm.teamcity.tasks.StartAgent
+import com.github.rodm.teamcity.tasks.StartDockerAgent
+import com.github.rodm.teamcity.tasks.StartDockerServer
 import com.github.rodm.teamcity.tasks.StartServer
 import com.github.rodm.teamcity.tasks.StopAgent
+import com.github.rodm.teamcity.tasks.StopDockerAgent
+import com.github.rodm.teamcity.tasks.StopDockerServer
 import com.github.rodm.teamcity.tasks.StopServer
 import com.github.rodm.teamcity.internal.TeamCityTask
 import com.github.rodm.teamcity.tasks.Undeploy
@@ -37,6 +41,7 @@ import org.gradle.api.tasks.Delete
 import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
@@ -1100,6 +1105,94 @@ class EnvironmentsTest {
         assertThat(agent, isA(AgentPluginConfiguration))
         assertThat(server, isA(ServerPluginConfiguration))
         assertThat(environments, isA(TeamCityEnvironments))
+    }
+
+    @Test
+    void 'environment tasks are for a local installation'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test {
+                    version = '2021.2.3'
+                }
+            }
+        }
+        project.evaluate()
+
+        assertThat(task('downloadTest'), isA(DownloadTeamCity))
+        assertThat(task('installTest'), isA(InstallTeamCity))
+        assertThat(task('startTestServer'), isA(StartServer))
+        assertThat(task('stopTestServer'), isA(StopServer))
+        assertThat(task('startTestAgent'), isA(StartAgent))
+        assertThat(task('stopTestAgent'), isA(StopAgent))
+    }
+
+    private Task task(String name) {
+        project.tasks.getByName(name)
+    }
+
+    @Nested
+    class UsingDocker {
+
+        @Test
+        void 'creates tasks for a docker environment'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker()
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(task('startTestServer'), isA(StartDockerServer))
+            assertThat(task('stopTestServer'), isA(StopDockerServer))
+            assertThat(task('startTestAgent'), isA(StartDockerAgent))
+            assertThat(task('stopTestAgent'), isA(StopDockerAgent))
+        }
+
+        @Test
+        void 'configures startServer task'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker()
+                        version = '2021.2.3'
+                        serverOptions '-DadditionalOption=value'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.version.get(), equalTo('2021.2.3'))
+            assertThat(normalize(startServer.dataDir.get()), endsWith('data/2021.2'))
+            def expectedOptions = defaultOptions + ' -DadditionalOption=value'
+            assertThat(startServer.serverOptions.get(), equalTo(expectedOptions))
+        }
+
+        @Test
+        void 'configures startAgent task'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker()
+                        version = '2021.2.3'
+                        agentOptions = '-DadditionalOption=value'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.version.get(), equalTo('2021.2.3'))
+            def expectedOptions = '-DadditionalOption=value'
+            assertThat(startAgent.agentOptions.get(), equalTo(expectedOptions))
+        }
     }
 
     class TestPluginAction extends PluginAction {

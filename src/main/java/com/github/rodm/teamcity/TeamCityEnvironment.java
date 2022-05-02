@@ -92,4 +92,7 @@ public interface TeamCityEnvironment {
     // Convenience accessors for base properties
     String getBaseHomeDir();
     String getBaseDataDir();
+
+    void useDocker();
+    boolean isDockerEnabled();
 }

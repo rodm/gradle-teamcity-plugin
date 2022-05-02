@@ -54,6 +54,8 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     private final ListProperty<String> serverOptions;
     private final ListProperty<String> agentOptions;
 
+    private boolean useDocker = false;
+
     public DefaultTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name;
         this.environments = environments;
@@ -257,5 +259,15 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     private Provider<String> asStringProvider(ListProperty<String> options) {
         return options.map(strings -> String.join(" ", strings));
+    }
+
+    @Override
+    public void useDocker() {
+        this.useDocker = true;
+    }
+
+    @Override
+    public boolean isDockerEnabled() {
+        return useDocker;
     }
 }
