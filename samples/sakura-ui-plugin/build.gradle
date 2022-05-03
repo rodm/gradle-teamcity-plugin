@@ -27,10 +27,15 @@ task npmInstall(type: Exec) {
 }
 
 task webpack(type: Exec) {
+    outputs.cacheIf { true }
     inputs.dir('src/main/js')
-    inputs.file('package-lock.json')
-    inputs.file('webpack.config.js')
+        .withPropertyName('js')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files('package-lock.json', 'webpack.config.js')
+        .withPropertyName('configFiles')
+        .withPathSensitivity(PathSensitivity.RELATIVE)
     outputs.dir("$buildDir/js")
+        .withPropertyName('bundle')
     commandLine = [*dockerCommandLine, 'npm', 'run', 'build']
 }
 

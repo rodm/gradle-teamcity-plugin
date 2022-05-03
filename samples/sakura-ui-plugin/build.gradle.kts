@@ -27,10 +27,15 @@ tasks {
     }
 
     register<Exec>("webpack") {
+        outputs.cacheIf { true }
         inputs.dir("src/main/js")
-        inputs.file("package-lock.json")
-        inputs.file("webpack.config.js")
+            .withPropertyName("js")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+        inputs.files("package-lock.json", "webpack.config.js")
+            .withPropertyName("configFiles")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
         outputs.dir("$buildDir/js")
+            .withPropertyName("bundle")
         commandLine = listOf(*dockerCommandLine, "npm", "run", "build")
     }
 }
@@ -59,12 +64,12 @@ teamcity {
 
     environments {
         downloadsDir = extra["downloadsDir"] as String
-        baseHomeDir = serversDir
+        baseHomeDir = serversDir as String
         baseDataDir = "${rootDir}/data"
 
         register("teamcity2020.2") {
             version = "2020.2.1"
-            javaHome = java8Home
+            javaHome = java8Home as String
             serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
             agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
         }
