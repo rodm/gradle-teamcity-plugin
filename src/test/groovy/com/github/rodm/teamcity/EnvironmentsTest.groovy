@@ -1151,6 +1151,8 @@ class EnvironmentsTest {
             assertThat(task('stopTestServer'), isA(StopDockerServer))
             assertThat(task('startTestAgent'), isA(StartDockerAgent))
             assertThat(task('stopTestAgent'), isA(StopDockerAgent))
+            assertThat(project, hasTask('startTest'))
+            assertThat(project, hasTask('stopTest'))
         }
 
         @Test
