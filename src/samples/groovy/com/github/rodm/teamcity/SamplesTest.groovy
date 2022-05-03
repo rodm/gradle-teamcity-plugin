@@ -99,6 +99,13 @@ class SamplesTest {
 
             assertThat(result.task(':build').getOutcome(), is(SUCCESS))
         }
+
+        @Test
+        void 'docker environment'() {
+            BuildResult result = executeBuild(samples.resolve('docker-environment'))
+
+            assertThat(result.task(':plugin:build').getOutcome(), is(SUCCESS))
+        }
     }
 
     @Nested

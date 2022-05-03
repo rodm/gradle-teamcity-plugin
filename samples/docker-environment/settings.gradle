@@ -1,0 +1,6 @@
+
+rootProject.name = 'docker-environment'
+
+include 'plugin'
+
+includeBuild '../..'
