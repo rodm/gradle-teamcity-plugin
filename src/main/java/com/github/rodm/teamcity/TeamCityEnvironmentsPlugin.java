@@ -187,12 +187,15 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getVersion().set(environment.getVersion());
                 task.getDataDir().set(environment.getDataDirProperty());
                 task.getServerOptions().set(environment.getServerOptionsProvider());
+                task.getImageName().set(environment.getDockerOptions().getServerImage());
+                task.getContainerName().set(environment.getDockerOptions().getServerName());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
                 task.dependsOn(tasks.named("deployTo" + name));
             });
 
             tasks.register("stop" + name + "Server", StopDockerServer.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
+                task.getContainerName().set(environment.getDockerOptions().getServerName());
                 task.finalizedBy(tasks.named("undeployFrom" + name));
             });
 
@@ -200,10 +203,14 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
+                task.getImageName().set(environment.getDockerOptions().getAgentImage());
+                task.getContainerName().set(environment.getDockerOptions().getAgentName());
+                task.getServerContainerName().set(environment.getDockerOptions().getServerName());
             });
 
             tasks.register("stop" + name + "Agent", StopDockerAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
+                task.getContainerName().set(environment.getDockerOptions().getAgentName());
             });
         }
 

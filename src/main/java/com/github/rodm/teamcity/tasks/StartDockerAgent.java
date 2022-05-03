@@ -40,6 +40,15 @@ public abstract class StartDockerAgent extends DefaultTask {
     @Input
     public abstract Property<String> getAgentOptions();
 
+    @Input
+    public abstract Property<String> getImageName();
+
+    @Input
+    public abstract Property<String> getContainerName();
+
+    @Input
+    public abstract Property<String> getServerContainerName();
+
     @TaskAction
     public void exec() {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -47,7 +56,7 @@ public abstract class StartDockerAgent extends DefaultTask {
             execSpec.executable("docker");
             execSpec.args("inspect");
             execSpec.args("--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}");
-            execSpec.args("tc-server");
+            execSpec.args(getServerContainerName().get());
             execSpec.setStandardOutput(out);
             execSpec.setErrorOutput(out);
             execSpec.setIgnoreExitValue(true);
@@ -58,9 +67,9 @@ public abstract class StartDockerAgent extends DefaultTask {
             execSpec.executable("docker");
             execSpec.args("run");
             execSpec.args("--detach", "--rm");
-            execSpec.args("--name", "tc-agent");
+            execSpec.args("--name", getContainerName().get());
             execSpec.args("-e", "SERVER_URL=http://" + ipAddress + ":8111/");
-            execSpec.args("jetbrains/teamcity-agent:" + getVersion().get());
+            execSpec.args(getImageName().get() + ":" + getVersion().get());
             execSpec.setStandardOutput(out);
             execSpec.setErrorOutput(out);
             execSpec.setIgnoreExitValue(true);

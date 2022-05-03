@@ -43,6 +43,12 @@ public abstract class StartDockerServer extends DefaultTask {
     @Input
     public abstract Property<String> getServerOptions();
 
+    @Input
+    public abstract Property<String> getImageName();
+
+    @Input
+    public abstract Property<String> getContainerName();
+
     @TaskAction
     public void exec() {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -50,12 +56,12 @@ public abstract class StartDockerServer extends DefaultTask {
             execSpec.executable("docker");
             execSpec.args("run");
             execSpec.args("--detach", "--rm");
-            execSpec.args("--name", "tc-server");
+            execSpec.args("--name", getContainerName().get());
             execSpec.args("-v", getDataDir().get() + ":/data/teamcity_server/datadir");
             execSpec.args("-v", getDataDir().get() + "/logs:/opt/teamcity/logs");
             execSpec.args("-e", "TEAMCITY_SERVER_OPTS=\"" + getServerOptions().get() + "\"");
             execSpec.args("-p", "8111:8111");
-            execSpec.args("jetbrains/teamcity-server:" + getVersion().get());
+            execSpec.args(getImageName().get() + ":" + getVersion().get());
             execSpec.setStandardOutput(out);
             execSpec.setErrorOutput(out);
             execSpec.setIgnoreExitValue(true);

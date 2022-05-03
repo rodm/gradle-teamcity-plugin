@@ -16,6 +16,8 @@
 package com.github.rodm.teamcity.tasks;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
@@ -32,12 +34,15 @@ public abstract class StopDockerAgent extends DefaultTask {
         setDescription("Stops the TeamCity Agent using Docker");
     }
 
+    @Input
+    public abstract Property<String> getContainerName();
+
     @TaskAction
     public void exec() {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         execOperations.exec(execSpec -> {
             execSpec.executable("docker");
-            execSpec.args("stop", "tc-agent");
+            execSpec.args("stop", getContainerName().get());
             execSpec.setStandardOutput(out);
             execSpec.setErrorOutput(out);
             execSpec.setIgnoreExitValue(true);

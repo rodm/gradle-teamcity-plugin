@@ -15,14 +15,18 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import com.github.rodm.teamcity.DockerOptions;
 import com.github.rodm.teamcity.TeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityVersion;
+import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +59,9 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
     private final ListProperty<String> agentOptions;
 
     private boolean useDocker = false;
+    private DockerOptions dockerOptions;
 
+    @Inject
     public DefaultTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name;
         this.environments = environments;
@@ -263,7 +269,26 @@ public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
 
     @Override
     public void useDocker() {
-        this.useDocker = true;
+        useDocker(dockerOptions -> {
+            dockerOptions.setServerImage("jetbrains/teamcity-server");
+            dockerOptions.setAgentImage("jetbrains/teamcity-agent");
+            dockerOptions.setServerName("teamcity-server");
+            dockerOptions.setAgentName("teamcity-agent");
+        });
+    }
+
+    @Override
+    public void useDocker(Action<DockerOptions> configuration) {
+        useDocker = true;
+        if (dockerOptions == null) {
+            dockerOptions = ((ExtensionAware) this).getExtensions().create("docker", DockerOptions.class);
+        }
+        configuration.execute(dockerOptions);
+    }
+
+    @Override
+    public DockerOptions getDockerOptions() {
+        return dockerOptions;
     }
 
     @Override

@@ -1193,6 +1193,72 @@ class EnvironmentsTest {
             def expectedOptions = '-DadditionalOption=value'
             assertThat(startAgent.agentOptions.get(), equalTo(expectedOptions))
         }
+
+        @Test
+        void 'configures tasks with default Docker images and container names'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker()
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.imageName.get(), equalTo('jetbrains/teamcity-server'))
+            assertThat(startServer.containerName.get(), equalTo('teamcity-server'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.imageName.get(), equalTo('jetbrains/teamcity-agent'))
+            assertThat(startAgent.containerName.get(), equalTo('teamcity-agent'))
+        }
+
+        @Test
+        void 'configures tasks with alternative Docker images'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker {
+                            serverImage = 'alt-teamcity-server'
+                            agentImage = 'alt-teamcity-agent'
+                        }
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.imageName.get(), equalTo('alt-teamcity-server'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.imageName.get(), equalTo('alt-teamcity-agent'))
+        }
+
+        @Test
+        void 'configures tasks with alternative Docker container names'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        useDocker {
+                            serverName = 'tc-server'
+                            agentName = 'tc-agent'
+                        }
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.containerName.get(), equalTo('tc-server'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.containerName.get(), equalTo('tc-agent'))
+            assertThat(startAgent.serverContainerName.get(), equalTo('tc-server'))
+        }
     }
 
     class TestPluginAction extends PluginAction {

@@ -16,6 +16,8 @@
 package com.github.rodm.teamcity.tasks;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
@@ -31,6 +33,9 @@ public abstract class StopDockerServer extends DefaultTask {
         this.execOperations = execOperations;
         setDescription("Stops the TeamCity Server using Docker");
     }
+
+    @Input
+    public abstract Property<String> getContainerName();
 
     @TaskAction
     public void exec() {

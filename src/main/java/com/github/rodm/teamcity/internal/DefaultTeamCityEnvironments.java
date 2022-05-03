@@ -64,7 +64,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
         this.baseDataDir = objects.property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
         NamedDomainObjectFactory<TeamCityEnvironment> factory = name ->
-            new DefaultTeamCityEnvironment(name, DefaultTeamCityEnvironments.this, objects);
+            objects.newInstance(DefaultTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
         this.environments = objects.domainObjectContainer(TeamCityEnvironment.class, factory);
     }
 

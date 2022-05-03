@@ -15,6 +15,8 @@
  */
 package com.github.rodm.teamcity;
 
+import org.gradle.api.Action;
+
 public interface TeamCityEnvironment {
 
     /**
@@ -94,5 +96,7 @@ public interface TeamCityEnvironment {
     String getBaseDataDir();
 
     void useDocker();
+    void useDocker(Action<DockerOptions> configuration);
+    DockerOptions getDockerOptions();
     boolean isDockerEnabled();
 }
