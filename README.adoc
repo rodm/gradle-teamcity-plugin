@@ -14,6 +14,9 @@
 :uri-gradle-plugin-portal: https://plugins.gradle.org
 :uri-gradle-plugin: {uri-gradle-plugin-portal}/plugin/{plugin-id}
 :uri-gradle-plugin-version: {uri-shields-gradle-portal}/{plugin-id}
+:uri-docker-hub: https://hub.docker.com
+:uri-docker-teamcity-server: {uri-docker-hub}/r/jetbrains/teamcity-server
+:uri-docker-teamcity-agent: {uri-docker-hub}/r/jetbrains/teamcity-agent
 :plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2018.1
@@ -134,7 +137,7 @@ Plugin descriptor defined in the build script.
     teamcity {
         version = '2021.2-SNAPSHOT'
         allowSnapshotVersions = true            // allow snapshot versions
-        validateBeanDefinition = "fail"         // fail build on any plugin validation erros
+        validateBeanDefinition = "fail"         // fail build on any plugin validation errors
         defaultRepositories = true              // use default repositories to resolve dependencies
     }
 ----
@@ -537,7 +540,7 @@ The following example uses the Kotlin DSL.
 
 === TeamCity Environments Plugin
 
-Applying this plugin provides tasks to download, install, start and stop a TeamCity Server and Build Agent.
+Applying this plugin provides tasks to download, install, start and stop a local TeamCity Server and Build Agent or start and stop a server or agent using Docker.
 This allows a plugin to be debugged or tested against multiple versions of TeamCity.
 
 ==== Configuration
@@ -600,7 +603,10 @@ For each environment the following tasks are created based on the environment na
 * `stop<environment>Server` : Stops the TeamCity Server for the environment, requires the environment `homeDir` property to be defined.
 * `start<environment>Agent` : Starts the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
 * `stop<environment>Agent` : Stops the default TeamCity Build Agent for the environment, requires the environment `homeDir` property to be defined.
-* `install<environment>` : Downloads and installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
+* `start<environment>` : Starts both the TeamCity Server and Build Agent for this environment.
+* `stop<environment>` : Stops both the TeamCity Server and Build Agent for this environment.
+* `download<environment>` : Downloads a TeamCity installer for the environment, this task uses the `downloadBaseUrl` and the environment `version` and `homeDir` properties.
+* `install<environment>` : Installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
 
 ==== Examples
 
@@ -695,6 +701,55 @@ The following example shows environments being configured using the Kotlin DSL.
 
             register("teamcity2020.2") {
                 version = "2020.2.4"
+            }
+        }
+    }
+----
+
+==== Using Docker
+
+To use Docker to start and stop a TeamCity Server and Build Agent an environment can be configured with
+the `useDocker()` function.
+
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+    teamcity {
+        environments {
+            'teamcity2021.2' {
+                version = '2021.2.3'
+                useDocker()
+            }
+        }
+    }
+----
+
+To start and stop a TeamCity Server and Build Agent using Docker requires Docker to be installed and running before
+the running the environment tasks. The start server task uses the image `{uri-docker-teamcity-server}[jetbrains/teamcity-server]`
+and the start agent task uses the image `{uri-docker-teamcity-agent}[jetbrains/teamcity-agent]`. The environment
+`version` property is used to select an image by tag. The start server and start agent tasks also set name of the
+containers to `teamcity-server` and `teamcity-agent`.
+
+The default image and container names can be overridden by providing additional configuration to the
+`useDocker` function as shown in the example below.
+
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+    teamcity {
+        version = "{example-api-version}"
+
+        environments {
+            'teamcity2021.2' {
+                version = '2021.2.3'
+                useDocker {
+                    serverImage = 'my-teamcity-server'
+                    serverName = 'my-server'
+                    agentImage = 'my-teamcity-agent'
+                    agentName = 'my-agent'
+                }
             }
         }
     }
