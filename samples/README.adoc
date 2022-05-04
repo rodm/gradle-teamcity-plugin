@@ -113,4 +113,5 @@ the plugin descriptor and reloads the plugin without restarting the TeamCity ser
 
 The `sakura-ui-plugin` creates a plugin using the new Sakura UI built by webpack. The plugin adds a simple
 message to the top of the side-bar. Building the plugin requires {uri-docker-desktop}[Docker] to be installed
-to run the `webpack` task.
+to run the `webpack` task. The `webpack` task is also configured to support the Gradle build cache, building the
+plugin with the `--build-cache` option will allow the `webpack` task to reuse the output from a previous build.
