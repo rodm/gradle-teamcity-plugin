@@ -48,7 +48,7 @@ import java.util.Set;
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP;
 import static com.github.rodm.teamcity.TeamCityServerPlugin.SERVER_PLUGIN_TASK_NAME;
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2;
-import static org.gradle.language.base.plugins.LifecycleBasePlugin.BUILD_TASK_NAME;
+import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME;
 
 public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     @Override
@@ -80,7 +80,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                     task.setGroup(TEAMCITY_GROUP);
                     task.getPlugins().from(environment.getPlugins());
                     task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
-                    task.dependsOn(tasks.named(BUILD_TASK_NAME));
+                    task.dependsOn(tasks.named(ASSEMBLE_TASK_NAME));
                 });
 
                 final TaskProvider<Undeploy> undeployPlugin = tasks.register("undeployFrom" + name, Undeploy.class, task -> {
