@@ -61,6 +61,9 @@ public interface TeamCityEnvironments {
     // methods to create and access TeamCityEnvironments
     TeamCityEnvironment getByName(String name);
     NamedDomainObjectProvider<TeamCityEnvironment> named(String name) throws UnknownDomainObjectException;
-    TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException;
-    NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) throws InvalidUserDataException;
+    LocalTeamCityEnvironment create(String name, Action<LocalTeamCityEnvironment> action) throws InvalidUserDataException;
+    NamedDomainObjectProvider<LocalTeamCityEnvironment> register(String name, Action<LocalTeamCityEnvironment> action) throws InvalidUserDataException;
+
+    <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
+    <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
 }

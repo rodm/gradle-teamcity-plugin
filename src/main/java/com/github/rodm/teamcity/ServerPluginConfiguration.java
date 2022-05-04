@@ -18,6 +18,7 @@ package com.github.rodm.teamcity;
 import com.github.rodm.teamcity.internal.DefaultPublishConfiguration;
 import com.github.rodm.teamcity.internal.DefaultSignConfiguration;
 import org.gradle.api.Action;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -161,11 +162,23 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
         return environments.named(name);
     }
 
-    public TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) {
-        return environments.create(name, action);
+    @Override
+    public LocalTeamCityEnvironment create(String name, Action<LocalTeamCityEnvironment> action) {
+        return environments.create(name, LocalTeamCityEnvironment.class, action);
     }
 
-    public NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) {
-        return environments.register(name, action);
+    @Override
+    public NamedDomainObjectProvider<LocalTeamCityEnvironment> register(String name, Action<LocalTeamCityEnvironment> action) {
+        return environments.register(name, LocalTeamCityEnvironment.class, action);
+    }
+
+    @Override
+    public <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
+        return environments.create(name, type, action);
+    }
+
+    @Override
+    public <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
+        return environments.register(name, type, action);
     }
 }

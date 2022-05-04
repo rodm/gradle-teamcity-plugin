@@ -148,12 +148,24 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         return environments.named(name);
     }
 
-    public TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
+    @Override
+    public LocalTeamCityEnvironment create(String name, Action<LocalTeamCityEnvironment> action) throws InvalidUserDataException {
         return environments.create(name, LocalTeamCityEnvironment.class, action);
     }
 
-    public NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) throws InvalidUserDataException {
+    @Override
+    public NamedDomainObjectProvider<LocalTeamCityEnvironment> register(String name, Action<LocalTeamCityEnvironment> action) throws InvalidUserDataException {
         return environments.register(name, LocalTeamCityEnvironment.class, action);
+    }
+
+    @Override
+    public <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
+        return environments.create(name, type, action);
+    }
+
+    @Override
+    public <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
+        return environments.register(name, type, action);
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
