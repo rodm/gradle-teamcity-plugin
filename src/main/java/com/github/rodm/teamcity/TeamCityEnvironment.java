@@ -29,36 +29,12 @@ public interface TeamCityEnvironment extends Named {
     void setVersion(String version);
 
     /**
-     * The download URL used to download the TeamCity distribution for this environment.
-     *
-     * @return the download URL
-     */
-    String getDownloadUrl();
-    void setDownloadUrl(String downloadUrl);
-
-    /**
-     * The home directory for this environment's TeamCity installation.
-     *
-     * @return the home directory
-     */
-    String getHomeDir();
-    void setHomeDir(String homeDir);
-
-    /**
      * The data directory for this environment's TeamCity configuration.
      *
      * @return the data directory
      */
     String getDataDir();
     void setDataDir(String dataDir);
-
-    /**
-     * The Java home directory used to start the server and agent for this environment.
-     *
-     * @return the Java home directory
-     */
-    String getJavaHome();
-    void setJavaHome(String javaHome);
 
     /**
      * The list of plugins to be deployed to this environment.

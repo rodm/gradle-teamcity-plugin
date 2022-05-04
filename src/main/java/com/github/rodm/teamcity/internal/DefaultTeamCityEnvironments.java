@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import com.github.rodm.teamcity.LocalTeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityEnvironments;
 import groovy.lang.Closure;
@@ -31,6 +32,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
+import org.gradle.util.ClosureBackedAction;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -65,9 +67,9 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
         this.baseDataDir = objects.property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
         this.environments = objects.polymorphicDomainObjectContainer(TeamCityEnvironment.class);
-        NamedDomainObjectFactory<TeamCityEnvironment> factory = name ->
+        NamedDomainObjectFactory<LocalTeamCityEnvironment> factory = name ->
             objects.newInstance(DefaultTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
-        this.environments.registerFactory(TeamCityEnvironment.class, factory);
+        this.environments.registerFactory(LocalTeamCityEnvironment.class, factory);
     }
 
     /**
@@ -147,11 +149,11 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     public TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
-        return environments.create(name, action);
+        return environments.create(name, LocalTeamCityEnvironment.class, action);
     }
 
-    public NamedDomainObjectProvider<TeamCityEnvironment> register(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException {
-        return environments.register(name, action);
+    public NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) throws InvalidUserDataException {
+        return environments.register(name, LocalTeamCityEnvironment.class, action);
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
@@ -159,7 +161,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         Object[] args = (Object[]) arg;
         if (args.length == 1 && args[0] instanceof Closure) {
             Closure configuration = (Closure) args[0];
-            return environments.create(name, configuration);
+            return environments.create(name, LocalTeamCityEnvironment.class, ClosureBackedAction.of(configuration));
         } else {
             throw new MissingMethodException(name, getClass(), args);
         }

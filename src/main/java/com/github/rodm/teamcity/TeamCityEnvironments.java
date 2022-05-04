@@ -62,5 +62,5 @@ public interface TeamCityEnvironments {
     TeamCityEnvironment getByName(String name);
     NamedDomainObjectProvider<TeamCityEnvironment> named(String name) throws UnknownDomainObjectException;
     TeamCityEnvironment create(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException;
-    NamedDomainObjectProvider<TeamCityEnvironment> register(String name, Action<TeamCityEnvironment> action) throws InvalidUserDataException;
+    NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) throws InvalidUserDataException;
 }

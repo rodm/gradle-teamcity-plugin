@@ -167,7 +167,7 @@ class EnvironmentsKotlinTest {
             }
         }
 
-        val environment = teamcity.environments.named("test").get()
+        val environment = teamcity.environments.named("test").get() as LocalTeamCityEnvironment
         assertThat(environment.javaHome, equalTo("/opt/java1.8.0"))
     }
 }

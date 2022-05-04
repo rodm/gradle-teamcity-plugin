@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.DockerOptions;
-import com.github.rodm.teamcity.TeamCityEnvironment;
+import com.github.rodm.teamcity.LocalTeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityVersion;
 import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultTeamCityEnvironment implements TeamCityEnvironment {
+public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
 
     private static final List<String> DEFAULT_SERVER_OPTIONS = Collections.unmodifiableList(
         Arrays.asList(

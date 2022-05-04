@@ -165,7 +165,7 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
         return environments.create(name, action);
     }
 
-    public NamedDomainObjectProvider<TeamCityEnvironment> register(String name, Action<TeamCityEnvironment> action) {
+    public NamedDomainObjectProvider<? extends LocalTeamCityEnvironment> register(String name, Action<? super LocalTeamCityEnvironment> action) {
         return environments.register(name, action);
     }
 }
