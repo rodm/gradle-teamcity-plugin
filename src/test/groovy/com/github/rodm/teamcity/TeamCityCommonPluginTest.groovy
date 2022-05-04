@@ -58,4 +58,15 @@ class TeamCityCommonPluginTest {
         Configuration configuration = project.configurations.getByName('provided')
         assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'common-api', '2021.2'))
     }
+
+    @Test
+    void 'apply adds tests-support to the testImplementation configuration'() {
+        project.apply plugin: 'java'
+        project.apply plugin: 'com.github.rodm.teamcity-common'
+
+        project.evaluate()
+
+        Configuration configuration = project.configurations.getByName('testImplementation')
+        assertThat(configuration, hasDependency('org.jetbrains.teamcity', 'tests-support', '9.0'))
+    }
 }

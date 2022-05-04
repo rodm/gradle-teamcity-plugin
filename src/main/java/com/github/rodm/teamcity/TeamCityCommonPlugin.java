@@ -25,10 +25,15 @@ public class TeamCityCommonPlugin implements Plugin<Project> {
     public void apply(final Project project) {
         project.getPlugins().apply(TeamCityPlugin.class);
 
-        final DefaultTeamCityPluginExtension extension = (DefaultTeamCityPluginExtension)
-            project.getExtensions().getByType(TeamCityPluginExtension.class);
+        final TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
+        configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
+    }
+
+    private void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
         Provider<String> version = extension.getVersionProperty();
-        project.getPlugins().withType(JavaPlugin.class, plugin ->
-            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:common-api:" + v)));
+        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:common-api:" + v));
+            project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
+        });
     }
 }
