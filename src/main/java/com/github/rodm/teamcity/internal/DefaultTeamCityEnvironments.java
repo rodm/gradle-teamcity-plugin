@@ -20,6 +20,7 @@ import com.github.rodm.teamcity.TeamCityEnvironments;
 import groovy.lang.Closure;
 import groovy.lang.MissingMethodException;
 import org.gradle.api.Action;
+import org.gradle.api.ExtensiblePolymorphicDomainObjectContainer;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
@@ -53,7 +54,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
 
     private final ProjectLayout layout;
     private final ProviderFactory providers;
-    private final NamedDomainObjectContainer<TeamCityEnvironment> environments;
+    private final ExtensiblePolymorphicDomainObjectContainer<TeamCityEnvironment> environments;
 
     @Inject
     public DefaultTeamCityEnvironments(ProjectLayout layout, ProviderFactory providers, ObjectFactory objects) {
@@ -63,9 +64,10 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.downloadsDir = objects.property(String.class).convention(DEFAULT_DOWNLOADS_DIR);
         this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
         this.baseDataDir = objects.property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
+        this.environments = objects.polymorphicDomainObjectContainer(TeamCityEnvironment.class);
         NamedDomainObjectFactory<TeamCityEnvironment> factory = name ->
             objects.newInstance(DefaultTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
-        this.environments = objects.domainObjectContainer(TeamCityEnvironment.class, factory);
+        this.environments.registerFactory(TeamCityEnvironment.class, factory);
     }
 
     /**

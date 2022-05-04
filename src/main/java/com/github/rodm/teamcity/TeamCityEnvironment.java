@@ -16,8 +16,9 @@
 package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
+import org.gradle.api.Named;
 
-public interface TeamCityEnvironment {
+public interface TeamCityEnvironment extends Named {
 
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
