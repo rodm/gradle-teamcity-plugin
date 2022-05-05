@@ -31,7 +31,7 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
     @Inject
     public DefaultDockerTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         super(name, environments, factory);
-        this.serverImage = factory.property(String.class).convention("jetbrains/teamcity-server");;
+        this.serverImage = factory.property(String.class).convention("jetbrains/teamcity-server");
         this.agentImage = factory.property(String.class).convention("jetbrains/teamcity-agent");
         this.serverName = factory.property(String.class).convention("teamcity-server");
         this.agentName = factory.property(String.class).convention("teamcity-agent");

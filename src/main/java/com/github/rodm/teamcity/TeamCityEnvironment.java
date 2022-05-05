@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Action;
 import org.gradle.api.Named;
 
 public interface TeamCityEnvironment extends Named {

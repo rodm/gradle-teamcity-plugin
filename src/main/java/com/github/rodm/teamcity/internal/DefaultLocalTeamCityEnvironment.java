@@ -16,9 +16,7 @@
 package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.LocalTeamCityEnvironment;
-import com.github.rodm.teamcity.TeamCityVersion;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 
@@ -104,22 +102,5 @@ public class DefaultLocalTeamCityEnvironment extends BaseTeamCityEnvironment imp
 
     private Provider<String> defaultHomeDir() {
         return environments.getBaseHomeDirProperty().map(dir -> dir + "/TeamCity-" + getVersion());
-    }
-
-    private Provider<String> defaultDataDir() {
-        return environments.getBaseDataDirProperty()
-            .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
-    }
-
-    private Provider<String> gradleProperty(final String name) {
-        return environments.gradleProperty(name);
-    }
-
-    private String propertyName(final String property) {
-        return "teamcity.environments." + getName() + "." + property;
-    }
-
-    private Provider<String> asStringProvider(ListProperty<String> options) {
-        return options.map(strings -> String.join(" ", strings));
     }
 }

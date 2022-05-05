@@ -173,17 +173,17 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
         return environments.getBaseDataDirProperty().get();
     }
 
-    private Provider<String> defaultDataDir() {
-        return environments.getBaseDataDirProperty()
-            .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
-    }
-
-    private Provider<String> gradleProperty(final String name) {
+    protected final Provider<String> gradleProperty(final String name) {
         return environments.gradleProperty(name);
     }
 
-    private String propertyName(final String property) {
+    protected final String propertyName(final String property) {
         return "teamcity.environments." + getName() + "." + property;
+    }
+
+    private Provider<String> defaultDataDir() {
+        return environments.getBaseDataDirProperty()
+            .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
     }
 
     private Provider<String> asStringProvider(ListProperty<String> options) {
