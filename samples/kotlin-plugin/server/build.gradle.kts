@@ -1,5 +1,5 @@
 
-import com.github.rodm.teamcity.TeamCityEnvironment
+import com.github.rodm.teamcity.LocalTeamCityEnvironment
 
 plugins {
     kotlin("jvm")
@@ -37,7 +37,7 @@ teamcity {
         baseHomeDir = serversDir
         baseDataDir = "${rootDir}/data"
 
-        operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = environments.create(this, block)
+        operator fun String.invoke(block: LocalTeamCityEnvironment.() -> Unit) = environments.create(this, block)
 
         "teamcity2020.1" {
             version = "2020.1.5"
