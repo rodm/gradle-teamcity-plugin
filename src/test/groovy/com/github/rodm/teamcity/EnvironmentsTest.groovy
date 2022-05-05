@@ -1226,8 +1226,7 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker()
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
                     }
                 }
@@ -1247,8 +1246,7 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker()
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
                         serverOptions '-DadditionalOption=value'
                     }
@@ -1268,8 +1266,7 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker()
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
                         agentOptions = '-DadditionalOption=value'
                     }
@@ -1288,8 +1285,7 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker()
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
                     }
                 }
@@ -1309,12 +1305,10 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker {
-                            serverImage = 'alt-teamcity-server'
-                            agentImage = 'alt-teamcity-agent'
-                        }
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
+                        serverImage = 'alt-teamcity-server'
+                        agentImage = 'alt-teamcity-agent'
                     }
                 }
             }
@@ -1331,12 +1325,10 @@ class EnvironmentsTest {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
-                    test {
-                        useDocker {
-                            serverName = 'tc-server'
-                            agentName = 'tc-agent'
-                        }
+                    test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
+                        serverName = 'tc-server'
+                        agentName = 'tc-agent'
                     }
                 }
             }
