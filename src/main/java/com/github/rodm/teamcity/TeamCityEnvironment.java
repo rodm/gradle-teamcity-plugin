@@ -71,9 +71,4 @@ public interface TeamCityEnvironment extends Named {
     // Convenience accessors for base properties
     String getBaseHomeDir();
     String getBaseDataDir();
-
-    void useDocker();
-    void useDocker(Action<DockerOptions> configuration);
-    DockerOptions getDockerOptions();
-    boolean isDockerEnabled();
 }

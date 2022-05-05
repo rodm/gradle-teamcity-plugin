@@ -15,13 +15,10 @@
  */
 package com.github.rodm.teamcity.internal;
 
-import com.github.rodm.teamcity.DockerOptions;
 import com.github.rodm.teamcity.TeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityVersion;
-import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -191,37 +188,5 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     private Provider<String> asStringProvider(ListProperty<String> options) {
         return options.map(strings -> String.join(" ", strings));
-    }
-
-    private boolean useDocker = false;
-    private DockerOptions dockerOptions;
-
-    @Override
-    public void useDocker() {
-        useDocker(dockerOptions -> {
-            dockerOptions.setServerImage("jetbrains/teamcity-server");
-            dockerOptions.setAgentImage("jetbrains/teamcity-agent");
-            dockerOptions.setServerName("teamcity-server");
-            dockerOptions.setAgentName("teamcity-agent");
-        });
-    }
-
-    @Override
-    public void useDocker(Action<DockerOptions> configuration) {
-        useDocker = true;
-        if (dockerOptions == null) {
-            dockerOptions = ((ExtensionAware) this).getExtensions().create("docker", DockerOptions.class);
-        }
-        configuration.execute(dockerOptions);
-    }
-
-    @Override
-    public DockerOptions getDockerOptions() {
-        return dockerOptions;
-    }
-
-    @Override
-    public boolean isDockerEnabled() {
-        return useDocker;
     }
 }
