@@ -1,4 +1,6 @@
 
+import com.github.rodm.teamcity.DockerTeamCityEnvironment
+
 plugins {
     id ("com.github.rodm.teamcity-environments") version "1.4"
 }
@@ -18,14 +20,12 @@ teamcity {
     version = teamcityVersion
 
     environments {
-        register("teamcity2020.1") {
+        register("teamcity2020.1", DockerTeamCityEnvironment::class.java) {
             version = "2021.2.3"
-            useDocker {
-//                serverImage = "alt-teamcity-server"
-//                agentImage = "alt-teamcity-agent"
-                serverName = "tc-server"
-                agentName = "tc-agent"
-            }
+//            serverImage = "alt-teamcity-server"
+//            agentImage = "alt-teamcity-agent"
+            serverName = "tc-server"
+            agentName = "tc-agent"
             plugins = configurations["teamcityPlugins"]
             serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
             agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
