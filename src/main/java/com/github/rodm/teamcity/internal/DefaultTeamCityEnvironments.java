@@ -174,6 +174,10 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         if (args.length == 1 && args[0] instanceof Closure) {
             Closure configuration = (Closure) args[0];
             return environments.create(name, LocalTeamCityEnvironment.class, ClosureBackedAction.of(configuration));
+        } else if (args.length == 2 && args[0] instanceof Class && args[1] instanceof Closure) {
+            Class<TeamCityEnvironment> type = (Class) args[0];
+            Closure<TeamCityEnvironment> configuration = (Closure) args[1];
+            return environments.create(name, type, ClosureBackedAction.of(configuration));
         } else {
             throw new MissingMethodException(name, getClass(), args);
         }

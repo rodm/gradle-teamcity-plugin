@@ -92,6 +92,10 @@ class EnvironmentsTest {
 
     private Project project
 
+    private Task task(String name) {
+        project.tasks.getByName(name)
+    }
+
     @BeforeEach
     void setup() {
         project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
@@ -1127,8 +1131,62 @@ class EnvironmentsTest {
         assertThat(task('stopTestAgent'), isA(StopAgent))
     }
 
-    private Task task(String name) {
-        project.tasks.getByName(name)
+    @Test
+    void 'default environment type is local'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test1 {
+                    version = '2021.2.1'
+                    homeDir = '/opt/teamcity-server'
+                }
+                create('test2') {
+                    version = '2021.2.2'
+                    homeDir = '/opt/teamcity-server'
+                }
+                register('test3') {
+                    version = '2021.2.3'
+                    homeDir = '/opt/teamcity-server'
+                }
+            }
+        }
+        project.evaluate()
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+        assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
+        assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
+        assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
+    }
+
+    @Test
+    void 'configure local environment type'() {
+        project.apply plugin: 'com.github.rodm.teamcity-environments'
+        project.teamcity {
+            environments {
+                test1(LocalTeamCityEnvironment) {
+                    version = '2021.2.1'
+                    homeDir = '/opt/teamcity-server'
+                }
+                create('test2', LocalTeamCityEnvironment) {
+                    version = '2021.2.2'
+                    homeDir = '/opt/teamcity-server'
+                }
+                register('test3', LocalTeamCityEnvironment) {
+                    version = '2021.2.3'
+                    homeDir = '/opt/teamcity-server'
+                }
+            }
+        }
+        project.evaluate()
+
+        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+        def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+        assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
+        assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
+        assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
     }
 
     @Nested
