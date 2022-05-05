@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.DockerOptions;
-import com.github.rodm.teamcity.LocalTeamCityEnvironment;
+import com.github.rodm.teamcity.TeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityVersion;
 import org.gradle.api.Action;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
+public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     private static final List<String> DEFAULT_SERVER_OPTIONS = Collections.unmodifiableList(
         Arrays.asList(
@@ -49,27 +49,16 @@ public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
     private final DefaultTeamCityEnvironments environments;
 
     private String version = "9.0";
-    private final Property<String> downloadUrl;
-    private final Provider<String> installerFile;
-    private final Property<String> homeDir;
     private final Property<String> dataDir;
-    private final Property<String> javaHome;
     private final ConfigurableFileCollection plugins;
     private final ListProperty<String> serverOptions;
     private final ListProperty<String> agentOptions;
 
-    private boolean useDocker = false;
-    private DockerOptions dockerOptions;
-
     @Inject
-    public DefaultTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
+    public BaseTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name;
         this.environments = environments;
-        this.downloadUrl = factory.property(String.class).convention(defaultDownloadUrl());
-        this.installerFile = factory.property(String.class).convention(defaultInstallerFile());
-        this.homeDir = factory.property(String.class).convention(defaultHomeDir());
         this.dataDir = factory.property(String.class).convention(defaultDataDir());
-        this.javaHome = factory.property(String.class).convention(System.getProperty("java.home"));
         this.plugins = factory.fileCollection();
         this.serverOptions = factory.listProperty(String.class);
         this.serverOptions.addAll(DEFAULT_SERVER_OPTIONS);
@@ -93,36 +82,6 @@ public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
     }
 
     /**
-     * The download URL used to download the TeamCity distribution for this environment.
-     */
-    public String getDownloadUrl() {
-        return gradleProperty(propertyName("downloadUrl")).orElse(downloadUrl).get();
-    }
-
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl.set(downloadUrl);
-    }
-
-    public Provider<String> getInstallerFile() {
-        return installerFile;
-    }
-
-    /**
-     * The home directory for this environment's TeamCity installation.
-     */
-    public String getHomeDir() {
-        return getHomeDirProperty().get();
-    }
-
-    public void setHomeDir(String homeDir) {
-        this.homeDir.set(homeDir);
-    }
-
-    public Provider<String> getHomeDirProperty() {
-        return gradleProperty(propertyName("homeDir")).orElse(homeDir);
-    }
-
-    /**
      * The data directory for this environment's TeamCity configuration.
      */
     public String getDataDir() {
@@ -139,21 +98,6 @@ public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
 
     public Provider<String> getPluginsDirProperty() {
         return getDataDirProperty().map(path -> path + "/plugins");
-    }
-
-    /**
-     * The Java home directory used to start the server and agent for this environment.
-     */
-    public String getJavaHome() {
-        return getJavaHomeProperty().get();
-    }
-
-    public void setJavaHome(String javaHome) {
-        this.javaHome.set(javaHome);
-    }
-
-    public Provider<String> getJavaHomeProperty() {
-        return gradleProperty(propertyName("javaHome")).orElse(javaHome);
     }
 
     /**
@@ -232,24 +176,6 @@ public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
         return environments.getBaseDataDirProperty().get();
     }
 
-    private Provider<String> defaultDownloadUrl() {
-        return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + version + ".tar.gz");
-    }
-
-    private Provider<String> defaultInstallerFile() {
-        return environments.getDownloadsDirProperty().map(dir -> dir + "/" + filename());
-    }
-
-    private String filename() {
-        String url = downloadUrl.get();
-        int index = url.lastIndexOf("/") + 1;
-        return url.substring(index);
-    }
-
-    private Provider<String> defaultHomeDir() {
-        return environments.getBaseHomeDirProperty().map(dir -> dir + "/TeamCity-" + getVersion());
-    }
-
     private Provider<String> defaultDataDir() {
         return environments.getBaseDataDirProperty()
             .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
@@ -266,6 +192,9 @@ public class DefaultTeamCityEnvironment implements LocalTeamCityEnvironment {
     private Provider<String> asStringProvider(ListProperty<String> options) {
         return options.map(strings -> String.join(" ", strings));
     }
+
+    private boolean useDocker = false;
+    private DockerOptions dockerOptions;
 
     @Override
     public void useDocker() {

@@ -1193,6 +1193,35 @@ class EnvironmentsTest {
     class UsingDocker {
 
         @Test
+        void 'configure docker environment type'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test1(DockerTeamCityEnvironment) {
+                        version = '2021.2.1'
+                        serverImage = 'teamcity-server'
+                    }
+                    create('test2', DockerTeamCityEnvironment) {
+                        version = '2021.2.2'
+                        serverImage = 'teamcity-server'
+                    }
+                    register('test3', DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                        serverImage = 'teamcity-server'
+                    }
+                }
+            }
+            project.evaluate()
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+            assertThat(environments.getByName('test1'), isA(DockerTeamCityEnvironment))
+            assertThat(environments.getByName('test2'), isA(DockerTeamCityEnvironment))
+            assertThat(environments.getByName('test3'), isA(DockerTeamCityEnvironment))
+        }
+
+        @Test
         void 'creates tasks for a docker environment'() {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {

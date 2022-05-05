@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import com.github.rodm.teamcity.DockerTeamCityEnvironment;
 import com.github.rodm.teamcity.LocalTeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityEnvironment;
 import com.github.rodm.teamcity.TeamCityEnvironments;
@@ -67,9 +68,12 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         this.baseHomeDir = objects.property(String.class).convention(dir(DEFAULT_BASE_HOME_DIR));
         this.baseDataDir = objects.property(String.class).convention(dir(DEFAULT_BASE_DATA_DIR));
         this.environments = objects.polymorphicDomainObjectContainer(TeamCityEnvironment.class);
-        NamedDomainObjectFactory<LocalTeamCityEnvironment> factory = name ->
-            objects.newInstance(DefaultTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
-        this.environments.registerFactory(LocalTeamCityEnvironment.class, factory);
+        NamedDomainObjectFactory<LocalTeamCityEnvironment> localFactory = name ->
+            objects.newInstance(DefaultLocalTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
+        this.environments.registerFactory(LocalTeamCityEnvironment.class, localFactory);
+        NamedDomainObjectFactory<DockerTeamCityEnvironment> dockerFactory = name ->
+            objects.newInstance(DefaultDockerTeamCityEnvironment.class, name, DefaultTeamCityEnvironments.this, objects);
+        this.environments.registerFactory(DockerTeamCityEnvironment.class, dockerFactory);
     }
 
     /**
