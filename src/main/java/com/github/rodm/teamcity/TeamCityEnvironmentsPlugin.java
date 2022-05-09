@@ -73,14 +73,14 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         public void execute(final Project project) {
             DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) extension.getEnvironments();
             NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
-            container.withType(DefaultLocalTeamCityEnvironment.class).all(environment -> {
-                configureDeploymentTasks(project, environment);
-                configureLocalEnvironmentTasks(project, environment);
+            container.withType(LocalTeamCityEnvironment.class).all(environment -> {
+                configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
+                configureLocalEnvironmentTasks(project, (DefaultLocalTeamCityEnvironment) environment);
                 configureCommonTasks(project, capitalize(environment.getName()));
             });
-            container.withType(DefaultDockerTeamCityEnvironment.class).all(environment -> {
-                configureDeploymentTasks(project, environment);
-                configureDockerEnvironmentTasks(project, environment);
+            container.withType(DockerTeamCityEnvironment.class).all(environment -> {
+                configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
+                configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
                 configureCommonTasks(project, capitalize(environment.getName()));
             });
         }
