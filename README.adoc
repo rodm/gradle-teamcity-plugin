@@ -75,7 +75,7 @@ To test the samples run
 
 === Applying the plugins to a build
 
-The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains four plugins:
+The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains five plugins:
 
 * `com.github.rodm.teamcity-base` - Allows extension properties `version`, `allowSnapshotVersions`,
 `validateBeanDefinition`, and `defaultRepositories` to be set and shared to sub-projects applying the other plugins.
@@ -89,7 +89,8 @@ un-deploy plugins to the server, and to start and stop a TeamCity Server and Bui
 Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-server[server],
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-agent[agent],
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common] and
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common],
+{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-base[base] and
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations
@@ -545,9 +546,10 @@ This allows a plugin to be debugged or tested against multiple versions of TeamC
 
 ==== Configuration
 
-The environments configuration is available by applying the `com.github.rodm.teamcity-environments` plugin.
+The `environments` configuration is available by applying the `com.github.rodm.teamcity-environments` plugin.
 
-The following properties can be defined in the `environments` configuration block.
+The following properties can be defined in the `environments` configuration block
+and are only used by local TeamCity environments.
 
 * `downloadsDir` : The directory the TeamCity installers are downloaded to. Defaults to `downloads`
 * `baseDownloadUrl` : The base URL used to download the TeamCity installer. Defaults to `https://download.jetbrains.com/teamcity`.
@@ -562,8 +564,14 @@ by setting a value in a gradle.properties file.
 * `teamcity.environments.baseDataDir`
 * `teamcity.environments.baseHomeDir`
 
-Within the `environments` configuration block multiple TeamCity environments can be defined, each environment
-supports the following properties
+The `environments` configuration block supports defining multiple TeamCity environments.
+When creating an environment the default is to create or register a local TeamCity environment.
+
+==== A Local TeamCity Environment
+
+===== Configuration
+
+To configure a local TeamCity environment the configuration block supports the following properties
 
 * `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '{default-api-version}'.
 * `downloadUrl` : The URL used to download the TeamCity installer. Defaults to `${baseDownloadUrl}/TeamCity-${version}.tar.gz`.
@@ -589,7 +597,7 @@ defined in the build script.
 * `teamcity.environments._<environment>_.serverOptions`
 * `teamcity.environments._<environment>_.agentOptions`
 
-==== Tasks
+===== Tasks
 
 For each environment the following tasks are created based on the environment name:
 
@@ -608,7 +616,7 @@ For each environment the following tasks are created based on the environment na
 * `download<environment>` : Downloads a TeamCity installer for the environment, this task uses the `downloadBaseUrl` and the environment `version` and `homeDir` properties.
 * `install<environment>` : Installs TeamCity for the environment, this tasks uses the `downloadBaseUrl` and the environment `homeDir` properties.
 
-==== Examples
+===== Examples
 
 [source,groovy]
 [subs="attributes"]
@@ -654,6 +662,11 @@ For each environment the following tasks are created based on the environment na
             'teamcity2018.2' {
                 version = '2018.2.2'
                 javaHome = file('/opt/jdk1.8.0_202')
+            }
+
+            // explicitly specifying the environment type
+            'teamcity2022.04'(LocalTeamCityEnvironment) {
+                version = '2022.04'
             }
         }
     }
@@ -706,10 +719,12 @@ The following example shows environments being configured using the Kotlin DSL.
     }
 ----
 
-==== Using Docker
+==== A Docker TeamCity Environment
 
-To use Docker to start and stop a TeamCity Server and Build Agent an environment can be configured with
-the `useDocker()` function.
+To create an environment that uses Docker to start and stop a TeamCity Server and Build Agent an environment can
+specify the type when creating or registering the environment.
+
+The following example shows the different ways Docker environments can be configured using the Groovy DSL.
 
 [source,groovy]
 [subs="attributes"]
@@ -717,22 +732,76 @@ the `useDocker()` function.
 ----
     teamcity {
         environments {
-            'teamcity2021.2' {
+            'teamcity2021.1'(DockerTeamCityEnvironment) {
+                version = '2021.1.4'
+            }
+            create('teamcity2021.2', DockerTeamCityEnvironment) {
                 version = '2021.2.3'
-                useDocker()
+            }
+            register('teamcity2022.04', DockerTeamCityEnvironment) {
+                version = '2022.04'
             }
         }
     }
 ----
 
-To start and stop a TeamCity Server and Build Agent using Docker requires Docker to be installed and running before
-the running the environment tasks. The start server task uses the image `{uri-docker-teamcity-server}[jetbrains/teamcity-server]`
-and the start agent task uses the image `{uri-docker-teamcity-agent}[jetbrains/teamcity-agent]`. The environment
-`version` property is used to select an image by tag. The start server and start agent tasks also set name of the
-containers to `teamcity-server` and `teamcity-agent`.
+The following example shows the different ways Docker environments can be configured using the Kotlin DSL.
 
-The default image and container names can be overridden by providing additional configuration to the
-`useDocker` function as shown in the example below.
+[source,groovy]
+[subs="attributes"]
+.build.gradle
+----
+    teamcity {
+        environments {
+            create('teamcity2021.2', DockerTeamCityEnvironment::class.java) {
+                version = '2021.2.3'
+            }
+            register("teamcity2022.04", DockerTeamCityEnvironment::class.java) {
+                version = '2021.2.3'
+            }
+        }
+    }
+----
+
+===== Configuration
+
+To configure a Docker TeamCity environment the configuration block supports the following properties
+
+* `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '{default-api-version}'.
+* `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
+* `serverImage` : The name of the Docker image to use for the TeamCity Server. Defaults to `{uri-docker-teamcity-server}[jetbrains/teamcity-server]:${version}`.
+* `serverName` : The name of the running Docker container for the TeamCity Server. Defaults to `teamcity-server`.
+* `agentImage` : The name of the Docker image to use for the TeamCity Build Agent. Defaults to `{uri-docker-teamcity-agent}[jetbrains/teamcity-agent]:${version}`..
+* `agentName` : The name to the running Docker container for the TeamCity Build Agent. Defaults to `teamcity-agent`.
+* `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable.
+Default `-Dteamcity.development.mode=true`, `-Dteamcity.development.shadowCopyClasses=true`,
+`-Dteamcity.superUser.token.saveToFile=true`, `-Dteamcity.kotlinConfigsDsl.generateDslDocs=false`
+these plugin development settings are described on the {uri-teamcity-environment}[Development Environment] page.
+* `agentOptions` : Options passed to the TeamCity agent via the `TEAMCITY_AGENT_OPTS` environment variable.
+* `plugins` : The collection of plugins to be deployed to the TeamCity server for this environment. Defaults to the
+plugin output by the `serverPlugin` task when the `com.github.rodm.teamcity-server` plugin is also applied.
+
+===== Tasks
+
+For each environment the following tasks are created based on the environment name:
+
+* `deployTo<environment>` : Deploys one or more plugin archives to the TeamCity server for the environment. If the
+environment is using TeamCity version 2018.2 or later and the server is running, the deploy task will send unload
+and load requests to the server. This allows changes to be made to the plugin without having to restart the server.
+Note that this feature currently relies on the file name of the plugin not changing between deploys.
+* `undeployFrom<environment>` : Un-deploys one or more plugin archives from the TeamCity server for the environment.
+* `start<environment>Sever` : Starts the TeamCity Server for the environment.
+* `stop<environment>Server` : Stops the TeamCity Server for the environment.
+* `start<environment>Agent` : Starts the TeamCity Build Agent for the environment.
+* `stop<environment>Agent` : Stops the TeamCity Build Agent for the environment.
+* `start<environment>` : Starts both the TeamCity Server and Build Agent for this environment.
+* `stop<environment>` : Stops both the TeamCity Server and Build Agent for this environment.
+
+To start and stop a TeamCity Server and Build Agent using Docker requires {uri-docker-desktop}[Docker] to be
+installed and running before executing the environment tasks.
+The environment `version` property is used to select an image by tag.
+
+===== Examples
 
 [source,groovy]
 [subs="attributes"]
@@ -744,12 +813,15 @@ The default image and container names can be overridden by providing additional 
         environments {
             'teamcity2021.2' {
                 version = '2021.2.3'
-                useDocker {
-                    serverImage = 'my-teamcity-server'
-                    serverName = 'my-server'
-                    agentImage = 'my-teamcity-agent'
-                    agentName = 'my-agent'
-                }
+                serverImage = 'my-teamcity-server'
+                serverName = 'my-server'
+                agentImage = 'my-teamcity-agent'
+                agentName = 'my-agent'
+
+                // Add to the default server and agent options
+                serverOptions("-Dproperty=value")
+                serverOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
+                agentOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5501")
             }
         }
     }
