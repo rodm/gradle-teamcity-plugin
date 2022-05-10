@@ -17,6 +17,7 @@ package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.UnknownDomainObjectException;
 
@@ -66,4 +67,5 @@ public interface TeamCityEnvironments {
 
     <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
     <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
+    <T extends TeamCityEnvironment> void registerFactory(Class<T> type, NamedDomainObjectFactory<T> factory);
 }

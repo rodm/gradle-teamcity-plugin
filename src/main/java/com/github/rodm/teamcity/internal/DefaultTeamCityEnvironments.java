@@ -172,6 +172,11 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         return environments.register(name, type, action);
     }
 
+    @Override
+    public <T extends TeamCityEnvironment> void registerFactory(Class<T> type, NamedDomainObjectFactory<T> factory) {
+        environments.registerFactory(type, factory);
+    }
+
     @SuppressWarnings("GroovyAssignabilityCheck")
     public TeamCityEnvironment methodMissing(String name, Object arg) {
         Object[] args = (Object[]) arg;
@@ -187,7 +192,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         }
     }
 
-    Provider<String> gradleProperty(final String name) {
+    public Provider<String> gradleProperty(final String name) {
         return providers.gradleProperty(name).forUseAtConfigurationTime();
     }
 

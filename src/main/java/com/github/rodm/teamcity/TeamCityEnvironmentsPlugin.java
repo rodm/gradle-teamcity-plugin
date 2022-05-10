@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import com.github.rodm.teamcity.internal.BaseTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultLocalTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;

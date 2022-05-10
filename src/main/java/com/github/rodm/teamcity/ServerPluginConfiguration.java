@@ -19,6 +19,7 @@ import com.github.rodm.teamcity.internal.DefaultPublishConfiguration;
 import com.github.rodm.teamcity.internal.DefaultSignConfiguration;
 import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
@@ -180,5 +181,10 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
     @Override
     public <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
         return environments.register(name, type, action);
+    }
+
+    @Override
+    public <T extends TeamCityEnvironment> void registerFactory(Class<T> type, NamedDomainObjectFactory<T> factory) {
+        environments.registerFactory(type, factory);
     }
 }

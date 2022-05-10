@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import com.github.rodm.teamcity.BaseTeamCityEnvironment;
 import com.github.rodm.teamcity.LocalTeamCityEnvironment;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;

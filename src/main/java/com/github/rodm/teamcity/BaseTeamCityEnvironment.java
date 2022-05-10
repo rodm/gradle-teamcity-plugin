@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal;
+package com.github.rodm.teamcity;
 
-import com.github.rodm.teamcity.TeamCityEnvironment;
-import com.github.rodm.teamcity.TeamCityVersion;
+import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
