@@ -1340,6 +1340,41 @@ class EnvironmentsTest {
             assertThat(startAgent.containerName.get(), equalTo('tc-agent'))
             assertThat(startAgent.serverContainerName.get(), equalTo('tc-server'))
         }
+
+        @Test
+        void 'environments plugin configures environment tasks using overrides from gradle properties'() {
+            projectDir.resolve('gradle.properties').toFile() << """
+            teamcity.environments.test.serverImage = alt-teamcity-server
+            teamcity.environments.test.agentImage = alt-teamcity-agent
+            teamcity.environments.test.serverName = alt-server
+            teamcity.environments.test.agentName = alt-agent
+            """
+            project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+            // workaround for https://github.com/gradle/gradle/issues/13122
+            (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
+
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                        serverImage = 'my-teamcity-server'
+                        agentImage = 'my-teamcity-agent'
+                        serverName = 'my-teamcity-server'
+                        agentName = 'my-teamcity-agent'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.imageName.get(), equalTo('alt-teamcity-server'))
+            assertThat(startServer.containerName.get(), equalTo('alt-server'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.imageName.get(), equalTo('alt-teamcity-agent'))
+            assertThat(startAgent.containerName.get(), equalTo('alt-agent'))
+            assertThat(startAgent.serverContainerName.get(), equalTo('alt-server'))
+        }
     }
 
     class TestPluginAction extends PluginAction {

@@ -19,6 +19,7 @@ import com.github.rodm.teamcity.BaseTeamCityEnvironment;
 import com.github.rodm.teamcity.DockerTeamCityEnvironment;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 
 import javax.inject.Inject;
 
@@ -39,34 +40,50 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
     }
 
     public String getServerImage() {
-        return serverImage.get();
+        return getServerImageProperty().get();
     }
 
     public void setServerImage(String serverImage) {
         this.serverImage.set(serverImage);
     }
 
+    public Provider<String> getServerImageProperty() {
+        return gradleProperty(propertyName("serverImage")).orElse(serverImage);
+    }
+
     public String getAgentImage() {
-        return agentImage.get();
+        return getAgentImageProperty().get();
     }
 
     public void setAgentImage(String agentImage) {
         this.agentImage.set(agentImage);
     }
 
+    public Provider<String> getAgentImageProperty() {
+        return gradleProperty(propertyName("agentImage")).orElse(agentImage);
+    }
+
     public String getServerName() {
-        return serverName.get();
+        return getServerNameProperty().get();
     }
 
     public void setServerName(String serverName) {
         this.serverName.set(serverName);
     }
 
+    public Provider<String> getServerNameProperty() {
+        return gradleProperty(propertyName("serverName")).orElse(serverName);
+    }
+
     public String getAgentName() {
-        return agentName.get();
+        return getAgentNameProperty().get();
     }
 
     public void setAgentName(String agentName) {
         this.agentName.set(agentName);
+    }
+
+    public Provider<String> getAgentNameProperty() {
+        return gradleProperty(propertyName("agentName")).orElse(agentName);
     }
 }

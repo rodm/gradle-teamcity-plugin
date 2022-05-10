@@ -182,8 +182,8 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getVersion().set(environment.getVersion());
                 task.getDataDir().set(environment.getDataDirProperty());
                 task.getServerOptions().set(environment.getServerOptionsProvider());
-                task.getImageName().set(environment.getServerImage());
-                task.getContainerName().set(environment.getServerName());
+                task.getImageName().set(environment.getServerImageProperty());
+                task.getContainerName().set(environment.getServerNameProperty());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
                 task.dependsOn(tasks.named("deployTo" + name));
             });
@@ -198,9 +198,9 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
-                task.getImageName().set(environment.getAgentImage());
-                task.getContainerName().set(environment.getAgentName());
-                task.getServerContainerName().set(environment.getServerName());
+                task.getImageName().set(environment.getAgentImageProperty());
+                task.getContainerName().set(environment.getAgentNameProperty());
+                task.getServerContainerName().set(environment.getServerNameProperty());
                 task.mustRunAfter(tasks.named(startServerTaskName));
             });
 
