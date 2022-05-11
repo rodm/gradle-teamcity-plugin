@@ -1375,6 +1375,42 @@ class EnvironmentsTest {
             assertThat(startAgent.containerName.get(), equalTo('alt-agent'))
             assertThat(startAgent.serverContainerName.get(), equalTo('alt-server'))
         }
+
+        @Test
+        void 'server image must not include a tag'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+
+            def e = assertThrows(InvalidUserDataException, () -> {
+                project.teamcity {
+                    environments {
+                        test(DockerTeamCityEnvironment) {
+                            version = '2021.2.3'
+                            serverImage = 'jetbrains/teamcity-server:2022.04'
+                        }
+                    }
+                }
+            })
+
+            assertThat(e.message, equalTo('serverImage must not include a tag.'))
+        }
+
+        @Test
+        void 'agent image must not include a tag'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+
+            def e = assertThrows(InvalidUserDataException, () -> {
+                project.teamcity {
+                    environments {
+                        test(DockerTeamCityEnvironment) {
+                            version = '2021.2.3'
+                            agentImage = 'jetbrains/teamcity-agent:2022.04'
+                        }
+                    }
+                }
+            })
+
+            assertThat(e.message, equalTo('agentImage must not include a tag.'))
+        }
     }
 
     class TestPluginAction extends PluginAction {

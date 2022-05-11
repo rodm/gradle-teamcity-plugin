@@ -17,6 +17,7 @@ package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.BaseTeamCityEnvironment;
 import com.github.rodm.teamcity.DockerTeamCityEnvironment;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -44,6 +45,7 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
     }
 
     public void setServerImage(String serverImage) {
+        validateImage(serverImage, "serverImage");
         this.serverImage.set(serverImage);
     }
 
@@ -56,6 +58,7 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
     }
 
     public void setAgentImage(String agentImage) {
+        validateImage(agentImage, "agentImage");
         this.agentImage.set(agentImage);
     }
 
@@ -85,5 +88,11 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
 
     public Provider<String> getAgentNameProperty() {
         return gradleProperty(propertyName("agentName")).orElse(agentName);
+    }
+
+    private void validateImage(String image, String property) {
+        if (image.contains(":")) {
+            throw new InvalidUserDataException(property + " must not include a tag.");
+        }
     }
 }
