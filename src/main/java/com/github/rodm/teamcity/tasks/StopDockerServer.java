@@ -15,38 +15,22 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.TaskAction;
+import com.github.rodm.teamcity.internal.DockerTask;
 import org.gradle.process.ExecOperations;
+import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 
-public abstract class StopDockerServer extends DefaultTask {
-
-    private final ExecOperations execOperations;
+public abstract class StopDockerServer extends DockerTask {
 
     @Inject
     public StopDockerServer(ExecOperations execOperations) {
-        this.execOperations = execOperations;
+        super(execOperations);
         setDescription("Stops the TeamCity Server using Docker");
     }
 
-    @Input
-    public abstract Property<String> getContainerName();
-
-    @TaskAction
-    public void exec() {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        execOperations.exec(execSpec -> {
-            execSpec.executable("docker");
-            execSpec.args("stop", "tc-server");
-            execSpec.setStandardOutput(out);
-            execSpec.setErrorOutput(out);
-            execSpec.setIgnoreExitValue(true);
-        });
-        getLogger().info(out.toString());
+    @Override
+    protected void configure(ExecSpec execSpec) {
+        execSpec.args("stop", getContainerName().get());
     }
 }

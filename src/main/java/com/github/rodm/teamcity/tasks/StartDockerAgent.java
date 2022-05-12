@@ -15,22 +15,20 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import org.gradle.api.DefaultTask;
+import com.github.rodm.teamcity.internal.DockerTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.Internal;
 import org.gradle.process.ExecOperations;
+import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 
-public abstract class StartDockerAgent extends DefaultTask {
-
-    private final ExecOperations execOperations;
+public abstract class StartDockerAgent extends DockerTask {
 
     @Inject
     public StartDockerAgent(ExecOperations execOperations) {
-        this.execOperations = execOperations;
+        super(execOperations);
         setDescription("Starts the TeamCity Agent using Docker");
     }
 
@@ -44,36 +42,17 @@ public abstract class StartDockerAgent extends DefaultTask {
     public abstract Property<String> getImageName();
 
     @Input
-    public abstract Property<String> getContainerName();
-
-    @Input
     public abstract Property<String> getServerContainerName();
 
-    @TaskAction
-    public void exec() {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        execOperations.exec(execSpec -> {
-            execSpec.executable("docker");
-            execSpec.args("inspect");
-            execSpec.args("--format", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}");
-            execSpec.args(getServerContainerName().get());
-            execSpec.setStandardOutput(out);
-            execSpec.setErrorOutput(out);
-            execSpec.setIgnoreExitValue(true);
-        });
-        String ipAddress = out.toString().replace("\n", "");
-        out.reset();
-        execOperations.exec(execSpec -> {
-            execSpec.executable("docker");
-            execSpec.args("run");
-            execSpec.args("--detach", "--rm");
-            execSpec.args("--name", getContainerName().get());
-            execSpec.args("-e", "SERVER_URL=http://" + ipAddress + ":8111/");
-            execSpec.args(getImageName().get() + ":" + getVersion().get());
-            execSpec.setStandardOutput(out);
-            execSpec.setErrorOutput(out);
-            execSpec.setIgnoreExitValue(true);
-        });
-        getLogger().warn(out.toString());
+    @Internal
+    public abstract Property<String> getIpAddress();
+
+    @Override
+    protected void configure(ExecSpec execSpec) {
+        execSpec.args("run");
+        execSpec.args("--detach", "--rm");
+        execSpec.args("--name", getContainerName().get());
+        execSpec.args("-e", "SERVER_URL=http://" + getIpAddress().get() + ":8111/");
+        execSpec.args(getImageName().get() + ":" + getVersion().get());
     }
 }

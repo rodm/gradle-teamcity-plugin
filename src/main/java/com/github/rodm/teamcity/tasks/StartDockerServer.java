@@ -15,22 +15,19 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import org.gradle.api.DefaultTask;
+import com.github.rodm.teamcity.internal.DockerTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
+import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
 
-public abstract class StartDockerServer extends DefaultTask {
-
-    private final ExecOperations execOperations;
+public abstract class StartDockerServer extends DockerTask {
 
     @Inject
     public StartDockerServer(ExecOperations execOperations) {
-        this.execOperations = execOperations;
+        super(execOperations);
         setDescription("Starts the TeamCity Server using Docker");
     }
 
@@ -46,27 +43,15 @@ public abstract class StartDockerServer extends DefaultTask {
     @Input
     public abstract Property<String> getImageName();
 
-    @Input
-    public abstract Property<String> getContainerName();
-
-    @TaskAction
-    public void exec() {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        execOperations.exec(execSpec -> {
-            execSpec.executable("docker");
-            execSpec.args("run");
-            execSpec.args("--detach", "--rm");
-            execSpec.args("--name", getContainerName().get());
-            execSpec.args("-v", getDataDir().get() + ":/data/teamcity_server/datadir");
-            execSpec.args("-v", getDataDir().get() + "/logs:/opt/teamcity/logs");
-            execSpec.args("-e", "TEAMCITY_SERVER_OPTS=\"" + getServerOptions().get() + "\"");
-            execSpec.args("-p", "8111:8111");
-            execSpec.args(getImageName().get() + ":" + getVersion().get());
-            execSpec.setStandardOutput(out);
-            execSpec.setErrorOutput(out);
-            execSpec.setIgnoreExitValue(true);
-        });
-        getLogger().info(out.toString());
+    @Override
+    protected void configure(ExecSpec execSpec) {
+        execSpec.args("run");
+        execSpec.args("--detach", "--rm");
+        execSpec.args("--name", getContainerName().get());
+        execSpec.args("-v", getDataDir().get() + ":/data/teamcity_server/datadir");
+        execSpec.args("-v", getDataDir().get() + "/logs:/opt/teamcity/logs");
+        execSpec.args("-e", "TEAMCITY_SERVER_OPTS=\"" + getServerOptions().get() + "\"");
+        execSpec.args("-p", "8111:8111");
+        execSpec.args(getImageName().get() + ":" + getVersion().get());
     }
-
 }
