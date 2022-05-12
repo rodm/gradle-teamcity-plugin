@@ -81,13 +81,13 @@
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>configs-dsl-kotlin</artifactId>
+      <artifactId>configs-dsl-kotlin-latest</artifactId>
       <version>${teamcity.dsl.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.teamcity</groupId>
-      <artifactId>configs-dsl-kotlin-plugins</artifactId>
+      <artifactId>configs-dsl-kotlin-plugins-latest</artifactId>
       <version>1.0-SNAPSHOT</version>
       <type>pom</type>
       <scope>compile</scope>
@@ -107,7 +107,7 @@
       <dependency>
           <groupId>com.github.rodm</groupId>
           <artifactId>teamcity-dsl-extensions</artifactId>
-          <version>0.7</version>
+          <version>0.8</version>
           <scope>compile</scope>
       </dependency>
   </dependencies>
