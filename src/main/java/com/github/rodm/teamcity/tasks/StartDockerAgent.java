@@ -55,6 +55,7 @@ public abstract class StartDockerAgent extends DockerTask {
         execSpec.args("--detach", "--rm");
         execSpec.args("--name", getContainerName().get());
         execSpec.args("-e", "SERVER_URL=http://" + getIpAddress().get() + ":8111/");
+        execSpec.args("-e", "TEAMCITY_AGENT_OPTS=" + getAgentOptions().get());
         getDebugPort(getAgentOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
         execSpec.args(getImageName().get() + ":" + getVersion().get());
     }
