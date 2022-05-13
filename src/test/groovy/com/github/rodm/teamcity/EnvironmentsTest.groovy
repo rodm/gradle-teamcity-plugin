@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.DisablePluginAction
+import com.github.rodm.teamcity.internal.DockerSupport
 import com.github.rodm.teamcity.internal.EnablePluginAction
 import com.github.rodm.teamcity.internal.PluginAction
 import com.github.rodm.teamcity.tasks.Deploy
@@ -66,6 +67,7 @@ import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.startsWith
+import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
@@ -1410,6 +1412,22 @@ class EnvironmentsTest {
             })
 
             assertThat(e.message, equalTo('agentImage must not include a tag.'))
+        }
+
+        @Test
+        void 'extract debug port from options'() {
+            def serverOptions = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+            def agentOptions =  '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
+
+            assertEquals('5005', getDebugPort(serverOptions))
+            assertEquals('5006', getDebugPort(agentOptions))
+            assertEquals('', getDebugPort(''))
+            assertEquals('', getDebugPort('jdwp'))
+            assertEquals('', getDebugPort('address=1234'))
+        }
+
+        private static String getDebugPort(String options) {
+            return DockerSupport.getDebugPort(options).orElse('')
         }
     }
 

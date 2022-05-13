@@ -23,6 +23,8 @@ import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
 
+import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
+
 public abstract class StartDockerServer extends DockerTask {
 
     @Inject
@@ -52,6 +54,7 @@ public abstract class StartDockerServer extends DockerTask {
         execSpec.args("-v", getDataDir().get() + "/logs:/opt/teamcity/logs");
         execSpec.args("-e", "TEAMCITY_SERVER_OPTS=\"" + getServerOptions().get() + "\"");
         execSpec.args("-p", "8111:8111");
+        getDebugPort(getServerOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
         execSpec.args(getImageName().get() + ":" + getVersion().get());
     }
 }

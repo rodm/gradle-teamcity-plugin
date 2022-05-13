@@ -24,6 +24,8 @@ import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
 
+import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
+
 public abstract class StartDockerAgent extends DockerTask {
 
     @Inject
@@ -53,6 +55,7 @@ public abstract class StartDockerAgent extends DockerTask {
         execSpec.args("--detach", "--rm");
         execSpec.args("--name", getContainerName().get());
         execSpec.args("-e", "SERVER_URL=http://" + getIpAddress().get() + ":8111/");
+        getDebugPort(getAgentOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
         execSpec.args(getImageName().get() + ":" + getVersion().get());
     }
 }
