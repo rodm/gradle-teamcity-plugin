@@ -27,7 +27,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCopyDetails;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.PluginManager;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
@@ -55,10 +55,11 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
     public static final String AGENT_PLUGIN_TASK_NAME = "agentPlugin";
 
     public void apply(final Project project) {
-        project.getPlugins().apply(TeamCityPlugin.class);
+        PluginManager plugins = project.getPluginManager();
+        plugins.apply(TeamCityPlugin.class);
 
-        project.getPlugins().withType(JavaPlugin.class, javaPlugin -> {
-            if (project.getPlugins().hasPlugin(TeamCityServerPlugin.class)) {
+        plugins.withPlugin("org.gradle.java", javaPlugin -> {
+            if (plugins.hasPlugin("com.github.rodm.teamcity-server")) {
                 throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin");
             }
         });
@@ -71,7 +72,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
 
     public void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
         Provider<String> version = extension.getVersionProperty();
-        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+        project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
             project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:agent-api:" + v));
             project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
         });
@@ -101,7 +102,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
             task.setDescription(TEAMCITY_GROUP);
             task.getDescriptor().set(descriptorFile);
             task.getLib().from(project.getConfigurations().getByName("agent"));
-            project.getPlugins().withType(JavaPlugin.class, plugin -> {
+            project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
                 task.getLib().from(project.getTasks().named(JAR_TASK_NAME));
                 task.getLib().from(project.getConfigurations().getByName("runtimeClasspath"));
             });
@@ -116,7 +117,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
             task.doLast(new PluginExecutableFilesValidationAction(files));
         });
 
-        project.getPlugins().withType(TeamCityServerPlugin.class, serverPlugin ->
+        project.getPluginManager().withPlugin("com.github.rodm.teamcity-server", serverPlugin ->
             packagePlugin.configure(agentPlugin ->
                 agentPlugin.getArchiveAppendix().convention("agent")));
 

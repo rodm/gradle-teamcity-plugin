@@ -31,6 +31,7 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.RegularFile;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.PluginManager;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
@@ -65,10 +66,11 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     private static final String MARKETPLACE_CONFIGURATION_NAME = "marketplace";
 
     public void apply(final Project project) {
-        project.getPlugins().apply(TeamCityPlugin.class);
+        PluginManager plugins = project.getPluginManager();
+        plugins.apply(TeamCityPlugin.class);
 
-        project.getPlugins().withType(JavaPlugin.class, plugin -> {
-            if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
+        plugins.withPlugin("org.gradle.java", plugin -> {
+            if (plugins.hasPlugin("com.github.rodm.teamcity-agent")) {
                 throw new GradleException("Cannot apply both the teamcity-agent and teamcity-server plugins with the Java plugin");
             }
         });
@@ -100,7 +102,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     public void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
         Provider<String> version = extension.getVersionProperty();
         Property<Boolean> allowSnapshotVersions = extension.getAllowSnapshotVersionsProperty();
-        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+        project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
             project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:server-api:" + v));
             project.getDependencies().add("provided", version.map(v -> {
                 TeamCityVersion teamCityVersion = TeamCityVersion.version(version.get(), allowSnapshotVersions.get());
@@ -114,7 +116,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         final TaskContainer tasks = project.getTasks();
         final ServerPluginConfiguration server = extension.getServer();
 
-        project.getPlugins().withType(JavaPlugin.class, plugin ->
+        project.getPluginManager().withPlugin("org.gradle.java", plugin ->
             tasks.named(JAR_TASK_NAME, Jar.class).configure(task ->
                 task.into("buildServerResources", copySpec ->
                     copySpec.from(server.getWeb()))));
@@ -137,11 +139,11 @@ public class TeamCityServerPlugin implements Plugin<Project> {
             task.setGroup(TEAMCITY_GROUP);
             task.getDescriptor().set(descriptorFile);
             task.getServer().from(project.getConfigurations().getByName("server"));
-            project.getPlugins().withType(JavaPlugin.class, plugin -> {
+            project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
                 task.getServer().from(tasks.named(JAR_TASK_NAME));
                 task.getServer().from(project.getConfigurations().getByName("runtimeClasspath"));
             });
-            if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
+            if (project.getPluginManager().hasPlugin("com.github.rodm.teamcity-agent")) {
                 task.getAgent().from(tasks.named(AGENT_PLUGIN_TASK_NAME));
             } else {
                 task.getAgent().from((project.getConfigurations().getByName("agent")));

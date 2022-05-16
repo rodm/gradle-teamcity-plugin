@@ -55,7 +55,7 @@ import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK
 public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
-        project.getPlugins().apply(TeamCityPlugin.class);
+        project.getPluginManager().apply(TeamCityPlugin.class);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension));

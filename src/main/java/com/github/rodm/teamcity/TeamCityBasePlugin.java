@@ -20,7 +20,6 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.BasePlugin;
-import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.provider.Property;
 import org.gradle.util.GradleVersion;
 
@@ -31,8 +30,7 @@ public class TeamCityBasePlugin implements Plugin<Project> {
     private static final String MINIMUM_SUPPORTED_VERSION = "7.0";
 
     public void apply(Project project) {
-        PluginContainer plugins = project.getPlugins();
-        plugins.apply(BasePlugin.class);
+        project.getPluginManager().apply(BasePlugin.class);
 
         if (GradleVersion.current().compareTo(GradleVersion.version(MINIMUM_SUPPORTED_VERSION)) < 0) {
             throw new GradleException("Gradle TeamCity plugin requires Gradle version " + MINIMUM_SUPPORTED_VERSION + " or later");

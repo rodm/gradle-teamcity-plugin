@@ -18,12 +18,11 @@ package com.github.rodm.teamcity;
 import com.github.rodm.teamcity.internal.DefaultTeamCityPluginExtension;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
 
 public class TeamCityCommonPlugin implements Plugin<Project> {
     public void apply(final Project project) {
-        project.getPlugins().apply(TeamCityPlugin.class);
+        project.getPluginManager().apply(TeamCityPlugin.class);
 
         final TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
         configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
@@ -31,7 +30,7 @@ public class TeamCityCommonPlugin implements Plugin<Project> {
 
     private void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
         Provider<String> version = extension.getVersionProperty();
-        project.getPlugins().withType(JavaPlugin.class, plugin -> {
+        project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
             project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:common-api:" + v));
             project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
         });
