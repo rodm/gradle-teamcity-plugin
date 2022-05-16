@@ -40,12 +40,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @SuppressWarnings('unused')
     static List<String> data() {
         return [
-            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.1'
+            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5-rc-1'
         ]
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17']
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18']
     }
 
     static List<String> supportedByGradle(String version) {
@@ -62,6 +62,9 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         }
         if (gradleVersion < GradleVersion.version('7.3')) {
             javaVersions.remove('17')
+        }
+        if (gradleVersion < GradleVersion.version('7.5-rc-1')) {
+            javaVersions.remove('18')
         }
         return javaVersions
     }
