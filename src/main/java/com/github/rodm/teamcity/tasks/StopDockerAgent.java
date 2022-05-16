@@ -32,5 +32,6 @@ public abstract class StopDockerAgent extends DockerTask {
     @Override
     protected void configure(ExecSpec execSpec) {
         execSpec.args("stop", getContainerName().get());
+        execSpec.setIgnoreExitValue(true);
     }
 }
