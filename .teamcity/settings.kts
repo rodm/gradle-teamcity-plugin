@@ -18,7 +18,8 @@ fun supportedGradleVersion(javaVersion: String?): String? {
         "14" to "6.3",
         "15" to "6.7.1",
         "16" to "7.0.2",
-        "17" to "7.3"
+        "17" to "7.3",
+        "18" to "7.5-rc-1"
     )
     return versionsMap[javaVersion]
 }
@@ -162,7 +163,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("16", "17")
+                    "Java"("16", "17", "18")
                 }
                 build {
                     val javaVersion = axes["Java"]
