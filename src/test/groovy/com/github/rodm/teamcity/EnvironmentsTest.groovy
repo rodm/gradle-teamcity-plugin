@@ -1415,12 +1415,20 @@ class EnvironmentsTest {
         }
 
         @Test
-        void 'extract debug port from options'() {
-            def serverOptions = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
-            def agentOptions =  '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
+        void 'options with a debug port'() {
+            // JDK 5-8
+            def options1 = '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005'
+            // JDK 9 or later
+            def options2 =  '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006,allow=*'
+            def options3 =  '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=teamcity-server:5007,timeout=1000'
 
-            assertEquals('5005', getDebugPort(serverOptions))
-            assertEquals('5006', getDebugPort(agentOptions))
+            assertEquals('5005', getDebugPort(options1))
+            assertEquals('5006', getDebugPort(options2))
+            assertEquals('5007', getDebugPort(options3))
+        }
+
+        @Test
+        void 'options without a debug port'() {
             assertEquals('', getDebugPort(''))
             assertEquals('', getDebugPort('jdwp'))
             assertEquals('', getDebugPort('address=1234'))

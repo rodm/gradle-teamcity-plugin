@@ -27,8 +27,8 @@ teamcity {
             serverName = "tc-server"
             agentName = "tc-agent"
             plugins = configurations["teamcityPlugins"]
-            serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
-            agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
+            serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
+            agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006")
         }
     }
 }

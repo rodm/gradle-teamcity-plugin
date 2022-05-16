@@ -26,6 +26,7 @@ public class DockerSupport {
             .flatMap(debugOption -> Arrays.stream(debugOption.split(",")))
             .filter(debugParameter -> debugParameter.contains("address="))
             .map(debugParameter -> debugParameter.replace("address=", ""))
+            .map(debugParameterValue -> debugParameterValue.replaceAll("^.*:", ""))
             .findAny();
     }
 
