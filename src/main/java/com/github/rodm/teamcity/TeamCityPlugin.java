@@ -40,6 +40,17 @@ public class TeamCityPlugin implements Plugin<Project> {
 
     public static final String TEAMCITY_GROUP = "TeamCity";
 
+    public static final String JAVA_PLUGIN_ID = "org.gradle.java";
+    public static final String SERVER_PLUGIN_ID = "com.github.rodm.teamcity-server";
+    public static final String AGENT_PLUGIN_ID = "com.github.rodm.teamcity-agent";
+
+    public static final String AGENT_CONFIGURATION_NAME = "agent";
+    public static final String SERVER_CONFIGURATION_NAME = "server";
+    public static final String PLUGIN_CONFIGURATION_NAME = "plugin";
+    public static final String PROVIDED_CONFIGURATION_NAME = "provided";
+
+    public static final String GRADLE_OFFLINE = "gradle-offline";
+
     private static final String JETBRAINS_MAVEN_REPOSITORY = "https://download.jetbrains.com/teamcity-repository";
 
     private static final String CLASSES_PATTERN = "**/*.class";
@@ -54,7 +65,7 @@ public class TeamCityPlugin implements Plugin<Project> {
 
     private static void configureRepositories(Project project, TeamCityPluginExtension extension) {
         project.afterEvaluate(p ->
-            project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
+            project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
                 if (extension.getDefaultRepositories()) {
                     project.getRepositories().mavenCentral();
                     project.getRepositories().maven(repository -> repository.setUrl(JETBRAINS_MAVEN_REPOSITORY));
@@ -65,18 +76,18 @@ public class TeamCityPlugin implements Plugin<Project> {
 
     public static void configureConfigurations(final Project project) {
         final ConfigurationContainer configurations = project.getConfigurations();
-        configurations.maybeCreate("agent")
+        configurations.maybeCreate(AGENT_CONFIGURATION_NAME)
             .setVisible(false)
             .setDescription("Configuration for agent plugin.");
-        configurations.maybeCreate("server")
+        configurations.maybeCreate(SERVER_CONFIGURATION_NAME)
             .setVisible(false)
             .setDescription("Configuration for server plugin.");
-        configurations.maybeCreate("plugin")
+        configurations.maybeCreate(PLUGIN_CONFIGURATION_NAME)
             .setVisible(false)
             .setTransitive(false)
             .setDescription("Configuration for plugin artifact.");
-        project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
-            Configuration providedConfiguration = configurations.maybeCreate("provided")
+        project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
+            Configuration providedConfiguration = configurations.maybeCreate(PROVIDED_CONFIGURATION_NAME)
                 .setVisible(false)
                 .setDescription("Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.");
             configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(providedConfiguration);
@@ -85,9 +96,9 @@ public class TeamCityPlugin implements Plugin<Project> {
     }
 
     public static void configureJarTask(final Project project, final TeamCityPluginExtension extension, final String pattern) {
-        project.getPluginManager().withPlugin("org.gradle.java", plugin ->
+        project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin ->
             project.getTasks().named(JavaPlugin.JAR_TASK_NAME, Jar.class).configure(task -> {
-            task.getInputs().property("gradle-offline", project.getGradle().getStartParameter().isOffline());
+            task.getInputs().property(GRADLE_OFFLINE, project.getGradle().getStartParameter().isOffline());
             ValidationMode mode = extension.getValidateBeanDefinition();
             List<PluginDefinition> pluginDefinitions = new ArrayList<>();
             Set<String> classes = new LinkedHashSet<>();

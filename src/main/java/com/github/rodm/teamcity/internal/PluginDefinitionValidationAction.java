@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.rodm.teamcity.TeamCityPlugin.GRADLE_OFFLINE;
 import static com.github.rodm.teamcity.ValidationMode.FAIL;
 import static com.github.rodm.teamcity.ValidationMode.IGNORE;
 
@@ -66,7 +67,7 @@ public class PluginDefinitionValidationAction implements Action<Task> {
     }
 
     private void validateDefinition(PluginDefinition definition, Task task) {
-        Object value = task.getInputs().getProperties().getOrDefault("gradle-offline", false);
+        Object value = task.getInputs().getProperties().getOrDefault(GRADLE_OFFLINE, false);
         boolean offline = Boolean.parseBoolean(value.toString());
         List<PluginBean> beans;
         try {

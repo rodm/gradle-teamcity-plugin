@@ -20,6 +20,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Provider;
 
+import static com.github.rodm.teamcity.TeamCityPlugin.JAVA_PLUGIN_ID;
+import static com.github.rodm.teamcity.TeamCityPlugin.PROVIDED_CONFIGURATION_NAME;
+import static org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME;
+
 public class TeamCityCommonPlugin implements Plugin<Project> {
     public void apply(final Project project) {
         project.getPluginManager().apply(TeamCityPlugin.class);
@@ -30,9 +34,9 @@ public class TeamCityCommonPlugin implements Plugin<Project> {
 
     private void configureDependencies(final Project project, final DefaultTeamCityPluginExtension extension) {
         Provider<String> version = extension.getVersionProperty();
-        project.getPluginManager().withPlugin("org.gradle.java", plugin -> {
-            project.getDependencies().add("provided", version.map(v -> "org.jetbrains.teamcity:common-api:" + v));
-            project.getDependencies().add("testImplementation", version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
+        project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
+            project.getDependencies().add(PROVIDED_CONFIGURATION_NAME, version.map(v -> "org.jetbrains.teamcity:common-api:" + v));
+            project.getDependencies().add(TEST_IMPLEMENTATION_CONFIGURATION_NAME, version.map(v ->"org.jetbrains.teamcity:tests-support:" + v));
         });
     }
 }
