@@ -172,6 +172,30 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
         return environments.getBaseDataDirProperty().get();
     }
 
+    public String deployTaskName() {
+        return "deployTo" + capitalize(name);
+    }
+
+    public String undeployTaskName() {
+        return "undeployFrom" + capitalize(name);
+    }
+
+    public String startServerTaskName() {
+        return "start" + capitalize(name) + "Server";
+    }
+
+    public String stopServerTaskName() {
+        return "stop" + capitalize(name) + "Server";
+    }
+
+    public String startAgentTaskName() {
+        return "start" + capitalize(name) + "Agent";
+    }
+
+    public String stopAgentTaskName() {
+        return "stop" + capitalize(name) + "Agent";
+    }
+
     protected final Provider<String> gradleProperty(final String name) {
         return environments.gradleProperty(name);
     }
@@ -187,5 +211,9 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     private Provider<String> asStringProvider(ListProperty<String> options) {
         return options.map(strings -> String.join(" ", strings));
+    }
+
+    private String capitalize(String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

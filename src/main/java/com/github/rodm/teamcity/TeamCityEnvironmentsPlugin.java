@@ -76,26 +76,25 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             container.withType(LocalTeamCityEnvironment.class).all(environment -> {
                 configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
                 configureLocalEnvironmentTasks(project, (DefaultLocalTeamCityEnvironment) environment);
-                configureCommonTasks(project, capitalize(environment.getName()));
+                configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
             });
             container.withType(DockerTeamCityEnvironment.class).all(environment -> {
                 configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
                 configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
-                configureCommonTasks(project, capitalize(environment.getName()));
+                configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
             });
         }
 
         private void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {
             final TaskContainer tasks = project.getTasks();
-            final String name = capitalize(environment.getName());
-            final TaskProvider<Deploy> deployPlugin = tasks.register("deployTo" + name, Deploy.class, task -> {
+            final TaskProvider<Deploy> deployPlugin = tasks.register(environment.deployTaskName(), Deploy.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getPlugins().from(environment.getPlugins());
                 task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
                 task.dependsOn(tasks.named(ASSEMBLE_TASK_NAME));
             });
 
-            final TaskProvider<Undeploy> undeployPlugin = tasks.register("undeployFrom" + name, Undeploy.class, task -> {
+            final TaskProvider<Undeploy> undeployPlugin = tasks.register(environment.undeployTaskName(), Undeploy.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getPlugins().from(environment.getPlugins());
                 task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
@@ -139,7 +138,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.dependsOn(tasks.named(downloadTaskName));
             });
 
-            tasks.register("start" + name + "Server", StartServer.class, task -> {
+            tasks.register(environment.startServerTaskName(), StartServer.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
@@ -147,18 +146,18 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getJavaHome().set(environment.getJavaHomeProperty());
                 task.getServerOptions().set(environment.getServerOptionsProvider());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
-                task.dependsOn(tasks.named("deployTo" + name));
+                task.dependsOn(tasks.named(environment.deployTaskName()));
             });
 
-            tasks.register("stop" + name + "Server", StopServer.class, task -> {
+            tasks.register(environment.stopServerTaskName(), StopServer.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
                 task.getJavaHome().set(environment.getJavaHomeProperty());
-                task.finalizedBy(tasks.named("undeployFrom" + name));
+                task.finalizedBy(tasks.named(environment.undeployTaskName()));
             });
 
-            tasks.register("start" + name + "Agent", StartAgent.class, task -> {
+            tasks.register(environment.startAgentTaskName(), StartAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
@@ -166,7 +165,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
             });
 
-            tasks.register("stop" + name + "Agent", StopAgent.class, task -> {
+            tasks.register(environment.stopAgentTaskName(), StopAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
@@ -176,9 +175,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         private void configureDockerEnvironmentTasks(Project project, DefaultDockerTeamCityEnvironment environment) {
             final TaskContainer tasks = project.getTasks();
-            final String name = capitalize(environment.getName());
-            final String startServerTaskName = "start" + name + "Server";
-            tasks.register(startServerTaskName, StartDockerServer.class, task -> {
+            tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getDataDir().set(environment.getDataDirProperty());
@@ -186,16 +183,16 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getImageName().set(environment.getServerImageProperty());
                 task.getContainerName().set(environment.getServerNameProperty());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
-                task.dependsOn(tasks.named("deployTo" + name));
+                task.dependsOn(tasks.named(environment.deployTaskName()));
             });
 
-            tasks.register("stop" + name + "Server", StopDockerServer.class, task -> {
+            tasks.register(environment.stopServerTaskName(), StopDockerServer.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getContainerName().set(environment.getServerName());
-                task.finalizedBy(tasks.named("undeployFrom" + name));
+                task.finalizedBy(tasks.named(environment.undeployTaskName()));
             });
 
-            tasks.register("start" + name + "Agent", StartDockerAgent.class, task -> {
+            tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
@@ -203,27 +200,28 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getContainerName().set(environment.getAgentNameProperty());
                 task.getServerContainerName().set(environment.getServerNameProperty());
                 task.doFirst(new DockerInspectAction());
-                task.mustRunAfter(tasks.named(startServerTaskName));
+                task.mustRunAfter(tasks.named(environment.startServerTaskName()));
             });
 
-            tasks.register("stop" + name + "Agent", StopDockerAgent.class, task -> {
+            tasks.register(environment.stopAgentTaskName(), StopDockerAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getContainerName().set(environment.getAgentName());
             });
         }
 
-        private void configureCommonTasks(Project project, String name) {
+        private void configureCommonTasks(Project project, BaseTeamCityEnvironment environment) {
             final TaskContainer tasks = project.getTasks();
-            final String startServerTaskName = "start" + name + "Server";
-            final String startAgentTaskName = "start" + name + "Agent";
+            final String name = capitalize(environment.getName());
+            final String startServerTaskName = environment.startServerTaskName();
+            final String startAgentTaskName = environment.startAgentTaskName();
             tasks.register("start" + name, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.setDescription("Starts the TeamCity Server and Build Agent");
                 task.dependsOn(tasks.named(startServerTaskName), tasks.named(startAgentTaskName));
             });
 
-            final String stopServerTaskName = "stop" + name + "Server";
-            final String stopAgentTaskName = "stop" + name + "Agent";
+            final String stopServerTaskName = environment.stopServerTaskName();
+            final String stopAgentTaskName = environment.stopAgentTaskName();
             tasks.register("stop" + name, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.setDescription("Stops the TeamCity Server and Build Agent");
