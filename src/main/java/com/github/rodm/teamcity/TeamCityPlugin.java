@@ -67,7 +67,13 @@ public class TeamCityPlugin implements Plugin<Project> {
         project.afterEvaluate(p ->
             project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
                 if (extension.getDefaultRepositories()) {
-                    project.getRepositories().mavenCentral();
+                    project.getRepositories().mavenCentral(
+                        repository -> repository.content(
+                            descriptor -> {
+                                descriptor.excludeGroup("org.jetbrains.teamcity");
+                                descriptor.excludeGroup("org.jetbrains.teamcity.internal");
+                            })
+                    );
                     project.getRepositories().maven(repository -> repository.setUrl(JETBRAINS_MAVEN_REPOSITORY));
                 }
             })
