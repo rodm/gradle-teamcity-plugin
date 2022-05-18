@@ -30,6 +30,7 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
     private final Property<String> agentImage;
     private final Property<String> serverName;
     private final Property<String> agentName;
+    private final Property<String> port;
 
     @Inject
     public DefaultDockerTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
@@ -38,6 +39,7 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
         this.agentImage = factory.property(String.class).convention("jetbrains/teamcity-agent");
         this.serverName = factory.property(String.class).convention("teamcity-server");
         this.agentName = factory.property(String.class).convention("teamcity-agent");
+        this.port = factory.property(String.class).convention("8111");
     }
 
     public String getServerImage() {
@@ -88,6 +90,20 @@ public class DefaultDockerTeamCityEnvironment extends BaseTeamCityEnvironment im
 
     public Provider<String> getAgentNameProperty() {
         return gradleProperty(propertyName("agentName")).orElse(agentName);
+    }
+
+    @Override
+    public String getPort() {
+        return getPortProperty().get();
+    }
+
+    @Override
+    public void setPort(String port) {
+        this.port.set(port);
+    }
+
+    public Provider<String> getPortProperty() {
+        return gradleProperty(propertyName("port")).orElse(port);
     }
 
     private void validateImage(String image, String property) {

@@ -182,6 +182,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getServerOptions().set(environment.getServerOptionsProvider());
                 task.getImageName().set(environment.getServerImageProperty());
                 task.getContainerName().set(environment.getServerNameProperty());
+                task.getPort().set(environment.getPortProperty());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
                 task.dependsOn(tasks.named(environment.deployTaskName()));
             });

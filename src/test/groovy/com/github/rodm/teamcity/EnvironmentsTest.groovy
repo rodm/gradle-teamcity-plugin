@@ -1344,12 +1344,46 @@ class EnvironmentsTest {
         }
 
         @Test
+        void 'configures tasks with default port'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.port.get(), equalTo('8111'))
+        }
+
+        @Test
+        void 'configures tasks with alternative server port'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                        port = '8080'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.port.get(), equalTo('8080'))
+        }
+
+        @Test
         void 'environments plugin configures environment tasks using overrides from gradle properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
             teamcity.environments.test.serverImage = alt-teamcity-server
             teamcity.environments.test.agentImage = alt-teamcity-agent
             teamcity.environments.test.serverName = alt-server
             teamcity.environments.test.agentName = alt-agent
+            teamcity.environments.test.port = 7070
             """
             project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
             // workaround for https://github.com/gradle/gradle/issues/13122
@@ -1360,6 +1394,7 @@ class EnvironmentsTest {
                 environments {
                     test(DockerTeamCityEnvironment) {
                         version = '2021.2.3'
+                        port = '8080'
                         serverImage = 'my-teamcity-server'
                         agentImage = 'my-teamcity-agent'
                         serverName = 'my-teamcity-server'
@@ -1372,6 +1407,7 @@ class EnvironmentsTest {
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.imageName.get(), equalTo('alt-teamcity-server'))
             assertThat(startServer.containerName.get(), equalTo('alt-server'))
+            assertThat(startServer.port.get(), equalTo('7070'))
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.imageName.get(), equalTo('alt-teamcity-agent'))
             assertThat(startAgent.containerName.get(), equalTo('alt-agent'))
