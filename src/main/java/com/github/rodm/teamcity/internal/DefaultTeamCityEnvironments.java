@@ -33,7 +33,6 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
-import org.gradle.util.ClosureBackedAction;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -177,7 +176,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
         environments.registerFactory(type, factory);
     }
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
+    @SuppressWarnings("rawtypes")
     public TeamCityEnvironment methodMissing(String name, Object arg) {
         Object[] args = (Object[]) arg;
         if (args.length == 1 && args[0] instanceof Closure) {
