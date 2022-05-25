@@ -55,7 +55,7 @@ public abstract class StartDockerServer extends DockerTask {
         execSpec.args("--name", getContainerName().get());
         execSpec.args("-v", getDataDir().get() + ":/data/teamcity_server/datadir");
         execSpec.args("-v", getDataDir().get() + "/logs:/opt/teamcity/logs");
-        execSpec.args("-e", "TEAMCITY_SERVER_OPTS=\"" + getServerOptions().get() + "\"");
+        execSpec.args("-e", "TEAMCITY_SERVER_OPTS=" + getServerOptions().get());
         execSpec.args("-p", getPort().get() + ":8111");
         getDebugPort(getServerOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
         execSpec.args(getImageName().get() + ":" + getVersion().get());
