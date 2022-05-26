@@ -1224,6 +1224,28 @@ class EnvironmentsTest {
         }
 
         @Test
+        void 'configure environment types using convenience properties'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    register('test1', Docker) {
+                        version = '2021.2.1'
+                    }
+                    register('test2', Local) {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+            assertThat(environments.getByName('test1'), isA(DockerTeamCityEnvironment))
+            assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
+        }
+
+        @Test
         void 'creates tasks for a docker environment'() {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {

@@ -68,4 +68,7 @@ public interface TeamCityEnvironments {
     <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
     <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException;
     <T extends TeamCityEnvironment> void registerFactory(Class<T> type, NamedDomainObjectFactory<T> factory);
+
+    Class<LocalTeamCityEnvironment> Local = LocalTeamCityEnvironment.class;
+    Class<DockerTeamCityEnvironment> Docker = DockerTeamCityEnvironment.class;
 }
