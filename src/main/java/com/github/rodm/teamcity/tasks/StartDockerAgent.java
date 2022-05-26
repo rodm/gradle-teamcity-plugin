@@ -38,6 +38,9 @@ public abstract class StartDockerAgent extends DockerTask {
     public abstract Property<String> getVersion();
 
     @Input
+    public abstract Property<String> getDataDir();
+
+    @Input
     public abstract Property<String> getAgentOptions();
 
     @Input
@@ -54,6 +57,7 @@ public abstract class StartDockerAgent extends DockerTask {
         execSpec.args("run");
         execSpec.args("--detach", "--rm");
         execSpec.args("--name", getContainerName().get());
+        execSpec.args("-v", getDataDir().get() + "/agent/conf:/data/teamcity_agent/conf");
         execSpec.args("-e", "SERVER_URL=http://" + getIpAddress().get() + ":8111/");
         execSpec.args("-e", "TEAMCITY_AGENT_OPTS=" + getAgentOptions().get());
         getDebugPort(getAgentOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));

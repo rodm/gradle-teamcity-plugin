@@ -196,6 +196,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
+                task.getDataDir().set(environment.getDataDirProperty());
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
                 task.getImageName().set(environment.getAgentImageProperty());
                 task.getContainerName().set(environment.getAgentNameProperty());
