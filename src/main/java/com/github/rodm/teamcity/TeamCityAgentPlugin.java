@@ -86,6 +86,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
     }
 
     public void configureTasks(final Project project, final TeamCityPluginExtension extension) {
+        final PluginManager plugins = project.getPluginManager();
         final TaskContainer tasks = project.getTasks();
         final AgentPluginConfiguration agent = extension.getAgent();
         final Provider<RegularFile> descriptorFile = project.getLayout().getBuildDirectory().file(AGENT_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME);
@@ -98,33 +99,33 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
             });
 
         final TaskProvider<GenerateAgentPluginDescriptor> generateDescriptor =
-            project.getTasks().register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor.class, task -> {
+            tasks.register(GENERATE_AGENT_DESCRIPTOR_TASK_NAME, GenerateAgentPluginDescriptor.class, task -> {
                 task.getVersion().set(project.getProviders().provider(() -> TeamCityVersion.version(extension.getVersion(), extension.getAllowSnapshotVersions())));
                 task.getDescriptor().set(project.getProviders().provider(() -> (AgentPluginDescriptor) agent.getDescriptor()));
                 task.getDestination().set(descriptorFile);
             });
 
         final TaskProvider<AgentPlugin> packagePlugin =
-            project.getTasks().register(AGENT_PLUGIN_TASK_NAME, AgentPlugin.class, task -> {
+            tasks.register(AGENT_PLUGIN_TASK_NAME, AgentPlugin.class, task -> {
             task.setDescription(TEAMCITY_GROUP);
             task.getDescriptor().set(descriptorFile);
             task.getLib().from(project.getConfigurations().getByName(AGENT_CONFIGURATION_NAME));
-            project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
-                task.getLib().from(project.getTasks().named(JAR_TASK_NAME));
+            plugins.withPlugin(JAVA_PLUGIN_ID, plugin -> {
+                task.getLib().from(tasks.named(JAR_TASK_NAME));
                 task.getLib().from(project.getConfigurations().getByName(RUNTIME_CLASSPATH_CONFIGURATION_NAME));
             });
             task.with(agent.getFiles());
             task.dependsOn(processDescriptor, generateDescriptor);
         });
 
-        project.getTasks().withType(AgentPlugin.class).configureEach(task -> {
+        tasks.withType(AgentPlugin.class).configureEach(task -> {
             task.doLast(new PluginDescriptorValidationAction("teamcity-agent-plugin-descriptor.xsd"));
             Set<FileCopyDetails> files = new LinkedHashSet<>();
             task.filesMatching("**/*", new FileCollectorAction(files));
             task.doLast(new PluginExecutableFilesValidationAction(files));
         });
 
-        project.getPluginManager().withPlugin(SERVER_PLUGIN_ID, serverPlugin ->
+        plugins.withPlugin(SERVER_PLUGIN_ID, serverPlugin ->
             packagePlugin.configure(agentPlugin ->
                 agentPlugin.getArchiveAppendix().convention("agent")));
 

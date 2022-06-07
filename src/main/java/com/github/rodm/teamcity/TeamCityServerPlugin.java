@@ -121,10 +121,11 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     public void configureServerPluginTasks(final Project project, final TeamCityPluginExtension extension) {
+        final PluginManager plugins = project.getPluginManager();
         final TaskContainer tasks = project.getTasks();
         final ServerPluginConfiguration server = extension.getServer();
 
-        project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin ->
+        plugins.withPlugin(JAVA_PLUGIN_ID, plugin ->
             tasks.named(JAR_TASK_NAME, Jar.class).configure(task ->
                 task.into(BUILD_SERVER_RESOURCES_PATH, copySpec ->
                     copySpec.from(server.getWeb()))));
@@ -147,11 +148,11 @@ public class TeamCityServerPlugin implements Plugin<Project> {
             task.setGroup(TEAMCITY_GROUP);
             task.getDescriptor().set(descriptorFile);
             task.getServer().from(project.getConfigurations().getByName(SERVER_CONFIGURATION_NAME));
-            project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
+            plugins.withPlugin(JAVA_PLUGIN_ID, plugin -> {
                 task.getServer().from(tasks.named(JAR_TASK_NAME));
                 task.getServer().from(project.getConfigurations().getByName(RUNTIME_CLASSPATH_CONFIGURATION_NAME));
             });
-            if (project.getPluginManager().hasPlugin(AGENT_PLUGIN_ID)) {
+            if (plugins.hasPlugin(AGENT_PLUGIN_ID)) {
                 task.getAgent().from(tasks.named(AGENT_PLUGIN_TASK_NAME));
             } else {
                 task.getAgent().from((project.getConfigurations().getByName(AGENT_CONFIGURATION_NAME)));
