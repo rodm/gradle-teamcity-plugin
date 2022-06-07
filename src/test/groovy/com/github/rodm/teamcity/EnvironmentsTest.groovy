@@ -1382,6 +1382,22 @@ class EnvironmentsTest {
         }
 
         @Test
+        void 'configures start server task with default logs directory'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.logsDir.get(), endsWith('/data/2021.2/logs'))
+        }
+
+        @Test
         void 'configures tasks with alternative server port'() {
             project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {

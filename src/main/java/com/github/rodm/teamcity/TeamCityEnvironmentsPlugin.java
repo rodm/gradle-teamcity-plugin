@@ -179,6 +179,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getDataDir().set(environment.getDataDirProperty());
+                task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/logs"));
                 task.getServerOptions().set(environment.getServerOptionsProvider());
                 task.getImageName().set(environment.getServerImageProperty());
                 task.getContainerName().set(environment.getServerNameProperty());
