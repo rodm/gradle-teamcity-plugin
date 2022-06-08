@@ -27,7 +27,7 @@ import java.io.ByteArrayOutputStream;
 
 public abstract class DockerTask extends DefaultTask {
 
-    protected final ExecOperations execOperations;
+    private final ExecOperations execOperations;
 
     protected DockerTask(ExecOperations execOperations) {
         this.execOperations = execOperations;
