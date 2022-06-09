@@ -1394,7 +1394,7 @@ class EnvironmentsTest {
             project.evaluate()
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
-            assertThat(startServer.logsDir.get(), endsWith('/data/2021.2/logs'))
+            assertThat(normalize(startServer.logsDir.get()), endsWith('/data/2021.2/logs'))
         }
 
         @Test
