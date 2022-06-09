@@ -1,6 +1,6 @@
 
 plugins {
-    id ("com.github.rodm.teamcity-base")
+    id ("io.github.rodm.teamcity-base")
 }
 
 group = "com.github.rodm.teamcity"

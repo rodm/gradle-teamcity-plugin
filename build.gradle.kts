@@ -10,7 +10,7 @@ plugins {
 }
 
 version = "1.5-SNAPSHOT"
-group = "com.github.rodm"
+group = "io.github.rodm"
 
 repositories {
     mavenCentral()
@@ -63,7 +63,7 @@ gradlePlugin {
 
     plugins {
         create("teamcityBasePlugin") {
-            id = "com.github.rodm.teamcity-base"
+            id = "io.github.rodm.teamcity-base"
             displayName = "Gradle TeamCity base plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityBasePlugin"
         }

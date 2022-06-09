@@ -77,7 +77,7 @@ To test the samples run
 
 The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains five plugins:
 
-* `com.github.rodm.teamcity-base` - Allows extension properties `version`, `allowSnapshotVersions`,
+* `io.github.rodm.teamcity-base` - Allows extension properties `version`, `allowSnapshotVersions`,
 `validateBeanDefinition`, and `defaultRepositories` to be set and shared to sub-projects applying the other plugins.
 * `com.github.rodm.teamcity-server` - Provides tasks to package, sign and publish a TeamCity plugin.
 * `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent-side of a TeamCity plugin.
@@ -90,7 +90,7 @@ Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-server[server],
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-agent[agent],
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common],
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-base[base] and
+{uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-base[base] and
 {uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations

@@ -48,14 +48,14 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'applies Gradle BasePlugin for lifecycle tasks'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         assertTrue(project.plugins.hasPlugin(BasePlugin))
     }
 
     @Test
     void 'apply base plugin creates teamcity extension'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         def extension = project.extensions.getByName('teamcity')
         assertThat(extension, is(not(nullValue())))
@@ -64,7 +64,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'default TeamCity API version'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         def extension = project.extensions.getByName('teamcity') as TeamCityPluginExtension
         assertEquals('9.0', extension.version)
@@ -72,7 +72,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'specified TeamCity API version'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         project.teamcity {
             version = '8.1.5'
@@ -84,7 +84,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'reject snapshot version without allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         try {
             project.teamcity {
@@ -101,7 +101,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'accept snapshot version with allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         project.teamcity {
             version = '2020.2-SNAPSHOT'
@@ -115,7 +115,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'accept release version with allow snapshots setting'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         project.teamcity {
             version = '2020.2'
@@ -129,7 +129,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'default mode for bean definition validation'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
         project.evaluate()
 
         def extension = project.extensions.getByName('teamcity') as TeamCityPluginExtension
@@ -138,7 +138,7 @@ class TeamCityBasePluginTest {
 
     @Test
     void 'set ignore mode for bean definition validation'() {
-        project.apply plugin: 'com.github.rodm.teamcity-base'
+        project.apply plugin: 'io.github.rodm.teamcity-base'
 
         project.teamcity {
             validateBeanDefinition = 'ignore'
@@ -163,12 +163,12 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project inherits version from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
+            rootProject.apply plugin: 'io.github.rodm.teamcity-base'
             rootProject.teamcity {
                 version = '8.1.5'
             }
 
-            subproject.apply plugin: 'com.github.rodm.teamcity-base'
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
 
             def extension = subproject.extensions.getByName('teamcity') as TeamCityPluginExtension
             assertEquals('8.1.5', extension.version)
@@ -176,8 +176,8 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project lazily inherits version from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
-            subproject.apply plugin: 'com.github.rodm.teamcity-base'
+            rootProject.apply plugin: 'io.github.rodm.teamcity-base'
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
 
             rootProject.teamcity {
                 version = '8.1.5'
@@ -189,14 +189,14 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project inherits properties from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
+            rootProject.apply plugin: 'io.github.rodm.teamcity-base'
             rootProject.teamcity {
                 defaultRepositories = false
                 allowSnapshotVersions = true
                 validateBeanDefinition = IGNORE
             }
 
-            subproject.apply plugin: 'com.github.rodm.teamcity-base'
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
 
             def extension = subproject.extensions.getByName('teamcity') as TeamCityPluginExtension
             assertThat(extension.defaultRepositories, is(false))
@@ -206,8 +206,8 @@ class TeamCityBasePluginTest {
 
         @Test
         void 'sub-project lazily inherits properties from root project'() {
-            rootProject.apply plugin: 'com.github.rodm.teamcity-base'
-            subproject.apply plugin: 'com.github.rodm.teamcity-base'
+            rootProject.apply plugin: 'io.github.rodm.teamcity-base'
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
 
             rootProject.teamcity {
                 defaultRepositories = false
