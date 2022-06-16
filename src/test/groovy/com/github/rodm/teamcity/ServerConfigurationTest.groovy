@@ -478,15 +478,12 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
     @Test
     void configuringAgentWithOnlyServerPluginFails() {
-        try {
+        def expected = assertThrows(InvalidUserDataException, {
             project.teamcity {
                 agent {}
             }
-            fail("Configuring agent block should fail when the agent plugin is not applied")
-        }
-        catch (InvalidUserDataException expected) {
-            assertEquals('Agent plugin configuration is invalid for a project without the teamcity-agent plugin', expected.message)
-        }
+        }, 'Configuring agent block should fail when the agent plugin is not applied')
+        assertThat(expected.message, equalTo('Agent plugin configuration is invalid for a project without the teamcity-agent plugin'))
     }
 
     @Test
@@ -994,13 +991,10 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             }
             PublishPlugin task = project.tasks.findByPath(':publishPlugin') as PublishPlugin
 
-            try {
+            def expected = assertThrows(GradleException, {
                 task.publishPlugin()
-                fail('Should fail when channels list is empty')
-            }
-            catch (GradleException expected) {
-                assertThat(expected.message, equalTo('Channels list can\'t be empty'))
-            }
+            }, 'Should fail when channels list is empty')
+            assertThat(expected.message, equalTo('Channels list can\'t be empty'))
         }
 
         @Test
@@ -1025,13 +1019,10 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             publish.parameters.channels.set(['default'])
 
             publish.result = mock(PluginCreationFail)
-            try {
+            def expected = assertThrows(GradleException, {
                 publish.execute()
-                fail('Should throw exception on plugin creation failure')
-            }
-            catch (GradleException expected) {
-                assertThat(expected.message, containsString('Cannot upload plugin.'))
-            }
+            }, 'Should throw exception on plugin creation failure')
+            assertThat(expected.message, containsString('Cannot upload plugin.'))
         }
 
         static class TestPublishParameters implements PublishAction.PublishParameters {

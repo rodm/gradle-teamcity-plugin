@@ -42,8 +42,7 @@ import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
-import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.fail
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 class AgentConfigurationTest extends ConfigurationTestCase {
 
@@ -181,7 +180,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
     @Test
     void 'cannot configure plugin for both pluginDeployment and toolDeployment'() {
-        try {
+        def expected = assertThrows(InvalidUserDataException) {
             project.teamcity {
                 agent {
                     descriptor {
@@ -191,14 +190,12 @@ class AgentConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        catch (InvalidUserDataException expected) {
-            assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
-        }
+        assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
     }
 
     @Test
     void 'cannot configure plugin for both toolDeployment and pluginDeployment'() {
-        try {
+        def expected = assertThrows(InvalidUserDataException) {
             project.teamcity {
                 agent {
                     descriptor {
@@ -208,9 +205,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
                 }
             }
         }
-        catch (InvalidUserDataException expected) {
-            assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
-        }
+        assertThat(expected.message, equalTo('Agent plugin cannot be configured for plugin deployment and tool deployment'))
     }
 
     @Test
@@ -443,15 +438,12 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
     @Test
     void configuringServerWithOnlyAgentPluginFails() {
-        try {
+        def expected = assertThrows(InvalidUserDataException, {
             project.teamcity {
                 server {}
             }
-            fail("Configuring server block should fail when the server plugin is not applied")
-        }
-        catch (InvalidUserDataException expected) {
-            assertEquals('Server plugin configuration is invalid for a project without the teamcity-server plugin', expected.message)
-        }
+        }, 'Configuring server block should fail when the server plugin is not applied')
+        assertThat(expected.message, equalTo('Server plugin configuration is invalid for a project without the teamcity-server plugin'))
     }
 
     @Test

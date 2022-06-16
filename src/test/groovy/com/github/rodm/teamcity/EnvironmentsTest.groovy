@@ -261,7 +261,7 @@ class EnvironmentsTest {
     void 'reject invalid version'() {
         project.apply plugin: 'com.github.rodm.teamcity-environments'
 
-        try {
+        def expected = assertThrows(IllegalArgumentException, {
             project.teamcity {
                 environments {
                     test {
@@ -269,11 +269,8 @@ class EnvironmentsTest {
                     }
                 }
             }
-            fail('Invalid version not rejected')
-        }
-        catch (IllegalArgumentException expected ) {
-            assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
-        }
+        }, 'Invalid version not rejected')
+        assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
     }
 
     @Test

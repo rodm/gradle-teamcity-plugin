@@ -48,7 +48,7 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.hasKey
-import static org.junit.jupiter.api.Assertions.fail
+import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -188,13 +188,10 @@ class ValidateDefinitionActionTest {
     void 'throws exception for missing plugin definition files with validation mode set to fail'() {
         Action<Task> pluginValidationAction = createValidationAction(FAIL)
 
-        try {
+        def expected = assertThrows(GradleException, {
             pluginValidationAction.execute(stubTask)
-            fail("Should throw exception when plugin definition is missing and mode is set to fail")
-        }
-        catch (GradleException e) {
-            assertThat(e.message, equalTo('Plugin definition validation failed'))
-        }
+        }, 'Should throw exception when plugin definition is missing and mode is set to fail')
+        assertThat(expected.message, equalTo('Plugin definition validation failed'))
 
         assertThat(outputEventListener.toString(), containsString(NO_DEFINITION_WARNING))
     }
@@ -209,14 +206,11 @@ class ValidateDefinitionActionTest {
         definitions.add(new PluginDefinition(definitionFile))
         outputEventListener.reset()
 
-        try {
+        def expected = assertThrows(GradleException, {
             Action<Task> pluginValidationAction = createValidationAction(FAIL)
             pluginValidationAction.execute(stubTask)
-            fail("Should throw exception when plugin definitions are invalid and mode is set to fail")
-        }
-        catch (GradleException e) {
-            assertThat(e.message, equalTo('Plugin definition validation failed'))
-        }
+        }, 'Should throw exception when plugin definitions are invalid and mode is set to fail')
+        assertThat(expected.message, equalTo('Plugin definition validation failed'))
 
         String noBeanClassesMessage = String.format(NO_BEAN_CLASSES_WARNING, 'build-server-plugin1.xml')
         assertThat(outputEventListener.toString(), containsString(noBeanClassesMessage))
