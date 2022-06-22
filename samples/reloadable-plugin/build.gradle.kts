@@ -12,7 +12,7 @@ version = "1.0-SNAPSHOT"
 
 val downloadsDir by extra((project.findProperty("downloads.dir") ?: "${rootDir}/downloads") as String)
 val serversDir by extra((project.findProperty("servers.dir") ?: "${rootDir}/servers") as String)
-val java8Home by extra((project.findProperty("java8.home") ?: "/opt/jdk1.8.0_92") as String)
+val java11Home by extra((project.findProperty("java11.home") ?: "/opt/jdk-11.0.2") as String)
 
 tasks {
     test {
@@ -49,9 +49,9 @@ teamcity {
         baseHomeDir = serversDir
         baseDataDir = "data"
 
-        register("teamcity2018.2") {
-            version = "2018.2"
-            javaHome = java8Home
+        register("teamcity2022.04") {
+            version = "2022.04.1"
+            javaHome = java11Home
 //            serverOptions ("") // uncomment to disable super user token
         }
     }

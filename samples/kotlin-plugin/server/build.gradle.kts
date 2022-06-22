@@ -37,22 +37,15 @@ teamcity {
         baseHomeDir = serversDir
         baseDataDir = "${rootDir}/data"
 
-        operator fun String.invoke(block: LocalTeamCityEnvironment.() -> Unit) = environments.create(this, block)
-
-        "teamcity2020.1" {
+        create("teamcity2020.1") {
             version = "2020.1.5"
             javaHome = java8Home
             serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
             agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006")
         }
 
-        create("teamcity2020.2") {
-            version = "2020.2.4"
-            javaHome = java8Home
-        }
-
-        register("teamcity2021.1") {
-            version = "2021.1.1"
+        register("teamcity2022.04", LocalTeamCityEnvironment::class.java) {
+            version = "2022.04.1"
             javaHome = java11Home
         }
     }

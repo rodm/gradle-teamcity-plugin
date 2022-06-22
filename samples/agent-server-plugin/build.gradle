@@ -14,6 +14,7 @@ ext {
     downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
     serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
     java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
+    java11Home = project.findProperty('java11.home') ?: '/opt/jdk-11.0.2'
 }
 
 dependencies {
@@ -49,9 +50,9 @@ teamcity {
             agentOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006'
         }
 
-        'teamcity2021.1' {
-            version = '2021.1.1'
-            javaHome = file(java8Home)
+        'teamcity2022.04' {
+            version = '2022.04.1'
+            javaHome = file(java11Home)
         }
     }
 }

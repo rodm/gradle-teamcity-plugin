@@ -1,3 +1,4 @@
+
 import java.time.LocalDateTime
 
 plugins {
@@ -12,7 +13,7 @@ version = '1.0-SNAPSHOT'
 ext {
     downloadsDir = project.findProperty('downloads.dir') ?: "$rootDir/downloads"
     serversDir = project.findProperty('servers.dir') ?: "$rootDir/servers"
-    java8Home = project.findProperty('java8.home') ?: '/opt/jdk1.8.0_92'
+    java11Home = project.findProperty('java11.home') ?: '/opt/jdk-11.0.2'
 }
 
 test {
@@ -48,9 +49,9 @@ teamcity {
         baseHomeDir = project.serversDir
         baseDataDir = 'data'
 
-        'teamcity2018.2' {
-            version = '2018.2'
-            javaHome = file(java8Home)
+        'teamcity2022.04' {
+            version = '2022.04.1'
+            javaHome = file(java11Home)
 //            serverOptions = [] // uncomment to disable super user token
         }
     }
