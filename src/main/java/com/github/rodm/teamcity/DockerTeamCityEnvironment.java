@@ -51,6 +51,8 @@ public interface DockerTeamCityEnvironment extends TeamCityEnvironment {
 
     /**
      * The port the TeamCity Server is accessible on.
+     *
+     * @return the server port
      */
     String getPort();
     void setPort(String port);
