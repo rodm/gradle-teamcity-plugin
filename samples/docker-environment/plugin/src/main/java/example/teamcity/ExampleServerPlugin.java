@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 public class ExampleServerPlugin extends BuildServerAdapter {
 
-    private static Logger logger = Logger.getLogger("jetbrains.buildServer.SERVER");
+    private static final Logger logger = Logger.getLogger("jetbrains.buildServer.SERVER");
 
     private final SBuildServer server;
 
@@ -23,5 +23,11 @@ public class ExampleServerPlugin extends BuildServerAdapter {
         String name = getClass().getSimpleName();
         logger.info(String.format("%s: Plugin name: %s, version: %s", name, descriptor.getPluginName(), descriptor.getPluginVersion()));
         logger.info(String.format("%s: Plugin parameter: param=%s", name, descriptor.getParameterValue("param")));
+    }
+
+    @Override
+    public void serverShutdown() {
+        String name = getClass().getSimpleName();
+        logger.info(String.format("%s: Server shutdown: Unregistering plugin %s", name, descriptor.getPluginName()));
     }
 }

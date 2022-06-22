@@ -3,6 +3,7 @@ package example.agent;
 
 import jetbrains.buildServer.agent.AgentBuildFeature;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
+import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.apache.log4j.Logger;
@@ -14,9 +15,9 @@ import static example.common.ExampleBuildFeature.BUILD_FEATURE_NAME;
 
 public class AgentExampleBuildFeature extends AgentLifeCycleAdapter {
 
-    private static Logger log = Logger.getLogger("jetbrains.buildServer.AGENT");
+    private static final Logger log = Logger.getLogger("jetbrains.buildServer.AGENT");
 
-    public AgentExampleBuildFeature(EventDispatcher<AgentLifeCycleAdapter> eventDispatcher) {
+    public AgentExampleBuildFeature(EventDispatcher<AgentLifeCycleListener> eventDispatcher) {
         eventDispatcher.addListener(this);
     }
 

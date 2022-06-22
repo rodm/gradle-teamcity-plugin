@@ -7,7 +7,7 @@ public class ExampleBuildFeature {
 
     public static final String BUILD_FEATURE_NAME = "example";
 
-    {
+    static {
         // Just simple usage of TeamCity Common API (shared between server and agent)
         assert StringUtil.isTrue("true");
     }

@@ -1,15 +1,19 @@
 package example.teamcity.server;
 
 import jetbrains.buildServer.serverSide.BuildFeature;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 public class ExampleBuildFeature extends BuildFeature {
 
+    @NotNull
     @Override
     public String getType() {
         return "example-build-feature";
     }
 
+    @NotNull
     @Override
     public String getDisplayName() {
         return "Example Build Feature";
@@ -25,8 +29,9 @@ public class ExampleBuildFeature extends BuildFeature {
         return false;
     }
 
+    @NotNull
     @Override
-    public String describeParameters(Map<String, String> params) {
+    public String describeParameters(@NotNull Map<String, String> params) {
         return "Example Build Feature plugin";
     }
 }

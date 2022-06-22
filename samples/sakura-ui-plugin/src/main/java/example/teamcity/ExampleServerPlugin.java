@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ExampleServerPlugin extends BaseController {
 
     private static final String PLUGIN_NAME = "SakuraUI-Plugin";
-    private static final String PLUGIN_URL = "/reactPlugin.html";
+    private static final String PLUGIN_URL = "/exampleSakuraReactPlugin.html";
 
     private final PluginDescriptor descriptor;
 

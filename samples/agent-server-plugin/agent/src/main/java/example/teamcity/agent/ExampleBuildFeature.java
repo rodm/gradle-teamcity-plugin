@@ -2,6 +2,7 @@ package example.teamcity.agent;
 
 import jetbrains.buildServer.agent.AgentBuildFeature;
 import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
+import jetbrains.buildServer.agent.AgentLifeCycleListener;
 import jetbrains.buildServer.agent.AgentRunningBuild;
 import jetbrains.buildServer.util.EventDispatcher;
 import org.apache.log4j.Logger;
@@ -11,9 +12,9 @@ import java.util.Collection;
 
 public class ExampleBuildFeature extends AgentLifeCycleAdapter {
 
-    private static Logger log = Logger.getLogger("jetbrains.buildServer.AGENT");
+    private static final Logger log = Logger.getLogger("jetbrains.buildServer.AGENT");
 
-    public ExampleBuildFeature(EventDispatcher<AgentLifeCycleAdapter> eventDispatcher) {
+    public ExampleBuildFeature(EventDispatcher<AgentLifeCycleListener> eventDispatcher) {
         eventDispatcher.addListener(this);
     }
 

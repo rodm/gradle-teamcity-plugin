@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 public class ExampleServerPlugin extends BuildServerAdapter {
 
-    private static Logger logger = Logger.getLogger("jetbrains.buildServer.SERVER");
+    private static final Logger logger = Logger.getLogger("jetbrains.buildServer.SERVER");
 
     private final SBuildServer server;
 
