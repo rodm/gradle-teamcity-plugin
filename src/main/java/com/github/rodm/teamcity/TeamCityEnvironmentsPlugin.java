@@ -202,6 +202,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getImageName().set(environment.getAgentImageProperty());
                 task.getContainerName().set(environment.getAgentNameProperty());
                 task.getServerContainerName().set(environment.getServerNameProperty());
+                task.getServerPort().set(environment.getPortProperty());
                 task.doFirst(new DockerInspectAction());
                 task.mustRunAfter(tasks.named(environment.startServerTaskName()));
             });

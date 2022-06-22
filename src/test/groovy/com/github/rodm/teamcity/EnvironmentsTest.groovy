@@ -1376,22 +1376,8 @@ class EnvironmentsTest {
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.port.get(), equalTo('8111'))
-        }
-
-        @Test
-        void 'configures start server task with default logs directory'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
-            project.teamcity {
-                environments {
-                    test(DockerTeamCityEnvironment) {
-                        version = '2021.2.3'
-                    }
-                }
-            }
-            project.evaluate()
-
-            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
-            assertThat(normalize(startServer.logsDir.get()), endsWith('/data/2021.2/logs'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.serverPort.get(), equalTo('8111'))
         }
 
         @Test
@@ -1409,6 +1395,24 @@ class EnvironmentsTest {
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.port.get(), equalTo('8080'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.serverPort.get(), equalTo('8080'))
+        }
+
+        @Test
+        void 'configures start server task with default logs directory'() {
+            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(normalize(startServer.logsDir.get()), endsWith('/data/2021.2/logs'))
         }
 
         @Test

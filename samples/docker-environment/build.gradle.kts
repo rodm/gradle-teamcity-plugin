@@ -22,6 +22,7 @@ teamcity {
     environments {
         register("teamcity2020.1", DockerTeamCityEnvironment::class.java) {
             version = "2021.2.3"
+            port = "7111"
 //            serverImage = "alt-teamcity-server"
 //            agentImage = "alt-teamcity-agent"
             serverName = "tc-server"
