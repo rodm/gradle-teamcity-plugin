@@ -21,7 +21,6 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
-import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ContainerNetwork;
 import com.github.dockerjava.api.model.HostConfig;
@@ -67,25 +66,12 @@ public abstract class StartDockerAgent extends DockerTask {
         DockerClient client = getDockerClient();
 
         String image = getImageName().get() + ":" + getVersion().get();
-        try {
-            client.inspectImageCmd(image).exec();
-        }
-        catch (NotFoundException e) {
-            String message = String.format("Docker image '%s' not available. Please use docker pull to download this image", image);
-            throw new GradleException(message);
-        }
+        checkImageAvailable(client, image);
 
         String containerId = getContainerName().get();
-        try {
-            InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
-            InspectContainerResponse inspectResponse = inspectContainer.exec();
-            if (Boolean.TRUE.equals(inspectResponse.getState().getRunning())) {
-                getLogger().info("TeamCity Build Agent container '{}' is already running", containerId);
-                return;
-            }
-        }
-        catch (NotFoundException e) {
-            // ignore
+        if (isContainerRunning(client, containerId)) {
+            getLogger().info("TeamCity Build Agent container '{}' is already running", containerId);
+            return;
         }
 
         List<PortBinding> portBindings = new ArrayList<>();

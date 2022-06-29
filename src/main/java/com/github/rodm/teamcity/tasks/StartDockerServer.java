@@ -18,15 +18,11 @@ package com.github.rodm.teamcity.tasks;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.InspectContainerCmd;
-import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
-import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
-import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -65,25 +61,12 @@ public abstract class StartDockerServer extends DockerTask {
         DockerClient client = getDockerClient();
 
         String image = getImageName().get() + ":" + getVersion().get();
-        try {
-            client.inspectImageCmd(image).exec();
-        }
-        catch (NotFoundException e) {
-            String message = String.format("Docker image '%s' not available. Please use docker pull to download this image", image);
-            throw new GradleException(message);
-        }
+        checkImageAvailable(client, image);
 
         String containerId = getContainerName().get();
-        try {
-            InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
-            InspectContainerResponse inspectResponse = inspectContainer.exec();
-            if (Boolean.TRUE.equals(inspectResponse.getState().getRunning())) {
-                getLogger().info("TeamCity Server container '{}' is already running", containerId);
-                return;
-            }
-        }
-        catch (NotFoundException e) {
-            // ignore
+        if (isContainerRunning(client, containerId)) {
+            getLogger().info("TeamCity Server container '{}' is already running", containerId);
+            return;
         }
 
         List<PortBinding> portBindings = new ArrayList<>();
