@@ -15,43 +15,25 @@
  */
 package com.github.rodm.teamcity.internal;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.TaskAction;
-import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecSpec;
-
-import java.io.ByteArrayOutputStream;
 
 public abstract class DockerTask extends DefaultTask {
 
-    private final ExecOperations execOperations;
-
-    protected DockerTask(ExecOperations execOperations) {
-        this.execOperations = execOperations;
-    }
-
-    @Internal
-    public ExecOperations getExecOperations() {
-        return execOperations;
+    protected static DockerClient getDockerClient() {
+        DefaultDockerClientConfig clientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+            .dockerHost(clientConfig.getDockerHost())
+            .build();
+        return DockerClientImpl.getInstance(clientConfig, httpClient);
     }
 
     @Input
     public abstract Property<String> getContainerName();
-
-    @TaskAction
-    public void exec() {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        execOperations.exec(execSpec -> {
-            execSpec.executable("docker");
-            configure(execSpec);
-            execSpec.setStandardOutput(out);
-            execSpec.setErrorOutput(out);
-        });
-        getLogger().info(out.toString());
-    }
-
-    protected abstract void configure(ExecSpec execSpec);
 }

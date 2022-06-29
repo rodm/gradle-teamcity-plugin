@@ -15,21 +15,29 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectContainerCmd;
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.StartContainerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecSpec;
+import org.gradle.api.tasks.TaskAction;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
 
 public abstract class StartDockerServer extends DockerTask {
 
-    @Inject
-    public StartDockerServer(ExecOperations execOperations) {
-        super(execOperations);
+    public StartDockerServer() {
         setDescription("Starts the TeamCity Server using Docker");
     }
 
@@ -51,16 +59,46 @@ public abstract class StartDockerServer extends DockerTask {
     @Input
     public abstract Property<String> getPort();
 
-    @Override
-    protected void configure(ExecSpec execSpec) {
-        execSpec.args("run");
-        execSpec.args("--detach", "--rm");
-        execSpec.args("--name", getContainerName().get());
-        execSpec.args("-v", getDataDir().get() + ":/data/teamcity_server/datadir");
-        execSpec.args("-v", getLogsDir().get() + ":/opt/teamcity/logs");
-        execSpec.args("-e", "TEAMCITY_SERVER_OPTS=" + getServerOptions().get());
-        execSpec.args("-p", getPort().get() + ":8111");
-        getDebugPort(getServerOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
-        execSpec.args(getImageName().get() + ":" + getVersion().get());
+    @TaskAction
+    void startServer() {
+        DockerClient client = getDockerClient();
+
+        String containerId = getContainerName().get();
+        try {
+            InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
+            InspectContainerResponse inspectResponse = inspectContainer.exec();
+            if (Boolean.TRUE.equals(inspectResponse.getState().getRunning())) {
+                getLogger().info("TeamCity Server container '{}' is already running", containerId);
+                return;
+            }
+        }
+        catch (NotFoundException e) {
+            // ignore
+        }
+
+        List<PortBinding> portBindings = new ArrayList<>();
+        portBindings.add(PortBinding.parse(getPort().get() + ":8111"));
+        getDebugPort(getServerOptions().get())
+            .ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
+
+        Bind dataDir = Bind.parse(getDataDir().get() + ":/data/teamcity_server/datadir");
+        Bind logsDir = Bind.parse(getLogsDir().get() + ":/opt/teamcity/logs");
+        HostConfig hostConfig = HostConfig.newHostConfig()
+            .withAutoRemove(true)
+            .withBinds(dataDir, logsDir)
+            .withPortBindings(portBindings);
+
+        String image = getImageName().get() + ":" + getVersion().get();
+        CreateContainerCmd createContainer = client.createContainerCmd(image)
+            .withName(containerId)
+            .withHostConfig(hostConfig)
+            .withEnv("TEAMCITY_SERVER_OPTS=" + getServerOptions().get());
+
+        CreateContainerResponse response = createContainer.exec();
+        getLogger().info("Created TeamCity Server container with id: {}", response.getId());
+
+        StartContainerCmd startContainer = client.startContainerCmd(containerId);
+        startContainer.exec();
+        getLogger().info("Started TeamCity Server container");
     }
 }

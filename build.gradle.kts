@@ -18,6 +18,11 @@ repositories {
 
 dependencies {
     implementation ("de.undercouch:gradle-download-task:4.1.2")
+
+    implementation (platform("com.github.docker-java:docker-java-bom:3.2.13"))
+    implementation ("com.github.docker-java:docker-java-core")
+    implementation ("com.github.docker-java:docker-java-transport-httpclient5")
+
     compileOnly ("org.jetbrains.intellij.plugins:structure-base:3.190")
     compileOnly ("org.jetbrains.intellij.plugins:structure-teamcity:3.190")
     compileOnly ("org.jetbrains.intellij:plugin-repository-rest-client:2.0.17")

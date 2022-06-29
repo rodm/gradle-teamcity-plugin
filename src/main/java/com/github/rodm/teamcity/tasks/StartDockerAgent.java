@@ -15,22 +15,32 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectContainerCmd;
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.StartContainerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.ContainerNetwork;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Internal;
-import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecSpec;
+import org.gradle.api.tasks.TaskAction;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
 
 public abstract class StartDockerAgent extends DockerTask {
 
-    @Inject
-    public StartDockerAgent(ExecOperations execOperations) {
-        super(execOperations);
+    public StartDockerAgent() {
         setDescription("Starts the TeamCity Agent using Docker");
     }
 
@@ -52,18 +62,55 @@ public abstract class StartDockerAgent extends DockerTask {
     @Input
     public abstract Property<String> getServerPort();
 
-    @Internal
-    public abstract Property<String> getIpAddress();
+    @TaskAction
+    void startAgent() {
+        DockerClient client = getDockerClient();
 
-    @Override
-    protected void configure(ExecSpec execSpec) {
-        execSpec.args("run");
-        execSpec.args("--detach", "--rm");
-        execSpec.args("--name", getContainerName().get());
-        execSpec.args("-v", getDataDir().get() + "/agent/conf:/data/teamcity_agent/conf");
-        execSpec.args("-e", "SERVER_URL=http://" + getIpAddress().get() + ":" + getServerPort().get() + "/");
-        execSpec.args("-e", "TEAMCITY_AGENT_OPTS=" + getAgentOptions().get());
-        getDebugPort(getAgentOptions().get()).ifPresent(port -> execSpec.args("-p", port + ":" + port));
-        execSpec.args(getImageName().get() + ":" + getVersion().get());
+        String containerId = getContainerName().get();
+        try {
+            InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
+            InspectContainerResponse inspectResponse = inspectContainer.exec();
+            if (Boolean.TRUE.equals(inspectResponse.getState().getRunning())) {
+                getLogger().info("TeamCity Build Agent container '{}' is already running", containerId);
+                return;
+            }
+        }
+        catch (NotFoundException e) {
+            // ignore
+        }
+
+        List<PortBinding> portBindings = new ArrayList<>();
+        getDebugPort(getAgentOptions().get())
+            .ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
+
+        Bind configDir = Bind.parse(getDataDir().get() + "/agent/conf:/data/teamcity_agent/conf");
+        HostConfig hostConfig = HostConfig.newHostConfig()
+            .withAutoRemove(true)
+            .withBinds(configDir)
+            .withPortBindings(portBindings);
+
+        String image = getImageName().get() + ":" + getVersion().get();
+        CreateContainerCmd createContainer = client.createContainerCmd(image)
+            .withName(getContainerName().get())
+            .withEnv("SERVER_URL=http://" + getIpAddress(client) + ":" + getServerPort().get() + "/")
+            .withEnv("TEAMCITY_AGENT_OPTS=" + getAgentOptions().get())
+            .withHostConfig(hostConfig);
+
+        CreateContainerResponse response = createContainer.exec();
+        getLogger().info("Created TeamCity Build Agent container with id: {}", response.getId());
+
+        StartContainerCmd startContainer = client.startContainerCmd(getContainerName().get());
+        startContainer.exec();
+        getLogger().info("Started TeamCity Build Agent container");
+    }
+
+    private String getIpAddress(DockerClient client) {
+        InspectContainerCmd inspectContainer = client.inspectContainerCmd(getServerContainerName().get());
+        InspectContainerResponse inspectResponse = inspectContainer.exec();
+        Map<String, ContainerNetwork> networks = inspectResponse.getNetworkSettings().getNetworks();
+        return networks.values().stream()
+            .findFirst()
+            .map(ContainerNetwork::getIpAddress)
+            .orElseThrow(() -> new GradleException("Failed to get IP address for TeamCity Server"));
     }
 }

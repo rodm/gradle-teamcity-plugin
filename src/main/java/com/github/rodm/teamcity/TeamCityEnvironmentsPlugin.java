@@ -19,7 +19,6 @@ import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultLocalTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import com.github.rodm.teamcity.internal.DisablePluginAction;
-import com.github.rodm.teamcity.internal.DockerInspectAction;
 import com.github.rodm.teamcity.internal.EnablePluginAction;
 import com.github.rodm.teamcity.tasks.Deploy;
 import com.github.rodm.teamcity.tasks.DownloadTeamCity;
@@ -203,7 +202,6 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getContainerName().set(environment.getAgentNameProperty());
                 task.getServerContainerName().set(environment.getServerNameProperty());
                 task.getServerPort().set(environment.getPortProperty());
-                task.doFirst(new DockerInspectAction());
                 task.mustRunAfter(tasks.named(environment.startServerTaskName()));
             });
 

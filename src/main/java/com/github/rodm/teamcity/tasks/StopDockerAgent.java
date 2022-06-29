@@ -15,23 +15,33 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.StopContainerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.rodm.teamcity.internal.DockerTask;
-import org.gradle.process.ExecOperations;
-import org.gradle.process.ExecSpec;
-
-import javax.inject.Inject;
+import org.gradle.api.tasks.TaskAction;
 
 public abstract class StopDockerAgent extends DockerTask {
 
-    @Inject
-    public StopDockerAgent(ExecOperations execOperations) {
-        super(execOperations);
+    public StopDockerAgent() {
         setDescription("Stops the TeamCity Agent using Docker");
     }
 
-    @Override
-    protected void configure(ExecSpec execSpec) {
-        execSpec.args("stop", getContainerName().get());
-        execSpec.setIgnoreExitValue(true);
+    @TaskAction
+    void stopAgent() {
+        DockerClient client = getDockerClient();
+        String containerId = getContainerName().get();
+        try {
+            StopContainerCmd stopContainer = client.stopContainerCmd(containerId);
+            stopContainer.exec();
+            getLogger().info("TeamCity Build Agent container stopped");
+        }
+        catch (NotModifiedException e) {
+            getLogger().info("TeamCity Build Agent container is already stopped");
+        }
+        catch (NotFoundException e) {
+            getLogger().info("TeamCity Build Agent container '{}' not found", containerId);
+        }
     }
 }
