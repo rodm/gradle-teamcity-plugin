@@ -26,6 +26,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -63,6 +64,15 @@ public abstract class StartDockerServer extends DockerTask {
     void startServer() {
         DockerClient client = getDockerClient();
 
+        String image = getImageName().get() + ":" + getVersion().get();
+        try {
+            client.inspectImageCmd(image).exec();
+        }
+        catch (NotFoundException e) {
+            String message = String.format("Docker image '%s' not available. Please use docker pull to download this image", image);
+            throw new GradleException(message);
+        }
+
         String containerId = getContainerName().get();
         try {
             InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
@@ -88,7 +98,6 @@ public abstract class StartDockerServer extends DockerTask {
             .withBinds(dataDir, logsDir)
             .withPortBindings(portBindings);
 
-        String image = getImageName().get() + ":" + getVersion().get();
         CreateContainerCmd createContainer = client.createContainerCmd(image)
             .withName(containerId)
             .withHostConfig(hostConfig)

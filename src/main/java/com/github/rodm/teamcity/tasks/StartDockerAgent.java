@@ -66,6 +66,15 @@ public abstract class StartDockerAgent extends DockerTask {
     void startAgent() {
         DockerClient client = getDockerClient();
 
+        String image = getImageName().get() + ":" + getVersion().get();
+        try {
+            client.inspectImageCmd(image).exec();
+        }
+        catch (NotFoundException e) {
+            String message = String.format("Docker image '%s' not available. Please use docker pull to download this image", image);
+            throw new GradleException(message);
+        }
+
         String containerId = getContainerName().get();
         try {
             InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
@@ -89,7 +98,6 @@ public abstract class StartDockerAgent extends DockerTask {
             .withBinds(configDir)
             .withPortBindings(portBindings);
 
-        String image = getImageName().get() + ":" + getVersion().get();
         CreateContainerCmd createContainer = client.createContainerCmd(image)
             .withName(getContainerName().get())
             .withEnv("SERVER_URL=http://" + getIpAddress(client) + ":" + getServerPort().get() + "/")
