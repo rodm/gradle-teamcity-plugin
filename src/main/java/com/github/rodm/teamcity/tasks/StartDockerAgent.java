@@ -23,6 +23,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ContainerNetwork;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
@@ -34,6 +35,7 @@ import org.gradle.api.tasks.TaskAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
 
@@ -75,8 +77,8 @@ public abstract class StartDockerAgent extends DockerTask {
         }
 
         List<PortBinding> portBindings = new ArrayList<>();
-        getDebugPort(getAgentOptions().get())
-            .ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
+        Optional<String> debugPort = getDebugPort(getAgentOptions().get());
+        debugPort.ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
 
         Bind configDir = Bind.parse(getDataDir().get() + "/agent/conf:/data/teamcity_agent/conf");
         HostConfig hostConfig = HostConfig.newHostConfig()
@@ -89,6 +91,7 @@ public abstract class StartDockerAgent extends DockerTask {
             .withEnv("SERVER_URL=http://" + getIpAddress(client) + ":" + getServerPort().get() + "/")
             .withEnv("TEAMCITY_AGENT_OPTS=" + getAgentOptions().get())
             .withHostConfig(hostConfig);
+        debugPort.ifPresent(port -> createContainer.withExposedPorts(ExposedPort.parse(port)));
 
         CreateContainerResponse response = createContainer.exec();
         getLogger().info("Created TeamCity Build Agent container with id: {}", response.getId());

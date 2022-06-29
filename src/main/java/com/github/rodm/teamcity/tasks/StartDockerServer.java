@@ -20,6 +20,7 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.rodm.teamcity.internal.DockerTask;
@@ -29,6 +30,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
 
@@ -71,8 +73,8 @@ public abstract class StartDockerServer extends DockerTask {
 
         List<PortBinding> portBindings = new ArrayList<>();
         portBindings.add(PortBinding.parse(getPort().get() + ":8111"));
-        getDebugPort(getServerOptions().get())
-            .ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
+        Optional<String> debugPort = getDebugPort(getServerOptions().get());
+        debugPort.ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
 
         Bind dataDir = Bind.parse(getDataDir().get() + ":/data/teamcity_server/datadir");
         Bind logsDir = Bind.parse(getLogsDir().get() + ":/opt/teamcity/logs");
@@ -85,6 +87,7 @@ public abstract class StartDockerServer extends DockerTask {
             .withName(containerId)
             .withHostConfig(hostConfig)
             .withEnv("TEAMCITY_SERVER_OPTS=" + getServerOptions().get());
+        debugPort.ifPresent(port -> createContainer.withExposedPorts(ExposedPort.parse(port)));
 
         CreateContainerResponse response = createContainer.exec();
         getLogger().info("Created TeamCity Server container with id: {}", response.getId());
