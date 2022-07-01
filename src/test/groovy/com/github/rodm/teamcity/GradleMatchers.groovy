@@ -25,6 +25,22 @@ import org.hamcrest.TypeSafeDiagnosingMatcher
 
 class GradleMatchers {
 
+    static Matcher<Project> hasPlugin(String id) {
+        return new TypeSafeDiagnosingMatcher<Project>() {
+            @Override
+            void describeTo(final Description description) {
+                description.appendText("Project should have plugin ").appendValue(id).appendText(" applied")
+            }
+
+            @Override
+            protected boolean matchesSafely(final Project project, final Description mismatchDescription) {
+                def classNames = project.plugins.collect { it.getClass().simpleName }
+                mismatchDescription.appendText(" was ").appendValueList("[", ", ", "]", classNames)
+                return project.pluginManager.hasPlugin(id)
+            }
+        }
+    }
+
     static Matcher<Configuration> hasDependency(String group, String name, String version) {
         return new HasDependency(group, name, version)
     }

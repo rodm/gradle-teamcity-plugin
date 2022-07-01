@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDependency
+import static com.github.rodm.teamcity.GradleMatchers.hasPlugin
 import static org.hamcrest.MatcherAssert.assertThat
 
 class TeamCityCommonPluginTest {
@@ -32,6 +33,13 @@ class TeamCityCommonPluginTest {
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+    }
+
+    @Test
+    void 'applying common plugin applies teamcity-base plugin'() {
+        project.apply plugin: 'com.github.rodm.teamcity-common'
+
+        assertThat(project, hasPlugin('io.github.rodm.teamcity-base'))
     }
 
     @Test
