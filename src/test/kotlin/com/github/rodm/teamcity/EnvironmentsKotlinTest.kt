@@ -41,7 +41,7 @@ class EnvironmentsKotlinTest {
         // workaround for https://github.com/gradle/gradle/issues/13122
         (project as ProjectInternal).services.get(GradlePropertiesController::class.java).loadGradlePropertiesFrom(projectDir)
 
-        project.plugins.apply("com.github.rodm.teamcity-environments")
+        project.plugins.apply("io.github.rodm.teamcity-environments")
         teamcity = project.extensions.getByType(TeamCityPluginExtension::class.java)
     }
 

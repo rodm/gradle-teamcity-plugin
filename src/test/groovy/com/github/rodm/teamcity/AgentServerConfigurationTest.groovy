@@ -44,21 +44,21 @@ class AgentServerConfigurationTest {
     @Test
     void 'cannot apply server plugin with java and agent plugins'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
 
         def e = assertThrows(GradleException.class) {
-            project.apply plugin: 'com.github.rodm.teamcity-server'
+            project.apply plugin: 'io.github.rodm.teamcity-server'
         }
         assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
     void 'cannot apply server plugin with agent and java plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
         project.apply plugin: 'java'
 
         def e = assertThrows(GradleException.class) {
-            project.apply plugin: 'com.github.rodm.teamcity-server'
+            project.apply plugin: 'io.github.rodm.teamcity-server'
         }
         assertThat(e.message, containsString('Failed to apply plugin'))
     }
@@ -66,29 +66,29 @@ class AgentServerConfigurationTest {
     @Test
     void 'cannot apply agent plugin with java and sever plugins'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
 
         def e = assertThrows(GradleException.class) {
-            project.apply plugin: 'com.github.rodm.teamcity-agent'
+            project.apply plugin: 'io.github.rodm.teamcity-agent'
         }
         assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
     void 'cannot apply agent plugin with server and java plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
         project.apply plugin: 'java'
 
         def e = assertThrows(GradleException.class) {
-            project.apply plugin: 'com.github.rodm.teamcity-agent'
+            project.apply plugin: 'io.github.rodm.teamcity-agent'
         }
         assertThat(e.message, containsString('Failed to apply plugin'))
     }
 
     @Test
     void 'cannot apply java plugin with agent and server plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
 
         def e = assertThrows(GradleException.class) {
             project.apply plugin: 'java'
@@ -98,8 +98,8 @@ class AgentServerConfigurationTest {
 
     @Test
     void 'cannot apply java plugin with server and agent plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
 
         def e = assertThrows(GradleException.class) {
             project.apply plugin: 'java'
@@ -109,14 +109,14 @@ class AgentServerConfigurationTest {
 
     @Test
     void applyBothPlugins() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
     }
 
     @Test
     void applyAndConfigureBothPlugins() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
 
         project.teamcity {
             agent {
@@ -134,8 +134,8 @@ class AgentServerConfigurationTest {
 
     @Test
     void 'agent and server archive names do not clash'() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
 
         project.archivesBaseName = 'my-plugin'
         project.teamcity {

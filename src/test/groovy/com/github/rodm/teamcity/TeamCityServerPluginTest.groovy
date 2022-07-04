@@ -42,12 +42,11 @@ class TeamCityServerPluginTest {
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+        project.apply plugin: 'io.github.rodm.teamcity-server'
     }
 
     @Test
     void configurationsCreatedWithoutJavaPlugin() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
         def configuration = project.configurations.getByName('agent')
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))
@@ -66,8 +65,6 @@ class TeamCityServerPluginTest {
 
     @Test
     void providedConfigurationNotCreatedWithoutJavaPlugin() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
         def configurationNames = project.configurations.getNames()
         assertThat(configurationNames, not(hasItem('provided')))
     }
@@ -75,7 +72,6 @@ class TeamCityServerPluginTest {
     @Test
     void configurationsCreatedWithJavaPlugin() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         def configuration = project.configurations.getByName('agent')
         assertThat(configuration, notNullValue())
@@ -94,8 +90,6 @@ class TeamCityServerPluginTest {
 
     @Test
     void 'creates configuration for signing and publishing task dependencies'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
         def configuration = project.configurations.getByName('marketplace')
         assertThat(configuration, notNullValue())
         assertThat(configuration.visible, is(false))
@@ -104,8 +98,6 @@ class TeamCityServerPluginTest {
 
     @Test
     void 'apply adds signing and publishing as default dependencies to the marketplace configuration'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
         project.evaluate()
 
         Configuration configuration = project.configurations.getByName('marketplace')
@@ -118,7 +110,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'adds MavenCentral and JetBrains repositories when Java plugin is applied'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
         project.evaluate()
 
         List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
@@ -129,7 +120,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'adds no repositories when defaultRepositories is false'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.teamcity {
             defaultRepositories = false
@@ -141,8 +131,6 @@ class TeamCityServerPluginTest {
 
     @Test
     void 'adds no repositories when Java plugin is not applied'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-
         project.evaluate()
 
         assertThat(project.repositories.size(), equalTo(0))
@@ -151,7 +139,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'apply adds server-api to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 
@@ -162,7 +149,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'apply adds server-api with specified version to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
         project.teamcity {
             version = '2021.2'
         }
@@ -176,7 +162,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'apply adds server-web-api to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 
@@ -187,7 +172,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'apply does not add server-web-api to the provided configuration for versions before 9_0'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
         project.teamcity {
             version = '8.1'
         }
@@ -201,7 +185,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 
@@ -212,7 +195,6 @@ class TeamCityServerPluginTest {
     @Test
     void 'server-side plugin artifact is published to the plugin configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
 
         project.evaluate()
 

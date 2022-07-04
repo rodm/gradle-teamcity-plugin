@@ -48,7 +48,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
 
     @BeforeEach
     void applyPlugin() {
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
+        project.apply plugin: 'io.github.rodm.teamcity-agent'
         extension = project.extensions.getByType(TeamCityPluginExtension)
     }
 
@@ -449,7 +449,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     @Test
     void 'apply adds agent-api to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
 
         project.evaluate()
 
@@ -460,7 +459,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     @Test
     void 'apply adds agent-api with specified version to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
         project.teamcity {
             version = '2021.2'
         }
@@ -474,7 +472,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     @Test
     void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
 
         project.evaluate()
 
@@ -485,7 +482,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     @Test
     void 'agent-side plugin artifact is published to the plugin configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-agent'
 
         project.evaluate()
 

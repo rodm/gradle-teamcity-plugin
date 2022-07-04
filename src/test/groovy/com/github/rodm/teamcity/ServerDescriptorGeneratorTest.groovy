@@ -56,7 +56,7 @@ class ServerDescriptorGeneratorTest {
                 .withProjectDir(projectDir)
                 .withName('test-plugin')
                 .build()
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
         writer = new StringWriter()
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }

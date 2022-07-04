@@ -78,9 +78,7 @@ import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.Matchers.not
-import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertThrows
-import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.mock
@@ -91,7 +89,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
 
     @BeforeEach
     void applyPlugin() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
+        project.apply plugin: 'io.github.rodm.teamcity-server'
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
     }
 

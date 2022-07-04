@@ -33,19 +33,17 @@ class TeamCityCommonPluginTest {
     @BeforeEach
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+        project.apply plugin: 'io.github.rodm.teamcity-common'
     }
 
     @Test
     void 'applying common plugin applies teamcity-base plugin'() {
-        project.apply plugin: 'com.github.rodm.teamcity-common'
-
         assertThat(project, hasPlugin('io.github.rodm.teamcity-base'))
     }
 
     @Test
     void 'apply adds common-api to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-common'
 
         project.evaluate()
 
@@ -56,7 +54,6 @@ class TeamCityCommonPluginTest {
     @Test
     void 'apply adds common-api with specified version to the provided configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-common'
         project.teamcity {
             version = '2021.2'
         }
@@ -70,7 +67,6 @@ class TeamCityCommonPluginTest {
     @Test
     void 'apply adds tests-support to the testImplementation configuration'() {
         project.apply plugin: 'java'
-        project.apply plugin: 'com.github.rodm.teamcity-common'
 
         project.evaluate()
 

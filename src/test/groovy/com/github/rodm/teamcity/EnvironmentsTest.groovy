@@ -92,6 +92,8 @@ class EnvironmentsTest {
         '-Dteamcity.kotlinConfigsDsl.generateDslDocs=false'
     ].join(' ')
 
+    private String ENVIRONMENTS_WARNING = 'Configuring environments with the teamcity-server plugin is deprecated'
+
     private Project project
 
     private Task task(String name) {
@@ -105,1095 +107,1046 @@ class EnvironmentsTest {
         (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
     }
 
-    @Test
-    void defaultProperties() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
+    @Nested
+    class WithEnvironmentsPlugin {
 
-        TeamCityEnvironments environments = project.extensions.getByType(TeamCityPluginExtension).environments
-        assertThat(environments.downloadsDir, equalTo('downloads'))
-        assertThat(environments.baseDownloadUrl, equalTo('https://download.jetbrains.com/teamcity'))
-        assertThat(normalize(environments.baseHomeDir), endsWith('/servers'))
-        assertThat(normalize(environments.baseDataDir), endsWith('/data'))
-    }
-
-    @Test
-    void alternativeDownloadsDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                downloadsDir = '/tmp/downloads'
-            }
+        @BeforeEach
+        void setup() {
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.downloadsDir, equalTo('/tmp/downloads'))
-    }
-
-    @Test
-    void alternativeDownloadBaseUrl() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                baseDownloadUrl = 'http://local-repository'
-            }
+        @Test
+        void defaultProperties() {
+            TeamCityEnvironments environments = project.extensions.getByType(TeamCityPluginExtension).environments
+            assertThat(environments.downloadsDir, equalTo('downloads'))
+            assertThat(environments.baseDownloadUrl, equalTo('https://download.jetbrains.com/teamcity'))
+            assertThat(normalize(environments.baseHomeDir), endsWith('/servers'))
+            assertThat(normalize(environments.baseDataDir), endsWith('/data'))
         }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(extension.environments.baseDownloadUrl, equalTo('http://local-repository'))
-    }
-
-    @Test
-    void alternativeBaseDataDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                baseDataDir = '/tmp/data'
-            }
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(normalize(extension.environments.baseDataDir), endsWith('/tmp/data'))
-    }
-
-    @Test
-    void alternativeBaseHomeDir() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                baseHomeDir = '/tmp/servers'
-            }
-        }
-
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        assertThat(normalize(extension.environments.baseHomeDir), endsWith('/tmp/servers'))
-    }
-
-    @Test
-    void 'gradle properties should override default shared properties'() {
-        projectDir.resolve('gradle.properties').toFile() << """
-        teamcity.environments.downloadsDir = /alt/downloads
-        teamcity.environments.baseDownloadUrl = http://alt-repository
-        teamcity.environments.baseHomeDir = /alt/servers
-        teamcity.environments.baseDataDir = /alt/data
-        """
-        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
-        // workaround for https://github.com/gradle/gradle/issues/13122
-        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
-
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2021.2.3'
+        @Test
+        void alternativeDownloadsDir() {
+            project.teamcity {
+                environments {
+                    downloadsDir = '/tmp/downloads'
                 }
             }
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            assertThat(extension.environments.downloadsDir, equalTo('/tmp/downloads'))
         }
-        project.evaluate()
 
-        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
-        assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
-        assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
-        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
-    }
-
-    @Test
-    void 'gradle properties should override shared properties'() {
-        projectDir.resolve('gradle.properties').toFile() << """
-        teamcity.environments.downloadsDir = /alt/downloads
-        teamcity.environments.baseDownloadUrl = http://alt-repository
-        teamcity.environments.baseHomeDir = /alt/servers
-        teamcity.environments.baseDataDir = /alt/data
-        """
-        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
-        // workaround for https://github.com/gradle/gradle/issues/13122
-        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
-
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                downloadsDir = '/tmp/downloads'
-                baseDownloadUrl = 'http://local-repository'
-                baseHomeDir = '/tmp/servers'
-                baseDataDir = '/tmp/data'
-
-                test {
-                    version = '2021.2.3'
+        @Test
+        void alternativeDownloadBaseUrl() {
+            project.teamcity {
+                environments {
+                    baseDownloadUrl = 'http://local-repository'
                 }
             }
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            assertThat(extension.environments.baseDownloadUrl, equalTo('http://local-repository'))
         }
-        project.evaluate()
 
-        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
-        assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
-        assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(normalize(startTestServer.homeDir.get()), endsWith('/alt/servers/TeamCity-2021.2.3'))
-        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
-    }
-
-    @Test
-    void defaultOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
+        @Test
+        void alternativeBaseDataDir() {
+            project.teamcity {
+                environments {
+                    baseDataDir = '/tmp/data'
                 }
             }
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            assertThat(normalize(extension.environments.baseDataDir), endsWith('/tmp/data'))
         }
-        project.evaluate()
 
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.serverOptions.get(), equalTo(defaultOptions))
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo(''))
-    }
+        @Test
+        void alternativeBaseHomeDir() {
+            project.teamcity {
+                environments {
+                    baseHomeDir = '/tmp/servers'
+                }
+            }
 
-    @Test
-    void 'reject invalid version'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            assertThat(normalize(extension.environments.baseHomeDir), endsWith('/tmp/servers'))
+        }
 
-        def expected = assertThrows(IllegalArgumentException, {
+        @Test
+        void defaultOptions() {
             project.teamcity {
                 environments {
                     test {
-                        version = '123'
                     }
                 }
             }
-        }, 'Invalid version not rejected')
-        assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
-    }
+            project.evaluate()
 
-    @Test
-    void replaceDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    serverOptions = '-DnewOption=test'
-                }
-            }
-        }
-        project.evaluate()
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.serverOptions.get(), equalTo('-DnewOption=test'))
-    }
-
-    @Test
-    void replaceDefaultServerOptionsWithMultipleValues() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    serverOptions = ['-Doption1=value1', '-Doption2=value2']
-                }
-            }
-        }
-        project.evaluate()
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.serverOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
-    }
-
-    @Test
-    void addToDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    serverOptions '-DadditionalOption=test'
-                }
-            }
-        }
-        project.evaluate()
-
-        def expectedOptions = defaultOptions + ' -DadditionalOption=test'
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
-    }
-
-    @Test
-    void addMultipleValuesToDefaultServerOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    serverOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
-                }
-            }
-        }
-        project.evaluate()
-
-        def expectedOptions = defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
-    }
-
-    @Test
-    void replaceDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    agentOptions = '-DnewOption1=value1'
-                    agentOptions = '-DnewOption2=value2'
-                }
-            }
-        }
-        project.evaluate()
-
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo('-DnewOption2=value2'))
-    }
-
-    @Test
-    void replaceDefaultAdentOptionsWithMultipleValues() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    agentOptions = ['-Doption1=value1', '-Doption2=value2']
-                }
-            }
-        }
-        project.evaluate()
-
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
-    }
-
-    @Test
-    void addToDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    agentOptions '-DadditionalOption1=value1'
-                    agentOptions '-DadditionalOption2=value2'
-                }
-            }
-        }
-        project.evaluate()
-
-        String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
-    }
-
-    @Test
-    void addMultipleValuesToDefaultAgentOptions() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-
-        project.teamcity {
-            environments {
-                test {
-                    agentOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
-                }
-            }
-        }
-        project.evaluate()
-
-        String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
-    }
-
-    private String ENVIRONMENTS_WARNING = 'Configuring environments with the teamcity-server plugin is deprecated'
-
-    @Test
-    void 'configuring environment with teamcity-environments plugin does not output warning'() {
-        outputEventListener.reset()
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                }
-            }
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.serverOptions.get(), equalTo(defaultOptions))
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo(''))
         }
 
-        assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
-    }
-
-    @Test
-    void 'configuring environment with teamcity-server plugin outputs warning'() {
-        outputEventListener.reset()
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.teamcity {
-            environments {
-                test {
+        @Test
+        void 'reject invalid version'() {
+            def expected = assertThrows(IllegalArgumentException, {
+                project.teamcity {
+                    environments {
+                        test {
+                            version = '123'
+                        }
+                    }
                 }
-            }
+            }, 'Invalid version not rejected')
+            assertThat(expected.message, startsWith("'123' is not a valid TeamCity version"))
         }
 
-        assertThat(outputEventListener.toString(), containsString(ENVIRONMENTS_WARNING))
-    }
-
-    @Test
-    void 'configuring environment with teamcity-environments and teamcity-server plugins does not output warning'() {
-        outputEventListener.reset()
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
+        @Test
+        void replaceDefaultServerOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        serverOptions = '-DnewOption=test'
+                    }
                 }
             }
+            project.evaluate()
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.serverOptions.get(), equalTo('-DnewOption=test'))
         }
 
-        assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
-    }
-
-    @Test
-    void 'environments plugin configures environments with default properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test1 {
-                    version = '9.1.7'
-                }
-                test2 {
-                    version = '10.0.4'
+        @Test
+        void replaceDefaultServerOptionsWithMultipleValues() {
+            project.teamcity {
+                environments {
+                    test {
+                        serverOptions = ['-Doption1=value1', '-Doption2=value2']
+                    }
                 }
             }
+            project.evaluate()
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.serverOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
         }
-        project.evaluate()
 
-        def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
-        assertThat(downloadTest1.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
-        def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/servers/TeamCity-9.1.7'))
-        assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/data/9.1'))
-        assertThat(startTest1Server.javaHome.get(), equalTo(System.getProperty('java.home')))
+        @Test
+        void addToDefaultServerOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        serverOptions '-DadditionalOption=test'
+                    }
+                }
+            }
+            project.evaluate()
 
-        def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
-        assertThat(downloadTest2.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
-        def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
-        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/servers/TeamCity-10.0.4'))
-        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/data/10.0'))
-        assertThat(startTest2Server.javaHome.get(), equalTo(System.getProperty('java.home')))
-    }
+            def expectedOptions = defaultOptions + ' -DadditionalOption=test'
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
+        }
 
-    @Test
-    void 'environments plugin configures environments using shared properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
+        @Test
+        void addMultipleValuesToDefaultServerOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        serverOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def expectedOptions = defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
+        }
+
+        @Test
+        void replaceDefaultAgentOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        agentOptions = '-DnewOption1=value1'
+                        agentOptions = '-DnewOption2=value2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo('-DnewOption2=value2'))
+        }
+
+        @Test
+        void replaceDefaultAdentOptionsWithMultipleValues() {
+            project.teamcity {
+                environments {
+                    test {
+                        agentOptions = ['-Doption1=value1', '-Doption2=value2']
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
+        }
+
+        @Test
+        void addToDefaultAgentOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        agentOptions '-DadditionalOption1=value1'
+                        agentOptions '-DadditionalOption2=value2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
+        }
+
+        @Test
+        void addMultipleValuesToDefaultAgentOptions() {
+            project.teamcity {
+                environments {
+                    test {
+                        agentOptions '-DadditionalOption1=value1', '-DadditionalOption2=value2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
+        }
+
+        @Test
+        void 'configuring environment with teamcity-environments plugin does not output warning'() {
+            outputEventListener.reset()
+            project.teamcity {
+                environments {
+                    test {
+                    }
+                }
+            }
+
+            assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
+        }
+
+        @Test
+        void 'configuring environment with teamcity-environments and teamcity-server plugins does not output warning'() {
+            outputEventListener.reset()
+            project.apply plugin: 'io.github.rodm.teamcity-server'
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                    }
+                }
+            }
+
+            assertThat(outputEventListener.toString(), not(containsString(ENVIRONMENTS_WARNING)))
+        }
+
+        @Test
+        void 'environments plugin configures environments with default properties'() {
+            project.teamcity {
+                environments {
+                    test1 {
+                        version = '9.1.7'
+                    }
+                    test2 {
+                        version = '10.0.4'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
+            assertThat(downloadTest1.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
+            def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+            assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/servers/TeamCity-9.1.7'))
+            assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/data/9.1'))
+            assertThat(startTest1Server.javaHome.get(), equalTo(System.getProperty('java.home')))
+
+            def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
+            assertThat(downloadTest2.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
+            def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+            assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/servers/TeamCity-10.0.4'))
+            assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/data/10.0'))
+            assertThat(startTest2Server.javaHome.get(), equalTo(System.getProperty('java.home')))
+        }
+
+        @Test
+        void 'environments plugin configures environments using shared properties'() {
+            project.teamcity {
+                environments {
+                    baseDownloadUrl = 'http://local-repository'
+                    baseHomeDir = '/tmp/servers'
+                    baseDataDir = '/tmp/data'
+                    test1 {
+                        version = '9.1.7'
+                    }
+                    test2 {
+                        version = '10.0.4'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
+            assertThat(downloadTest1.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+
+            def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+            assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
+            assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/tmp/data/9.1'))
+
+            def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
+            assertThat(downloadTest2.src.toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+
+            def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+            assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-10.0.4'))
+            assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/10.0'))
+        }
+
+        @Test
+        void 'environments plugin configures environments composed with shared properties'() {
+            project.teamcity {
+                environments {
+                    baseHomeDir = '/tmp/servers'
+                    baseDataDir = '/tmp/data'
+                    test1 {
+                        version = '2021.1'
+                        homeDir = "${baseHomeDir}/Test1"
+                        dataDir = "${baseDataDir}/Test1"
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startTest2Server = project.tasks.getByName('startTest1Server') as StartServer
+            assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/Test1'))
+            assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/Test1'))
+        }
+
+        @Test
+        void 'environments plugin configures environment tasks using environment properties'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '9.1.7'
+                        downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
+                        homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
+                        dataDir = project.file('/tmp/data/teamcity9.1')
+                        javaHome = project.file('/tmp/java')
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+            assertThat(downloadTest.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(normalize(startTestServer.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
+            assertThat(normalize(startTestServer.dataDir.get()), endsWith('/tmp/data/teamcity9.1'))
+            assertThat(normalize(startTestServer.javaHome.get()), endsWith('/tmp/java'))
+        }
+
+        @Test
+        void 'environments plugin adds tasks for an environment'() {
+            project.teamcity {
+                environments {
+                    teamcity9 {
+                        version = '9.1.7'
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(project, hasTask('downloadTeamcity9'))
+            assertThat(project, hasTask('installTeamcity9'))
+
+            assertThat(project, hasTask('deployToTeamcity9'))
+            assertThat(project, hasTask('undeployFromTeamcity9'))
+
+            assertThat(project, hasTask('startTeamcity9Server'))
+            assertThat(project, hasTask('stopTeamcity9Server'))
+            assertThat(project, hasTask('startTeamcity9Agent'))
+            assertThat(project, hasTask('stopTeamcity9Agent'))
+            assertThat(project, hasTask('startTeamcity9'))
+            assertThat(project, hasTask('stopTeamcity9'))
+        }
+
+        @Test
+        void 'configures deploy task with actions to disable and enable plugin for version 2018_2 and later'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2018.2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
+            assertThat(deployPlugin, hasAction(DisablePluginAction))
+            assertThat(deployPlugin, hasAction(EnablePluginAction))
+        }
+
+        @Test
+        void 'configures deploy task without actions to disable and enable plugin for version 2018_1 and earlier'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2018.1'
+                    }
+                }
+            }
+            project.evaluate()
+
+            Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
+            assertThat(deployPlugin, not(hasAction(DisablePluginAction)))
+            assertThat(deployPlugin, not(hasAction(EnablePluginAction)))
+        }
+
+        @Test
+        void 'configures undeploy task with action to disable the plugin for version 2018_2 and later'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2018.2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
+            assertThat(undeployPlugin, hasAction(DisablePluginAction))
+        }
+
+        @Test
+        void 'configures undeploy task without action to disable the plugin for version 2018_1 and earlier'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2018.1'
+                    }
+                }
+            }
+            project.evaluate()
+
+            Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
+            assertThat(undeployPlugin, not(hasAction(DisablePluginAction)))
+        }
+
+        @Test
+        void 'environments plugin adds tasks for each separate environment'() {
+            project.teamcity {
+                environments {
+                    teamcity9 {
+                        version = '9.1.7'
+                    }
+                    teamcity10 {
+                        version = '10.0.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(project, hasTask('startTeamcity9Server'))
+            assertThat(project, hasTask('startTeamcity10Server'))
+        }
+
+        @Test
+        void 'environments plugin configures deploy and undeploy tasks with project plugin'() {
+            project.apply plugin: 'io.github.rodm.teamcity-server'
+            project.teamcity {
+                environments {
+                    test {
+                        version = '10.0.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            Set<File> deployFiles = deployPlugin.plugins.files
+            assertThat(deployFiles, hasSize(1))
+            assertThat(deployFiles, hasItem(project.file('build/distributions/test.zip')))
+            assertThat(normalizePath(deployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
+
+            def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
+            Set<File> undeployFiles = undeployPlugin.plugins.files
+            assertThat(undeployFiles, hasSize(1))
+            assertThat(undeployFiles, hasItem(project.file('build/distributions/test.zip')))
+            assertThat(normalizePath(undeployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
+        }
+
+        @Test
+        void 'environments plugin configures deploy and undeploy tasks with multiple plugins'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '10.0.3'
+                        plugins 'plugin1.zip'
+                        plugins 'plugin2.zip'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            Set<File> deployFiles = deployPlugin.plugins.files
+            assertThat(deployFiles, hasSize(2))
+            assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
+            assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
+
+            def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
+            Set<File> undeployFiles = undeployPlugin.plugins.files
+            assertThat(undeployFiles, hasSize(2))
+            assertThat(undeployFiles, hasItem(project.file('plugin1.zip')))
+            assertThat(undeployFiles, hasItem(project.file('plugin2.zip')))
+        }
+
+        @Test
+        void 'configure plugin with assignment replaces'() {
+            project.teamcity {
+                environments {
+                    test {
+                        plugins = 'plugin1.zip'
+                        plugins = 'plugin2.zip'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            Set<File> deployFiles = deployPlugin.plugins.files
+            assertThat(deployFiles, hasSize(1))
+            assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
+        }
+
+        @Test
+        void 'configure multiple plugins for an environment with a list'() {
+            project.teamcity {
+                environments {
+                    test {
+                        plugins = ['plugin1.zip', 'plugin2.zip']
+                    }
+                }
+            }
+            project.evaluate()
+
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            Set<File> deployFiles = deployPlugin.plugins.files
+            assertThat(deployFiles, hasSize(2))
+            assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
+            assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
+        }
+
+        @Test
+        void 'applying teamcity-server and teamcity-environments does not duplicate tasks'() {
+            outputEventListener.reset()
+            project.apply plugin: 'io.github.rodm.teamcity-server'
+            project.teamcity {
+                environments {
+                    test {
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(project, hasTask('downloadTest'))
+        }
+
+        private Closure TEAMCITY10_ENVIRONMENT = {
             environments {
                 baseDownloadUrl = 'http://local-repository'
                 baseHomeDir = '/tmp/servers'
                 baseDataDir = '/tmp/data'
-                test1 {
-                    version = '9.1.7'
-                }
-                test2 {
-                    version = '10.0.4'
-                }
-            }
-        }
-        project.evaluate()
-
-        def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
-        assertThat(downloadTest1.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
-
-        def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/tmp/data/9.1'))
-
-        def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
-        assertThat(downloadTest2.src.toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
-
-        def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
-        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-10.0.4'))
-        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/10.0'))
-    }
-
-    @Test
-    void 'environments plugin configures environments composed with shared properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                baseHomeDir = '/tmp/servers'
-                baseDataDir = '/tmp/data'
-                test1 {
-                    version = '2021.1'
-                    homeDir = "${baseHomeDir}/Test1"
-                    dataDir = "${baseDataDir}/Test1"
-                }
-            }
-        }
-        project.evaluate()
-
-        def startTest2Server = project.tasks.getByName('startTest1Server') as StartServer
-        assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/Test1'))
-        assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/Test1'))
-    }
-
-    @Test
-    void 'environments plugin configures environment tasks using environment properties'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '9.1.7'
-                    downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
-                    homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
-                    dataDir = project.file('/tmp/data/teamcity9.1')
-                    javaHome = project.file('/tmp/java')
-                }
-            }
-        }
-        project.evaluate()
-
-        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
-        assertThat(downloadTest.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(normalize(startTestServer.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
-        assertThat(normalize(startTestServer.dataDir.get()), endsWith('/tmp/data/teamcity9.1'))
-        assertThat(normalize(startTestServer.javaHome.get()), endsWith('/tmp/java'))
-    }
-
-    @Test
-    void 'environments plugin configures environment tasks using overrides from gradle properties'() {
-        projectDir.resolve('gradle.properties').toFile() << """
-        teamcity.environments.test.downloadUrl = https://alt-repository/TeamCity-9.1.7.tar.gz
-        teamcity.environments.test.javaHome = /alt/java
-        teamcity.environments.test.homeDir = /alt/servers/TeamCity-9.1.7
-        teamcity.environments.test.dataDir = /alt/data/9.1
-        teamcity.environments.test.serverOptions = -DserverOption1=value1 -DserverOption2=value2
-        teamcity.environments.test.agentOptions = -DagentOption1=value1 -DagentOption2=value2
-        """
-        project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
-        // workaround for https://github.com/gradle/gradle/issues/13122
-        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
-
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '9.1.7'
-                    downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
-                    javaHome = project.file('/tmp/java')
-                    homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
-                    dataDir = project.file('/tmp/data/teamcity9.1')
-                }
-            }
-        }
-        project.evaluate()
-
-        def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
-        assertThat(downloadTest.src.toString(), equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
-
-        def startTestServer = project.tasks.getByName('startTestServer') as StartServer
-        assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-9.1.7'))
-        assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/9.1'))
-        assertThat(startTestServer.javaHome.get(), equalTo('/alt/java'))
-        assertThat(startTestServer.serverOptions.get(), equalTo('-DserverOption1=value1 -DserverOption2=value2'))
-
-        def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
-        assertThat(startTestAgent.agentOptions.get(), equalTo('-DagentOption1=value1 -DagentOption2=value2'))
-    }
-
-    @Test
-    void 'environments plugin adds tasks for an environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                teamcity9 {
-                    version = '9.1.7'
-                }
-            }
-        }
-        project.evaluate()
-
-        assertThat(project, hasTask('downloadTeamcity9'))
-        assertThat(project, hasTask('installTeamcity9'))
-
-        assertThat(project, hasTask('deployToTeamcity9'))
-        assertThat(project, hasTask('undeployFromTeamcity9'))
-
-        assertThat(project, hasTask('startTeamcity9Server'))
-        assertThat(project, hasTask('stopTeamcity9Server'))
-        assertThat(project, hasTask('startTeamcity9Agent'))
-        assertThat(project, hasTask('stopTeamcity9Agent'))
-        assertThat(project, hasTask('startTeamcity9'))
-        assertThat(project, hasTask('stopTeamcity9'))
-    }
-
-    @Test
-    void 'configures deploy task with actions to disable and enable plugin for version 2018_2 and later'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2018.2'
-                }
-            }
-        }
-        project.evaluate()
-
-        Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        assertThat(deployPlugin, hasAction(DisablePluginAction))
-        assertThat(deployPlugin, hasAction(EnablePluginAction))
-    }
-
-    @Test
-    void 'configures deploy task without actions to disable and enable plugin for version 2018_1 and earlier'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2018.1'
-                }
-            }
-        }
-        project.evaluate()
-
-        Copy deployPlugin = project.tasks.getByName('deployToTest') as Copy
-        assertThat(deployPlugin, not(hasAction(DisablePluginAction)))
-        assertThat(deployPlugin, not(hasAction(EnablePluginAction)))
-    }
-
-    @Test
-    void 'configures undeploy task with action to disable the plugin for version 2018_2 and later'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2018.2'
-                }
-            }
-        }
-        project.evaluate()
-
-        Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        assertThat(undeployPlugin, hasAction(DisablePluginAction))
-    }
-
-    @Test
-    void 'configures undeploy task without action to disable the plugin for version 2018_1 and earlier'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2018.1'
-                }
-            }
-        }
-        project.evaluate()
-
-        Delete undeployPlugin = project.tasks.getByName('undeployFromTest') as Delete
-        assertThat(undeployPlugin, not(hasAction(DisablePluginAction)))
-    }
-
-    @Test
-    void 'environments plugin adds tasks for each separate environment'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                teamcity9 {
-                    version = '9.1.7'
-                }
                 teamcity10 {
-                    version = '10.0.3'
-                }
-            }
-        }
-        project.evaluate()
-
-        assertThat(project, hasTask('startTeamcity9Server'))
-        assertThat(project, hasTask('startTeamcity10Server'))
-    }
-
-    @Test
-    void 'environments plugin configures deploy and undeploy tasks with project plugin'() {
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '10.0.3'
-                }
-            }
-        }
-        project.evaluate()
-
-        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
-        Set<File> deployFiles = deployPlugin.plugins.files
-        assertThat(deployFiles, hasSize(1))
-        assertThat(deployFiles, hasItem(project.file('build/distributions/test.zip')))
-        assertThat(normalizePath(deployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
-
-        def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
-        Set<File> undeployFiles = undeployPlugin.plugins.files
-        assertThat(undeployFiles, hasSize(1))
-        assertThat(undeployFiles, hasItem(project.file('build/distributions/test.zip')))
-        assertThat(normalizePath(undeployPlugin.pluginsDir), endsWith('data/10.0/plugins'))
-    }
-
-    @Test
-    void 'environments plugin configures deploy and undeploy tasks with multiple plugins'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '10.0.3'
-                    plugins 'plugin1.zip'
-                    plugins 'plugin2.zip'
-                }
-            }
-        }
-        project.evaluate()
-
-        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
-        Set<File> deployFiles = deployPlugin.plugins.files
-        assertThat(deployFiles, hasSize(2))
-        assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
-        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
-
-        def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
-        Set<File> undeployFiles = undeployPlugin.plugins.files
-        assertThat(undeployFiles, hasSize(2))
-        assertThat(undeployFiles, hasItem(project.file('plugin1.zip')))
-        assertThat(undeployFiles, hasItem(project.file('plugin2.zip')))
-    }
-
-    @Test
-    void 'configure plugin with assignment replaces'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    plugins = 'plugin1.zip'
-                    plugins = 'plugin2.zip'
-                }
-            }
-        }
-        project.evaluate()
-
-        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
-        Set<File> deployFiles = deployPlugin.plugins.files
-        assertThat(deployFiles, hasSize(1))
-        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
-    }
-
-    @Test
-    void 'configure multiple plugins for an environment with a list'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    plugins = ['plugin1.zip', 'plugin2.zip']
-                }
-            }
-        }
-        project.evaluate()
-
-        def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
-        Set<File> deployFiles = deployPlugin.plugins.files
-        assertThat(deployFiles, hasSize(2))
-        assertThat(deployFiles, hasItem(project.file('plugin1.zip')))
-        assertThat(deployFiles, hasItem(project.file('plugin2.zip')))
-    }
-
-    @Test
-    void 'applying teamcity-server and teamcity-environments does not duplicate tasks'() {
-        outputEventListener.reset()
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                }
-            }
-        }
-        project.evaluate()
-
-        assertThat(project, hasTask('downloadTest'))
-    }
-
-    @Test
-    void 'applying teamcity-environments before teamcity-server does not duplicate environment tasks'() {
-        outputEventListener.reset()
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.apply plugin: 'com.github.rodm.teamcity-server'
-        project.teamcity {
-            environments {
-                test {
-                }
-            }
-        }
-        project.evaluate()
-
-        assertThat(project, hasTask('downloadTest'))
-    }
-
-    private Closure TEAMCITY10_ENVIRONMENT = {
-        environments {
-            baseDownloadUrl = 'http://local-repository'
-            baseHomeDir = '/tmp/servers'
-            baseDataDir = '/tmp/data'
-            teamcity10 {
-                version = '10.0.4'
-                javaHome = project.file('/opt/jdk1.8.0')
-                agentOptions = '-DagentOption=agentValue'
-            }
-        }
-    }
-
-    @Test
-    void 'configures startServer task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
-
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
-        assertThat(normalize(startServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(startServer.dataDir.get()), endsWith('data/10.0'))
-        assertThat(normalize(startServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
-        assertThat(startServer.serverOptions.get(), endsWith(defaultOptions))
-    }
-
-    @Test
-    void 'configures stopServer task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
-
-        project.evaluate()
-
-        StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
-        assertThat(normalize(stopServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(stopServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
-    }
-
-    @Test
-    void 'configures startAgent task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
-
-        project.evaluate()
-
-        StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
-        assertThat(normalize(startAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(startAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
-        assertThat(startAgent.agentOptions.get(), endsWith('-DagentOption=agentValue'))
-    }
-
-    @Test
-    void 'configures stopAgent task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
-
-        project.evaluate()
-
-        StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
-        assertThat(normalize(stopAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
-        assertThat(normalize(stopAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
-    }
-
-    @Test
-    void 'teamcity task validates home directory'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.1' {
-                    version = '2020.1'
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
-        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
-        assertThat(e.message, containsString("specified for property 'homeDir' does not exist."))
-    }
-
-    @Test
-    void 'teamcity task validates home directory not a file'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.1' {
-                    version = '2020.1'
-                }
-            }
-        }
-        project.evaluate()
-        def serverDir = createDirectory(projectDir.resolve('servers'))
-        createFile(serverDir.toPath().resolve('TeamCity-2020.1'))
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
-        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
-        assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
-    }
-
-    @Test
-    void 'teamcity task outputs no warning when environment version matches installed version'() {
-        createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.2' {
-                    version = '2020.2.3'
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
-        startServer.validate()
-
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3', '2020.2.3')
-        assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
-    }
-
-    @Test
-    void 'teamcity task outputs a warning when environment version does not match at bugfix level'() {
-        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.2' {
-                    version = '2020.2.5'
-                    homeDir = fakeHomeDir.absolutePath
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
-        startServer.validate()
-
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3')
-        assertThat(outputEventListener.toString(), containsString(expectedMessage))
-    }
-
-    @Test
-    void 'teamcity task outputs a warning when environment version does not match EAP level'() {
-        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 EAP1')
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2021.2' {
-                    version = '2021.2'
-                    homeDir = fakeHomeDir.absolutePath
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
-        startServer.validate()
-
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1')
-        assertThat(outputEventListener.toString(), containsString(expectedMessage))
-    }
-
-    @Test
-    void 'teamcity task outputs a warning when environment version does not match RC level'() {
-        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 RC')
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2021.2' {
-                    version = '2021.2'
-                    homeDir = fakeHomeDir.absolutePath
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
-        startServer.validate()
-
-        String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC')
-        assertThat(outputEventListener.toString(), containsString(expectedMessage))
-    }
-
-    @Test
-    void 'teamcity task fail when environment version is not data compatible with installed version'() {
-        File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.2' {
-                    version = '2020.1.2'
-                    homeDir = fakeHomeDir.absolutePath
-                }
-            }
-        }
-        project.evaluate()
-
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
-        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-
-        String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2', '2020.2.3')
-        assertThat(e.message, containsString(expectedMessage))
-    }
-
-    @Test
-    void 'teamcity task validates Java home directory'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                'teamcity2020.1' {
-                    version = '2020.1'
-                    javaHome = project.file('/tmp/opt/jdk1.8.0')
+                    version = '10.0.4'
+                    javaHome = project.file('/opt/jdk1.8.0')
+                    agentOptions = '-DagentOption=agentValue'
                 }
             }
         }
 
-        project.evaluate()
-        createFakeTeamCityInstall(projectDir, 'servers', '2020.1')
+        @Test
+        void 'configures startServer task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
 
-        StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
-        def e = assertThrows(InvalidUserDataException) { startServer.validate() }
-        assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
-        assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
-    }
+            project.evaluate()
 
-    @Test
-    void 'configures install task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
+            StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
+            assertThat(normalize(startServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
+            assertThat(normalize(startServer.dataDir.get()), endsWith('data/10.0'))
+            assertThat(normalize(startServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
+            assertThat(startServer.serverOptions.get(), endsWith(defaultOptions))
+        }
 
-        project.evaluate()
+        @Test
+        void 'configures stopServer task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
 
-        InstallTeamCity install = project.tasks.getByName('installTeamcity10') as InstallTeamCity
-        assertThat(normalizePath(install.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalizePath(install.getTarget()), endsWith('servers/TeamCity-10.0.4'))
-    }
+            project.evaluate()
 
-    @Test
-    void 'configures download task'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity TEAMCITY10_ENVIRONMENT
+            StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
+            assertThat(normalize(stopServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
+            assertThat(normalize(stopServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
+        }
 
-        project.evaluate()
+        @Test
+        void 'configures startAgent task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
 
-        DownloadTeamCity download = project.tasks.getByName('downloadTeamcity10') as DownloadTeamCity
-        assertThat(download.getSrc().toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
-        assertThat(normalizePath(download.getDest()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
-    }
+            project.evaluate()
 
-    @Test
-    void 'extension has named child extensions'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity { }
+            StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
+            assertThat(normalize(startAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
+            assertThat(normalize(startAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
+            assertThat(startAgent.agentOptions.get(), endsWith('-DagentOption=agentValue'))
+        }
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        def agent = extension.extensions.findByName('agent')
-        def server = extension.extensions.findByName('server')
-        def environments = extension.extensions.findByName('environments')
+        @Test
+        void 'configures stopAgent task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
 
-        assertThat(agent, isA(AgentPluginConfiguration))
-        assertThat(server, isA(ServerPluginConfiguration))
-        assertThat(environments, isA(TeamCityEnvironments))
-    }
+            project.evaluate()
 
-    @Test
-    void 'environment tasks are for a local installation'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test {
-                    version = '2021.2.3'
+            StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
+            assertThat(normalize(stopAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
+            assertThat(normalize(stopAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
+        }
+
+        @Test
+        void 'teamcity task validates home directory'() {
+            project.teamcity {
+                environments {
+                    'teamcity2020.1' {
+                        version = '2020.1'
+                    }
                 }
             }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+            assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
+            assertThat(e.message, containsString("specified for property 'homeDir' does not exist."))
         }
-        project.evaluate()
 
-        assertThat(task('downloadTest'), isA(DownloadTeamCity))
-        assertThat(task('installTest'), isA(InstallTeamCity))
-        assertThat(task('startTestServer'), isA(StartServer))
-        assertThat(task('stopTestServer'), isA(StopServer))
-        assertThat(task('startTestAgent'), isA(StartAgent))
-        assertThat(task('stopTestAgent'), isA(StopAgent))
-    }
-
-    @Test
-    void 'default environment type is local'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test1 {
-                    version = '2021.2.1'
-                    homeDir = '/opt/teamcity-server'
-                }
-                create('test2') {
-                    version = '2021.2.2'
-                    homeDir = '/opt/teamcity-server'
-                }
-                register('test3') {
-                    version = '2021.2.3'
-                    homeDir = '/opt/teamcity-server'
+        @Test
+        void 'teamcity task validates home directory not a file'() {
+            project.teamcity {
+                environments {
+                    'teamcity2020.1' {
+                        version = '2020.1'
+                    }
                 }
             }
+            project.evaluate()
+            def serverDir = createDirectory(projectDir.resolve('servers'))
+            createFile(serverDir.toPath().resolve('TeamCity-2020.1'))
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+            assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
+            assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
         }
-        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
-
-        assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
-        assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
-        assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
-    }
-
-    @Test
-    void 'configure local environment type'() {
-        project.apply plugin: 'com.github.rodm.teamcity-environments'
-        project.teamcity {
-            environments {
-                test1(LocalTeamCityEnvironment) {
-                    version = '2021.2.1'
-                    homeDir = '/opt/teamcity-server'
-                }
-                create('test2', LocalTeamCityEnvironment) {
-                    version = '2021.2.2'
-                    homeDir = '/opt/teamcity-server'
-                }
-                register('test3', LocalTeamCityEnvironment) {
-                    version = '2021.2.3'
-                    homeDir = '/opt/teamcity-server'
+        @Test
+        void 'teamcity task outputs no warning when environment version matches installed version'() {
+            createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+            project.teamcity {
+                environments {
+                    'teamcity2020.2' {
+                        version = '2020.2.3'
+                    }
                 }
             }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            startServer.validate()
+
+            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3', '2020.2.3')
+            assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
         }
-        project.evaluate()
 
-        TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-        def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+        @Test
+        void 'teamcity task outputs a warning when environment version does not match at bugfix level'() {
+            File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+            project.teamcity {
+                environments {
+                    'teamcity2020.2' {
+                        version = '2020.2.5'
+                        homeDir = fakeHomeDir.absolutePath
+                    }
+                }
+            }
+            project.evaluate()
 
-        assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
-        assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
-        assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            startServer.validate()
+
+            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3')
+            assertThat(outputEventListener.toString(), containsString(expectedMessage))
+        }
+
+        @Test
+        void 'teamcity task outputs a warning when environment version does not match EAP level'() {
+            File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 EAP1')
+            project.teamcity {
+                environments {
+                    'teamcity2021.2' {
+                        version = '2021.2'
+                        homeDir = fakeHomeDir.absolutePath
+                    }
+                }
+            }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+            startServer.validate()
+
+            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1')
+            assertThat(outputEventListener.toString(), containsString(expectedMessage))
+        }
+
+        @Test
+        void 'teamcity task outputs a warning when environment version does not match RC level'() {
+            File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 RC')
+            project.teamcity {
+                environments {
+                    'teamcity2021.2' {
+                        version = '2021.2'
+                        homeDir = fakeHomeDir.absolutePath
+                    }
+                }
+            }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+            startServer.validate()
+
+            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC')
+            assertThat(outputEventListener.toString(), containsString(expectedMessage))
+        }
+
+        @Test
+        void 'teamcity task fail when environment version is not data compatible with installed version'() {
+            File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
+            project.teamcity {
+                environments {
+                    'teamcity2020.2' {
+                        version = '2020.1.2'
+                        homeDir = fakeHomeDir.absolutePath
+                    }
+                }
+            }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+
+            String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2', '2020.2.3')
+            assertThat(e.message, containsString(expectedMessage))
+        }
+
+        @Test
+        void 'teamcity task validates Java home directory'() {
+            project.teamcity {
+                environments {
+                    'teamcity2020.1' {
+                        version = '2020.1'
+                        javaHome = project.file('/tmp/opt/jdk1.8.0')
+                    }
+                }
+            }
+
+            project.evaluate()
+            createFakeTeamCityInstall(projectDir, 'servers', '2020.1')
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            def e = assertThrows(InvalidUserDataException) { startServer.validate() }
+            assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
+            assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
+        }
+
+        @Test
+        void 'configures install task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
+
+            project.evaluate()
+
+            InstallTeamCity install = project.tasks.getByName('installTeamcity10') as InstallTeamCity
+            assertThat(normalizePath(install.getSource()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
+            assertThat(normalizePath(install.getTarget()), endsWith('servers/TeamCity-10.0.4'))
+        }
+
+        @Test
+        void 'configures download task'() {
+            project.teamcity TEAMCITY10_ENVIRONMENT
+
+            project.evaluate()
+
+            DownloadTeamCity download = project.tasks.getByName('downloadTeamcity10') as DownloadTeamCity
+            assertThat(download.getSrc().toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
+            assertThat(normalizePath(download.getDest()), endsWith('downloads/TeamCity-10.0.4.tar.gz'))
+        }
+
+        @Test
+        void 'extension has named child extensions'() {
+            project.teamcity {}
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            def agent = extension.extensions.findByName('agent')
+            def server = extension.extensions.findByName('server')
+            def environments = extension.extensions.findByName('environments')
+
+            assertThat(agent, isA(AgentPluginConfiguration))
+            assertThat(server, isA(ServerPluginConfiguration))
+            assertThat(environments, isA(TeamCityEnvironments))
+        }
+
+        @Test
+        void 'environment tasks are for a local installation'() {
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(task('downloadTest'), isA(DownloadTeamCity))
+            assertThat(task('installTest'), isA(InstallTeamCity))
+            assertThat(task('startTestServer'), isA(StartServer))
+            assertThat(task('stopTestServer'), isA(StopServer))
+            assertThat(task('startTestAgent'), isA(StartAgent))
+            assertThat(task('stopTestAgent'), isA(StopAgent))
+        }
+
+        @Test
+        void 'default environment type is local'() {
+            project.teamcity {
+                environments {
+                    test1 {
+                        version = '2021.2.1'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                    create('test2') {
+                        version = '2021.2.2'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                    register('test3') {
+                        version = '2021.2.3'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                }
+            }
+            project.evaluate()
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+            assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
+            assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
+            assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
+        }
+
+        @Test
+        void 'configure local environment type'() {
+            project.teamcity {
+                environments {
+                    test1(LocalTeamCityEnvironment) {
+                        version = '2021.2.1'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                    create('test2', LocalTeamCityEnvironment) {
+                        version = '2021.2.2'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                    register('test3', LocalTeamCityEnvironment) {
+                        version = '2021.2.3'
+                        homeDir = '/opt/teamcity-server'
+                    }
+                }
+            }
+            project.evaluate()
+
+            TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
+            def environments = extension.extensions.findByName('environments') as TeamCityEnvironments
+
+            assertThat(environments.getByName('test1'), isA(LocalTeamCityEnvironment))
+            assertThat(environments.getByName('test2'), isA(LocalTeamCityEnvironment))
+            assertThat(environments.getByName('test3'), isA(LocalTeamCityEnvironment))
+        }
+    }
+
+    @Nested
+    class WithoutEnvironmentsPlugin {
+
+        @Test
+        void 'configuring environment with teamcity-server plugin outputs warning'() {
+            outputEventListener.reset()
+            project.apply plugin: 'io.github.rodm.teamcity-server'
+            project.teamcity {
+                environments {
+                    test {
+                    }
+                }
+            }
+
+            assertThat(outputEventListener.toString(), containsString(ENVIRONMENTS_WARNING))
+        }
+
+        @Test
+        void 'applying teamcity-environments before teamcity-server does not duplicate environment tasks'() {
+            outputEventListener.reset()
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+            project.apply plugin: 'io.github.rodm.teamcity-server'
+            project.teamcity {
+                environments {
+                    test {
+                    }
+                }
+            }
+            project.evaluate()
+
+            assertThat(project, hasTask('downloadTest'))
+        }
+
+        @Test
+        void 'gradle properties should override default shared properties'() {
+            projectDir.resolve('gradle.properties').toFile() << """
+            teamcity.environments.downloadsDir = /alt/downloads
+            teamcity.environments.baseDownloadUrl = http://alt-repository
+            teamcity.environments.baseHomeDir = /alt/servers
+            teamcity.environments.baseDataDir = /alt/data
+            """
+            project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+            // workaround for https://github.com/gradle/gradle/issues/13122
+            (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
+
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+            assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
+            assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
+            assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
+        }
+
+        @Test
+        void 'gradle properties should override shared properties'() {
+            projectDir.resolve('gradle.properties').toFile() << """
+            teamcity.environments.downloadsDir = /alt/downloads
+            teamcity.environments.baseDownloadUrl = http://alt-repository
+            teamcity.environments.baseHomeDir = /alt/servers
+            teamcity.environments.baseDataDir = /alt/data
+            """
+            project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+            // workaround for https://github.com/gradle/gradle/issues/13122
+            (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
+
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    downloadsDir = '/tmp/downloads'
+                    baseDownloadUrl = 'http://local-repository'
+                    baseHomeDir = '/tmp/servers'
+                    baseDataDir = '/tmp/data'
+
+                    test {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+            assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
+            assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(normalize(startTestServer.homeDir.get()), endsWith('/alt/servers/TeamCity-2021.2.3'))
+            assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
+        }
+
+        @Test
+        void 'environments plugin configures environment tasks using overrides from gradle properties'() {
+            projectDir.resolve('gradle.properties').toFile() << """
+            teamcity.environments.test.downloadUrl = https://alt-repository/TeamCity-9.1.7.tar.gz
+            teamcity.environments.test.javaHome = /alt/java
+            teamcity.environments.test.homeDir = /alt/servers/TeamCity-9.1.7
+            teamcity.environments.test.dataDir = /alt/data/9.1
+            teamcity.environments.test.serverOptions = -DserverOption1=value1 -DserverOption2=value2
+            teamcity.environments.test.agentOptions = -DagentOption1=value1 -DagentOption2=value2
+            """
+            project = ProjectBuilder.builder().withProjectDir(projectDir.toFile()).build()
+            // workaround for https://github.com/gradle/gradle/issues/13122
+            (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
+
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+            project.teamcity {
+                environments {
+                    test {
+                        version = '9.1.7'
+                        downloadUrl = 'http://local-repository/TeamCity-9.1.7.tar.gz'
+                        javaHome = project.file('/tmp/java')
+                        homeDir = project.file('/tmp/servers/TeamCity-9.1.7')
+                        dataDir = project.file('/tmp/data/teamcity9.1')
+                    }
+                }
+            }
+            project.evaluate()
+
+            def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
+            assertThat(downloadTest.src.toString(), equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
+
+            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-9.1.7'))
+            assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/9.1'))
+            assertThat(startTestServer.javaHome.get(), equalTo('/alt/java'))
+            assertThat(startTestServer.serverOptions.get(), equalTo('-DserverOption1=value1 -DserverOption2=value2'))
+
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            assertThat(startTestAgent.agentOptions.get(), equalTo('-DagentOption1=value1 -DagentOption2=value2'))
+        }
     }
 
     @Nested
     class UsingDocker {
 
+        @BeforeEach
+        void init() {
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
+        }
+
         @Test
         void 'configure docker environment type'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test1(DockerTeamCityEnvironment) {
@@ -1222,7 +1175,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configure environment types using convenience properties'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     register('test1', Docker) {
@@ -1244,7 +1196,6 @@ class EnvironmentsTest {
 
         @Test
         void 'creates tasks for a docker environment'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1264,7 +1215,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures startServer task'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1284,7 +1234,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures startAgent task'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1303,7 +1252,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures tasks with default Docker images and container names'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1323,7 +1271,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures tasks with alternative Docker images'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1343,7 +1290,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures tasks with alternative Docker container names'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1364,7 +1310,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures tasks with default port'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1382,7 +1327,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures tasks with alternative server port'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1401,7 +1345,6 @@ class EnvironmentsTest {
 
         @Test
         void 'configures start server task with default logs directory'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1428,7 +1371,7 @@ class EnvironmentsTest {
             // workaround for https://github.com/gradle/gradle/issues/13122
             (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir.toFile())
 
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
+            project.apply plugin: 'io.github.rodm.teamcity-environments'
             project.teamcity {
                 environments {
                     test(DockerTeamCityEnvironment) {
@@ -1455,8 +1398,6 @@ class EnvironmentsTest {
 
         @Test
         void 'server image must not include a tag'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
-
             def e = assertThrows(InvalidUserDataException, () -> {
                 project.teamcity {
                     environments {
@@ -1473,8 +1414,6 @@ class EnvironmentsTest {
 
         @Test
         void 'agent image must not include a tag'() {
-            project.apply plugin: 'com.github.rodm.teamcity-environments'
-
             def e = assertThrows(InvalidUserDataException, () -> {
                 project.teamcity {
                     environments {
