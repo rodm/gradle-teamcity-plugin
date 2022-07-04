@@ -41,8 +41,10 @@ public class TeamCityPlugin implements Plugin<Project> {
     public static final String TEAMCITY_GROUP = "TeamCity";
 
     public static final String JAVA_PLUGIN_ID = "org.gradle.java";
-    public static final String SERVER_PLUGIN_ID = "com.github.rodm.teamcity-server";
-    public static final String AGENT_PLUGIN_ID = "com.github.rodm.teamcity-agent";
+    public static final String SERVER_PLUGIN_ID = "io.github.rodm.teamcity-server";
+    public static final String AGENT_PLUGIN_ID = "io.github.rodm.teamcity-agent";
+    public static final String COMMON_PLUGIN_ID = "io.github.rodm.teamcity-common";
+    public static final String ENVIRONMENTS_PLUGIN_ID = "io.github.rodm.teamcity-environments";
 
     public static final String AGENT_CONFIGURATION_NAME = "agent";
     public static final String SERVER_CONFIGURATION_NAME = "server";

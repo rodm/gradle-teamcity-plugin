@@ -73,24 +73,45 @@ gradlePlugin {
             implementationClass = "com.github.rodm.teamcity.TeamCityBasePlugin"
         }
         create("teamcityServerPlugin") {
-            id = "com.github.rodm.teamcity-server"
+            id = "io.github.rodm.teamcity-server"
             displayName = "Gradle TeamCity Server plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityServerPlugin"
         }
         create("teamcityAgentPlugin") {
-            id = "com.github.rodm.teamcity-agent"
+            id = "io.github.rodm.teamcity-agent"
             displayName = "Gradle TeamCity Agent plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityAgentPlugin"
         }
         create("teamcityCommonPlugin") {
-            id = "com.github.rodm.teamcity-common"
+            id = "io.github.rodm.teamcity-common"
             displayName = "Gradle TeamCity Common API plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityCommonPlugin"
         }
         create("teamcityEnvironmentsPlugin") {
-            id = "com.github.rodm.teamcity-environments"
+            id = "io.github.rodm.teamcity-environments"
             displayName = "Gradle TeamCity Environments plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityEnvironmentsPlugin"
+        }
+
+        create("deprecatedServerPlugin") {
+            id = "com.github.rodm.teamcity-server"
+            displayName = "Gradle TeamCity Server plugin"
+            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityServerPlugin"
+        }
+        create("deprecatedAgentPlugin") {
+            id = "com.github.rodm.teamcity-agent"
+            displayName = "Gradle TeamCity Agent plugin"
+            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityAgentPlugin"
+        }
+        create("deprecatedCommonPlugin") {
+            id = "com.github.rodm.teamcity-common"
+            displayName = "Gradle TeamCity Common API plugin"
+            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityCommonPlugin"
+        }
+        create("deprecatedEnvironmentsPlugin") {
+            id = "com.github.rodm.teamcity-environments"
+            displayName = "Gradle TeamCity Environments plugin"
+            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityEnvironmentsPlugin"
         }
     }
 }
