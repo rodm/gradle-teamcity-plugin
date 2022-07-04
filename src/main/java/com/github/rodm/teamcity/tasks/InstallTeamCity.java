@@ -51,7 +51,7 @@ public abstract class InstallTeamCity extends DefaultTask {
         fileSystemOperations.copy(copySpec -> {
             copySpec.from(archiveOperations.tarTree(getSource().get()), copySpec1 -> {
                 copySpec1.setIncludeEmptyDirs(false);
-                copySpec1.eachFile(file -> file.setPath(targetName + "/" + getPath().split("/", 2)[1]));
+                copySpec1.eachFile(file -> file.setPath(targetName + "/" + file.getPath().split("/", 2)[1]));
             });
             copySpec.into(getTarget().get().getAsFile().getParentFile());
         });
