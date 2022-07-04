@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation ("de.undercouch:gradle-download-task:4.1.2")
+    implementation ("de.undercouch:gradle-download-task:5.1.0")
 
     implementation (platform("com.github.docker-java:docker-java-bom:3.2.13"))
     implementation ("com.github.docker-java:docker-java-core")
@@ -25,21 +25,21 @@ dependencies {
 
     compileOnly ("org.jetbrains.intellij.plugins:structure-base:3.190")
     compileOnly ("org.jetbrains.intellij.plugins:structure-teamcity:3.190")
-    compileOnly ("org.jetbrains.intellij:plugin-repository-rest-client:2.0.17")
-    compileOnly ("org.jetbrains:marketplace-zip-signer:0.1.5")
+    compileOnly ("org.jetbrains.intellij:plugin-repository-rest-client:2.0.20")
+    compileOnly ("org.jetbrains:marketplace-zip-signer:0.1.8")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.2")) {
+    testImplementation(platform("org.junit:junit-bom:5.8.2")) {
         because("Platform, Jupiter, and Vintage versions should match")
     }
     testImplementation ("org.junit.jupiter:junit-jupiter")
-    testImplementation ("org.xmlunit:xmlunit-matchers:2.8.2")
+    testImplementation ("org.xmlunit:xmlunit-matchers:2.9.0")
     testImplementation ("org.hamcrest:hamcrest-library:2.2")
-    testImplementation ("org.mockito:mockito-core:3.11.2")
+    testImplementation ("org.mockito:mockito-core:4.6.1")
 
-    testImplementation ("org.jetbrains:marketplace-zip-signer:0.1.5")
+    testImplementation ("org.jetbrains:marketplace-zip-signer:0.1.8")
     testImplementation ("org.jetbrains.intellij.plugins:structure-base:3.190")
     testImplementation ("org.jetbrains.intellij.plugins:structure-teamcity:3.190")
-    testImplementation ("org.jetbrains.intellij:plugin-repository-rest-client:2.0.17")
+    testImplementation ("org.jetbrains.intellij:plugin-repository-rest-client:2.0.20")
 }
 
 sourceSets {
