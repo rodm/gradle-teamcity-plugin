@@ -32,8 +32,8 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
     void agentAndServerPluginPackage() {
         buildFile << """
             plugins {
-                id 'com.github.rodm.teamcity-agent'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-server'
             }
             dependencies {
                 agent files('lib/agent-lib.jar')
@@ -82,8 +82,8 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
     void multiProjectPlugin() {
         buildFile << """
             plugins {
-                id 'com.github.rodm.teamcity-agent'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-server'
             }
 
             subprojects {
@@ -164,8 +164,8 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-agent'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-server'
             }
             teamcity {
                 version = '8.1.5'

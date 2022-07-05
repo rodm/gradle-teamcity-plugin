@@ -43,7 +43,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
     static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
         plugins {
             id 'java'
-            id 'com.github.rodm.teamcity-server'
+            id 'io.github.rodm.teamcity-server'
         }
         teamcity {
             version = '8.1.5'
@@ -61,7 +61,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
     static final String BUILD_SCRIPT_WITH_FILE_DESCRIPTOR = """
         plugins {
             id 'java'
-            id 'com.github.rodm.teamcity-server'
+            id 'io.github.rodm.teamcity-server'
         }
         teamcity {
             version = '8.1.5'
@@ -252,7 +252,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             ext {
                 pluginVersion = findProperty('plugin.version') ?: '1.2.3'
@@ -287,7 +287,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             ext {
                 pluginVersion = findProperty('plugin.version') ?: '1.2.3'
@@ -407,7 +407,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             dependencies {
                 implementation 'org.apache.commons:commons-lang3:3.7'
@@ -446,7 +446,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             teamcity {
                 version = '2020.2'
@@ -507,7 +507,7 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             teamcity {
                 version = '2020.2'

@@ -55,7 +55,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
 
         buildFile << """
             plugins {
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 environments {
@@ -87,8 +87,8 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 version = '8.1.5'
@@ -128,8 +128,8 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 version = '8.1.5'
@@ -173,8 +173,8 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 version = '8.1.5'
@@ -214,7 +214,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 version = '9.1'
@@ -251,7 +251,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-environments'
+                id 'io.github.rodm.teamcity-environments'
             }
             teamcity {
                 version = '9.1'
@@ -284,7 +284,7 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
 
             buildFile << """
                 plugins {
-                    id 'com.github.rodm.teamcity-environments'
+                    id 'io.github.rodm.teamcity-environments'
                 }
                 teamcity {
                     version = '2021.2'

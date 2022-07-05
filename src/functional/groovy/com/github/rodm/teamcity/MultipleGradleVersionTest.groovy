@@ -74,12 +74,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
 
             project(':common') {
                 apply plugin: 'java'
-                apply plugin: 'com.github.rodm.teamcity-common'
+                apply plugin: 'io.github.rodm.teamcity-common'
 
                 teamcity {
                     version = '8.1.5'
@@ -88,7 +88,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
             project(':agent') {
                 apply plugin: 'java'
-                apply plugin: 'com.github.rodm.teamcity-agent'
+                apply plugin: 'io.github.rodm.teamcity-agent'
 
                 dependencies {
                     implementation project(':common')

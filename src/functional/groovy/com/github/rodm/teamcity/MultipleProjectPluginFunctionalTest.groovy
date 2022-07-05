@@ -28,7 +28,7 @@ class MultipleProjectPluginFunctionalTest extends FunctionalTestCase {
     void allowSnapshotVersions() {
         buildFile << """
             plugins {
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
 
             teamcity {
@@ -40,7 +40,7 @@ class MultipleProjectPluginFunctionalTest extends FunctionalTestCase {
         createFile(createDirectory('common').toPath(), 'build.gradle') << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-common'
+                id 'io.github.rodm.teamcity-common'
             }
             teamcity {
                 allowSnapshotVersions = true
@@ -50,7 +50,7 @@ class MultipleProjectPluginFunctionalTest extends FunctionalTestCase {
         createFile(createDirectory('agent').toPath(), 'build.gradle') << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-agent'
             }
             dependencies {
                 implementation (project(':common'))
@@ -70,7 +70,7 @@ class MultipleProjectPluginFunctionalTest extends FunctionalTestCase {
         createFile(createDirectory('server').toPath(), 'build.gradle') << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-server'
+                id 'io.github.rodm.teamcity-server'
             }
             dependencies {
                 implementation (project(':common'))

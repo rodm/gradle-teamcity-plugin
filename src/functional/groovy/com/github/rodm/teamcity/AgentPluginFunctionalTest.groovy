@@ -43,7 +43,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
     static final String BUILD_SCRIPT_WITH_INLINE_DESCRIPTOR = """
         plugins {
             id 'java'
-            id 'com.github.rodm.teamcity-agent'
+            id 'io.github.rodm.teamcity-agent'
         }
         teamcity {
             version = '8.1.5'
@@ -58,7 +58,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
     static final String BUILD_SCRIPT_WITH_FILE_DESCRIPTOR = """
         plugins {
             id 'java'
-            id 'com.github.rodm.teamcity-agent'
+            id 'io.github.rodm.teamcity-agent'
         }
         teamcity {
             version = '8.1.5'
@@ -241,7 +241,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-agent'
             }
             ext {
                 executablePath = findProperty('exec.path') ?: 'file'
@@ -277,7 +277,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'java'
-                id 'com.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-agent'
             }
             ext {
                 executablePath = findProperty('exec.path') ?: 'file'
@@ -321,7 +321,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-agent'
             }
             dependencies {
                 implementation 'org.apache.commons:commons-lang3:3.7'
@@ -358,7 +358,7 @@ class AgentPluginFunctionalTest extends FunctionalTestCase {
         buildFile << """
             plugins {
                 id 'org.gradle.java'
-                id 'com.github.rodm.teamcity-agent'
+                id 'io.github.rodm.teamcity-agent'
             }
             teamcity {
                 version = '2020.2'
