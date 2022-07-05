@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.gradle.testkit.runner.BuildResult
@@ -37,6 +38,8 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.io.FileMatchers.anExistingDirectory
+import static org.hamcrest.io.FileMatchers.anExistingFile
 import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertTrue
 
@@ -272,6 +275,36 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
         assertThat(result.task(":undeployFromTeamcity").getOutcome(), is(UP_TO_DATE))
     }
 
+    @Test
+    void 'download and install teamcity'() {
+        File installerDir = createDirectory('installers')
+        File installerFile = createFakeTeamCityInstaller(installerDir.toPath().resolve('FakeTeamCity-2021.2.3.tar.gz'))
+
+        buildFile << """
+            plugins {
+                id 'io.github.rodm.teamcity-environments'
+            }
+            teamcity {
+                version = '2021.2'
+                environments {
+                    teamcity {
+                        version = '2021.2.3'
+                        downloadUrl = '${installerFile.toURI()}'
+                    }
+                }
+            }
+        """
+
+        executeBuild('installTeamcity')
+
+        Path downloadedInstaller = testProjectDir.resolve('downloads/' + installerFile.name)
+        assertThat(downloadedInstaller.toFile(), anExistingFile())
+        Path teamcityInstallation = testProjectDir.resolve('servers/TeamCity-2021.2.3')
+        assertThat(teamcityInstallation.toFile(), anExistingDirectory())
+        Path teamcityInstallationFile = testProjectDir.resolve('servers/TeamCity-2021.2.3/file')
+        assertThat(teamcityInstallationFile.toFile(), anExistingFile())
+    }
+
     @Nested
     @DisplayName("with configuration cache")
     class WithConfigurationCache {
@@ -327,13 +360,20 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             assertThat(result.output, containsString('Reusing configuration cache.'))
         }
 
-        private File createFakeTeamCityInstaller(Path file) {
-            OutputStream os = Files.newOutputStream(file)
-            GzipCompressorOutputStream gzos = new GzipCompressorOutputStream(os)
-            TarArchiveOutputStream taos = new TarArchiveOutputStream(gzos)
-            taos.close()
-            file.toFile()
-        }
+    }
+
+    private static File createFakeTeamCityInstaller(Path file) {
+        OutputStream os = Files.newOutputStream(file)
+        GzipCompressorOutputStream gzos = new GzipCompressorOutputStream(os)
+        TarArchiveOutputStream taos = new TarArchiveOutputStream(gzos)
+        TarArchiveEntry dirEntry = new TarArchiveEntry('TeamCity/')
+        taos.putArchiveEntry(dirEntry)
+        taos.closeArchiveEntry()
+        TarArchiveEntry fileEntry = new TarArchiveEntry('TeamCity/file')
+        taos.putArchiveEntry(fileEntry)
+        taos.closeArchiveEntry()
+        taos.close()
+        file.toFile()
     }
 
     private File createFakeTeamCityInstall(String baseDir, String version) {
