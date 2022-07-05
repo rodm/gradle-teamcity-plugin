@@ -1,7 +1,7 @@
 
 plugins {
     kotlin("jvm")
-    id ("com.github.rodm.teamcity-common")
+    id ("io.github.rodm.teamcity-common")
 }
 
 dependencies {

@@ -1,6 +1,6 @@
 
 apply plugin: 'java'
-apply plugin: 'com.github.rodm.teamcity-server'
+apply plugin: 'io.github.rodm.teamcity-server'
 
 group = 'com.github.rodm.teamcity'
 version = '1.0-SNAPSHOT'

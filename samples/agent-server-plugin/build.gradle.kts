@@ -1,8 +1,8 @@
 
 plugins {
     id ("org.gradle.java")
-    id ("com.github.rodm.teamcity-server") version "1.4"
-    id ("com.github.rodm.teamcity-environments") version "1.4"
+    id ("io.github.rodm.teamcity-server") version "1.4"
+    id ("io.github.rodm.teamcity-environments") version "1.4"
 }
 
 group = "com.github.rodm.teamcity"

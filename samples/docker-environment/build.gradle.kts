@@ -2,7 +2,7 @@
 import com.github.rodm.teamcity.DockerTeamCityEnvironment
 
 plugins {
-    id ("com.github.rodm.teamcity-environments") version "1.4"
+    id ("io.github.rodm.teamcity-environments") version "1.4"
 }
 
 val vendorName by extra("rodm")

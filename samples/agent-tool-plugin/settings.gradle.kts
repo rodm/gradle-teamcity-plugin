@@ -1,7 +1,7 @@
 
 pluginManagement {
     plugins {
-        id ("com.github.rodm.teamcity-server") version "1.4"
+        id ("io.github.rodm.teamcity-server") version "1.4"
     }
 }
 

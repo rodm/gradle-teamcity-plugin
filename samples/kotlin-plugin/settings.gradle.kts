@@ -2,7 +2,7 @@
 pluginManagement {
     plugins {
         kotlin("jvm") version "1.3.72"
-        id("com.github.rodm.teamcity-server") version "1.4"
+        id("io.github.rodm.teamcity-server") version "1.4"
     }
 }
 

@@ -3,8 +3,8 @@ import com.github.rodm.teamcity.LocalTeamCityEnvironment
 
 plugins {
     kotlin("jvm")
-    id ("com.github.rodm.teamcity-server")
-    id ("com.github.rodm.teamcity-environments")
+    id ("io.github.rodm.teamcity-server")
+    id ("io.github.rodm.teamcity-environments")
 }
 
 val downloadsDir by extra((project.findProperty("downloads.dir") ?: "${rootDir}/downloads") as String)

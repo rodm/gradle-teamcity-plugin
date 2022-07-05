@@ -1,6 +1,6 @@
 
 apply plugin: 'java'
-apply plugin: 'com.github.rodm.teamcity-agent'
+apply plugin: 'io.github.rodm.teamcity-agent'
 
 teamcity {
     // API version is inherited from the root project
