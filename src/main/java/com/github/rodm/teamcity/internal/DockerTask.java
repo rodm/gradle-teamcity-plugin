@@ -15,50 +15,13 @@
  */
 package com.github.rodm.teamcity.internal;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.InspectContainerCmd;
-import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.exception.NotFoundException;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.github.dockerjava.transport.DockerHttpClient;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 
 public abstract class DockerTask extends DefaultTask {
 
-    protected static DockerClient getDockerClient() {
-        DefaultDockerClientConfig clientConfig = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
-            .dockerHost(clientConfig.getDockerHost())
-            .build();
-        return DockerClientImpl.getInstance(clientConfig, httpClient);
-    }
-
-    protected static void checkImageAvailable(DockerClient client, String image) {
-        try {
-            client.inspectImageCmd(image).exec();
-        }
-        catch (NotFoundException e) {
-            String message = String.format("Docker image '%s' not available. Please use docker pull to download this image", image);
-            throw new GradleException(message);
-        }
-    }
-
-    protected static boolean isContainerRunning(DockerClient client, String containerId) {
-        try {
-            InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
-            InspectContainerResponse inspectResponse = inspectContainer.exec();
-            return Boolean.TRUE.equals(inspectResponse.getState().getRunning());
-        }
-        catch (NotFoundException e) {
-            // ignore
-        }
-        return false;
-    }
+    public static final String IMAGE_NOT_AVAILABLE = "Docker image '%s' not available. Please use docker pull to download this image";
 
     @Input
     public abstract Property<String> getContainerName();

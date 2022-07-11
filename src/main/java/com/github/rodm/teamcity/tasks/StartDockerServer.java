@@ -15,24 +15,18 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.command.StartContainerCmd;
-import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
+import com.github.rodm.teamcity.internal.ContainerConfiguration;
+import com.github.rodm.teamcity.internal.DockerOperations;
 import com.github.rodm.teamcity.internal.DockerTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
+import static java.lang.String.format;
 
 public abstract class StartDockerServer extends DockerTask {
 
@@ -60,40 +54,33 @@ public abstract class StartDockerServer extends DockerTask {
 
     @TaskAction
     void startServer() {
-        DockerClient client = getDockerClient();
+        DockerOperations dockerOperations = new DockerOperations();
 
         String image = getImageName().get() + ":" + getVersion().get();
-        checkImageAvailable(client, image);
+        if (!dockerOperations.isImageAvailable(image)) {
+            throw new GradleException(format(IMAGE_NOT_AVAILABLE, image));
+        }
 
         String containerId = getContainerName().get();
-        if (isContainerRunning(client, containerId)) {
+        if (dockerOperations.isContainerRunning(containerId)) {
             getLogger().info("TeamCity Server container '{}' is already running", containerId);
             return;
         }
 
-        List<PortBinding> portBindings = new ArrayList<>();
-        portBindings.add(PortBinding.parse(getPort().get() + ":8111"));
+        ContainerConfiguration configuration = ContainerConfiguration.builder()
+            .image(image)
+            .name(getContainerName().get())
+            .bind(getDataDir().get(),"/data/teamcity_server/datadir")
+            .bind(getLogsDir().get(),"/opt/teamcity/logs")
+            .bindPort(getPort().get(), "8111")
+            .environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
         Optional<String> debugPort = getDebugPort(getServerOptions().get());
-        debugPort.ifPresent(port -> portBindings.add(PortBinding.parse(port + ":" + port)));
+        debugPort.ifPresent(port -> configuration.bindPort(port, port).exposePort(port));
 
-        Bind dataDir = Bind.parse(getDataDir().get() + ":/data/teamcity_server/datadir");
-        Bind logsDir = Bind.parse(getLogsDir().get() + ":/opt/teamcity/logs");
-        HostConfig hostConfig = HostConfig.newHostConfig()
-            .withAutoRemove(true)
-            .withBinds(dataDir, logsDir)
-            .withPortBindings(portBindings);
+        String id = dockerOperations.createContainer(configuration);
+        getLogger().info("Created TeamCity Server container with id: {}", id);
 
-        CreateContainerCmd createContainer = client.createContainerCmd(image)
-            .withName(containerId)
-            .withHostConfig(hostConfig)
-            .withEnv("TEAMCITY_SERVER_OPTS=" + getServerOptions().get());
-        debugPort.ifPresent(port -> createContainer.withExposedPorts(ExposedPort.parse(port)));
-
-        CreateContainerResponse response = createContainer.exec();
-        getLogger().info("Created TeamCity Server container with id: {}", response.getId());
-
-        StartContainerCmd startContainer = client.startContainerCmd(containerId);
-        startContainer.exec();
+        dockerOperations.startContainer(containerId);
         getLogger().info("Started TeamCity Server container");
     }
 }
