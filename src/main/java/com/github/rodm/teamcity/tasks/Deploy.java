@@ -15,18 +15,21 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.rodm.teamcity.internal.ServerAction;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 
-public abstract class Deploy extends Copy {
+public abstract class Deploy extends Copy implements ServerAction {
 
     public Deploy() {
         setDescription("Deploys plugins to the TeamCity Server");
         from(getPlugins());
         into(getPluginsDir());
+        getServerHost().convention("localhost");
+        getServerPort().convention("8111");
     }
 
     @InputFiles

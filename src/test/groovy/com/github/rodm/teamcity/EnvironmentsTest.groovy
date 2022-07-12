@@ -1323,6 +1323,10 @@ class EnvironmentsTest {
             assertThat(startServer.port.get(), equalTo('8111'))
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.serverPort.get(), equalTo('8111'))
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            assertThat(deployPlugin.serverPort.get(), equalTo('8111'))
+            def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
+            assertThat(undeployPlugin.serverPort.get(), equalTo('8111'))
         }
 
         @Test
@@ -1341,6 +1345,10 @@ class EnvironmentsTest {
             assertThat(startServer.port.get(), equalTo('8080'))
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.serverPort.get(), equalTo('8080'))
+            def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
+            assertThat(deployPlugin.serverPort.get(), equalTo('8080'))
+            def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
+            assertThat(undeployPlugin.serverPort.get(), equalTo('8080'))
         }
 
         @Test
@@ -1467,13 +1475,17 @@ class EnvironmentsTest {
             return false
         }
 
+        void executeAction(String pluginName) {
+            executeAction(pluginName, 'localhost', 8111)
+        }
+
         @Override
         void sendRequest(HttpURLConnection request, String pluginName) {
             this.request = request
             this.pluginName = pluginName
         }
 
-        boolean isServerAvailable() {
+        boolean isServerAvailable(String host, int port) {
             return true
         }
     }
@@ -1618,7 +1630,7 @@ class EnvironmentsTest {
         def request = mock(HttpURLConnection)
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
         new DisablePluginAction(project.logger, projectDir.toFile(), plugins , unloaded) {
-            void executeAction(String pluginName) {
+            void executeAction(String pluginName, String host, int port) {
                 sendRequest(request, pluginName)
                 EnvironmentsTest.this.wasRequestSent = true
             }
@@ -1630,7 +1642,7 @@ class EnvironmentsTest {
         def response = 'Plugin loaded successfully'
         when(request.inputStream).thenReturn(new ByteArrayInputStream(response.bytes))
         new EnablePluginAction(project.logger, projectDir.toFile(), plugins, unloaded) {
-            void executeAction(String pluginName) {
+            void executeAction(String pluginName, String host, int port) {
                 sendRequest(request, pluginName)
                 EnvironmentsTest.this.wasRequestSent = true
             }
@@ -1642,7 +1654,7 @@ class EnvironmentsTest {
         def pluginName = 'test-plugin.zip'
         File pluginDir = createDirectory(projectDir.resolve('plugins'))
         File pluginFile = createFile(projectDir.resolve(pluginName))
-        def deploy = project.tasks.create('deploy', Copy) {
+        def deploy = project.tasks.create('deploy', Deploy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
@@ -1662,7 +1674,7 @@ class EnvironmentsTest {
         def pluginName = 'test-plugin.zip'
         File pluginDir = createDirectory(projectDir.resolve('plugins'))
         File pluginFile = createFile(pluginDir.toPath().resolve(pluginName))
-        def deploy = project.tasks.create('deploy', Copy) {
+        def deploy = project.tasks.create('deploy', Deploy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
@@ -1682,7 +1694,7 @@ class EnvironmentsTest {
         def pluginName = 'test-plugin.zip'
         File pluginDir = createDirectory(projectDir.resolve('plugins'))
         File pluginFile = createFile(pluginDir.toPath().resolve(pluginName))
-        def deploy = project.tasks.create('deploy', Copy) {
+        def deploy = project.tasks.create('deploy', Deploy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
@@ -1702,7 +1714,7 @@ class EnvironmentsTest {
         def pluginName = 'test-plugin.zip'
         File pluginDir = createDirectory(projectDir.resolve('plugins'))
         File pluginFile = createFile(projectDir.resolve(pluginName))
-        def deploy = project.tasks.create('deploy', Copy) {
+        def deploy = project.tasks.create('deploy', Deploy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
@@ -1720,7 +1732,7 @@ class EnvironmentsTest {
         def pluginName = 'test-plugin.zip'
         File pluginDir = createDirectory(projectDir.resolve('plugins'))
         File pluginFile = createFile(projectDir.resolve(pluginName))
-        def deploy = project.tasks.create('deploy', Copy) {
+        def deploy = project.tasks.create('deploy', Deploy) {
             from { "${pluginFile.name}" }
             into { pluginDir }
         }
@@ -1732,6 +1744,70 @@ class EnvironmentsTest {
         action.execute(deploy)
 
         assertTrue(wasRequestSent)
+    }
+
+    class ConfigurationTestPluginAction extends PluginAction {
+
+        String host
+        int port
+
+        ConfigurationTestPluginAction(Logger logger, File dataDir, Set<File> plugins) {
+            super(logger, dataDir, plugins, [], true)
+        }
+
+        @Override
+        boolean canExecuteAction(Task task, String name) {
+            return true
+        }
+
+        @Override
+        void executeAction(String name, String host, int port) {
+            this.host = host
+            this.port = port
+        }
+
+        @Override
+        void sendRequest(HttpURLConnection request, String pluginName) {}
+    }
+
+    @Test
+    void 'plugin action configured with host and port from deploy task'() {
+        def pluginName = 'test-plugin.zip'
+        File testPluginDir = createDirectory(projectDir.resolve('plugins'))
+        File testPluginFile = createFile(projectDir.resolve(pluginName))
+        Set<File> testPlugins = [testPluginFile] as Set
+        def deploy = project.tasks.create('deploy', Deploy) {
+            from { "${testPluginFile.name}" }
+            into { testPluginDir }
+            serverHost = 'teamcity-server'
+            serverPort = '7111'
+        }
+
+        def action = new ConfigurationTestPluginAction(project.logger, projectDir.toFile(), testPlugins)
+        action.execute(deploy)
+
+        assertThat(action.host, equalTo('teamcity-server'))
+        assertThat(action.port, equalTo(7111))
+    }
+
+    @Test
+    void 'plugin action configured with host and port from undeploy task'() {
+        def pluginName = 'test-plugin.zip'
+        File testPluginDir = createDirectory(projectDir.resolve('plugins'))
+        File testPluginFile = createFile(projectDir.resolve(pluginName))
+        Set<File> testPlugins = [testPluginFile] as Set
+        def undeploy = project.tasks.create('undeploy', Undeploy) {
+            plugins.from(testPlugins)
+            pluginsDir.set(testPluginDir)
+            serverHost = 'teamcity-server'
+            serverPort = '7111'
+        }
+
+        def action = new ConfigurationTestPluginAction(project.logger, projectDir.toFile(), testPlugins)
+        action.execute(undeploy)
+
+        assertThat(action.host, equalTo('teamcity-server'))
+        assertThat(action.port, equalTo(7111))
     }
 
     private static File createFakeTeamCityInstall(Path folder, String baseDir, String version) {

@@ -209,6 +209,11 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getContainerName().set(environment.getAgentName());
             });
+
+            tasks.named(environment.deployTaskName(), Deploy.class).configure(task ->
+                task.getServerPort().set(environment.getPortProperty()));
+            tasks.named(environment.undeployTaskName(), Undeploy.class).configure(task ->
+                task.getServerPort().set(environment.getPortProperty()));
         }
 
         private void configureCommonTasks(Project project, BaseTeamCityEnvironment environment) {

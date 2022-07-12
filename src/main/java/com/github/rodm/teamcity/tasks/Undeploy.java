@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.rodm.teamcity.internal.ServerAction;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
@@ -28,7 +29,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class Undeploy extends Delete {
+public abstract class Undeploy extends Delete implements ServerAction {
 
     @Inject
     public Undeploy(ObjectFactory objects, ProviderFactory providers) {
@@ -38,6 +39,8 @@ public abstract class Undeploy extends Delete {
                 .map(file -> getPluginsDir().file(file.getName()).get().getAsFile())
                 .collect(Collectors.toList()));
         delete(objects.fileCollection().from(files));
+        getServerHost().convention("localhost");
+        getServerPort().convention("8111");
     }
 
     @Internal

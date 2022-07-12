@@ -45,9 +45,6 @@ public abstract class PluginAction implements Action<Task> {
     private final boolean enable;
     private String path;
 
-    private static final String host = "localhost";
-    private static final int port = 8111;
-
     protected PluginAction(Logger logger, File dataDir, Set<File> plugins, List<String> unloadedPlugins, boolean enable) {
         this.logger = logger;
         this.dataDir = dataDir;
@@ -66,10 +63,16 @@ public abstract class PluginAction implements Action<Task> {
 
     @Override
     public void execute(final Task task) {
+        if (!(task instanceof ServerAction)) {
+            throw new GradleException("PluginAction attached to an invalid task");
+        }
         path = task.getPath();
+        ServerAction serverActionTask = (ServerAction) task;
+        String host = serverActionTask.getServerHost().get();
+        int port = Integer.parseInt(serverActionTask.getServerPort().get());
         plugins.forEach(file -> {
             if (canExecuteAction(task, file.getName())) {
-                executeAction(file.getName());
+                executeAction(file.getName(), host, port);
             } else {
                 skipAction(file.getName());
             }
@@ -80,8 +83,8 @@ public abstract class PluginAction implements Action<Task> {
 
     public abstract void sendRequest(HttpURLConnection request, String pluginName);
 
-    public void executeAction(String pluginName) {
-        if (!isServerAvailable()) {
+    public void executeAction(String pluginName, String host, int port) {
+        if (!isServerAvailable(host, port)) {
             logger.info("{}: Cannot connect to the server on http://{}:{}.", getPath(), host, port);
             return;
         }
@@ -110,7 +113,7 @@ public abstract class PluginAction implements Action<Task> {
 
         String authToken = "Basic " + Base64.getEncoder().encodeToString((":" + password).getBytes(StandardCharsets.UTF_8));
 
-        URL actionURL = getPluginActionURL(pluginName);
+        URL actionURL = getPluginActionURL(pluginName, host, port);
         logger.debug("{}: Sending {}", getPath(), actionURL);
 
         try {
@@ -137,7 +140,7 @@ public abstract class PluginAction implements Action<Task> {
     public void skipAction(String pluginName) {
     }
 
-    public boolean isServerAvailable() {
+    public boolean isServerAvailable(String host, int port) {
         try (Socket socket = new Socket(host, port)) {
             return socket.isConnected();
         }
@@ -146,7 +149,7 @@ public abstract class PluginAction implements Action<Task> {
         }
     }
 
-    private URL getPluginActionURL(final String pluginName) {
+    private URL getPluginActionURL(final String pluginName, String host, int port) {
         try {
             final String pluginPath = URLEncoder.encode("<TeamCity Data Directory>/plugins/" + pluginName, "UTF-8");
             return new URL("http://" + host + ":" + port + "/httpAuth/admin/plugins.html?action=setEnabled&enabled=" + enable + "&pluginPath=" + pluginPath);
