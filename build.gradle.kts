@@ -4,9 +4,9 @@ plugins {
     id ("org.gradle.java-gradle-plugin")
     id ("org.gradle.jacoco")
     id ("org.gradle.maven-publish")
-    id ("com.gradle.plugin-publish") version "0.15.0"
+    id ("com.gradle.plugin-publish") version "1.0.0"
     id ("org.jetbrains.kotlin.jvm") version "1.4.21"
-    id ("org.sonarqube") version "3.3"
+    id ("org.sonarqube") version "3.4.0.2513"
 }
 
 version = "1.5-SNAPSHOT"
