@@ -70,6 +70,7 @@ public abstract class StartDockerServer extends DockerTask {
         ContainerConfiguration configuration = ContainerConfiguration.builder()
             .image(image)
             .name(getContainerName().get())
+            .autoRemove()
             .bind(getDataDir().get(),"/data/teamcity_server/datadir")
             .bind(getLogsDir().get(),"/opt/teamcity/logs")
             .bindPort(getPort().get(), "8111")

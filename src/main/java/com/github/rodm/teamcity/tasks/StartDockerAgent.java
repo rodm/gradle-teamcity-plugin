@@ -71,6 +71,7 @@ public abstract class StartDockerAgent extends DockerTask {
         ContainerConfiguration configuration = ContainerConfiguration.builder()
             .image(image)
             .name(getContainerName().get())
+            .autoRemove()
             .bind(getDataDir().get() + "/agent/conf", "/data/teamcity_agent/conf")
             .environment("SERVER_URL", serverUrl)
             .environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());

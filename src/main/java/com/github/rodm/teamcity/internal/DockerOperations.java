@@ -58,7 +58,7 @@ public class DockerOperations {
 
     public String createContainer(ContainerConfiguration configuration) {
         HostConfig hostConfig = HostConfig.newHostConfig()
-            .withAutoRemove(true)
+            .withAutoRemove(configuration.getAutoRemove())
             .withBinds(configuration.getBinds())
             .withPortBindings(configuration.getPortBindings());
 

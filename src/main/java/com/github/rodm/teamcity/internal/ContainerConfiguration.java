@@ -26,6 +26,7 @@ public class ContainerConfiguration {
 
     private String image;
     private String containerId;
+    private boolean autoRemove;
     private final List<Bind> binds = new ArrayList<>();
     private final List<PortBinding> portBindings = new ArrayList<>();
     private final List<ExposedPort> exposedPorts = new ArrayList<>();
@@ -51,6 +52,15 @@ public class ContainerConfiguration {
 
     public String getName() {
         return containerId;
+    }
+
+    public ContainerConfiguration autoRemove() {
+        this.autoRemove = true;
+        return this;
+    }
+
+    public boolean getAutoRemove() {
+        return autoRemove;
     }
 
     public ContainerConfiguration bind(String hostPath, String containerPath) {
