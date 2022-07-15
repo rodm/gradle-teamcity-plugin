@@ -72,6 +72,16 @@ public class DockerOperations {
         return response.getId();
     }
 
+    public boolean isContainerAvailable(String containerId) {
+        try {
+            client.inspectContainerCmd(containerId);
+            return true;
+        }
+        catch (NotFoundException e) {
+            return false;
+        }
+    }
+
     public boolean isContainerRunning(String containerId) {
         try {
             InspectContainerCmd inspectContainer = client.inspectContainerCmd(containerId);
