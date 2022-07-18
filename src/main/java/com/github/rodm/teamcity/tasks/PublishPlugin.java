@@ -33,6 +33,8 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
+import static com.github.rodm.teamcity.TeamCityPlugin.GRADLE_OFFLINE;
+
 public abstract class PublishPlugin extends DefaultTask {
 
     private static final String DEFAULT_HOST = "https://plugins.jetbrains.com";
@@ -44,7 +46,7 @@ public abstract class PublishPlugin extends DefaultTask {
     @Inject
     public PublishPlugin(WorkerExecutor executor) {
         setDescription("Publishes the plugin to the TeamCity plugin repository");
-        setEnabled(!getProject().getGradle().getStartParameter().isOffline());
+        setEnabled(isOnline());
         this.executor = executor;
     }
 
@@ -98,5 +100,10 @@ public abstract class PublishPlugin extends DefaultTask {
             params.getDistributionFile().set(getDistributionFile());
         });
         queue.await();
+    }
+
+    private boolean isOnline() {
+        Object value = getInputs().getProperties().getOrDefault(GRADLE_OFFLINE, false);
+        return !Boolean.parseBoolean(value.toString());
     }
 }

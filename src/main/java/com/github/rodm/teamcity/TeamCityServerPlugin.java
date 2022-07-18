@@ -41,6 +41,7 @@ import org.gradle.api.tasks.bundling.Zip;
 import static com.github.rodm.teamcity.TeamCityAgentPlugin.AGENT_PLUGIN_TASK_NAME;
 import static com.github.rodm.teamcity.TeamCityPlugin.AGENT_CONFIGURATION_NAME;
 import static com.github.rodm.teamcity.TeamCityPlugin.AGENT_PLUGIN_ID;
+import static com.github.rodm.teamcity.TeamCityPlugin.GRADLE_OFFLINE;
 import static com.github.rodm.teamcity.TeamCityPlugin.JAVA_PLUGIN_ID;
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_CONFIGURATION_NAME;
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_DIR;
@@ -223,6 +224,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
                 p.getTasks().register(PUBLISH_PLUGIN_TASK_NAME, PublishPlugin.class, task -> {
                     task.setGroup(TEAMCITY_GROUP);
+                    task.getInputs().property(GRADLE_OFFLINE, project.getGradle().getStartParameter().isOffline());
                     task.setClasspath(p.getConfigurations().getByName(MARKETPLACE_CONFIGURATION_NAME));
                     task.getChannels().set(configuration.getChannels());
                     task.getToken().set(configuration.getTokenProperty());
