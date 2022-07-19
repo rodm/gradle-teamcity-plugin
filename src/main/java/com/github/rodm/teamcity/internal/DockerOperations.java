@@ -46,6 +46,10 @@ public class DockerOperations {
         client = DockerClientImpl.getInstance(clientConfig, httpClient);
     }
 
+    DockerOperations(DockerClient client) {
+        this.client = client;
+    }
+
     public boolean isImageAvailable(String image) {
         try {
             client.inspectImageCmd(image).exec();
@@ -74,7 +78,7 @@ public class DockerOperations {
 
     public boolean isContainerAvailable(String containerId) {
         try {
-            client.inspectContainerCmd(containerId);
+            client.inspectContainerCmd(containerId).exec();
             return true;
         }
         catch (NotFoundException e) {
