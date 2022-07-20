@@ -122,8 +122,9 @@ public class DockerOperations {
         InspectContainerResponse inspectResponse = inspectContainer.exec();
         Map<String, ContainerNetwork> networks = inspectResponse.getNetworkSettings().getNetworks();
         return networks.values().stream()
-            .findFirst()
             .map(ContainerNetwork::getIpAddress)
+            .filter((ipAddress) -> ipAddress != null && !ipAddress.isEmpty())
+            .findFirst()
             .orElseThrow(() -> new GradleException("Failed to get IP address for container: " + containerId));
     }
 }
