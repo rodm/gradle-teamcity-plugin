@@ -8,11 +8,13 @@ dependencyResolutionManagement {
         register("libs") {
             alias("download-task").to("de.undercouch", "gradle-download-task").version("5.1.0")
 
-            version("structure", "3.190")
-            alias("plugin-base").to("org.jetbrains.intellij.plugins", "structure-base").versionRef("structure")
-            alias("plugin-teamcity").to("org.jetbrains.intellij.plugins", "structure-teamcity").versionRef("structure")
-            alias("plugin-client").to("org.jetbrains.intellij", "plugin-repository-rest-client").version("2.0.20")
-            alias("plugin-signer").to("org.jetbrains", "marketplace-zip-signer").version("0.1.8")
+            version("plugin-structure", "3.190")
+            version("plugin-signer", "0.1.8")
+            version("plugin-client", "2.0.20")
+            alias("plugin-base").to("org.jetbrains.intellij.plugins", "structure-base").versionRef("plugin-structure")
+            alias("plugin-teamcity").to("org.jetbrains.intellij.plugins", "structure-teamcity").versionRef("plugin-structure")
+            alias("plugin-client").to("org.jetbrains.intellij", "plugin-repository-rest-client").versionRef("plugin-client")
+            alias("plugin-signer").to("org.jetbrains", "marketplace-zip-signer").versionRef("plugin-signer")
             bundle("publishing", listOf("plugin-base", "plugin-teamcity", "plugin-client", "plugin-signer"))
 
             version("docker", "3.2.13")

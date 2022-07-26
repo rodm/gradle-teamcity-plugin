@@ -119,6 +119,9 @@ tasks {
     test {
         useJUnitPlatform()
         finalizedBy (jacocoTestReport)
+        systemProperty ("plugin.structure.version", libs.versions.plugin.structure.get())
+        systemProperty ("plugin.signer.version", libs.versions.plugin.signer.get())
+        systemProperty ("plugin.client.version", libs.versions.plugin.client.get())
     }
 
     jacocoTestReport {

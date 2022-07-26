@@ -101,10 +101,10 @@ public class TeamCityServerPlugin implements Plugin<Project> {
             .setVisible(false)
             .setDescription("Configuration for signing and publishing task dependencies.")
             .defaultDependencies(dependencies -> {
-                dependencies.add(project.getDependencies().create("org.jetbrains:marketplace-zip-signer:0.1.3"));
-                dependencies.add(project.getDependencies().create("org.jetbrains.intellij.plugins:structure-base:3.171"));
-                dependencies.add(project.getDependencies().create("org.jetbrains.intellij.plugins:structure-teamcity:3.171"));
-                dependencies.add(project.getDependencies().create("org.jetbrains.intellij:plugin-repository-rest-client:2.0.17"));
+                dependencies.add(project.getDependencies().create("org.jetbrains:marketplace-zip-signer:0.1.8"));
+                dependencies.add(project.getDependencies().create("org.jetbrains.intellij.plugins:structure-base:3.190"));
+                dependencies.add(project.getDependencies().create("org.jetbrains.intellij.plugins:structure-teamcity:3.190"));
+                dependencies.add(project.getDependencies().create("org.jetbrains.intellij:plugin-repository-rest-client:2.0.20"));
             });
     }
 

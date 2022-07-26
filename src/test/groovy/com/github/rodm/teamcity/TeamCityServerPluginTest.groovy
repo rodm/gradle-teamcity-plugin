@@ -20,6 +20,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.GradleMatchers.hasDefaultDependency
@@ -97,14 +98,21 @@ class TeamCityServerPluginTest {
     }
 
     @Test
+    @EnabledIfSystemProperty(named = "plugin.structure.version", matches = ".*")
+    @EnabledIfSystemProperty(named = "plugin.signer.version", matches = ".*")
+    @EnabledIfSystemProperty(named = "plugin.client.version", matches = ".*")
     void 'apply adds signing and publishing as default dependencies to the marketplace configuration'() {
         project.evaluate()
 
+        def pluginStructureVersion = System.properties['plugin.structure.version'] as String
+        def pluginSignerVersion = System.properties['plugin.signer.version'] as String
+        def pluginClientVersion = System.properties['plugin.client.version'] as String
+
         Configuration configuration = project.configurations.getByName('marketplace')
-        assertThat(configuration, hasDefaultDependency('org.jetbrains', 'marketplace-zip-signer', '0.1.3'))
-        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-base', '3.171'))
-        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', '3.171'))
-        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', '2.0.17'))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-base', pluginStructureVersion))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij.plugins', 'structure-teamcity', pluginStructureVersion))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains', 'marketplace-zip-signer', pluginSignerVersion))
+        assertThat(configuration, hasDefaultDependency('org.jetbrains.intellij', 'plugin-repository-rest-client', pluginClientVersion))
     }
 
     @Test
