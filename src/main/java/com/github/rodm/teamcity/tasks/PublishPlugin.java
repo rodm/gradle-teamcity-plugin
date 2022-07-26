@@ -46,7 +46,7 @@ public abstract class PublishPlugin extends DefaultTask {
     @Inject
     public PublishPlugin(WorkerExecutor executor) {
         setDescription("Publishes the plugin to the TeamCity plugin repository");
-        setEnabled(isOnline());
+        onlyIf(task -> isOnline());
         this.executor = executor;
     }
 
