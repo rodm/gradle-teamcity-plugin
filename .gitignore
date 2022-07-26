@@ -2,7 +2,6 @@
 # Gradle
 .gradle
 build
-gradle.properties
 
 # IDEA
 .idea
