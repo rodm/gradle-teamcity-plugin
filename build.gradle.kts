@@ -18,12 +18,13 @@ repositories {
 
 dependencies {
     compileOnly (libs.bundles.publishing)
+    compileOnly (libs.bundles.docker)
 
     implementation (libs.download.task)
-    implementation (libs.bundles.docker)
 
     testImplementation (libs.bundles.testing)
     testImplementation (libs.bundles.publishing)
+    testImplementation (libs.bundles.docker)
 }
 
 sourceSets {
@@ -122,6 +123,7 @@ tasks {
         systemProperty ("plugin.structure.version", libs.versions.plugin.structure.get())
         systemProperty ("plugin.signer.version", libs.versions.plugin.signer.get())
         systemProperty ("plugin.client.version", libs.versions.plugin.client.get())
+        systemProperty ("docker.version", libs.versions.docker.get())
     }
 
     jacocoTestReport {

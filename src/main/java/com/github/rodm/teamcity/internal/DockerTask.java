@@ -16,12 +16,19 @@
 package com.github.rodm.teamcity.internal;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 
 public abstract class DockerTask extends DefaultTask {
 
     public static final String IMAGE_NOT_AVAILABLE = "Docker image '%s' not available. Please use docker pull to download this image";
+
+    @Classpath
+    public abstract FileCollection getClasspath();
+
+    public abstract void setClasspath(FileCollection classpath);
 
     @Input
     public abstract Property<String> getContainerName();

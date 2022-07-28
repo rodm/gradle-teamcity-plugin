@@ -15,23 +15,24 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ContainerConfiguration;
-import com.github.rodm.teamcity.internal.DockerOperations;
 import com.github.rodm.teamcity.internal.DockerTask;
-import org.gradle.api.GradleException;
+import com.github.rodm.teamcity.internal.StartAgentContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
 
-import java.util.Optional;
-
-import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
-import static java.lang.String.format;
+import javax.inject.Inject;
 
 public abstract class StartDockerAgent extends DockerTask {
 
-    public StartDockerAgent() {
+    private final WorkerExecutor executor;
+
+    @Inject
+    public StartDockerAgent(WorkerExecutor executor) {
         setDescription("Starts the TeamCity Agent using Docker");
+        this.executor = executor;
     }
 
     @Input
@@ -54,34 +55,16 @@ public abstract class StartDockerAgent extends DockerTask {
 
     @TaskAction
     void startAgent() {
-        DockerOperations dockerOperations = new DockerOperations();
-
-        String image = getImageName().get() + ":" + getVersion().get();
-        if (!dockerOperations.isImageAvailable(image)) {
-            throw new GradleException(format(IMAGE_NOT_AVAILABLE, image));
-        }
-
-        String containerId = getContainerName().get();
-        if (dockerOperations.isContainerRunning(containerId)) {
-            getLogger().info("TeamCity Build Agent container '{}' is already running", containerId);
-            return;
-        }
-
-        String serverUrl = "http://" + dockerOperations.getIpAddress(getServerContainerName().get()) + ":" + getServerPort().get() + "/";
-        ContainerConfiguration configuration = ContainerConfiguration.builder()
-            .image(image)
-            .name(getContainerName().get())
-            .autoRemove()
-            .bind(getDataDir().get() + "/agent/conf", "/data/teamcity_agent/conf")
-            .environment("SERVER_URL", serverUrl)
-            .environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());
-        Optional<String> debugPort = getDebugPort(getAgentOptions().get());
-        debugPort.ifPresent(port -> configuration.bindPort(port, port).exposePort(port));
-
-        String id = dockerOperations.createContainer(configuration);
-        getLogger().info("Created TeamCity Build Agent container with id: {}", id);
-
-        dockerOperations.startContainer(containerId);
-        getLogger().info("Started TeamCity Build Agent container");
+        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        queue.submit(StartAgentContainerAction.class, params -> {
+            params.getContainerName().set(getContainerName());
+            params.getVersion().set(getVersion());
+            params.getDataDir().set(getDataDir());
+            params.getAgentOptions().set(getAgentOptions());
+            params.getImageName().set(getImageName());
+            params.getServerContainerName().set(getServerContainerName());
+            params.getServerPort().set(getServerPort());
+        });
+        queue.await();
     }
 }

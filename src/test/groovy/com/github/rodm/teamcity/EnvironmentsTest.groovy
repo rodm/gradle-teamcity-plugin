@@ -35,6 +35,7 @@ import com.github.rodm.teamcity.tasks.Undeploy
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.Copy
@@ -44,6 +45,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 
@@ -53,12 +55,14 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 import static com.github.rodm.teamcity.GradleMatchers.hasAction
+import static com.github.rodm.teamcity.GradleMatchers.hasDefaultDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasTask
 import static com.github.rodm.teamcity.TestSupport.createDirectory
 import static com.github.rodm.teamcity.TestSupport.createFile
 import static com.github.rodm.teamcity.TestSupport.normalize
 import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.anyOf
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
@@ -1143,6 +1147,26 @@ class EnvironmentsTest {
         @BeforeEach
         void init() {
             project.apply plugin: 'io.github.rodm.teamcity-environments'
+        }
+
+        @Test
+        void 'adds MavenCentral repository for resolving Docker dependencies'() {
+            project.evaluate()
+
+            List<String> urls = project.repositories.collect { repository -> repository.url.toString() }
+            assertThat(urls, anyOf(hasItem('https://repo1.maven.org/maven2/'), hasItem('https://repo.maven.apache.org/maven2/')))
+        }
+
+        @Test
+        @EnabledIfSystemProperty(named = "docker.version", matches = ".*")
+        void 'apply adds docker dependencies to the docker configuration'() {
+            project.evaluate()
+
+            def dockerVersion = System.properties['docker.version'] as String
+
+            Configuration configuration = project.configurations.getByName('docker')
+            assertThat(configuration, hasDefaultDependency('com.github.docker-java', 'docker-java-core', dockerVersion))
+            assertThat(configuration, hasDefaultDependency('com.github.docker-java', 'docker-java-transport-httpclient5', dockerVersion))
         }
 
         @Test

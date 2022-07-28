@@ -15,23 +15,24 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ContainerConfiguration;
-import com.github.rodm.teamcity.internal.DockerOperations;
 import com.github.rodm.teamcity.internal.DockerTask;
-import org.gradle.api.GradleException;
+import com.github.rodm.teamcity.internal.StartServerContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
 
-import java.util.Optional;
-
-import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
-import static java.lang.String.format;
+import javax.inject.Inject;
 
 public abstract class StartDockerServer extends DockerTask {
 
-    public StartDockerServer() {
+    private final WorkerExecutor executor;
+
+    @Inject
+    public StartDockerServer(WorkerExecutor executor) {
         setDescription("Starts the TeamCity Server using Docker");
+        this.executor = executor;
     }
 
     @Input
@@ -54,34 +55,16 @@ public abstract class StartDockerServer extends DockerTask {
 
     @TaskAction
     void startServer() {
-        DockerOperations dockerOperations = new DockerOperations();
-
-        String image = getImageName().get() + ":" + getVersion().get();
-        if (!dockerOperations.isImageAvailable(image)) {
-            throw new GradleException(format(IMAGE_NOT_AVAILABLE, image));
-        }
-
-        String containerId = getContainerName().get();
-        if (dockerOperations.isContainerRunning(containerId)) {
-            getLogger().info("TeamCity Server container '{}' is already running", containerId);
-            return;
-        }
-
-        ContainerConfiguration configuration = ContainerConfiguration.builder()
-            .image(image)
-            .name(getContainerName().get())
-            .autoRemove()
-            .bind(getDataDir().get(),"/data/teamcity_server/datadir")
-            .bind(getLogsDir().get(),"/opt/teamcity/logs")
-            .bindPort(getPort().get(), "8111")
-            .environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
-        Optional<String> debugPort = getDebugPort(getServerOptions().get());
-        debugPort.ifPresent(port -> configuration.bindPort(port, port).exposePort(port));
-
-        String id = dockerOperations.createContainer(configuration);
-        getLogger().info("Created TeamCity Server container with id: {}", id);
-
-        dockerOperations.startContainer(containerId);
-        getLogger().info("Started TeamCity Server container");
+        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        queue.submit(StartServerContainerAction.class, params -> {
+            params.getContainerName().set(getContainerName());
+            params.getVersion().set(getVersion());
+            params.getDataDir().set(getDataDir());
+            params.getLogsDir().set(getLogsDir());
+            params.getServerOptions().set(getServerOptions());
+            params.getImageName().set(getImageName());
+            params.getPort().set(getPort());
+        });
+        queue.await();
     }
 }

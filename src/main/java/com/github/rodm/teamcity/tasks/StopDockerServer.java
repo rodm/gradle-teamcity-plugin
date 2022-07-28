@@ -15,25 +15,31 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.DockerOperations;
 import com.github.rodm.teamcity.internal.DockerTask;
+import com.github.rodm.teamcity.internal.StopContainerAction;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
+
+import javax.inject.Inject;
 
 public abstract class StopDockerServer extends DockerTask {
 
-    public StopDockerServer() {
+    private final WorkerExecutor executor;
+
+    @Inject
+    public StopDockerServer(WorkerExecutor executor) {
         setDescription("Stops the TeamCity Server using Docker");
+        this.executor = executor;
     }
 
     @TaskAction
     void stopServer() {
-        DockerOperations dockerOperations = new DockerOperations();
-        String containerId = getContainerName().get();
-        if (dockerOperations.isContainerRunning(containerId)) {
-            dockerOperations.stopContainer(containerId);
-            getLogger().info("TeamCity Server container stopped");
-        } else {
-            getLogger().info("TeamCity Server container is already stopped");
-        }
+        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        queue.submit(StopContainerAction.class, params -> {
+            params.getContainerName().set(getContainerName());
+            params.getDescription().set("TeamCity Server");
+        });
+        queue.await();
     }
 }
