@@ -66,14 +66,15 @@ public class DockerOperations {
             .withBinds(configuration.getBinds())
             .withPortBindings(configuration.getPortBindings());
 
-        CreateContainerCmd createContainer = client.createContainerCmd(configuration.getImage())
-            .withName(configuration.getName())
-            .withHostConfig(hostConfig)
-            .withEnv(configuration.getEnvironment())
-            .withExposedPorts(configuration.getExposedPorts());
+        try (CreateContainerCmd createContainer = client.createContainerCmd(configuration.getImage())) {
+            createContainer.withName(configuration.getName())
+                .withHostConfig(hostConfig)
+                .withEnv(configuration.getEnvironment())
+                .withExposedPorts(configuration.getExposedPorts());
 
-        CreateContainerResponse response = createContainer.exec();
-        return response.getId();
+            CreateContainerResponse response = createContainer.exec();
+            return response.getId();
+        }
     }
 
     public boolean isContainerAvailable(String containerId) {
@@ -123,7 +124,7 @@ public class DockerOperations {
         Map<String, ContainerNetwork> networks = inspectResponse.getNetworkSettings().getNetworks();
         return networks.values().stream()
             .map(ContainerNetwork::getIpAddress)
-            .filter((ipAddress) -> ipAddress != null && !ipAddress.isEmpty())
+            .filter(ipAddress -> ipAddress != null && !ipAddress.isEmpty())
             .findFirst()
             .orElseThrow(() -> new GradleException("Failed to get IP address for container: " + containerId));
     }

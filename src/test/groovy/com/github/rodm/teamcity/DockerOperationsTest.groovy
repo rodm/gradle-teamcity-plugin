@@ -164,5 +164,14 @@ class DockerOperationsTest {
             def hostConfig = createContainer.getHostConfig()
             assertThat(hostConfig.binds[0], equalTo(Bind.parse('/host:/container')))
         }
+
+        @Test
+        void 'create container command is closed after use'() {
+            ContainerConfiguration config = configuration()
+
+            dockerOperations.createContainer(config)
+
+            verify(createContainer).close()
+        }
     }
 }
