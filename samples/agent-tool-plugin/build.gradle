@@ -54,7 +54,7 @@ teamcity {
             from(zipTree(configurations.maven.singleFile)) {
                 includeEmptyDirs = false
                 eachFile { file ->
-                    file.relativePath = new RelativePath(file.relativePath.endsWithFile, file.relativePath.segments[1..-1] as String[])
+                    file.path = file.path.split('/', 2)[1]
                 }
             }
         }
