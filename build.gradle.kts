@@ -16,6 +16,12 @@ repositories {
     mavenCentral()
 }
 
+val functional by sourceSets.creating
+val samples by sourceSets.creating
+
+configurations["functionalImplementation"].extendsFrom(configurations["testImplementation"])
+configurations["samplesImplementation"].extendsFrom(configurations["testImplementation"])
+
 dependencies {
     compileOnly (libs.bundles.publishing)
     compileOnly (libs.bundles.docker)
@@ -25,17 +31,8 @@ dependencies {
     testImplementation (libs.bundles.testing)
     testImplementation (libs.bundles.publishing)
     testImplementation (libs.bundles.docker)
-}
 
-sourceSets {
-    register("functional") {
-        compileClasspath += main.get().output + configurations.testRuntimeClasspath
-        runtimeClasspath += main.get().output + configurations.testRuntimeClasspath
-    }
-    register("samples") {
-        compileClasspath += main.get().output + configurations.testRuntimeClasspath
-        runtimeClasspath += main.get().output + configurations.testRuntimeClasspath
-    }
+    "functionalImplementation" (project)
 }
 
 java {
@@ -49,7 +46,7 @@ jacoco {
 }
 
 gradlePlugin {
-    testSourceSets (sourceSets["functional"], sourceSets["samples"])
+    testSourceSets (functional, samples)
 
     plugins {
         create("teamcityBasePlugin") {
@@ -136,15 +133,15 @@ tasks {
         description = "Runs the functional tests."
         group = "verification"
         useJUnitPlatform()
-        testClassesDirs = sourceSets["functional"].output.classesDirs
-        classpath = sourceSets["functional"].runtimeClasspath
+        testClassesDirs = functional.output.classesDirs
+        classpath = functional.runtimeClasspath
     }
 
     register<Test>("samplesTest") {
         description = "Runs the sample builds."
         group = "verification"
         useJUnitPlatform()
-        testClassesDirs = sourceSets["samples"].output.classesDirs
-        classpath = sourceSets["samples"].runtimeClasspath
+        testClassesDirs = samples.output.classesDirs
+        classpath = samples.runtimeClasspath
     }
 }
