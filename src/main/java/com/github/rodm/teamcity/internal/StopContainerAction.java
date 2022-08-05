@@ -35,12 +35,14 @@ public abstract class StopContainerAction implements WorkAction<StopContainerAct
         final StopContainerParameters parameters = getParameters();
         final DockerOperations dockerOperations = new DockerOperations();
 
+        String description = parameters.getDescription().get();
         String containerId = parameters.getContainerName().get();
-        if (dockerOperations.isContainerRunning(containerId)) {
-            dockerOperations.stopContainer(containerId);
-            LOGGER.info("{} container stopped", parameters.getDescription().get());
-        } else {
-            LOGGER.info("TeamCity Build Agent container is already stopped");
+        if (!dockerOperations.isContainerRunning(containerId)) {
+            LOGGER.info("{} container {} is already stopped", description, containerId);
+            return;
         }
+
+        dockerOperations.stopContainer(containerId);
+        LOGGER.info("{} container stopped", description);
     }
 }
