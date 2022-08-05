@@ -15,8 +15,10 @@
  */
 package com.github.rodm.teamcity.tasks;
 
+import com.github.rodm.teamcity.internal.ContainerConfiguration;
+import com.github.rodm.teamcity.internal.CreateContainerAction;
 import com.github.rodm.teamcity.internal.DockerTask;
-import com.github.rodm.teamcity.internal.StartServerContainerAction;
+import com.github.rodm.teamcity.internal.StartContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -24,6 +26,8 @@ import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
+
+import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
 
 public abstract class StartDockerServer extends DockerTask {
 
@@ -55,15 +59,29 @@ public abstract class StartDockerServer extends DockerTask {
 
     @TaskAction
     void startServer() {
+        String image = getImageName().get() + ":" + getVersion().get();
+        String serverOptions = getServerOptions().get();
+        ContainerConfiguration configuration = ContainerConfiguration.builder()
+            .image(image)
+            .name(getContainerName().get())
+            .autoRemove()
+            .bind(getDataDir().get(),"/data/teamcity_server/datadir")
+            .bind(getLogsDir().get(),"/opt/teamcity/logs")
+            .bindPort(getPort().get(), "8111")
+            .environment("TEAMCITY_SERVER_OPTS", serverOptions);
+        getDebugPort(serverOptions).ifPresent(debugPort -> configuration
+            .bindPort(debugPort, debugPort)
+            .exposePort(debugPort));
+
         WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
-        queue.submit(StartServerContainerAction.class, params -> {
+        queue.submit(CreateContainerAction.class, params -> {
+            params.getConfiguration().set(configuration);
+            params.getDescription().set("TeamCity Server");
+        });
+        queue.await();
+        queue.submit(StartContainerAction.class, params -> {
             params.getContainerName().set(getContainerName());
-            params.getVersion().set(getVersion());
-            params.getDataDir().set(getDataDir());
-            params.getLogsDir().set(getLogsDir());
-            params.getServerOptions().set(getServerOptions());
-            params.getImageName().set(getImageName());
-            params.getPort().set(getPort());
+            params.getDescription().set("TeamCity Server");
         });
         queue.await();
     }
