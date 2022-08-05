@@ -15,9 +15,6 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.dockerjava.api.model.Bind
-import com.github.dockerjava.api.model.ExposedPort
-import com.github.dockerjava.api.model.PortBinding
 import com.github.rodm.teamcity.internal.ContainerConfiguration
 import org.junit.jupiter.api.Test
 
@@ -69,7 +66,7 @@ class ContainerConfigurationTest {
         config.bind('/host/path', '/container/path')
 
         assertThat(config.getBinds(), hasSize(1))
-        assertThat(config.getBinds().get(0), equalTo(Bind.parse('/host/path:/container/path')))
+        assertThat(config.getBinds().get(0), equalTo('/host/path:/container/path'))
     }
 
     @Test
@@ -85,7 +82,7 @@ class ContainerConfigurationTest {
         config.bindPort("7111", "8111")
 
         assertThat(config.getPortBindings(), hasSize(1))
-        assertThat(config.getPortBindings().get(0), equalTo(PortBinding.parse("7111:8111")))
+        assertThat(config.getPortBindings().get(0), equalTo("7111:8111"))
     }
 
     @Test
@@ -93,6 +90,6 @@ class ContainerConfigurationTest {
         config.exposePort("7111")
 
         assertThat(config.getExposedPorts(), hasSize(1))
-        assertThat(config.getExposedPorts().get(0), equalTo(ExposedPort.parse("7111")))
+        assertThat(config.getExposedPorts().get(0), equalTo("7111"))
     }
 }

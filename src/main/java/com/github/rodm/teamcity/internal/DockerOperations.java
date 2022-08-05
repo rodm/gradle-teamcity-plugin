@@ -24,15 +24,20 @@ import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.exception.NotModifiedException;
+import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.ContainerNetwork;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import org.gradle.api.GradleException;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DockerOperations {
 
@@ -61,16 +66,30 @@ public class DockerOperations {
     }
 
     public String createContainer(ContainerConfiguration configuration) {
+        List<Bind> binds = configuration.getBinds().
+            stream()
+            .map(Bind::parse)
+            .collect(Collectors.toList());
+        List<PortBinding> portBindings = configuration.getPortBindings()
+            .stream()
+            .map(PortBinding::parse)
+            .collect(Collectors.toList());
+
         HostConfig hostConfig = HostConfig.newHostConfig()
             .withAutoRemove(configuration.getAutoRemove())
-            .withBinds(configuration.getBinds())
-            .withPortBindings(configuration.getPortBindings());
+            .withBinds(binds)
+            .withPortBindings(portBindings);
+
+        List<ExposedPort> exposedPorts = configuration.getExposedPorts()
+            .stream()
+            .map(ExposedPort::parse)
+            .collect(Collectors.toList());
 
         try (CreateContainerCmd createContainer = client.createContainerCmd(configuration.getImage())) {
             createContainer.withName(configuration.getName())
                 .withHostConfig(hostConfig)
                 .withEnv(configuration.getEnvironment())
-                .withExposedPorts(configuration.getExposedPorts());
+                .withExposedPorts(exposedPorts);
 
             CreateContainerResponse response = createContainer.exec();
             return response.getId();

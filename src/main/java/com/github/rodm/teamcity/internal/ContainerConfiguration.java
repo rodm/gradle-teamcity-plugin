@@ -15,21 +15,18 @@
  */
 package com.github.rodm.teamcity.internal;
 
-import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.PortBinding;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerConfiguration {
+public class ContainerConfiguration implements Serializable {
 
     private String image;
     private String containerId;
     private boolean autoRemove;
-    private final List<Bind> binds = new ArrayList<>();
-    private final List<PortBinding> portBindings = new ArrayList<>();
-    private final List<ExposedPort> exposedPorts = new ArrayList<>();
+    private final List<String> binds = new ArrayList<>();
+    private final List<String> portBindings = new ArrayList<>();
+    private final List<String> exposedPorts = new ArrayList<>();
     private final List<String> environment = new ArrayList<>();
 
     public static ContainerConfiguration builder() {
@@ -64,11 +61,11 @@ public class ContainerConfiguration {
     }
 
     public ContainerConfiguration bind(String hostPath, String containerPath) {
-        binds.add(Bind.parse(hostPath + ":" + containerPath));
+        binds.add(hostPath + ":" + containerPath);
         return this;
     }
 
-    public List<Bind> getBinds() {
+    public List<String> getBinds() {
         return binds;
     }
 
@@ -82,20 +79,20 @@ public class ContainerConfiguration {
     }
 
     public ContainerConfiguration bindPort(String hostPort, String containerPort) {
-        portBindings.add(PortBinding.parse(hostPort + ":" + containerPort));
+        portBindings.add(hostPort + ":" + containerPort);
         return this;
     }
 
-    public List<PortBinding> getPortBindings() {
+    public List<String> getPortBindings() {
         return portBindings;
     }
 
     public ContainerConfiguration exposePort(String port) {
-        exposedPorts.add(ExposedPort.parse(port));
+        exposedPorts.add(port);
         return this;
     }
 
-    public List<ExposedPort> getExposedPorts() {
+    public List<String> getExposedPorts() {
         return exposedPorts;
     }
 }
