@@ -55,7 +55,7 @@ import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK
 
 public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
-    private static final String DOCKER_CONFIGURATION_NAME = "docker";
+    public static final String DOCKER_CONFIGURATION_NAME = "docker";
 
     @Override
     public void apply(Project project) {
