@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal;
+package com.github.rodm.teamcity.docker;
 
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;

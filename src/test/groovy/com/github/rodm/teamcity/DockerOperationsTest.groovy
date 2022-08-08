@@ -25,8 +25,8 @@ import com.github.dockerjava.api.exception.NotFoundException
 import com.github.dockerjava.api.model.Bind
 import com.github.dockerjava.core.command.CreateContainerCmdImpl
 import com.github.dockerjava.core.exec.CreateContainerCmdExec
-import com.github.rodm.teamcity.internal.ContainerConfiguration
-import com.github.rodm.teamcity.internal.DockerOperations
+import com.github.rodm.teamcity.docker.ContainerConfiguration
+import com.github.rodm.teamcity.docker.DockerOperations
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test

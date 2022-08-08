@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal;
+package com.github.rodm.teamcity.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
@@ -33,6 +33,7 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
+import com.github.rodm.teamcity.docker.ContainerConfiguration;
 import org.gradle.api.GradleException;
 
 import java.util.List;
@@ -40,6 +41,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DockerOperations {
+
+    public static final String IMAGE_NOT_AVAILABLE = "Docker image '%s' not available. Please use docker pull to download this image";
 
     private final DockerClient client;
 

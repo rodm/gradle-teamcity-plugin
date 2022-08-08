@@ -15,8 +15,8 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.DockerTask;
-import com.github.rodm.teamcity.internal.StartAgentContainerAction;
+import com.github.rodm.teamcity.docker.DockerTask;
+import com.github.rodm.teamcity.docker.StartAgentContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;

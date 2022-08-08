@@ -15,8 +15,8 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.DockerTask;
-import com.github.rodm.teamcity.internal.StopContainerAction;
+import com.github.rodm.teamcity.docker.DockerTask;
+import com.github.rodm.teamcity.docker.StopContainerAction;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;

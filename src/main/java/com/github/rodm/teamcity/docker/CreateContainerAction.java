@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.rodm.teamcity.internal;
+package com.github.rodm.teamcity.docker;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
@@ -22,7 +22,7 @@ import org.gradle.api.provider.Property;
 import org.gradle.workers.WorkAction;
 import org.gradle.workers.WorkParameters;
 
-import static com.github.rodm.teamcity.internal.DockerTask.IMAGE_NOT_AVAILABLE;
+import static com.github.rodm.teamcity.docker.DockerOperations.IMAGE_NOT_AVAILABLE;
 import static java.lang.String.format;
 
 public abstract class CreateContainerAction implements WorkAction<CreateContainerAction.CreateContainerParameters> {

@@ -15,10 +15,10 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ContainerConfiguration;
-import com.github.rodm.teamcity.internal.CreateContainerAction;
-import com.github.rodm.teamcity.internal.DockerTask;
-import com.github.rodm.teamcity.internal.StartContainerAction;
+import com.github.rodm.teamcity.docker.ContainerConfiguration;
+import com.github.rodm.teamcity.docker.CreateContainerAction;
+import com.github.rodm.teamcity.docker.DockerTask;
+import com.github.rodm.teamcity.docker.StartContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -27,7 +27,7 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
-import static com.github.rodm.teamcity.internal.DockerSupport.getDebugPort;
+import static com.github.rodm.teamcity.docker.DockerSupport.getDebugPort;
 
 public abstract class StartDockerServer extends DockerTask {
 

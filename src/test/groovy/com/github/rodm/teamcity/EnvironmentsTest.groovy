@@ -16,7 +16,7 @@
 package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.internal.DisablePluginAction
-import com.github.rodm.teamcity.internal.DockerSupport
+import com.github.rodm.teamcity.docker.DockerSupport
 import com.github.rodm.teamcity.internal.EnablePluginAction
 import com.github.rodm.teamcity.internal.PluginAction
 import com.github.rodm.teamcity.tasks.Deploy

@@ -15,7 +15,7 @@
  */
 package com.github.rodm.teamcity
 
-import com.github.rodm.teamcity.internal.ContainerConfiguration
+import com.github.rodm.teamcity.docker.ContainerConfiguration
 import org.junit.jupiter.api.Test
 
 import static org.hamcrest.MatcherAssert.assertThat
