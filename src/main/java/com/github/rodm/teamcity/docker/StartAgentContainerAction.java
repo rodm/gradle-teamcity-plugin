@@ -56,6 +56,11 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
             return;
         }
 
+        String serverContainerId = parameters.getServerContainerName().get();
+        if (!dockerOperations.isContainerRunning(serverContainerId)) {
+            throw new GradleException(format("TeamCity Server container '%s' is not running", serverContainerId));
+        }
+
         String ipAddress = dockerOperations.getIpAddress(parameters.getServerContainerName().get());
         String serverPort = parameters.getServerPort().get();
         String serverUrl = "http://" + ipAddress + ":" + serverPort + "/";
