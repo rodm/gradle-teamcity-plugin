@@ -69,6 +69,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
             .autoRemove()
             .bind(parameters.getDataDir().get() + "/agent/conf", "/data/teamcity_agent/conf")
             .environment("SERVER_URL", serverUrl)
+            .environment("AGENT_NAME", "Default Agent")
             .environment("TEAMCITY_AGENT_OPTS", agentOptions);
         getDebugPort(agentOptions).ifPresent(debugPort -> configuration
             .bindPort(debugPort, debugPort)
