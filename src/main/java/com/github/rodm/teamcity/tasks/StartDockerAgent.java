@@ -50,9 +50,6 @@ public abstract class StartDockerAgent extends DockerTask {
     @Input
     public abstract Property<String> getServerContainerName();
 
-    @Input
-    public abstract Property<String> getServerPort();
-
     @TaskAction
     void startAgent() {
         WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
@@ -63,7 +60,6 @@ public abstract class StartDockerAgent extends DockerTask {
             params.getAgentOptions().set(getAgentOptions());
             params.getImageName().set(getImageName());
             params.getServerContainerName().set(getServerContainerName());
-            params.getServerPort().set(getServerPort());
         });
         queue.await();
     }

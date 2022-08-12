@@ -1345,8 +1345,6 @@ class EnvironmentsTest {
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.port.get(), equalTo('8111'))
-            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
-            assertThat(startAgent.serverPort.get(), equalTo('8111'))
             def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
             assertThat(deployPlugin.serverPort.get(), equalTo('8111'))
             def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy
@@ -1367,8 +1365,6 @@ class EnvironmentsTest {
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.port.get(), equalTo('8080'))
-            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
-            assertThat(startAgent.serverPort.get(), equalTo('8080'))
             def deployPlugin = project.tasks.getByName('deployToTest') as Deploy
             assertThat(deployPlugin.serverPort.get(), equalTo('8080'))
             def undeployPlugin = project.tasks.getByName('undeployFromTest') as Undeploy

@@ -37,7 +37,6 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
         Property<String> getAgentOptions();
         Property<String> getImageName();
         Property<String> getServerContainerName();
-        Property<String> getServerPort();
     }
 
     @Override
@@ -62,8 +61,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
         }
 
         String ipAddress = dockerOperations.getIpAddress(parameters.getServerContainerName().get());
-        String serverPort = parameters.getServerPort().get();
-        String serverUrl = "http://" + ipAddress + ":" + serverPort + "/";
+        String serverUrl = "http://" + ipAddress + ":8111/";
         String agentOptions = parameters.getAgentOptions().get();
         ContainerConfiguration configuration = ContainerConfiguration.builder()
             .image(image)
