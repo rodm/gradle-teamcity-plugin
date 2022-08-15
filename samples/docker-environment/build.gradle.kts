@@ -13,14 +13,14 @@ val java11Home by extra((project.findProperty("java11.home") ?: "/opt/jdk-11.0.2
 val teamcityPlugins by configurations.creating
 
 dependencies {
-    teamcityPlugins (project(path = ":plugin", configuration = "plugin"))
+    teamcityPlugins (project(path = ":plugin:server", configuration = "plugin"))
 }
 
 teamcity {
     version = teamcityVersion
 
     environments {
-        register("teamcity2020.1", DockerTeamCityEnvironment::class.java) {
+        register("teamcity2021.2", DockerTeamCityEnvironment::class.java) {
             version = "2021.2.3"
             port = "7111"
 //            serverImage = "alt-teamcity-server"

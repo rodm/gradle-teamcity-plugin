@@ -1,0 +1,14 @@
+
+apply plugin: 'java'
+apply plugin: 'io.github.rodm.teamcity-agent'
+
+teamcity {
+    agent {
+        archiveName = 'docker-demo-agent-plugin.zip'
+        descriptor {
+            pluginDeployment {
+                useSeparateClassloader = false
+            }
+        }
+    }
+}

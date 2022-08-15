@@ -7,9 +7,13 @@ plugins {
 group = "com.github.rodm.teamcity"
 version = "1.0-SNAPSHOT"
 
+dependencies {
+    agent (project(path = ":plugin:agent", configuration = "plugin"))
+}
+
 teamcity {
     server {
-        archiveName = "teamcity-plugin.zip"
+        archiveName = "docker-demo-plugin.zip"
         descriptor {
             name = project.name
             displayName = project.name
@@ -21,10 +25,6 @@ teamcity {
             downloadUrl = "https://github.com/rodm/gradle-teamcity-plugin/"
             email = "rod.n.mackenzie@gmail.com"
             useSeparateClassloader = true
-
-            parameters {
-                parameter ("param", "example server value")
-            }
         }
     }
 }

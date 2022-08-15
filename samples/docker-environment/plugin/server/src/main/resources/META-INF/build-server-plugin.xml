@@ -4,8 +4,5 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
 
-    <bean id="exampleServerPlugin"
-          class="example.teamcity.ExampleServerPlugin"
-          init-method="register">
-    </bean>
+    <bean id="exampleContextProcessor" class="example.teamcity.server.ExampleBuildStartContextProcessor"/>
 </beans>

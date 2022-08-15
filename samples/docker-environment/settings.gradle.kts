@@ -1,7 +1,8 @@
 
 rootProject.name = "docker-environment"
 
-include ("plugin")
+include ("plugin:agent")
+include ("plugin:server")
 
 includeBuild ("../..")
 
