@@ -24,6 +24,9 @@ import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public abstract class StartDockerAgent extends DockerTask {
 
@@ -52,15 +55,23 @@ public abstract class StartDockerAgent extends DockerTask {
 
     @TaskAction
     void startAgent() {
-        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
-        queue.submit(StartAgentContainerAction.class, params -> {
-            params.getContainerName().set(getContainerName());
-            params.getVersion().set(getVersion());
-            params.getDataDir().set(getDataDir());
-            params.getAgentOptions().set(getAgentOptions());
-            params.getImageName().set(getImageName());
-            params.getServerContainerName().set(getServerContainerName());
-        });
-        queue.await();
+        try {
+            String configDir = getDataDir().get() + "/agent/conf";
+            Files.createDirectories(Paths.get(configDir));
+
+            WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+            queue.submit(StartAgentContainerAction.class, params -> {
+                params.getContainerName().set(getContainerName());
+                params.getVersion().set(getVersion());
+                params.getDataDir().set(getDataDir());
+                params.getAgentOptions().set(getAgentOptions());
+                params.getImageName().set(getImageName());
+                params.getServerContainerName().set(getServerContainerName());
+            });
+            queue.await();
+        }
+        catch (IOException e) {
+            getLogger().warn("Failed to create the agent configuration directory");
+        }
     }
 }

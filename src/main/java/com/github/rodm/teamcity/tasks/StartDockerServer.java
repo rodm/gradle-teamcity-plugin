@@ -27,6 +27,10 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static com.github.rodm.teamcity.docker.DockerSupport.getDebugPort;
 
 public abstract class StartDockerServer extends DockerTask {
@@ -79,10 +83,18 @@ public abstract class StartDockerServer extends DockerTask {
             params.getDescription().set("TeamCity Server");
         });
         queue.await();
-        queue.submit(StartContainerAction.class, params -> {
-            params.getContainerName().set(getContainerName());
-            params.getDescription().set("TeamCity Server");
-        });
-        queue.await();
+
+        try {
+            Files.createDirectories(Paths.get(getLogsDir().get()));
+
+            queue.submit(StartContainerAction.class, params -> {
+                params.getContainerName().set(getContainerName());
+                params.getDescription().set("TeamCity Server");
+            });
+            queue.await();
+        }
+        catch (IOException e) {
+            getLogger().warn("Failed to create the logs directory");
+        }
     }
 }
