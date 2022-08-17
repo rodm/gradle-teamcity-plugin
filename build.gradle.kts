@@ -144,4 +144,8 @@ tasks {
         testClassesDirs = samples.output.classesDirs
         classpath = samples.runtimeClasspath
     }
+
+    withType<Test> {
+        systemProperty ("junit.jupiter.tempdir.cleanup.mode.default", "ON_SUCCESS")
+    }
 }

@@ -22,10 +22,10 @@ dependencyResolutionManagement {
             alias("docker-httpclient5").to("com.github.docker-java", "docker-java-transport-httpclient5").versionRef("docker")
             bundle("docker", listOf("docker-core", "docker-httpclient5"))
 
-            alias("junit").to("org.junit.jupiter:junit-jupiter:5.8.2")
+            alias("junit").to("org.junit.jupiter:junit-jupiter:5.9.0")
             alias("xmlunit").to("org.xmlunit:xmlunit-matchers:2.9.0")
             alias("hamcrest").to("org.hamcrest:hamcrest-library:2.2")
-            alias("mockito").to("org.mockito:mockito-core:4.6.1")
+            alias("mockito").to("org.mockito:mockito-core:4.7.0")
             bundle("testing", listOf("junit", "xmlunit", "hamcrest", "mockito"))
         }
     }
