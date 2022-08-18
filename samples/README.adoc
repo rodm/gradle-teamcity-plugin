@@ -16,6 +16,7 @@ with scripts written in Kotlin using {uri-gradle-kotlin}[Gradle Kotlin DSL].
 * `multiple-plugins` : A sample demonstrating building and deploying multiple plugins to a TeamCity environment.
 * `reloadable-plugin` : A sample demonstrating reloading of a modified plugin without restarting the TeamCity environment.
 * `sakura-ui-plugin` : A sample demonstrating building a Sakura UI plugin.
+* `docker-environment` : A sample that uses {uri-docker-desktop}[Docker] to run the server and agent containers.
 
 Each sample includes Gradle build scripts using the Groovy DSL and the Kotlin DSL,
 except `multi-project-plugin` and `kotlin-plugin` that are equivalent projects.
@@ -115,3 +116,8 @@ The `sakura-ui-plugin` creates a plugin using the new Sakura UI built by webpack
 message to the top of the side-bar. Building the plugin requires {uri-docker-desktop}[Docker] to be installed
 to run the `webpack` task. The `webpack` task is also configured to support the Gradle build cache, building the
 plugin with the `--build-cache` option will allow the `webpack` task to reuse the output from a previous build.
+
+The `docker-environment` sample configures an environment to run the server and agent using {uri-docker-desktop}[Docker].
+The sample deploys a plugin that has server-side and agent-side components that can be used to try debugging a plugin
+deployed to a container. A build configuration with no VCS root and a build step using the command line runner is
+all that is required to execute the plugin code.
