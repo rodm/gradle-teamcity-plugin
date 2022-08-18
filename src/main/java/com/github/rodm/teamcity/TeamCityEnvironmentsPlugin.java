@@ -223,6 +223,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getDataDir().set(environment.getDataDirProperty());
+                task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
                 task.getImageName().set(environment.getAgentImageProperty());
                 task.getContainerName().set(environment.getAgentNameProperty());

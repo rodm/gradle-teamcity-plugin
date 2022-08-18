@@ -45,6 +45,9 @@ public abstract class StartDockerAgent extends DockerTask {
     public abstract Property<String> getDataDir();
 
     @Input
+    public abstract Property<String> getConfigDir();
+
+    @Input
     public abstract Property<String> getAgentOptions();
 
     @Input
@@ -56,14 +59,14 @@ public abstract class StartDockerAgent extends DockerTask {
     @TaskAction
     void startAgent() {
         try {
-            String configDir = getDataDir().get() + "/agent/conf";
-            Files.createDirectories(Paths.get(configDir));
+            Files.createDirectories(Paths.get(getConfigDir().get()));
 
             WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
             queue.submit(StartAgentContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
                 params.getVersion().set(getVersion());
                 params.getDataDir().set(getDataDir());
+                params.getConfigDir().set(getConfigDir());
                 params.getAgentOptions().set(getAgentOptions());
                 params.getImageName().set(getImageName());
                 params.getServerContainerName().set(getServerContainerName());

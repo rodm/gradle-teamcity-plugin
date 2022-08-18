@@ -1387,6 +1387,21 @@ class EnvironmentsTest {
         }
 
         @Test
+        void 'configures start agent task with default agent configuration directory'() {
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(normalize(startAgent.configDir.get()), endsWith('/data/2021.2/agent/conf'))
+        }
+
+        @Test
         void 'environments plugin configures environment tasks using overrides from gradle properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
             teamcity.environments.test.serverImage = alt-teamcity-server

@@ -34,6 +34,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
         Property<String> getContainerName();
         Property<String> getVersion();
         Property<String> getDataDir();
+        Property<String> getConfigDir();
         Property<String> getAgentOptions();
         Property<String> getImageName();
         Property<String> getServerContainerName();
@@ -67,7 +68,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
             .image(image)
             .name(containerId)
             .autoRemove()
-            .bind(parameters.getDataDir().get() + "/agent/conf", "/data/teamcity_agent/conf")
+            .bind(parameters.getConfigDir().get(), "/data/teamcity_agent/conf")
             .environment("SERVER_URL", serverUrl)
             .environment("AGENT_NAME", "Default Agent")
             .environment("TEAMCITY_AGENT_OPTS", agentOptions);
