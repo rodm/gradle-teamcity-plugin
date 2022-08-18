@@ -104,7 +104,7 @@ class SamplesTest {
         void 'docker environment'() {
             BuildResult result = executeBuild(samples.resolve('docker-environment'))
 
-            assertThat(result.task(':plugin:build').getOutcome(), is(SUCCESS))
+            assertThat(result.task(':plugin:server:build').getOutcome(), is(SUCCESS))
         }
     }
 
