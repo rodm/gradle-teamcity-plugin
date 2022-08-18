@@ -44,7 +44,7 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
     private final ServerPluginConfiguration server;
     private final TeamCityEnvironments environments;
 
-    private transient final Project project;
+    private final transient Project project;
 
     public DefaultTeamCityPluginExtension(Project project) {
         this.project = project;

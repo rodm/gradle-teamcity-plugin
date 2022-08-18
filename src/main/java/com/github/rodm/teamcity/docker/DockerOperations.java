@@ -33,7 +33,6 @@ import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
-import com.github.rodm.teamcity.docker.ContainerConfiguration;
 import org.gradle.api.GradleException;
 
 import java.util.List;
@@ -54,6 +53,7 @@ public class DockerOperations {
         client = DockerClientImpl.getInstance(clientConfig, httpClient);
     }
 
+    @SuppressWarnings("unused")
     DockerOperations(DockerClient client) {
         this.client = client;
     }
