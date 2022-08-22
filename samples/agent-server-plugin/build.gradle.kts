@@ -50,6 +50,8 @@ teamcity {
         register("teamcity2022.04") {
             version = "2022.04.3"
             javaHome = java11Home
+            serverOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
+            agentOptions ("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006")
         }
     }
 }
