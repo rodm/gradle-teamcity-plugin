@@ -36,7 +36,7 @@ teamcity {
         }
 
         register("teamcity2022.04") {
-            version = "2022.04.1"
+            version = "2022.04.3"
             javaHome = java11Home
             plugins = configurations["teamcityPlugins"]
         }
