@@ -1,5 +1,5 @@
 = Gradle TeamCity plugin
-:plugin-id: com.github.rodm.teamcity-server
+:plugin-id: io.github.rodm.teamcity-server
 :uri-teamcity-sdk-docs: https://plugins.jetbrains.com/docs/teamcity
 :uri-teamcity-environment: {uri-teamcity-sdk-docs}/development-environment.html
 :uri-server-descriptor: {uri-teamcity-sdk-docs}/plugins-packaging.html#Plugin+Descriptor
@@ -17,7 +17,6 @@
 :uri-docker-hub: https://hub.docker.com
 :uri-docker-teamcity-server: {uri-docker-hub}/r/jetbrains/teamcity-server
 :uri-docker-teamcity-agent: {uri-docker-hub}/r/jetbrains/teamcity-agent
-:plugin-version: 1.1
 :default-api-version: 9.0
 :example-api-version: 2018.1
 
@@ -34,7 +33,7 @@ image:{uri-gradle-plugin-version}?label=Gradle%20Plugin%20Portal[Gradle Plugin P
 |v1.5
 |7.0+
 |Java 8 & later
-|{uri-github-project}/blob/master/README.adoc#using-the-plugin[README]
+|{uri-github-project}/blob/v1.5/README.adoc#using-the-plugin[README]
 |v1.4
 |6.0+
 |Java 8 & later
@@ -78,27 +77,27 @@ To test the samples run
 The plugin archive published to the {uri-gradle-plugin-portal}[Gradle Plugin Portal] contains five plugins:
 
 * `io.github.rodm.teamcity-base` - Allows extension properties `version`, `allowSnapshotVersions`,
-`validateBeanDefinition`, and `defaultRepositories` to be set and shared to sub-projects applying the other plugins.
-* `com.github.rodm.teamcity-server` - Provides tasks to package, sign and publish a TeamCity plugin.
-* `com.github.rodm.teamcity-agent` - Provides tasks to package the Agent-side of a TeamCity plugin.
-* `com.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project to build a library used by both
+`validateBeanDefinition`, and `defaultRepositories` to be set and shared to subprojects applying the other plugins.
+* `io.github.rodm.teamcity-server` - Provides tasks to package, sign and publish a TeamCity plugin.
+* `io.github.rodm.teamcity-agent` - Provides tasks to package the Agent-side of a TeamCity plugin.
+* `io.github.rodm.teamcity-common` - Adds the `common-api` dependency to a project to build a library used by both
 the agent-side and server-side plugin components.
-* `com.github.rodm.teamcity-environments` - Adds tasks to download and install a TeamCity Server, to deploy and
+* `io.github.rodm.teamcity-environments` - Adds tasks to download and install a TeamCity Server, to deploy and
 un-deploy plugins to the server, and to start and stop a TeamCity Server and Build Agent.
 
 Refer to the Gradle Plugin Portal for instructions on how to apply the
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-server[server],
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-agent[agent],
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-common[common],
+{uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-server[server],
+{uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-agent[agent],
+{uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-common[common],
 {uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-base[base] and
-{uri-gradle-plugin-portal}/plugin/com.github.rodm.teamcity-environments[environments] plugins.
+{uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-environments[environments] plugins.
 
 === Configurations
 
 The plugins add the following configurations.
 
 * `provided` : The `provided` configuration is used to define dependencies required at compile time but not to be
-included in the plugin. By default the plugins add the `agent-api` and `server-api` dependencies when the `java` plugin
+included in the plugin. By default, the plugins add the `agent-api` and `server-api` dependencies when the `java` plugin
 is also applied.
 * `agent` : The `agent` configuration is used to define additional dependencies to be included in the agent plugin
 lib directory when used with the agent plugin. When used with the server plugin the dependencies are added to the
@@ -666,7 +665,7 @@ For each environment the following tasks are created based on the environment na
 
             // explicitly specifying the environment type
             'teamcity2022.04'(LocalTeamCityEnvironment) {
-                version = '2022.04'
+                version = '2022.04.3'
             }
         }
     }
@@ -715,6 +714,11 @@ The following example shows environments being configured using the Kotlin DSL.
             register("teamcity2020.2") {
                 version = "2020.2.4"
             }
+
+            // explicitly specifying the environment type
+            register("teamcity2022.04", LocalTeamCityEnvironment::class.java) {
+                version = '2022.04.3'
+            }
         }
     }
 ----
@@ -749,7 +753,7 @@ The following example shows the different ways Docker environments can be config
 
 [source,groovy]
 [subs="attributes"]
-.build.gradle
+.build.gradle.kts
 ----
     teamcity {
         environments {
@@ -801,7 +805,7 @@ To start and stop a TeamCity Server and Build Agent using Docker requires {uri-d
 installed and running before executing the environment tasks.
 The environment `version` property is used to select an image by tag.
 
-===== Examples
+===== Example
 
 [source,groovy]
 [subs="attributes"]
@@ -811,17 +815,18 @@ The environment `version` property is used to select an image by tag.
         version = "{example-api-version}"
 
         environments {
-            'teamcity2021.2' {
-                version = '2021.2.3'
+            'teamcity2022.04'(DockerTeamCityEnvironment) {
+                version = '2022.04.3'
+                port = '7111'
                 serverImage = 'my-teamcity-server'
                 serverName = 'my-server'
                 agentImage = 'my-teamcity-agent'
                 agentName = 'my-agent'
 
                 // Add to the default server and agent options
-                serverOptions("-Dproperty=value")
-                serverOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5500")
-                agentOptions("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5501")
+                serverOptions '-Dproperty=value'
+                serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5500'
+                agentOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5501'
             }
         }
     }
