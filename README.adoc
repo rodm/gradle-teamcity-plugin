@@ -17,6 +17,7 @@
 :uri-docker-hub: https://hub.docker.com
 :uri-docker-teamcity-server: {uri-docker-hub}/r/jetbrains/teamcity-server
 :uri-docker-teamcity-agent: {uri-docker-hub}/r/jetbrains/teamcity-agent
+:uri-github-example-project: https://github.com/rodm/teamcity-docker-multi-node
 :default-api-version: 9.0
 :example-api-version: 2018.1
 
@@ -540,8 +541,14 @@ The following example uses the Kotlin DSL.
 
 === TeamCity Environments Plugin
 
-Applying this plugin provides tasks to download, install, start and stop a local TeamCity Server and Build Agent or start and stop a server or agent using Docker.
-This allows a plugin to be debugged or tested against multiple versions of TeamCity.
+Applying this plugin provides tasks to download, install, start and stop a local TeamCity Server and Build Agent or
+start and stop a server or agent using Docker. This allows a plugin to be debugged or tested against multiple
+versions of TeamCity.
+
+The environments plugin supports two different types of environment a local environment and a Docker environment.
+The types of environments supported are implemented using Gradle's `ExtensiblePolymorphicDomainObjectContainer` that
+can be extended to support other environment types. An example plugin that extends the environments plugin to
+support running multiple nodes can be found in the following project {uri-github-example-project}[teamcity-docker-multi-node].
 
 ==== Configuration
 
