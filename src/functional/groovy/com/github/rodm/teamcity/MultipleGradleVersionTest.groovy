@@ -45,26 +45,25 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18']
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19']
     }
+
+    private static Map<String, String> GRADLE_JAVA_VERSIONS = [
+        '6.3': '14',
+        '6.7-rc-1': '15',
+        '7.0-rc-1': '16',
+        '7.3': '17',
+        '7.5-rc-1': '18',
+        '7.6-rc-1': '19'
+    ].asUnmodifiable()
 
     static List<String> supportedByGradle(String version) {
         def gradleVersion = GradleVersion.version(version)
         def javaVersions = releasedJavaVersions()
-        if (gradleVersion < GradleVersion.version('6.3')) {
-            javaVersions.remove('14')
-        }
-        if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
-            javaVersions.remove('15')
-        }
-        if (gradleVersion < GradleVersion.version('7.0-rc-1')) {
-            javaVersions.remove('16')
-        }
-        if (gradleVersion < GradleVersion.version('7.3')) {
-            javaVersions.remove('17')
-        }
-        if (gradleVersion < GradleVersion.version('7.5-rc-1')) {
-            javaVersions.remove('18')
+        GRADLE_JAVA_VERSIONS.each { entry ->
+            if (gradleVersion < GradleVersion.version(entry.key)) {
+                javaVersions.remove(entry.value)
+            }
         }
         return javaVersions
     }
