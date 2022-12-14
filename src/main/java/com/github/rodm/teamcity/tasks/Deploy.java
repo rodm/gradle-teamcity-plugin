@@ -21,6 +21,8 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 
 public abstract class Deploy extends Copy implements ServerAction {
 
@@ -33,6 +35,7 @@ public abstract class Deploy extends Copy implements ServerAction {
     }
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     public abstract ConfigurableFileCollection getPlugins();
 
     @OutputDirectory

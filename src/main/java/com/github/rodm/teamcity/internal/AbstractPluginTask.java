@@ -18,6 +18,8 @@ package com.github.rodm.teamcity.internal;
 import org.gradle.api.Transformer;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.bundling.Zip;
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
@@ -32,5 +34,6 @@ public abstract class AbstractPluginTask extends Zip {
     };
 
     @InputFile
+    @PathSensitive(PathSensitivity.NONE)
     public abstract RegularFileProperty getDescriptor();
 }

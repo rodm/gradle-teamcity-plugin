@@ -18,6 +18,8 @@ package com.github.rodm.teamcity.tasks;
 import com.github.rodm.teamcity.internal.AbstractPluginTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 
 public abstract class AgentPlugin extends AbstractPluginTask {
 
@@ -34,5 +36,6 @@ public abstract class AgentPlugin extends AbstractPluginTask {
     }
 
     @InputFiles
+    @PathSensitive(PathSensitivity.RELATIVE)
     public abstract ConfigurableFileCollection getLib();
 }

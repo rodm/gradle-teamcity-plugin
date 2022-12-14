@@ -148,4 +148,8 @@ tasks {
     withType<Test> {
         systemProperty ("junit.jupiter.tempdir.cleanup.mode.default", "ON_SUCCESS")
     }
+
+    validatePlugins {
+        enableStricterValidation.set(true)
+    }
 }
