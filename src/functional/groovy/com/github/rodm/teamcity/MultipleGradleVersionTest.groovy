@@ -40,7 +40,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @SuppressWarnings('unused')
     static List<String> data() {
         return [
-            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1'
+            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6',
+            '8.0-rc-1'
         ]
     }
 
