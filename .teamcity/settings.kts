@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
-version = "2022.04"
+version = "2022.10"
 
 val versionsMap = mapOf(
     "14" to "6.3",
