@@ -38,10 +38,10 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     @SuppressWarnings('unused')
-    static List<String> data() {
+    static List<String> gradleVersions() {
         return [
-            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6',
-            '8.0-rc-1'
+            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6.1',
+            '8.0.2'
         ]
     }
 
@@ -201,7 +201,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
     @DisplayName('build plugin')
     @ParameterizedTest(name = 'with Gradle {0}')
-    @MethodSource("data")
+    @MethodSource("gradleVersions")
     void 'build plugin'(String gradleVersion) {
         def releasedJavaVersions = releasedJavaVersions()
         def javaVersion = JavaVersion.current().toString()
