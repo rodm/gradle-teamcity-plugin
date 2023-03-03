@@ -14,12 +14,10 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.N
 version = "2022.10"
 
 val versionsMap = mapOf(
-    "14" to "6.3",
-    "15" to "6.7.1",
     "16" to "7.0.2",
     "17" to "7.3",
-    "18" to "7.5-rc-1",
-    "19" to "7.6-rc-1"
+    "18" to "7.5.1",
+    "19" to "7.6.1"
 )
 
 fun supportedGradleVersion(javaVersion: String?): String? {
