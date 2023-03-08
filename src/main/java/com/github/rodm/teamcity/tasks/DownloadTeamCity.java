@@ -16,7 +16,9 @@
 package com.github.rodm.teamcity.tasks;
 
 import de.undercouch.gradle.tasks.download.Download;
+import org.gradle.work.DisableCachingByDefault;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public class DownloadTeamCity extends Download {
     public DownloadTeamCity() {
         setDescription("Downloads a TeamCity distribution");

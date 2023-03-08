@@ -23,12 +23,14 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Delete;
 import org.gradle.api.tasks.Internal;
+import org.gradle.work.DisableCachingByDefault;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class Undeploy extends Delete implements ServerAction {
 
     @Inject

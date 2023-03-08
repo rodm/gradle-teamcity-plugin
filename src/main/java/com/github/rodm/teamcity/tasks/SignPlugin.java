@@ -31,11 +31,13 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.DisableCachingByDefault;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class SignPlugin extends DefaultTask {
 
     private final WorkerExecutor executor;

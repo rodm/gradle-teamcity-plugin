@@ -18,11 +18,13 @@ package com.github.rodm.teamcity.tasks;
 import com.github.rodm.teamcity.docker.DockerTask;
 import com.github.rodm.teamcity.docker.StopContainerAction;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 
+@UntrackedTask(because = "Should always run the Docker task")
 public abstract class StopDockerAgent extends DockerTask {
 
     private final WorkerExecutor executor;

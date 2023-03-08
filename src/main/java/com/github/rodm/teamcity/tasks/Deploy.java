@@ -23,7 +23,9 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
+import org.gradle.work.DisableCachingByDefault;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class Deploy extends Copy implements ServerAction {
 
     public Deploy() {

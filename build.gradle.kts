@@ -152,6 +152,6 @@ tasks {
     }
 
     validatePlugins {
-        enableStricterValidation.set(false) // TODO re-enable after updating tasks
+        enableStricterValidation.set(true)
     }
 }

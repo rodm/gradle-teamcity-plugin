@@ -22,6 +22,7 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
 
@@ -36,6 +37,7 @@ import java.util.Properties;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+@UntrackedTask(because = "Should always run the TeamCity task")
 public abstract class TeamCityTask extends DefaultTask {
 
     private static final String VERSION_MISMATCH_WARNING = "%s: Version %s does not match the TeamCity version %s installed at %s.";

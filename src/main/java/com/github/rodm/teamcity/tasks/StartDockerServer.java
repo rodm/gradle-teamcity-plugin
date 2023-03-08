@@ -22,6 +22,7 @@ import com.github.rodm.teamcity.docker.StartContainerAction;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
@@ -33,6 +34,7 @@ import java.nio.file.Paths;
 
 import static com.github.rodm.teamcity.docker.DockerSupport.getDebugPort;
 
+@UntrackedTask(because = "Should always run the Docker task")
 public abstract class StartDockerServer extends DockerTask {
 
     private final WorkerExecutor executor;

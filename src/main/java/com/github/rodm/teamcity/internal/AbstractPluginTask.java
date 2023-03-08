@@ -21,9 +21,11 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.bundling.Zip;
+import org.gradle.work.DisableCachingByDefault;
 
 import static com.github.rodm.teamcity.TeamCityPlugin.PLUGIN_DESCRIPTOR_FILENAME;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class AbstractPluginTask extends Zip {
 
     public static final Transformer<String, String> PLUGIN_DESCRIPTOR_RENAMER = new Transformer<String, String>() {

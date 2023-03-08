@@ -30,6 +30,7 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.DisableCachingByDefault;
 import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 
 import static com.github.rodm.teamcity.TeamCityPlugin.GRADLE_OFFLINE;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class PublishPlugin extends DefaultTask {
 
     private static final String DEFAULT_HOST = "https://plugins.jetbrains.com";

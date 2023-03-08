@@ -25,9 +25,11 @@ import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.work.DisableCachingByDefault;
 
 import javax.inject.Inject;
 
+@DisableCachingByDefault(because = "Not worth caching")
 public abstract class InstallTeamCity extends DefaultTask {
 
     private final FileSystemOperations fileSystemOperations;
