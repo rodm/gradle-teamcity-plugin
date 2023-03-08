@@ -9,7 +9,7 @@ plugins {
     id ("org.sonarqube") version "3.4.0.2513"
 }
 
-version = "1.6-SNAPSHOT"
+version = "2.0-SNAPSHOT"
 group = "io.github.rodm"
 
 repositories {
