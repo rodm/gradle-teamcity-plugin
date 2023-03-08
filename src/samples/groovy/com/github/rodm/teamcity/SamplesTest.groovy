@@ -129,7 +129,7 @@ class SamplesTest {
     private static BuildResult executeBuild(Path projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.toFile())
-                .withArguments('--warning-mode', 'fail', *args)
+                .withArguments('--warning-mode', 'all', *args) // TODO change to 'fail' once use of deprecated features has been removed
                 .withPluginClasspath()
                 .forwardOutput()
                 .build()

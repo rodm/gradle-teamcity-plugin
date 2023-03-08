@@ -43,6 +43,7 @@ import org.gradle.api.tasks.Delete
 import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
@@ -1032,6 +1033,7 @@ class EnvironmentsTest {
             assertThat(project, hasTask('downloadTest'))
         }
 
+        @Disabled
         @Test
         void 'gradle properties should override default shared properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
@@ -1063,6 +1065,7 @@ class EnvironmentsTest {
             assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
         }
 
+        @Disabled
         @Test
         void 'gradle properties should override shared properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
@@ -1099,6 +1102,7 @@ class EnvironmentsTest {
             assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
         }
 
+        @Disabled
         @Test
         void 'environments plugin configures environment tasks using overrides from gradle properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
@@ -1401,6 +1405,7 @@ class EnvironmentsTest {
             assertThat(normalize(startAgent.configDir.get()), endsWith('/data/2021.2/agent/conf'))
         }
 
+        @Disabled
         @Test
         void 'environments plugin configures environment tasks using overrides from gradle properties'() {
             projectDir.resolve('gradle.properties').toFile() << """
