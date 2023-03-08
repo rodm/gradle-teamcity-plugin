@@ -4,7 +4,7 @@ plugins {
     id ("org.gradle.java-gradle-plugin")
     id ("org.gradle.jacoco")
     id ("org.gradle.maven-publish")
-    id ("com.gradle.plugin-publish") version "1.0.0"
+    id ("com.gradle.plugin-publish") version "1.1.0"
     id ("org.jetbrains.kotlin.jvm") version "1.7.10"
     id ("org.sonarqube") version "3.4.0.2513"
 }
@@ -48,31 +48,40 @@ jacoco {
 gradlePlugin {
     testSourceSets (functional, samples)
 
+    website.set("https://github.com/rodm/gradle-teamcity-plugin")
+    vcsUrl.set("https://github.com/rodm/gradle-teamcity-plugin.git")
+    description = "Gradle plugin for developing TeamCity plugins"
+
     plugins {
         create("teamcityBasePlugin") {
             id = "io.github.rodm.teamcity-base"
             displayName = "Gradle TeamCity base plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityBasePlugin"
+            tags.set(listOf("teamcity"))
         }
         create("teamcityServerPlugin") {
             id = "io.github.rodm.teamcity-server"
             displayName = "Gradle TeamCity Server plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityServerPlugin"
+            tags.set(listOf("teamcity"))
         }
         create("teamcityAgentPlugin") {
             id = "io.github.rodm.teamcity-agent"
             displayName = "Gradle TeamCity Agent plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityAgentPlugin"
+            tags.set(listOf("teamcity"))
         }
         create("teamcityCommonPlugin") {
             id = "io.github.rodm.teamcity-common"
             displayName = "Gradle TeamCity Common API plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityCommonPlugin"
+            tags.set(listOf("teamcity"))
         }
         create("teamcityEnvironmentsPlugin") {
             id = "io.github.rodm.teamcity-environments"
             displayName = "Gradle TeamCity Environments plugin"
             implementationClass = "com.github.rodm.teamcity.TeamCityEnvironmentsPlugin"
+            tags.set(listOf("teamcity"))
         }
 
         create("deprecatedServerPlugin") {
@@ -104,13 +113,6 @@ publishing {
             from (components["java"])
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/rodm/gradle-teamcity-plugin"
-    vcsUrl = "https://github.com/rodm/gradle-teamcity-plugin"
-    description = "Gradle plugin for developing TeamCity plugins"
-    tags = listOf("teamcity")
 }
 
 tasks {
