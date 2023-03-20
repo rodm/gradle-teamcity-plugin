@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+    <info>
+        <name>@NAME@</name>
+        <display-name>@NAME@</display-name>
+        <version>@VERSION@</version>
+        <description>TeamCity Example Build Feature Plugin</description>
+        <download-url>https://github.com/rodm/gradle-teamcity-plugin/</download-url>
+        <email>rod.n.mackenzie@gmail.com</email>
+        <vendor>
+            <name>@VENDOR_NAME@</name>
+            <url>http://example.com</url>
+        </vendor>
+    </info>
+    <deployment use-separate-classloader="true"/>
+</teamcity-plugin>

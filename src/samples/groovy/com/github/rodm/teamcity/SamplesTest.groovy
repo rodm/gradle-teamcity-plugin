@@ -17,7 +17,6 @@ package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -31,38 +30,17 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class SamplesTest {
 
-    private Path samples
+    class Samples {
 
-    @BeforeEach
-    void setup() throws IOException {
-        samples = Paths.get('samples')
-    }
+        Path samples
 
-    @Test
-    void serverPluginWithAlternativeBuildFile() {
-        BuildResult result = executeBuild(samples.resolve('server-plugin'),
-            '--include-build', '../..', '-b', 'build-alt.gradle', 'clean', 'build')
+        Samples(Path samples) {
+            this.samples = samples
+        }
 
-        assertThat(result.task(':build').getOutcome(), is(SUCCESS))
-    }
-
-    @Test
-    void multiProjectPlugin() {
-        BuildResult result = executeBuild(samples.resolve('multi-project-plugin'))
-
-        assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
-    }
-
-    @Test
-    void 'build kotlin plugin'() {
-        BuildResult result = executeBuild(samples.resolve('kotlin-plugin'))
-
-        assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
-    }
-
-    abstract class Samples {
-
-        abstract BuildResult executeBuild(Path projectDir)
+        BuildResult executeBuild(Path projectDir) {
+            SamplesTest.executeBuild(projectDir)
+        }
 
         @Test
         void 'server plugin'() {
@@ -111,25 +89,39 @@ class SamplesTest {
     @Nested
     @DisplayName("using groovy build scripts")
     class UsingGroovyBuildScripts extends Samples {
-        @Override
-        BuildResult executeBuild(Path projectDir) {
-            return SamplesTest.executeBuild(projectDir)
+
+        UsingGroovyBuildScripts() {
+            super(Paths.get("samples", "groovy"))
+        }
+
+        @Test
+        void 'multi project plugin'() {
+            BuildResult result = executeBuild(samples.resolve('multi-project-plugin'))
+
+            assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
         }
     }
 
     @Nested
     @DisplayName("using kotlin build scripts")
     class UsingKotlinBuildScripts extends Samples {
-        @Override
-        BuildResult executeBuild(Path projectDir) {
-            executeBuild(projectDir, '-c', 'settings.gradle.kts', 'clean', 'build')
+
+        UsingKotlinBuildScripts() {
+            super(Paths.get("samples", "kotlin"))
+        }
+
+        @Test
+        void 'build kotlin plugin'() {
+            BuildResult result = executeBuild(samples.resolve('kotlin-plugin'))
+
+            assertThat(result.task(':server:build').getOutcome(), is(SUCCESS))
         }
     }
 
     private static BuildResult executeBuild(Path projectDir, String... args = ['clean', 'build']) {
         BuildResult result = GradleRunner.create()
                 .withProjectDir(projectDir.toFile())
-                .withArguments('--warning-mode', 'all', *args) // TODO change to 'fail' once use of deprecated features has been removed
+                .withArguments('--warning-mode', 'fail', *args)
                 .withPluginClasspath()
                 .forwardOutput()
                 .build()
