@@ -83,27 +83,6 @@ gradlePlugin {
             implementationClass = "com.github.rodm.teamcity.TeamCityEnvironmentsPlugin"
             tags.set(listOf("teamcity"))
         }
-
-        create("deprecatedServerPlugin") {
-            id = "com.github.rodm.teamcity-server"
-            displayName = "Gradle TeamCity Server plugin"
-            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityServerPlugin"
-        }
-        create("deprecatedAgentPlugin") {
-            id = "com.github.rodm.teamcity-agent"
-            displayName = "Gradle TeamCity Agent plugin"
-            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityAgentPlugin"
-        }
-        create("deprecatedCommonPlugin") {
-            id = "com.github.rodm.teamcity-common"
-            displayName = "Gradle TeamCity Common API plugin"
-            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityCommonPlugin"
-        }
-        create("deprecatedEnvironmentsPlugin") {
-            id = "com.github.rodm.teamcity-environments"
-            displayName = "Gradle TeamCity Environments plugin"
-            implementationClass = "com.github.rodm.teamcity.DeprecatedTeamCityEnvironmentsPlugin"
-        }
     }
 }
 
