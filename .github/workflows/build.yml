@@ -24,14 +24,10 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
-      - name: Gradle version
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: --version
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -s build
+          arguments: --show-version -s build
 
   test:
     runs-on: ${{ matrix.os }}
