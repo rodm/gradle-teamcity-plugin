@@ -27,7 +27,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: --show-version --warning-mode=all -s build
+          arguments: --show-version -s build
 
   test:
     runs-on: ${{ matrix.os }}
