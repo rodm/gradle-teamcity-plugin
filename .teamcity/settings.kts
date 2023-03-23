@@ -1,7 +1,7 @@
 
 import com.github.rodm.teamcity.pipeline
-import com.github.rodm.teamcity.gradle.switchGradleBuildStep
 import com.github.rodm.teamcity.project.githubIssueTracker
+import jetbrains.buildServer.configs.kotlin.BuildSteps
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.version
 import jetbrains.buildServer.configs.kotlin.project
@@ -13,7 +13,9 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.N
 
 version = "2022.10"
 
-val versionsMap = mapOf(
+val javaVersionsSupportedByProjectGradle = (8..18).map { it.toString() }
+
+val javaVersionsSupportedByGradleVersionMap = mapOf(
     "16" to "7.0.2",
     "17" to "7.3",
     "18" to "7.5.1",
@@ -21,8 +23,18 @@ val versionsMap = mapOf(
 )
 
 fun supportedGradleVersion(javaVersion: String?): String? {
-    if (!versionsMap.containsKey(javaVersion)) throw IllegalArgumentException("Unsupported Java version: ${javaVersion}")
-    return versionsMap[javaVersion]
+    if (javaVersion in javaVersionsSupportedByProjectGradle) return null
+    if (javaVersion !in javaVersionsSupportedByGradleVersionMap.keys) throw IllegalArgumentException("Unsupported Java version: ${javaVersion}")
+    return javaVersionsSupportedByGradleVersionMap[javaVersion]
+}
+
+fun BuildSteps.switchGradleBuildStep(javaHome: String, gradleVersion: String) {
+    gradle {
+        id = "SWITCH_GRADLE"
+        name = "Switch Gradle"
+        tasks = "wrapper --gradle-version $gradleVersion"
+        jdkHome = javaHome
+    }
 }
 
 project {
@@ -147,7 +159,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("8", "11", "17", "18")
+                    "Java"("8", "11", "17", "18", "19")
                 }
                 build {
                     val javaVersion = axes["Java"]
@@ -159,30 +171,13 @@ project {
                         param("gradle.tasks", "clean functionalTest")
                         param("java.home", "%java${javaVersion}.home%")
                     }
-                }
-            }
 
-            matrix {
-                axes {
-                    "Java"("19")
-                }
-                build {
-                    val javaVersion = axes["Java"]
                     val gradleVersion = supportedGradleVersion(javaVersion)
-                    id("BuildFunctionalTestJava${javaVersion}")
-                    name = "Build - Functional Test - Java ${javaVersion}"
-                    templates(buildTemplate)
-
-                    params {
-                        param("gradle.tasks", "clean functionalTest")
-                        param("gradle.version", "${gradleVersion}")
-                        param("default.java.home", "%java8.home%")
-                        param("java.home", "%java${javaVersion}.home%")
-                    }
-
-                    steps {
-                        switchGradleBuildStep()
-                        stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                    gradleVersion?.apply {
+                        steps {
+                            switchGradleBuildStep("%java8.home%", gradleVersion)
+                            stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                        }
                     }
                 }
             }
