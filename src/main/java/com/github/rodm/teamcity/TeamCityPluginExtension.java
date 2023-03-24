@@ -16,9 +16,6 @@
 package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
-import org.gradle.api.file.CopySpec;
-
-import java.util.Map;
 
 /**
  * TeamCity Plugin extension.
@@ -77,14 +74,6 @@ public interface TeamCityPluginExtension {
      */
     void server(Action<ServerPluginConfiguration> configuration);
     ServerPluginConfiguration getServer();
-
-    void setDescriptor(Object descriptor);
-    void descriptor(Action<?> configuration);
-
-    CopySpec files(Action<CopySpec> configuration);
-
-    void setTokens(Map<String, Object> tokens);
-    void tokens(Map<String, Object> tokens);
 
     /**
      * Configures the TeamCity environments.

@@ -424,57 +424,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void deprecatedDescriptorCreationForServerProjectType() {
-        project.teamcity {
-            descriptor {
-            }
-        }
-
-        assertThat(extension.server.descriptor, isA(ServerPluginDescriptor))
-        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
-    }
-
-    @Test
-    void deprecatedDescriptorAssignmentForServerProjectType() {
-        project.teamcity {
-            descriptor = project.file('teamcity-plugin.xml')
-        }
-
-        assertThat(extension.server.descriptorFile.isPresent(), is(true))
-        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
-    }
-
-    @Test
-    void deprecatedAdditionalFilesForServerPlugin() {
-        project.teamcity {
-            files {
-            }
-        }
-
-        assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
-    }
-
-    @Test
-    void deprecatedTokensForServerPlugin() {
-        project.teamcity {
-            tokens VERSION: project.version
-        }
-
-        assertThat(extension.server.tokens.size(), is(1))
-        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
-    }
-
-    @Test
-    void deprecatedTokensAssignmentForServerPlugin() {
-        project.teamcity {
-            tokens = [VERSION: project.version]
-        }
-
-        assertThat(extension.server.tokens.size(), is(1))
-        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
-    }
-
-    @Test
     void configuringAgentWithOnlyServerPluginFails() {
         def expected = assertThrows(InvalidUserDataException, {
             project.teamcity {

@@ -385,58 +385,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void deprecatedDescriptorCreationForAgentProjectType() {
-        project.teamcity {
-            descriptor {
-            }
-        }
-
-        assertThat(extension.agent.descriptor, isA(AgentPluginDescriptor))
-        assertThat(extension.agent.descriptorFile.isPresent(), is(false))
-        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
-    }
-
-    @Test
-    void deprecatedDescriptorAssignmentForAgentProjectType() {
-        project.teamcity {
-            descriptor = project.file('teamcity-plugin.xml')
-        }
-
-        assertThat(extension.agent.descriptorFile.isPresent(), is(true))
-        assertThat(outputEventListener.toString(), containsString('descriptor property is deprecated'))
-    }
-
-    @Test
-    void deprecatedAdditionalFilesForAgentPlugin() {
-        project.teamcity {
-            files {
-            }
-        }
-
-        assertThat(outputEventListener.toString(), containsString('files property is deprecated'))
-    }
-
-    @Test
-    void deprecatedTokensForAgentPlugin() {
-        project.teamcity {
-            tokens VERSION: project.version
-        }
-
-        assertThat(extension.agent.tokens.size(), is(1))
-        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
-    }
-
-    @Test
-    void deprecatedTokensAssignmentForAgentPlugin() {
-        project.teamcity {
-            tokens = [VERSION: project.version]
-        }
-
-        assertThat(extension.agent.tokens.size(), is(1))
-        assertThat(outputEventListener.toString(), containsString('tokens property is deprecated'))
-    }
-
-    @Test
     void configuringServerWithOnlyAgentPluginFails() {
         def expected = assertThrows(InvalidUserDataException, {
             project.teamcity {

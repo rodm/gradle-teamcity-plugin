@@ -19,12 +19,9 @@ import com.github.rodm.teamcity.*;
 import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.Project;
-import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.provider.Property;
-
-import java.util.Map;
 
 import static com.github.rodm.teamcity.ValidationMode.WARN;
 
@@ -139,56 +136,6 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
 
     public ServerPluginConfiguration getServer() {
         return server;
-    }
-
-    @Override
-    public void setDescriptor(Object descriptor) {
-        project.getLogger().warn("descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.setDescriptor(descriptor);
-        } else {
-            server.setDescriptor(descriptor);
-        }
-    }
-
-    @Override
-    public void descriptor(Action<?> configuration) {
-        project.getLogger().warn("descriptor property is deprecated. Please use the descriptor property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.descriptor((Action<AgentPluginDescriptor>) configuration);
-        } else {
-            server.descriptor((Action<ServerPluginDescriptor>) configuration);
-        }
-    }
-
-    @Override
-    public CopySpec files(Action<CopySpec> configuration) {
-        project.getLogger().warn("files property is deprecated. Please use the files property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            return agent.files(configuration);
-        } else {
-            return server.files(configuration);
-        }
-    }
-
-    @Override
-    public void setTokens(Map<String, Object> tokens) {
-        project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.setTokens(tokens);
-        } else {
-            server.setTokens(tokens);
-        }
-    }
-
-    @Override
-    public void tokens(Map<String, Object> tokens) {
-        project.getLogger().warn("tokens property is deprecated. Please use the tokens property in the agent or server configuration.");
-        if (project.getPlugins().hasPlugin(TeamCityAgentPlugin.class)) {
-            agent.tokens(tokens);
-        } else {
-            server.tokens(tokens);
-        }
     }
 
     @Override
