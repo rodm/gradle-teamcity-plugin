@@ -7,35 +7,29 @@
 
 The following projects demonstrate the features of the Gradle TeamCity plugin.
 
-* `server-plugin` : A simple server-side only plugin.
-* `agent-server-plugin` : A simple plugin with an agent-side and a server-side component.
-* `multi-project-plugin` : A plugin with agent-side and server-side built from multiple Gradle projects.
-* `agent-tool-plugin` : A simple tool plugin that repackages Apache Maven.
-* `kotlin-plugin` : A simple plugin with an agent-side and a server-side component written in Kotlin and built
+* `server-plugin` - A simple server-side only plugin.
+* `agent-server-plugin` - A simple plugin with an agent-side and a server-side component. This example uses external
+TeamCity plugin descriptor files.
+* `multi-project-plugin` - A plugin with agent-side and server-side built from multiple Gradle projects.
+* `agent-tool-plugin` - A simple tool plugin that repackages Apache Maven.
+* `kotlin-plugin` - A simple plugin with an agent-side and a server-side component written in Kotlin and built
 with scripts written in Kotlin using {uri-gradle-kotlin}[Gradle Kotlin DSL].
-* `multiple-plugins` : A sample demonstrating building and deploying multiple plugins to a TeamCity environment.
-* `reloadable-plugin` : A sample demonstrating reloading of a modified plugin without restarting the TeamCity environment.
-* `sakura-ui-plugin` : A sample demonstrating building a Sakura UI plugin.
-* `docker-environment` : A sample that uses {uri-docker-desktop}[Docker] to run the server and agent containers.
+* `multiple-plugins` - A sample demonstrating building and deploying multiple plugins to a TeamCity environment.
+* `reloadable-plugin` - A sample demonstrating reloading of a modified plugin without restarting the TeamCity environment.
+* `sakura-ui-plugin` - A sample demonstrating building a Sakura UI plugin.
+* `docker-environment` - A sample that uses {uri-docker-desktop}[Docker] to run the server and agent containers.
 
-Each sample includes Gradle build scripts using the Groovy DSL and the Kotlin DSL,
-except `multi-project-plugin` and `kotlin-plugin` that are equivalent projects.
+Each sample has a project with Gradle build scripts using the Groovy DSL and the Kotlin DSL, found in the `groovy`
+and `kotlin` directories, except `multi-project-plugin` and `kotlin-plugin` that are equivalent projects.
 
 == To build the plugins
 
 To build a sample plugin change into the plugin's directory then execute the following Gradle task
 
+[subs="attributes"]
+----
     ../../gradlew build
-
-By default, the Groovy DSL build scripts are used, to use the Kotlin DSL build scripts execute the
-following Gradle task
-
-    ../../gradlew -c settings.gradle.kts build
-
-The `server-plugin` sample contains an alternative build file the demonstrates using an external descriptor file.
-The plugin can be built by executing the following command.
-
-    ../../gradlew --include-build=../.. -b build-alt.gradle clean build
+----
 
 To download and install a TeamCity distribution to test the plugin execute the following Gradle task
 
@@ -48,7 +42,7 @@ This command will take some time but only needs to be executed once. To have the
 installation set the `teamcity.environments.baseHomeDir` Gradle property in a `gradle.properties` file for each
 project.
 
-To deploy the plugin to TeamCity execute the following task
+To deploy the plugin to TeamCity execute the following task, the `deploy` task is also executed when starting the server.
 
 [subs="attributes"]
 ----
