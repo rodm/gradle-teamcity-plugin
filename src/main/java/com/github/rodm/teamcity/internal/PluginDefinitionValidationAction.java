@@ -30,7 +30,8 @@ import static com.github.rodm.teamcity.ValidationMode.IGNORE;
 
 public class PluginDefinitionValidationAction implements Action<Task> {
 
-    private static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class %s was not found in the jar.";
+    private static final String NO_BEAN_CLASS_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the implementation class '%s' was not found in the jar.";
+    private static final String NO_BEAN_CLASS_ATTRIBUTE_WARNING_MESSAGE = "%s: Plugin definition file %s defines a bean but the class attribute is missing.";
     private static final String NO_BEAN_CLASSES_WARNING_MESSAGE = "%s: Plugin definition file %s contains no beans.";
     private static final String NO_BEAN_CLASSES_NON_PARSED_WARNING_MESSAGE = "%s: Failed to parse plugin definition file %s: %s";
     private static final String NO_DEFINITION_WARNING_MESSAGE = "%s: No valid plugin definition files were found in META-INF";
@@ -82,9 +83,14 @@ public class PluginDefinitionValidationAction implements Action<Task> {
             report(task, String.format(NO_BEAN_CLASSES_WARNING_MESSAGE, task.getPath(), definition.getName()));
         } else {
             for (PluginBean bean : beans) {
-                String fqcn = bean.getClassName().replace(".", "/") + ".class";
-                if (!classes.contains(fqcn)) {
-                    report(task, String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.getName(), bean.getClassName()));
+                String className = bean.getClassName();
+                if (className == null) {
+                    report(task, String.format(NO_BEAN_CLASS_ATTRIBUTE_WARNING_MESSAGE, task.getPath(), definition.getName()));
+                } else {
+                    String fqcn = className.replace(".", "/") + ".class";
+                    if (!classes.contains(fqcn)) {
+                        report(task, String.format(NO_BEAN_CLASS_WARNING_MESSAGE, task.getPath(), definition.getName(), className));
+                    }
                 }
             }
         }

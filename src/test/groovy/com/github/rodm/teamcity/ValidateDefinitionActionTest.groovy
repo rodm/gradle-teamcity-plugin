@@ -40,6 +40,7 @@ import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 import static com.github.rodm.teamcity.ValidationMode.WARN
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASSES_WARNING_MESSAGE
+import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_ATTRIBUTE_WARNING_MESSAGE
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_BEAN_CLASS_WARNING_MESSAGE
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.hamcrest.CoreMatchers.containsString
@@ -61,6 +62,13 @@ class ValidateDefinitionActionTest {
             </beans>
         """
 
+    public static final String MISSING_CLASS_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+            <beans default-autowire="constructor">
+                <bean id="examplePlugin"/>
+            </beans>
+        """
+
     public static final String EMPTY_BEAN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
             <beans default-autowire="constructor">
@@ -70,6 +78,7 @@ class ValidateDefinitionActionTest {
     private static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
     private static final String NO_BEAN_CLASS_WARNING = NO_BEAN_CLASS_WARNING_MESSAGE.substring(4)
     private static final String NO_BEAN_CLASSES_WARNING = NO_BEAN_CLASSES_WARNING_MESSAGE.substring(4)
+    private static final String NO_BEAN_CLASS_ATTRIBUTE_WARNING = NO_BEAN_CLASS_ATTRIBUTE_WARNING_MESSAGE.substring(4)
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
 
@@ -163,6 +172,34 @@ class ValidateDefinitionActionTest {
         pluginValidationAction.execute(stubTask)
 
         assertThat(outputEventListener.toString(), not(containsString(NO_DEFINITION_WARNING)))
+    }
+
+    @Test
+    void 'log warning message for missing class attribute'() {
+        File definitionFile = project.file('build-server-plugin.xml')
+        definitionFile << MISSING_CLASS_DEFINITION_FILE
+        definitions.add(new PluginDefinition(definitionFile))
+        Action<Task> pluginValidationAction = createValidationAction()
+        outputEventListener.reset()
+
+        pluginValidationAction.execute(stubTask)
+
+        String expectedMessage = String.format(NO_BEAN_CLASS_ATTRIBUTE_WARNING, 'build-server-plugin.xml')
+        assertThat(outputEventListener.toString(), containsString(expectedMessage))
+    }
+
+    @Test
+    void 'no warning message for missing class attribute with validation mode set to ignore'() {
+        File definitionFile = project.file('build-server-plugin.xml')
+        definitionFile << MISSING_CLASS_DEFINITION_FILE
+        definitions.add(new PluginDefinition(definitionFile))
+        Action<Task> pluginValidationAction = createValidationAction(IGNORE)
+        outputEventListener.reset()
+
+        pluginValidationAction.execute(stubTask)
+
+        String expectedMessage = String.format(NO_BEAN_CLASS_ATTRIBUTE_WARNING, 'build-server-plugin.xml')
+        assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
     }
 
     @Test
