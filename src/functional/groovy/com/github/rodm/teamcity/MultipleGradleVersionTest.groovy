@@ -41,7 +41,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static List<String> gradleVersions() {
         return [
             '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6.1',
-            '8.0.2'
+            '8.0.2', '8.1.1'
         ]
     }
 
