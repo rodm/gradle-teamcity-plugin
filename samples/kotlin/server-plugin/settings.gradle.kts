@@ -1,4 +1,4 @@
 
 rootProject.name = "server-plugin"
 
-includeBuild ("../..")
+includeBuild ("../../..")

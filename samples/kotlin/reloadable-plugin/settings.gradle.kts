@@ -1,4 +1,4 @@
 
 rootProject.name = "reloadable-plugin"
 
-includeBuild ("../..")
+includeBuild ("../../..")

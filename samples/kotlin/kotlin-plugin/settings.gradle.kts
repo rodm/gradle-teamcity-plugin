@@ -12,4 +12,4 @@ include("common")
 include("agent")
 include("server")
 
-includeBuild("../..")
+includeBuild("../../..")

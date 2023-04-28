@@ -7,4 +7,4 @@ pluginManagement {
 
 rootProject.name = "agent-tool-plugin"
 
-includeBuild ("../..")
+includeBuild ("../../..")
