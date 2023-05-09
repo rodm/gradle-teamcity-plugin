@@ -400,30 +400,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     }
 
     @Test
-    void deprecatedEnvironmentsConfiguration() {
-        project.teamcity {
-            version = '8.1.5'
-            server {
-                downloadsDir = '/tmp'
-                baseDownloadUrl = 'http://repository/'
-                baseDataDir = '/tmp/data'
-                baseHomeDir = '/tmp/servers'
-                environments {
-                    teamcity {
-                    }
-                }
-            }
-        }
-
-        String output = outputEventListener.toString()
-        assertThat(output, containsString('downloadsDir property in server configuration is deprecated'))
-        assertThat(output, containsString('baseDownloadUrl property in server configuration is deprecated'))
-        assertThat(output, containsString('baseDataDir property in server configuration is deprecated'))
-        assertThat(output, containsString('baseHomeDir property in server configuration is deprecated'))
-        assertThat(output, containsString('environments configuration in server configuration is deprecated'))
-    }
-
-    @Test
     void configuringAgentWithOnlyServerPluginFails() {
         def expected = assertThrows(InvalidUserDataException, {
             project.teamcity {

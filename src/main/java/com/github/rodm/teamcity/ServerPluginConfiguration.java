@@ -18,34 +18,22 @@ package com.github.rodm.teamcity;
 import com.github.rodm.teamcity.internal.DefaultPublishConfiguration;
 import com.github.rodm.teamcity.internal.DefaultSignConfiguration;
 import org.gradle.api.Action;
-import org.gradle.api.InvalidUserDataException;
-import org.gradle.api.NamedDomainObjectFactory;
-import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtensionAware;
-
-import java.io.File;
 
 /**
  * Server-side plugin configuration
  */
-public class ServerPluginConfiguration extends PluginConfiguration implements TeamCityEnvironments {
-
-    private static final Logger LOGGER = Logging.getLogger(ServerPluginConfiguration.class);
+public class ServerPluginConfiguration extends PluginConfiguration {
 
     private final ConfigurableFileCollection web;
     private PublishConfiguration publish;
     private SignConfiguration sign;
 
-    private final TeamCityEnvironments environments;
-
-    public ServerPluginConfiguration(Project project, TeamCityEnvironments environments) {
+    public ServerPluginConfiguration(Project project) {
         super(project);
         this.web = project.getObjects().fileCollection();
-        this.environments = environments;
     }
 
     /**
@@ -102,89 +90,5 @@ public class ServerPluginConfiguration extends PluginConfiguration implements Te
 
     public SignConfiguration getSign() {
         return sign;
-    }
-
-    public void setDownloadsDir(String downloadsDir) {
-        LOGGER.warn("downloadsDir property in server configuration is deprecated");
-        environments.setDownloadsDir(downloadsDir);
-    }
-
-    public String getDownloadsDir() {
-        return environments.getDownloadsDir();
-    }
-
-    public void setBaseDownloadUrl(String baseDownloadUrl) {
-        LOGGER.warn("baseDownloadUrl property in server configuration is deprecated");
-        environments.setBaseDownloadUrl(baseDownloadUrl);
-    }
-
-    public String getBaseDownloadUrl() {
-        return environments.getBaseDownloadUrl();
-    }
-
-    public void setBaseHomeDir(String baseHomeDir) {
-        LOGGER.warn("baseHomeDir property in server configuration is deprecated");
-        environments.setBaseHomeDir(baseHomeDir);
-    }
-
-    public void setBaseHomeDir(File baseHomeDir) {
-        LOGGER.warn("baseHomeDir property in server configuration is deprecated");
-        environments.setBaseHomeDir(baseHomeDir);
-    }
-
-    public String getBaseHomeDir() {
-        return environments.getBaseHomeDir();
-    }
-
-    public void setBaseDataDir(String baseDataDir) {
-        LOGGER.warn("baseDataDir property in server configuration is deprecated");
-        environments.setBaseDataDir(baseDataDir);
-    }
-
-    public void setBaseDataDir(File baseDataDir) {
-        LOGGER.warn("baseDataDir property in server configuration is deprecated");
-        environments.setBaseDataDir(baseDataDir);
-    }
-
-    public String getBaseDataDir() {
-        return environments.getBaseDataDir();
-    }
-
-    public void environments(Action<TeamCityEnvironments> configuration) {
-        LOGGER.warn("environments configuration in server configuration is deprecated");
-        configuration.execute(environments);
-    }
-
-    public TeamCityEnvironment getByName(String name) {
-        return environments.getByName(name);
-    }
-
-    public NamedDomainObjectProvider<TeamCityEnvironment> named(String name) {
-        return environments.named(name);
-    }
-
-    @Override
-    public LocalTeamCityEnvironment create(String name, Action<LocalTeamCityEnvironment> action) {
-        return environments.create(name, LocalTeamCityEnvironment.class, action);
-    }
-
-    @Override
-    public NamedDomainObjectProvider<LocalTeamCityEnvironment> register(String name, Action<LocalTeamCityEnvironment> action) {
-        return environments.register(name, LocalTeamCityEnvironment.class, action);
-    }
-
-    @Override
-    public <T extends TeamCityEnvironment> T create(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
-        return environments.create(name, type, action);
-    }
-
-    @Override
-    public <T extends TeamCityEnvironment> NamedDomainObjectProvider<T> register(String name, Class<T> type, Action<? super T> action) throws InvalidUserDataException {
-        return environments.register(name, type, action);
-    }
-
-    @Override
-    public <T extends TeamCityEnvironment> void registerFactory(Class<T> type, NamedDomainObjectFactory<T> factory) {
-        environments.registerFactory(type, factory);
     }
 }
