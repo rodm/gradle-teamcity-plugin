@@ -71,11 +71,12 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.CoreMatchers.hasItem
-import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.greaterThan
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isA
+import static org.hamcrest.Matchers.notNullValue
 import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.Matchers.not
 import static org.junit.jupiter.api.Assertions.assertThrows
@@ -85,12 +86,20 @@ import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
+@SuppressWarnings('ConfigurationAvoidance')
 class ServerConfigurationTest extends ConfigurationTestCase {
 
     @BeforeEach
     void applyPlugin() {
         project.apply plugin: 'io.github.rodm.teamcity-server'
         extension = project.getExtensions().getByType(TeamCityPluginExtension)
+    }
+
+    @Test
+    void 'server plugin adds named plugin configuration extension'(){
+        def agent = extension.extensions.findByName('server')
+        assertThat(agent, is(notNullValue()))
+        assertThat(agent, isA(ServerPluginConfiguration))
     }
 
     @Test
@@ -373,7 +382,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(contents, containsString('456'))
     }
 
-    @Test
+    @Test @SuppressWarnings('GroovyAccessibility')
     void 'server plugin archive includes additional files'() {
         project.teamcity {
             server {
@@ -397,16 +406,6 @@ class ServerConfigurationTest extends ConfigurationTestCase {
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1.txt'))
         assertThat(entries, hasItem('files/file2.txt'))
-    }
-
-    @Test
-    void configuringAgentWithOnlyServerPluginFails() {
-        def expected = assertThrows(InvalidUserDataException, {
-            project.teamcity {
-                agent {}
-            }
-        }, 'Configuring agent block should fail when the agent plugin is not applied')
-        assertThat(expected.message, equalTo('Agent plugin configuration is invalid for a project without the teamcity-agent plugin'))
     }
 
     @Test
@@ -850,7 +849,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
     @Nested
     class PublishExecutionTest {
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'publish action logs successful uploaded to default channel'() {
             def pluginFile = project.file('test-plugin.zip')
             PublishAction publish = new MockPublishAction(project)
@@ -903,7 +902,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             verify(publish.uploader).uploadPlugin(eq('TestPluginId'), eq(pluginFile), eq(''), eq('change notes'))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'publish task throws exception if channels list is empty'() {
             project.teamcity {
                 server {
@@ -948,6 +947,7 @@ class ServerConfigurationTest extends ConfigurationTestCase {
             assertThat(expected.message, containsString('Cannot upload plugin.'))
         }
 
+        @SuppressWarnings('GroovyAccessibility')
         static class TestPublishParameters implements PublishAction.PublishParameters {
             Property<String> host
             ListProperty<String> channels

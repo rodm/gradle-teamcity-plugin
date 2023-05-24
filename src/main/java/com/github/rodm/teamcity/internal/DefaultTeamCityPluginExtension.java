@@ -15,12 +15,9 @@
  */
 package com.github.rodm.teamcity.internal;
 
-import com.github.rodm.teamcity.*;
-import org.gradle.api.Action;
-import org.gradle.api.InvalidUserDataException;
+import com.github.rodm.teamcity.TeamCityPluginExtension;
+import com.github.rodm.teamcity.ValidationMode;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.provider.Property;
 
 import static com.github.rodm.teamcity.ValidationMode.WARN;
@@ -37,22 +34,11 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
     private final Property<Boolean> allowSnapshotVersions;
     private final Property<ValidationMode> validateBeanDefinition;
 
-    private final AgentPluginConfiguration agent;
-    private final ServerPluginConfiguration server;
-    private final TeamCityEnvironments environments;
-
-    private final transient Project project;
-
     public DefaultTeamCityPluginExtension(Project project) {
-        this.project = project;
         this.version = project.getObjects().property(String.class).convention(DEFAULT_TEAMCITY_API_VERSION);
         this.defaultRepositories = project.getObjects().property(Boolean.class).convention(true);
         this.allowSnapshotVersions = project.getObjects().property(Boolean.class).convention(false);
         this.validateBeanDefinition = project.getObjects().property(ValidationMode.class).convention(WARN);
-        ExtensionContainer extensions = ((ExtensionAware) this).getExtensions();
-        this.environments = extensions.create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
-        this.agent = extensions.create("agent", AgentPluginConfiguration.class, project);
-        this.server = extensions.create("server", ServerPluginConfiguration.class, project);
     }
 
     @Override
@@ -114,40 +100,5 @@ public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
 
     public Property<ValidationMode> getValidateBeanDefinitionProperty() {
         return validateBeanDefinition;
-    }
-
-    @Override
-    public void agent(Action<AgentPluginConfiguration> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityAgentPlugin.class))
-            throw new InvalidUserDataException("Agent plugin configuration is invalid for a project without the teamcity-agent plugin");
-        configuration.execute(agent);
-    }
-
-    public AgentPluginConfiguration getAgent() {
-        return agent;
-    }
-
-    @Override
-    public void server(Action<ServerPluginConfiguration> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityServerPlugin.class))
-            throw new InvalidUserDataException("Server plugin configuration is invalid for a project without the teamcity-server plugin");
-        configuration.execute(server);
-    }
-
-    public ServerPluginConfiguration getServer() {
-        return server;
-    }
-
-    @Override
-    public void environments(Action<TeamCityEnvironments> configuration) {
-        if (!project.getPlugins().hasPlugin(TeamCityEnvironmentsPlugin.class)) {
-            project.getLogger().warn("Configuring environments with the teamcity-server plugin is deprecated. Please use the teamcity-environments plugin.");
-        }
-        configuration.execute(environments);
-    }
-
-    @Override
-    public TeamCityEnvironments getEnvironments() {
-        return environments;
     }
 }

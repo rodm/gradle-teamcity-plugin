@@ -40,6 +40,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
@@ -62,6 +63,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         project.getPluginManager().apply(TeamCityPlugin.class);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
+        ((ExtensionAware) extension).getExtensions().create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         configureRepository(project, extension);
         configureConfiguration(project);
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension));
@@ -96,7 +98,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         @Override
         public void execute(final Project project) {
-            DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) extension.getEnvironments();
+            DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments();
             NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
             container.withType(LocalTeamCityEnvironment.class).all(environment -> {
                 configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
@@ -108,6 +110,10 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
                 configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
             });
+        }
+
+        private TeamCityEnvironments getEnvironments() {
+            return ((ExtensionAware) extension).getExtensions().getByType(TeamCityEnvironments.class);
         }
 
         private void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {

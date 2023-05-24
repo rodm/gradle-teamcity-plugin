@@ -18,6 +18,7 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.CoreMatchers.equalTo
@@ -47,11 +48,17 @@ class EnvironmentsKotlinTest {
 
     operator fun TeamCityPluginExtension.invoke(block: TeamCityPluginExtension.() -> Unit) = block()
 
+    operator fun TeamCityEnvironments.invoke(block: TeamCityEnvironments.() -> Unit) = block()
+
+    private val TeamCityPluginExtension.environments: TeamCityEnvironments get() {
+        return (this as ExtensionAware).extensions.getByType(TeamCityEnvironments::class.java)
+    }
+
     @Test
     fun `replace default agent options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = create(this, block)
 
                 "test" {
                     agentOptions = "-DnewOption1=value1"
@@ -68,7 +75,7 @@ class EnvironmentsKotlinTest {
     fun `replace default agent options with multiple values`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = create(this, block)
 
                 "test" {
                     agentOptions = listOf("-Doption1=value1", "-Doption2=value2")
@@ -84,7 +91,7 @@ class EnvironmentsKotlinTest {
     fun `clear default server options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = create(this, block)
 
                 "test" {
                     serverOptions = emptyList<String>()
@@ -100,7 +107,7 @@ class EnvironmentsKotlinTest {
     fun `replace default server options`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = create(this, block)
 
                 "test" {
                     serverOptions = "-DnewOption=test"
@@ -116,7 +123,7 @@ class EnvironmentsKotlinTest {
     fun `replace default server options with multiple values`() {
         teamcity {
             environments {
-                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = it.create(this, block)
+                operator fun String.invoke(block: TeamCityEnvironment.() -> Unit) = create(this, block)
 
                 "test" {
                     serverOptions = listOf("-Doption1=value1", "-Doption2=value2")
@@ -132,7 +139,7 @@ class EnvironmentsKotlinTest {
     fun `improve kotlin dsl by supporting create method`() {
         teamcity {
             environments {
-                it.create("test") {
+                create("test") {
                     it.version = "2020.1"
                 }
             }
@@ -146,7 +153,7 @@ class EnvironmentsKotlinTest {
     fun `improve kotlin dsl by supporting register method`() {
         teamcity {
             environments {
-                it.register("test") {
+                register("test") {
                     it.version = "2020.1"
                 }
             }
@@ -160,7 +167,7 @@ class EnvironmentsKotlinTest {
     fun `set java home`() {
         teamcity {
             environments {
-                it.register("test") {
+                register("test") {
                     it.version = "2020.1"
                     it.javaHome = "/opt/java1.8.0"
                 }

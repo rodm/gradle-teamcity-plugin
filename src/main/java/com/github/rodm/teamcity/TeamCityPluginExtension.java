@@ -15,8 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Action;
-
 /**
  * TeamCity Plugin extension.
  */
@@ -54,34 +52,4 @@ public interface TeamCityPluginExtension {
     void setValidateBeanDefinition(ValidationMode mode);
     void setValidateBeanDefinition(String mode);
     ValidationMode getValidateBeanDefinition();
-
-    /**
-     * Configures the agent-side plugin.
-     *
-     * <p>The given action is executed to configure the agent-side plugin configuration.</p>
-     *
-     * @param configuration The action.
-     */
-    void agent(Action<AgentPluginConfiguration> configuration);
-    AgentPluginConfiguration getAgent();
-
-    /**
-     * Configures the server-side plugin.
-     *
-     * <p>The given action is executed to configure the server-side plugin configuration.</p>
-     *
-     * @param configuration The action.
-     */
-    void server(Action<ServerPluginConfiguration> configuration);
-    ServerPluginConfiguration getServer();
-
-    /**
-     * Configures the TeamCity environments.
-     *
-     * <p>The given action is executed to configure the environments.</p>
-     *
-     * @param configuration The action.
-     */
-    void environments(Action<TeamCityEnvironments> configuration);
-    TeamCityEnvironments getEnvironments();
 }

@@ -35,21 +35,30 @@ import static com.github.rodm.teamcity.TestSupport.normalizePath
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.endsWith
 import static org.hamcrest.CoreMatchers.hasItem
-import static org.hamcrest.CoreMatchers.isA
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isA
+import static org.hamcrest.Matchers.notNullValue
 import static org.hamcrest.Matchers.nullValue
 import static org.junit.jupiter.api.Assertions.assertThrows
 
+@SuppressWarnings('ConfigurationAvoidance')
 class AgentConfigurationTest extends ConfigurationTestCase {
 
     @BeforeEach
     void applyPlugin() {
         project.apply plugin: 'io.github.rodm.teamcity-agent'
         extension = project.extensions.getByType(TeamCityPluginExtension)
+    }
+
+    @Test
+    void 'agent plugin adds named plugin configuration extension'(){
+        def agent = extension.extensions.findByName('agent')
+        assertThat(agent, is(notNullValue()))
+        assertThat(agent, isA(AgentPluginConfiguration))
     }
 
     @Test
@@ -358,7 +367,7 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         assertThat(extension.agent.tokens, hasEntry('BUILD_NUMBER', '123'))
     }
 
-    @Test
+    @Test @SuppressWarnings('GroovyAccessibility')
     void 'agent plugin archive includes additional files'() {
         project.teamcity {
             agent {
@@ -382,16 +391,6 @@ class AgentConfigurationTest extends ConfigurationTestCase {
         assertThat(entries, hasItem('files/'))
         assertThat(entries, hasItem('files/file1.txt'))
         assertThat(entries, hasItem('files/file2.txt'))
-    }
-
-    @Test
-    void configuringServerWithOnlyAgentPluginFails() {
-        def expected = assertThrows(InvalidUserDataException, {
-            project.teamcity {
-                server {}
-            }
-        }, 'Configuring server block should fail when the server plugin is not applied')
-        assertThat(expected.message, equalTo('Server plugin configuration is invalid for a project without the teamcity-server plugin'))
     }
 
     @Test

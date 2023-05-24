@@ -27,6 +27,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCopyDetails;
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginManager;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskContainer;
@@ -72,6 +73,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
         });
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
+        ((ExtensionAware) extension).getExtensions().create("agent", AgentPluginConfiguration.class, project);
         configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureTasks(project, extension);
@@ -88,7 +90,7 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
     public void configureTasks(final Project project, final TeamCityPluginExtension extension) {
         final PluginManager plugins = project.getPluginManager();
         final TaskContainer tasks = project.getTasks();
-        final AgentPluginConfiguration agent = extension.getAgent();
+        final AgentPluginConfiguration agent = ((ExtensionAware) extension).getExtensions().getByType(AgentPluginConfiguration.class);
         final Provider<RegularFile> descriptorFile = project.getLayout().getBuildDirectory().file(AGENT_PLUGIN_DESCRIPTOR_DIR + "/" + PLUGIN_DESCRIPTOR_FILENAME);
 
         final TaskProvider<ProcessDescriptor> processDescriptor =

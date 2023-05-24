@@ -69,8 +69,10 @@ import static org.hamcrest.Matchers.endsWith
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasItem
 import static org.hamcrest.Matchers.hasSize
+import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.not
+import static org.hamcrest.Matchers.notNullValue
 import static org.hamcrest.Matchers.startsWith
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertFalse
@@ -80,6 +82,7 @@ import static org.junit.jupiter.api.Assertions.fail
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
+@SuppressWarnings('ConfigurationAvoidance')
 class EnvironmentsTest {
 
     @TempDir
@@ -769,7 +772,7 @@ class EnvironmentsTest {
             assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'teamcity task outputs no warning when environment version matches installed version'() {
             createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
             project.teamcity {
@@ -788,7 +791,7 @@ class EnvironmentsTest {
             assertThat(outputEventListener.toString(), not(containsString(expectedMessage)))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'teamcity task outputs a warning when environment version does not match at bugfix level'() {
             File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
             project.teamcity {
@@ -808,7 +811,7 @@ class EnvironmentsTest {
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'teamcity task outputs a warning when environment version does not match EAP level'() {
             File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 EAP1')
             project.teamcity {
@@ -828,7 +831,7 @@ class EnvironmentsTest {
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'teamcity task outputs a warning when environment version does not match RC level'() {
             File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2021.2 RC')
             project.teamcity {
@@ -848,7 +851,7 @@ class EnvironmentsTest {
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
-        @Test
+        @Test @SuppressWarnings('GroovyAccessibility')
         void 'teamcity task fail when environment version is not data compatible with installed version'() {
             File fakeHomeDir = createFakeTeamCityInstall(projectDir, 'servers', '2020.2.3')
             project.teamcity {
@@ -911,16 +914,10 @@ class EnvironmentsTest {
         }
 
         @Test
-        void 'extension has named child extensions'() {
-            project.teamcity {}
-
+        void 'environments plugin adds named extension'() {
             TeamCityPluginExtension extension = project.extensions.getByType(TeamCityPluginExtension)
-            def agent = extension.extensions.findByName('agent')
-            def server = extension.extensions.findByName('server')
             def environments = extension.extensions.findByName('environments')
-
-            assertThat(agent, isA(AgentPluginConfiguration))
-            assertThat(server, isA(ServerPluginConfiguration))
+            assertThat(environments, is(notNullValue()))
             assertThat(environments, isA(TeamCityEnvironments))
         }
 
@@ -1002,20 +999,6 @@ class EnvironmentsTest {
 
     @Nested
     class WithoutEnvironmentsPlugin {
-
-        @Test
-        void 'configuring environment with teamcity-server plugin outputs warning'() {
-            outputEventListener.reset()
-            project.apply plugin: 'io.github.rodm.teamcity-server'
-            project.teamcity {
-                environments {
-                    test {
-                    }
-                }
-            }
-
-            assertThat(outputEventListener.toString(), containsString(ENVIRONMENTS_WARNING))
-        }
 
         @Test
         void 'applying teamcity-environments before teamcity-server does not duplicate environment tasks'() {
@@ -1562,7 +1545,7 @@ class EnvironmentsTest {
         assertThat(url.path, equalTo('/httpAuth/admin/plugins.html') )
     }
 
-    @Test
+    @Test @SuppressWarnings('GroovyAccessibility')
     void 'sends plugin action with authorization token from maintenance file'() {
         def action = new TestPluginAction(project.logger, projectDir.toFile(), true)
         createMaintenanceTokenFile()

@@ -30,6 +30,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginManager;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -87,6 +88,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         configureConfigurations(project);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
+        ((ExtensionAware) extension).getExtensions().create("server", ServerPluginConfiguration.class, project);
         configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureServerPluginTasks(project, extension);
@@ -124,7 +126,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     public void configureServerPluginTasks(final Project project, final TeamCityPluginExtension extension) {
         final PluginManager plugins = project.getPluginManager();
         final TaskContainer tasks = project.getTasks();
-        final ServerPluginConfiguration server = extension.getServer();
+        final ServerPluginConfiguration server = getServer(extension);
 
         plugins.withPlugin(JAVA_PLUGIN_ID, plugin ->
             tasks.named(JAR_TASK_NAME, Jar.class).configure(task ->
@@ -197,8 +199,8 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
     private static void configureSignPluginTask(final Project project, final TeamCityPluginExtension extension) {
         project.afterEvaluate(p -> {
-            if (extension.getServer().getSign() != null) {
-                DefaultSignConfiguration configuration = (DefaultSignConfiguration) extension.getServer().getSign();
+            if (getServer(extension).getSign() != null) {
+                DefaultSignConfiguration configuration = (DefaultSignConfiguration) getServer(extension).getSign();
                 Zip packagePlugin = (Zip) p.getTasks().findByName(SERVER_PLUGIN_TASK_NAME);
 
                 p.getTasks().register(SIGN_PLUGIN_TASK_NAME, SignPlugin.class, task -> {
@@ -216,8 +218,8 @@ public class TeamCityServerPlugin implements Plugin<Project> {
 
     private static void configurePublishPluginTask(final Project project, final TeamCityPluginExtension extension) {
         project.afterEvaluate(p -> {
-            if (extension.getServer().getPublish() != null) {
-                DefaultPublishConfiguration configuration = (DefaultPublishConfiguration) extension.getServer().getPublish();
+            if (getServer(extension).getPublish() != null) {
+                DefaultPublishConfiguration configuration = (DefaultPublishConfiguration) getServer(extension).getPublish();
                 SignPlugin signTask = (SignPlugin) p.getTasks().findByName(SIGN_PLUGIN_TASK_NAME);
                 Zip packagePlugin = (Zip) p.getTasks().getByName(SERVER_PLUGIN_TASK_NAME);
                 Provider<RegularFile> distributionFile = signTask != null ? signTask.getSignedPluginFile() : packagePlugin.getArchiveFile();
@@ -238,5 +240,9 @@ public class TeamCityServerPlugin implements Plugin<Project> {
                 });
             }
         });
+    }
+
+    private static ServerPluginConfiguration getServer(final TeamCityPluginExtension extension) {
+        return ((ExtensionAware) extension).getExtensions().getByType(ServerPluginConfiguration.class);
     }
 }
