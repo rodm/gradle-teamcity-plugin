@@ -25,7 +25,7 @@ import static com.github.rodm.teamcity.ValidationMode.WARN;
 /**
  * TeamCity Plugin extension.
  */
-public class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
+public abstract class DefaultTeamCityPluginExtension implements TeamCityPluginExtension {
 
     private static final String DEFAULT_TEAMCITY_API_VERSION = "9.0";
 

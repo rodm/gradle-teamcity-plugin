@@ -41,7 +41,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
@@ -65,7 +64,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         project.getPluginManager().apply(TeamCityPlugin.class);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        ((ExtensionAware) extension).getExtensions().create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
+        extension.getExtensions().create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         configureRepository(project, extension);
         configureConfiguration(project);
         configureEnvironments(project, extension);
@@ -105,7 +104,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
     }
 
     private static TeamCityEnvironments getEnvironments(final TeamCityPluginExtension extension) {
-        return ((ExtensionAware) extension).getExtensions().getByType(TeamCityEnvironments.class);
+        return extension.getExtensions().getByType(TeamCityEnvironments.class);
     }
 
     public static class ConfigureEnvironmentTasksAction implements Action<Project> {

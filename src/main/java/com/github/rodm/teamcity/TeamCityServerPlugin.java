@@ -30,7 +30,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.RegularFile;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.PluginManager;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -88,7 +87,7 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         configureConfigurations(project);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        ((ExtensionAware) extension).getExtensions().create("server", ServerPluginConfiguration.class, project);
+        extension.getExtensions().create("server", ServerPluginConfiguration.class, project);
         configureDependencies(project, (DefaultTeamCityPluginExtension) extension);
         configureJarTask(project, extension, PLUGIN_DEFINITION_PATTERN);
         configureServerPluginTasks(project, extension);
@@ -234,6 +233,6 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     }
 
     private static ServerPluginConfiguration getServer(final TeamCityPluginExtension extension) {
-        return ((ExtensionAware) extension).getExtensions().getByType(ServerPluginConfiguration.class);
+        return extension.getExtensions().getByType(ServerPluginConfiguration.class);
     }
 }

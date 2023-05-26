@@ -15,10 +15,12 @@
  */
 package com.github.rodm.teamcity;
 
+import org.gradle.api.plugins.ExtensionAware;
+
 /**
  * TeamCity Plugin extension.
  */
-public interface TeamCityPluginExtension {
+public interface TeamCityPluginExtension extends ExtensionAware {
 
     /**
      * The version of the TeamCity API.
