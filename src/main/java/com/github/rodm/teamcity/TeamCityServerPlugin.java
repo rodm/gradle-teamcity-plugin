@@ -94,7 +94,6 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         configureServerPluginTasks(project, extension);
         configureSignPluginTask(project, extension);
         configurePublishPluginTask(project, extension);
-        configureEnvironmentTasks(project, extension);
     }
 
     public static void configureConfigurations(final Project project) {
@@ -187,14 +186,6 @@ public class TeamCityServerPlugin implements Plugin<Project> {
         } else {
             return "teamcity-server-plugin-descriptor.xsd";
         }
-    }
-
-    private static void configureEnvironmentTasks(final Project project, final TeamCityPluginExtension extension) {
-        project.afterEvaluate(p -> {
-            if (!p.getPlugins().hasPlugin(TeamCityEnvironmentsPlugin.class)) {
-                new TeamCityEnvironmentsPlugin.ConfigureEnvironmentTasksAction(extension);
-            }
-        });
     }
 
     private static void configureSignPluginTask(final Project project, final TeamCityPluginExtension extension) {
