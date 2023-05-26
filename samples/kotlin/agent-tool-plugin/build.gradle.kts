@@ -71,7 +71,7 @@ teamcity {
     }
 
     environments {
-        downloadsDir = extra["downloadsDir"] as String
+        downloadsDir = project.extra["downloadsDir"] as String
         baseHomeDir = serversDir
         baseDataDir = "data"
 

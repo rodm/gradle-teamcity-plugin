@@ -29,7 +29,7 @@ teamcity {
             name = project.name
             displayName = project.name
             version = project.version as String
-            vendorName = extra["vendorName"] as String
+            vendorName = project.extra["vendorName"] as String
             vendorUrl = "http://example.com"
             description = "TeamCity Example Server Plugin"
 
@@ -44,7 +44,7 @@ teamcity {
     }
 
     environments {
-        downloadsDir = extra["downloadsDir"] as String
+        downloadsDir = project.extra["downloadsDir"] as String
         baseHomeDir = serversDir
         baseDataDir = "${rootDir}/data"
 
