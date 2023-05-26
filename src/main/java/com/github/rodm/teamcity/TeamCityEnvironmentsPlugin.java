@@ -36,11 +36,13 @@ import com.github.rodm.teamcity.tasks.StopServer;
 import com.github.rodm.teamcity.tasks.Undeploy;
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.TaskProvider;
 
@@ -66,6 +68,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         ((ExtensionAware) extension).getExtensions().create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         configureRepository(project, extension);
         configureConfiguration(project);
+        configureEnvironments(project, extension);
         project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension));
     }
 
@@ -88,6 +91,23 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             });
     }
 
+    private static void configureEnvironments(final Project project, final TeamCityPluginExtension extension) {
+        ObjectFactory objects = project.getObjects();
+        DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments(extension);
+
+        NamedDomainObjectFactory<LocalTeamCityEnvironment> localFactory = name ->
+            objects.newInstance(DefaultLocalTeamCityEnvironment.class, name, environments, objects);
+        environments.registerFactory(LocalTeamCityEnvironment.class, localFactory);
+
+        NamedDomainObjectFactory<DockerTeamCityEnvironment> dockerFactory = name ->
+            objects.newInstance(DefaultDockerTeamCityEnvironment.class, name, environments, objects);
+        environments.registerFactory(DockerTeamCityEnvironment.class, dockerFactory);
+    }
+
+    private static TeamCityEnvironments getEnvironments(final TeamCityPluginExtension extension) {
+        return ((ExtensionAware) extension).getExtensions().getByType(TeamCityEnvironments.class);
+    }
+
     public static class ConfigureEnvironmentTasksAction implements Action<Project> {
 
         private final TeamCityPluginExtension extension;
@@ -98,7 +118,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         @Override
         public void execute(final Project project) {
-            DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments();
+            DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments(extension);
             NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
             container.withType(LocalTeamCityEnvironment.class).all(environment -> {
                 configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
@@ -110,10 +130,6 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
                 configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
             });
-        }
-
-        private TeamCityEnvironments getEnvironments() {
-            return ((ExtensionAware) extension).getExtensions().getByType(TeamCityEnvironments.class);
         }
 
         private void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {
