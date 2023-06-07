@@ -34,7 +34,6 @@ import com.github.rodm.teamcity.tasks.StopDockerAgent;
 import com.github.rodm.teamcity.tasks.StopDockerServer;
 import com.github.rodm.teamcity.tasks.StopServer;
 import com.github.rodm.teamcity.tasks.Undeploy;
-import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
@@ -43,7 +42,6 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
-import org.gradle.api.tasks.TaskProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,6 +53,7 @@ import static com.github.rodm.teamcity.TeamCityServerPlugin.SERVER_PLUGIN_TASK_N
 import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2018_2;
 import static org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME;
 
+@SuppressWarnings("unused")
 public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
     public static final String DOCKER_CONFIGURATION_NAME = "docker";
@@ -67,8 +66,8 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         extension.getExtensions().create(TeamCityEnvironments.class, "environments", DefaultTeamCityEnvironments.class);
         configureRepository(project, extension);
         configureConfiguration(project);
-        configureEnvironments(project, extension);
-        project.afterEvaluate(new ConfigureEnvironmentTasksAction(extension));
+        configureLocalEnvironments(project, extension);
+        configureDockerEnvironments(project, extension);
     }
 
     private static void configureRepository(Project project, TeamCityPluginExtension extension) {
@@ -90,7 +89,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             });
     }
 
-    private static void configureEnvironments(final Project project, final TeamCityPluginExtension extension) {
+    private static void configureLocalEnvironments(final Project project, final TeamCityPluginExtension extension) {
         ObjectFactory objects = project.getObjects();
         DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments(extension);
 
@@ -98,196 +97,190 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             objects.newInstance(DefaultLocalTeamCityEnvironment.class, name, environments, objects);
         environments.registerFactory(LocalTeamCityEnvironment.class, localFactory);
 
+        NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
+        container.withType(LocalTeamCityEnvironment.class).all(environment -> {
+            configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
+            configureLocalEnvironmentTasks(project, (DefaultLocalTeamCityEnvironment) environment);
+            configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
+        });
+    }
+
+    private static void configureDockerEnvironments(final Project project, final TeamCityPluginExtension extension) {
+        ObjectFactory objects = project.getObjects();
+        DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments(extension);
+
         NamedDomainObjectFactory<DockerTeamCityEnvironment> dockerFactory = name ->
             objects.newInstance(DefaultDockerTeamCityEnvironment.class, name, environments, objects);
         environments.registerFactory(DockerTeamCityEnvironment.class, dockerFactory);
+
+        NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
+        container.withType(DockerTeamCityEnvironment.class).all(environment -> {
+            configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
+            configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
+            configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
+        });
     }
 
     private static TeamCityEnvironments getEnvironments(final TeamCityPluginExtension extension) {
         return extension.getExtensions().getByType(TeamCityEnvironments.class);
     }
 
-    public static class ConfigureEnvironmentTasksAction implements Action<Project> {
+    private static void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {
+        final TaskContainer tasks = project.getTasks();
+        tasks.register(environment.deployTaskName(), Deploy.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getPlugins().from(environment.getPlugins());
+            task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
+            task.dependsOn(tasks.named(ASSEMBLE_TASK_NAME));
 
-        private final TeamCityPluginExtension extension;
+            if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
+                final File dataDir = project.file(environment.getDataDirProperty().get());
+                Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
+                List<String> disabledPlugins = new ArrayList<>();
+                task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
+                task.doLast(new EnablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
+            }
+        });
 
-        public ConfigureEnvironmentTasksAction(TeamCityPluginExtension extension) {
-            this.extension = extension;
-        }
+        tasks.register(environment.undeployTaskName(), Undeploy.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getPlugins().from(environment.getPlugins());
+            task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
 
-        @Override
-        public void execute(final Project project) {
-            DefaultTeamCityEnvironments environments = (DefaultTeamCityEnvironments) getEnvironments(extension);
-            NamedDomainObjectContainer<TeamCityEnvironment> container = environments.getEnvironments();
-            container.withType(LocalTeamCityEnvironment.class).all(environment -> {
-                configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
-                configureLocalEnvironmentTasks(project, (DefaultLocalTeamCityEnvironment) environment);
-                configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
-            });
-            container.withType(DockerTeamCityEnvironment.class).all(environment -> {
-                configureDeploymentTasks(project, (BaseTeamCityEnvironment) environment);
-                configureDockerEnvironmentTasks(project, (DefaultDockerTeamCityEnvironment) environment);
-                configureCommonTasks(project, (BaseTeamCityEnvironment) environment);
-            });
-        }
+            if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
+                final File dataDir = project.file(environment.getDataDirProperty().get());
+                Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
+                task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, new ArrayList<>()));
+            }
+        });
 
-        private void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {
-            final TaskContainer tasks = project.getTasks();
-            tasks.register(environment.deployTaskName(), Deploy.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getPlugins().from(environment.getPlugins());
-                task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
-                task.dependsOn(tasks.named(ASSEMBLE_TASK_NAME));
+        tasks.withType(ServerPlugin.class, task -> {
+            if (((FileCollection) environment.getPlugins()).isEmpty()) {
+                environment.plugins(tasks.named(SERVER_PLUGIN_TASK_NAME));
+            }
+        });
+    }
 
-                if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
-                    final File dataDir = project.file(environment.getDataDirProperty().get());
-                    Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
-                    List<String> disabledPlugins = new ArrayList<>();
-                    task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
-                    task.doLast(new EnablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
-                }
-            });
+    private static void configureLocalEnvironmentTasks(Project project, DefaultLocalTeamCityEnvironment environment) {
+        final TaskContainer tasks = project.getTasks();
+        final String name = capitalize(environment.getName());
+        final String downloadTaskName = "download" + name;
+        tasks.register(downloadTaskName, DownloadTeamCity.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.src(environment.getDownloadUrl());
+            task.dest(project.file(environment.getInstallerFile()));
+        });
 
-            tasks.register(environment.undeployTaskName(), Undeploy.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getPlugins().from(environment.getPlugins());
-                task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
+        tasks.register("install" + name, InstallTeamCity.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getSource().set(project.file(environment.getInstallerFile()));
+            task.getTarget().set(project.file(environment.getHomeDirProperty()));
+            task.dependsOn(tasks.named(downloadTaskName));
+        });
 
-                if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
-                    final File dataDir = project.file(environment.getDataDirProperty().get());
-                    Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
-                    task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, new ArrayList<>()));
-                }
-            });
+        tasks.register(environment.startServerTaskName(), StartServer.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getHomeDir().set(environment.getHomeDirProperty());
+            task.getDataDir().set(environment.getDataDirProperty());
+            task.getJavaHome().set(environment.getJavaHomeProperty());
+            task.getServerOptions().set(environment.getServerOptionsProvider());
+            task.doFirst(t -> project.mkdir(environment.getDataDir()));
+            task.dependsOn(tasks.named(environment.deployTaskName()));
+        });
 
-            tasks.withType(ServerPlugin.class, task -> {
-                if (((FileCollection) environment.getPlugins()).isEmpty()) {
-                    environment.plugins(tasks.named(SERVER_PLUGIN_TASK_NAME));
-                }
-            });
-        }
+        tasks.register(environment.stopServerTaskName(), StopServer.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getHomeDir().set(environment.getHomeDirProperty());
+            task.getJavaHome().set(environment.getJavaHomeProperty());
+            task.finalizedBy(tasks.named(environment.undeployTaskName()));
+        });
 
-        private void configureLocalEnvironmentTasks(Project project, DefaultLocalTeamCityEnvironment environment) {
-            final TaskContainer tasks = project.getTasks();
-            final String name = capitalize(environment.getName());
-            final String downloadTaskName = "download" + name;
-            tasks.register(downloadTaskName, DownloadTeamCity.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.src(environment.getDownloadUrl());
-                task.dest(project.file(environment.getInstallerFile()));
-            });
+        tasks.register(environment.startAgentTaskName(), StartAgent.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getHomeDir().set(environment.getHomeDirProperty());
+            task.getJavaHome().set(environment.getJavaHomeProperty());
+            task.getAgentOptions().set(environment.getAgentOptionsProvider());
+        });
 
-            tasks.register("install" + name, InstallTeamCity.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getSource().set(project.file(environment.getInstallerFile()));
-                task.getTarget().set(project.file(environment.getHomeDirProperty()));
-                task.dependsOn(tasks.named(downloadTaskName));
-            });
+        tasks.register(environment.stopAgentTaskName(), StopAgent.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getHomeDir().set(environment.getHomeDirProperty());
+            task.getJavaHome().set(environment.getJavaHomeProperty());
+        });
+    }
 
-            tasks.register(environment.startServerTaskName(), StartServer.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getHomeDir().set(environment.getHomeDirProperty());
-                task.getDataDir().set(environment.getDataDirProperty());
-                task.getJavaHome().set(environment.getJavaHomeProperty());
-                task.getServerOptions().set(environment.getServerOptionsProvider());
-                task.doFirst(t -> project.mkdir(environment.getDataDir()));
-                task.dependsOn(tasks.named(environment.deployTaskName()));
-            });
+    private static void configureDockerEnvironmentTasks(Project project, DefaultDockerTeamCityEnvironment environment) {
+        final TaskContainer tasks = project.getTasks();
+        tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getDataDir().set(environment.getDataDirProperty());
+            task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/logs"));
+            task.getServerOptions().set(environment.getServerOptionsProvider());
+            task.getImageName().set(environment.getServerImageProperty());
+            task.getContainerName().set(environment.getServerNameProperty());
+            task.getPort().set(environment.getPortProperty());
+            task.doFirst(t -> project.mkdir(environment.getDataDir()));
+            task.dependsOn(tasks.named(environment.deployTaskName()));
+        });
 
-            tasks.register(environment.stopServerTaskName(), StopServer.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getHomeDir().set(environment.getHomeDirProperty());
-                task.getJavaHome().set(environment.getJavaHomeProperty());
-                task.finalizedBy(tasks.named(environment.undeployTaskName()));
-            });
+        tasks.register(environment.stopServerTaskName(), StopDockerServer.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getContainerName().set(environment.getServerName());
+            task.finalizedBy(tasks.named(environment.undeployTaskName()));
+        });
 
-            tasks.register(environment.startAgentTaskName(), StartAgent.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getHomeDir().set(environment.getHomeDirProperty());
-                task.getJavaHome().set(environment.getJavaHomeProperty());
-                task.getAgentOptions().set(environment.getAgentOptionsProvider());
-            });
+        tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getVersion().set(environment.getVersionProperty());
+            task.getDataDir().set(environment.getDataDirProperty());
+            task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
+            task.getAgentOptions().set(environment.getAgentOptionsProvider());
+            task.getImageName().set(environment.getAgentImageProperty());
+            task.getContainerName().set(environment.getAgentNameProperty());
+            task.getServerContainerName().set(environment.getServerNameProperty());
+            task.mustRunAfter(tasks.named(environment.startServerTaskName()));
+        });
 
-            tasks.register(environment.stopAgentTaskName(), StopAgent.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getHomeDir().set(environment.getHomeDirProperty());
-                task.getJavaHome().set(environment.getJavaHomeProperty());
-            });
-        }
+        tasks.register(environment.stopAgentTaskName(), StopDockerAgent.class, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.getContainerName().set(environment.getAgentName());
+        });
 
-        private void configureDockerEnvironmentTasks(Project project, DefaultDockerTeamCityEnvironment environment) {
-            final TaskContainer tasks = project.getTasks();
-            tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getDataDir().set(environment.getDataDirProperty());
-                task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/logs"));
-                task.getServerOptions().set(environment.getServerOptionsProvider());
-                task.getImageName().set(environment.getServerImageProperty());
-                task.getContainerName().set(environment.getServerNameProperty());
-                task.getPort().set(environment.getPortProperty());
-                task.doFirst(t -> project.mkdir(environment.getDataDir()));
-                task.dependsOn(tasks.named(environment.deployTaskName()));
-            });
+        tasks.named(environment.deployTaskName(), Deploy.class).configure(task ->
+            task.getServerPort().set(environment.getPortProperty()));
+        tasks.named(environment.undeployTaskName(), Undeploy.class).configure(task ->
+            task.getServerPort().set(environment.getPortProperty()));
 
-            tasks.register(environment.stopServerTaskName(), StopDockerServer.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getContainerName().set(environment.getServerName());
-                task.finalizedBy(tasks.named(environment.undeployTaskName()));
-            });
+        tasks.withType(DockerTask.class, task ->
+            task.setClasspath(project.getConfigurations().getByName(DOCKER_CONFIGURATION_NAME)));
+    }
 
-            tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getVersion().set(environment.getVersionProperty());
-                task.getDataDir().set(environment.getDataDirProperty());
-                task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
-                task.getAgentOptions().set(environment.getAgentOptionsProvider());
-                task.getImageName().set(environment.getAgentImageProperty());
-                task.getContainerName().set(environment.getAgentNameProperty());
-                task.getServerContainerName().set(environment.getServerNameProperty());
-                task.mustRunAfter(tasks.named(environment.startServerTaskName()));
-            });
+    private static void configureCommonTasks(Project project, BaseTeamCityEnvironment environment) {
+        final TaskContainer tasks = project.getTasks();
+        final String name = capitalize(environment.getName());
+        final String startServerTaskName = environment.startServerTaskName();
+        final String startAgentTaskName = environment.startAgentTaskName();
+        tasks.register("start" + name, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.setDescription("Starts the TeamCity Server and Build Agent");
+            task.dependsOn(tasks.named(startServerTaskName), tasks.named(startAgentTaskName));
+        });
 
-            tasks.register(environment.stopAgentTaskName(), StopDockerAgent.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getContainerName().set(environment.getAgentName());
-            });
+        final String stopServerTaskName = environment.stopServerTaskName();
+        final String stopAgentTaskName = environment.stopAgentTaskName();
+        tasks.register("stop" + name, task -> {
+            task.setGroup(TEAMCITY_GROUP);
+            task.setDescription("Stops the TeamCity Server and Build Agent");
+            task.dependsOn(tasks.named(stopServerTaskName), tasks.named(stopAgentTaskName));
+        });
+    }
 
-            tasks.named(environment.deployTaskName(), Deploy.class).configure(task ->
-                task.getServerPort().set(environment.getPortProperty()));
-            tasks.named(environment.undeployTaskName(), Undeploy.class).configure(task ->
-                task.getServerPort().set(environment.getPortProperty()));
-
-            tasks.withType(DockerTask.class, task ->
-                task.setClasspath(project.getConfigurations().getByName(DOCKER_CONFIGURATION_NAME)));
-        }
-
-        private void configureCommonTasks(Project project, BaseTeamCityEnvironment environment) {
-            final TaskContainer tasks = project.getTasks();
-            final String name = capitalize(environment.getName());
-            final String startServerTaskName = environment.startServerTaskName();
-            final String startAgentTaskName = environment.startAgentTaskName();
-            tasks.register("start" + name, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.setDescription("Starts the TeamCity Server and Build Agent");
-                task.dependsOn(tasks.named(startServerTaskName), tasks.named(startAgentTaskName));
-            });
-
-            final String stopServerTaskName = environment.stopServerTaskName();
-            final String stopAgentTaskName = environment.stopAgentTaskName();
-            tasks.register("stop" + name, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.setDescription("Stops the TeamCity Server and Build Agent");
-                task.dependsOn(tasks.named(stopServerTaskName), tasks.named(stopAgentTaskName));
-            });
-        }
-
-        private String capitalize(String name) {
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
-        }
+    private static String capitalize(String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }
