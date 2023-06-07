@@ -44,7 +44,7 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     private final DefaultTeamCityEnvironments environments;
 
-    private String version = "9.0";
+    private final Property<String> version;
     private final Property<String> dataDir;
     private final ConfigurableFileCollection plugins;
     private final ListProperty<String> serverOptions;
@@ -54,6 +54,7 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
     public BaseTeamCityEnvironment(String name, DefaultTeamCityEnvironments environments, ObjectFactory factory) {
         this.name = name;
         this.environments = environments;
+        this.version = factory.property(String.class).convention("9.0");
         this.dataDir = factory.property(String.class).convention(defaultDataDir());
         this.plugins = factory.fileCollection();
         this.serverOptions = factory.listProperty(String.class);
@@ -69,12 +70,16 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
      * The version of TeamCity this environment uses. Defaults to version '9.0'
      */
     public String getVersion() {
-        return version;
+        return getVersionProperty().get();
     }
 
     public void setVersion(String version) {
         TeamCityVersion.version(version);
-        this.version = version;
+        this.version.set(version);
+    }
+
+    public Provider<String> getVersionProperty() {
+        return this.version;
     }
 
     /**
