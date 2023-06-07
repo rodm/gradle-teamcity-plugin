@@ -133,32 +133,32 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         private void configureDeploymentTasks(Project project, BaseTeamCityEnvironment environment) {
             final TaskContainer tasks = project.getTasks();
-            final TaskProvider<Deploy> deployPlugin = tasks.register(environment.deployTaskName(), Deploy.class, task -> {
+            tasks.register(environment.deployTaskName(), Deploy.class, task -> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getPlugins().from(environment.getPlugins());
                 task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
                 task.dependsOn(tasks.named(ASSEMBLE_TASK_NAME));
-            });
 
-            final TaskProvider<Undeploy> undeployPlugin = tasks.register(environment.undeployTaskName(), Undeploy.class, task -> {
-                task.setGroup(TEAMCITY_GROUP);
-                task.getPlugins().from(environment.getPlugins());
-                task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
-            });
-
-            if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
-                final File dataDir = project.file(environment.getDataDirProperty().get());
-                deployPlugin.configure(task -> {
+                if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
+                    final File dataDir = project.file(environment.getDataDirProperty().get());
                     Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
                     List<String> disabledPlugins = new ArrayList<>();
                     task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
                     task.doLast(new EnablePluginAction(project.getLogger(), dataDir, plugins, disabledPlugins));
-                });
-                undeployPlugin.configure(task -> {
+                }
+            });
+
+            tasks.register(environment.undeployTaskName(), Undeploy.class, task -> {
+                task.setGroup(TEAMCITY_GROUP);
+                task.getPlugins().from(environment.getPlugins());
+                task.getPluginsDir().set(project.file(environment.getPluginsDirProperty()));
+
+                if (TeamCityVersion.version(environment.getVersion()).equalOrGreaterThan(VERSION_2018_2)) {
+                    final File dataDir = project.file(environment.getDataDirProperty().get());
                     Set<File> plugins = ((FileCollection) environment.getPlugins()).getFiles();
                     task.doFirst(new DisablePluginAction(project.getLogger(), dataDir, plugins, new ArrayList<>()));
-                });
-            }
+                }
+            });
 
             tasks.withType(ServerPlugin.class, task -> {
                 if (((FileCollection) environment.getPlugins()).isEmpty()) {
