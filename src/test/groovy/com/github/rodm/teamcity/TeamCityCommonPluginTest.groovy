@@ -26,6 +26,7 @@ import static com.github.rodm.teamcity.GradleMatchers.hasDependency
 import static com.github.rodm.teamcity.GradleMatchers.hasPlugin
 import static org.hamcrest.MatcherAssert.assertThat
 
+@SuppressWarnings('ConfigurationAvoidance')
 class TeamCityCommonPluginTest {
 
     private Project project

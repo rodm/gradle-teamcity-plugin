@@ -48,6 +48,7 @@ class DockerOperationsTest {
     private DockerOperations dockerOperations
 
     @BeforeEach
+    @SuppressWarnings('GroovyAccessibility')
     void init() {
         client = mock(DockerClient)
         dockerOperations = new DockerOperations(client)

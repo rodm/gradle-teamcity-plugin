@@ -33,6 +33,7 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 
+@SuppressWarnings('ConfigurationAvoidance')
 class ValidateDefinitionActionOfflineTest {
 
     public static final String BEAN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>

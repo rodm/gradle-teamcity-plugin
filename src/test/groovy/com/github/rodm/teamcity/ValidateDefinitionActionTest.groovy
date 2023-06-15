@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
+@SuppressWarnings(['ConfigurationAvoidance', 'GroovyAccessibility'])
 class ValidateDefinitionActionTest {
 
     public static final String BEAN_DEFINITION_FILE = """<?xml version="1.0" encoding="UTF-8"?>

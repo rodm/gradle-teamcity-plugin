@@ -18,7 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.tasks.TaskContainer
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeDiagnosingMatcher
@@ -49,6 +48,7 @@ class GradleMatchers {
         return new HasDefaultDependency(group, name, version)
     }
 
+    @SuppressWarnings('ConfigurationAvoidance')
     static Matcher<Project> hasTask(String name) {
         return new TypeSafeDiagnosingMatcher<Project>() {
             @Override

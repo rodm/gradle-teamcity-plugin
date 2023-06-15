@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.not
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
+@SuppressWarnings(['ConfigurationAvoidance', 'GroovyAccessibility'])
 class ValidateExecutableFileActionTest {
 
     private static final String AGENT_PLUGIN_DESCRIPTOR = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -75,7 +76,7 @@ class ValidateExecutableFileActionTest {
         return fileCopyDetails
     }
 
-    private validationAction(Set<FileCopyDetails> files) {
+    private static validationAction(Set<FileCopyDetails> files) {
         new PluginExecutableFilesValidationAction(files)
     }
 

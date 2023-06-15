@@ -32,6 +32,7 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 
+@SuppressWarnings(['ConfigurationAvoidance', 'GroovyAccessibility'])
 class ValidateDescriptorActionTest {
 
     private static final String EMPTY_VALUE_WARNING = EMPTY_VALUE_WARNING_MESSAGE.substring(4)

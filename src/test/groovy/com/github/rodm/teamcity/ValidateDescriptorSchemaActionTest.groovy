@@ -31,6 +31,7 @@ import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
 
+@SuppressWarnings('ConfigurationAvoidance')
 class ValidateDescriptorSchemaActionTest {
 
     private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()

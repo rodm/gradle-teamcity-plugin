@@ -165,6 +165,7 @@ class TeamCityVersionTest {
         assertInvalidVersion(version, false)
     }
 
+    @SuppressWarnings('GroovyAccessibility')
     private static void assertInvalidVersion(String version, boolean allowSnapshots) {
         try {
             TeamCityVersion.version(version, allowSnapshots)
