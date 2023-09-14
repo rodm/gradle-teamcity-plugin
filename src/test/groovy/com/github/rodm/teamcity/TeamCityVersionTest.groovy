@@ -43,6 +43,8 @@ class TeamCityVersionTest {
         version('2018.2')
         version('2022.04')
         version('2023.10')
+        version('2023.10-12345')
+        version('2023.09-23456')
         version('SNAPSHOT')
     }
 
@@ -62,6 +64,7 @@ class TeamCityVersionTest {
         assertThat(version('9.0'), lessThan(version('2018.1')))
         assertThat(version('2018.1.2'), lessThan(version('2018.1.3')))
         assertThat(version('2018.1.2'), lessThan(version('SNAPSHOT')))
+        assertThat(version('2018.1-12345'), lessThan(version('2018.1-23451')))
 
         assertThat(version('9.0'), equalTo(VERSION_9_0))
         assertThat(version('2018.2'), equalTo(VERSION_2018_2))
@@ -71,6 +74,7 @@ class TeamCityVersionTest {
         assertThat(version('9.0.1'), greaterThan(version('9.0')))
         assertThat(version('10.0'), greaterThan(version('9.0')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
+        assertThat(version('SNAPSHOT'), greaterThan(version('2018.1-12345')))
     }
 
     @Test
@@ -142,6 +146,8 @@ class TeamCityVersionTest {
             assertThat(version('9.0.1-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('10.0-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('SNAPSHOT'), greaterThan(version('2020.2-SNAPSHOT')))
+            assertThat(version('2018.1-SNAPSHOT'), lessThan(version('2018.1-23451')))
+            assertThat(version('2019.1-SNAPSHOT'), greaterThan(version('2018.1-23451')))
         }
 
         @Test
