@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializable {
 
     private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+");
-    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+-SNAPSHOT");
+    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+-(SNAPSHOT|\\d+)");
     private static final Pattern DATA_VERSION_PATTERN = Pattern.compile("^(\\d+\\.\\d+).*");
 
     private static final String INVALID_RELEASE_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')";
