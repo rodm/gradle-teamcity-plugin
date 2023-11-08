@@ -24,13 +24,15 @@ import java.util.regex.Pattern;
 public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializable {
 
     private static final Pattern RELEASE_VERSION_PATTERN = Pattern.compile("^(\\d+)(([\\.\\-]\\d+){1,2}){1,2}");
-    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^(\\d+)(\\.\\d+){1,2}+-(SNAPSHOT|\\d+)");
+    private static final Pattern SNAPSHOT_VERSION_PATTERN = Pattern.compile("^((\\d+)(\\.\\d+){1,2}+|LOCAL)-(SNAPSHOT|\\d+)");
     private static final Pattern DATA_VERSION_PATTERN = Pattern.compile("^(\\d+\\.\\d+).*");
 
     private static final String INVALID_RELEASE_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '9.0', '10.0.5', '2018.1')";
     private static final String INVALID_SNAPSHOT_MESSAGE = "'%s' is not a valid TeamCity version string (examples: '10.0-SNAPSHOT', '2021.1' '2021.2.1-SNAPSHOT')";
 
     private static final String SNAPSHOT = "SNAPSHOT";
+    private static final String LOCAL_SNAPSHOT = "LOCAL-SNAPSHOT";
+    private static final String LOCAL_PART = "LOCAL";
 
     public static final TeamCityVersion VERSION_9_0 = version("9.0");
     public static final TeamCityVersion VERSION_2018_2 = version("2018.2");
@@ -41,7 +43,7 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
     }
 
     public static TeamCityVersion version(String version, boolean allowSnapshots) throws IllegalArgumentException {
-        if (!version.equals(SNAPSHOT)) {
+        if (!version.equals(SNAPSHOT) && !version.equals(LOCAL_SNAPSHOT)) {
             Matcher releaseMatcher = RELEASE_VERSION_PATTERN.matcher(version);
             if (allowSnapshots) {
                 Matcher snapshotMatcher = SNAPSHOT_VERSION_PATTERN.matcher(version);
@@ -68,9 +70,13 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
     }
 
     public int compareTo(TeamCityVersion other) {
-        if (version.equals(SNAPSHOT) && !other.version.equals(SNAPSHOT)) {
+        if (
+            (version.equals(SNAPSHOT) && !other.version.equals(SNAPSHOT)) || (version.equals(LOCAL_SNAPSHOT) && !other.version.equals(LOCAL_SNAPSHOT))
+        ) {
             return 1;
-        } else if (other.version.equals(SNAPSHOT) && !version.equals(SNAPSHOT)) {
+        } else if (
+            (other.version.equals(SNAPSHOT) && !version.equals(SNAPSHOT)) || other.version.equals(LOCAL_SNAPSHOT) && !version.equals(LOCAL_SNAPSHOT)
+        ) {
             return -1;
         } else if (version.equals(other.version)) {
             return 0;
@@ -81,6 +87,7 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
     private int compareVersionParts(String[] versionParts, String[] otherVersionParts) {
         for (int part = 0; part < versionParts.length && part < otherVersionParts.length; ++part){
             if (versionParts[part].equals(SNAPSHOT) || otherVersionParts[part].equals(SNAPSHOT)) continue;
+            if (versionParts[part].equals(LOCAL_PART) || otherVersionParts[part].equals(LOCAL_PART)) continue;
             int partValue = Integer.parseInt(versionParts[part]);
             int otherPartValue = Integer.parseInt(otherVersionParts[part]);
             if (partValue > otherPartValue) return 1;
