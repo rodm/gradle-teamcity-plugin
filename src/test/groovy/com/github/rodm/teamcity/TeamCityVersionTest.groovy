@@ -46,6 +46,7 @@ class TeamCityVersionTest {
         version('2023.10-12345')
         version('2023.09-23456')
         version('SNAPSHOT')
+        version('LOCAL-SNAPSHOT')
     }
 
     @Test
@@ -70,11 +71,13 @@ class TeamCityVersionTest {
         assertThat(version('2018.2'), equalTo(VERSION_2018_2))
         assertThat(version('10.0.5'), equalTo(version('10.0.5')))
         assertThat(version('SNAPSHOT'), equalTo(version('SNAPSHOT')))
+        assertThat(version('LOCAL-SNAPSHOT'), equalTo(version('LOCAL-SNAPSHOT')))
 
         assertThat(version('9.0.1'), greaterThan(version('9.0')))
         assertThat(version('10.0'), greaterThan(version('9.0')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1.2')))
         assertThat(version('SNAPSHOT'), greaterThan(version('2018.1-12345')))
+        assertThat(version('LOCAL-SNAPSHOT'), greaterThan(version('2018.1-12345')))
     }
 
     @Test
@@ -108,6 +111,14 @@ class TeamCityVersionTest {
         assertThat(e.message, equalTo('Invalid version'))
     }
 
+    @Test
+    void 'data version cannot be determined for local-snapshot'() {
+        def e =assertThrows(GradleException, () -> {
+            version('LOCAL-SNAPSHOT').dataVersion
+        })
+        assertThat(e.message, equalTo('Invalid version'))
+    }
+
     @Nested
     class TeamCityVersionAllowingSnapshots {
 
@@ -118,6 +129,7 @@ class TeamCityVersionTest {
             version('2020.1.5-SNAPSHOT')
             version('2020.2-SNAPSHOT')
             version('2022.04-SNAPSHOT')
+            version('LOCAL-SNAPSHOT')
         }
 
         @Test
@@ -146,8 +158,10 @@ class TeamCityVersionTest {
             assertThat(version('9.0.1-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('10.0-SNAPSHOT'), greaterThan(version('9.0-SNAPSHOT')))
             assertThat(version('SNAPSHOT'), greaterThan(version('2020.2-SNAPSHOT')))
+            assertThat(version('LOCAL-SNAPSHOT'), greaterThan(version('2020.2-SNAPSHOT')))
             assertThat(version('2018.1-SNAPSHOT'), lessThan(version('2018.1-23451')))
             assertThat(version('2019.1-SNAPSHOT'), greaterThan(version('2018.1-23451')))
+            assertThat(version('LOCAL-SNAPSHOT'), greaterThan(version('2018.1-23451')))
         }
 
         @Test
