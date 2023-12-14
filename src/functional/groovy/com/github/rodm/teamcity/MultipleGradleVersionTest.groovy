@@ -41,12 +41,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static List<String> gradleVersions() {
         return [
             '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6.3',
-            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4'
+            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5'
         ]
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
     }
 
     private static Map<String, String> GRADLE_JAVA_VERSIONS = [
@@ -56,7 +56,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         '7.3': '17',
         '7.5-rc-1': '18',
         '7.6-rc-1': '19',
-        '8.3-rc-1': '20'
+        '8.3-rc-1': '20',
+        '8.5': '21'
     ].asUnmodifiable()
 
     static List<String> supportedByGradle(String version) {
