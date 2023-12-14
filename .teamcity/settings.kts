@@ -20,7 +20,8 @@ val javaVersionsSupportedByGradleVersionMap = mapOf(
     "17" to "7.3",
     "18" to "7.5.1",
     "19" to "7.6.1",
-    "20" to "8.3-rc-3"
+    "20" to "8.3-rc-3",
+    "21" to "8.5"
 )
 
 fun supportedGradleVersion(javaVersion: String?): String? {
@@ -160,7 +161,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("8", "11", "17", "18", "19", "20")
+                    "Java"("8", "11", "17", "18", "19", "20", "21")
                 }
                 build {
                     val javaVersion = axes["Java"]
