@@ -103,7 +103,7 @@
       <dependency>
           <groupId>com.github.rodm</groupId>
           <artifactId>teamcity-dsl-extensions</artifactId>
-          <version>0.8</version>
+          <version>0.9</version>
           <scope>compile</scope>
       </dependency>
   </dependencies>
