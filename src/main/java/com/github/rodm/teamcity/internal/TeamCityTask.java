@@ -24,6 +24,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -121,11 +122,7 @@ public abstract class TeamCityTask extends DefaultTask {
     }
 
     private static String getTeamCityVersion(String homeDir) {
-        Path jarPath = Paths.get(homeDir, "webapps/ROOT/WEB-INF/lib/common-api.jar");
-        if (!Files.isRegularFile(jarPath)) {
-            throw new InvalidUserDataException(String.format(INVALID_HOME_DIR, homeDir));
-        }
-
+        Path jarPath = getServerVersionJarPath(homeDir);
         try (JarFile jarFile = new JarFile(jarPath.toFile())) {
             ZipEntry entry = jarFile.getEntry("serverVersion.properties.xml");
             if (entry == null) {
@@ -140,5 +137,18 @@ public abstract class TeamCityTask extends DefaultTask {
         catch (IOException e) {
             throw new GradleException("Failure loading server version", e);
         }
+    }
+
+    @NotNull
+    private static Path getServerVersionJarPath(String homeDir) {
+        Path commonPath = Paths.get(homeDir, "webapps/ROOT/WEB-INF/lib/common-api.jar");
+        if (Files.isRegularFile(commonPath)) {
+            return commonPath;
+        }
+        Path buildVersionPath = Paths.get(homeDir, "webapps/ROOT/WEB-INF/lib/build-version.jar");
+        if (Files.isRegularFile(buildVersionPath)) {
+            return buildVersionPath;
+        }
+        throw new InvalidUserDataException(String.format(INVALID_HOME_DIR, homeDir));
     }
 }

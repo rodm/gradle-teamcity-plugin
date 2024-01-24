@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.io.TempDir
 
 import java.nio.file.Files
@@ -71,6 +72,7 @@ import static org.hamcrest.Matchers.hasSize
 import static org.hamcrest.Matchers.isA
 import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.startsWith
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertThrows
@@ -766,6 +768,22 @@ class EnvironmentsTest {
             def e = assertThrows(InvalidUserDataException) { startServer.validate() }
             assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
             assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
+        }
+
+        @Test
+        void 'teamcity task validates home directory for TeamCity 2023_11'() {
+            createFakeTeamCityInstall(projectDir, 'servers', '2023.11.2')
+            project.teamcity {
+                environments {
+                    'teamcity2023.11' {
+                        version = '2023.11.2'
+                    }
+                }
+            }
+            project.evaluate()
+
+            StartServer startServer = project.tasks.getByName('startTeamcity2023.11Server') as StartServer
+            assertDoesNotThrow((Executable) { startServer.validate() })
         }
 
         @Test
@@ -1847,7 +1865,12 @@ class EnvironmentsTest {
 
     private static File createFakeTeamCityInstall(Path folder, String baseDir, String version) {
         File homeDir = createDirectory(folder, "${baseDir}/TeamCity-${version}".toString())
-        createCommonApiJar(homeDir.toPath(), version)
+        def releaseVersion = version.contains(' ') ? version.takeBefore(' ') : version
+        if (TeamCityVersion.version(releaseVersion).lessThan(TeamCityVersion.version('2023.11'))) {
+            createCommonApiJar(homeDir.toPath(), version)
+        } else {
+            createBuildVersionJar(homeDir.toPath(), version)
+        }
         return homeDir
     }
 
@@ -1857,6 +1880,15 @@ class EnvironmentsTest {
 
     private static void createCommonApiJar(Path folder, String version) {
         Path jarPath = folder.resolve('webapps/ROOT/WEB-INF/lib/common-api.jar')
+        createJar(jarPath, version)
+    }
+
+    private static void createBuildVersionJar(Path folder, String version) {
+        Path jarPath = folder.resolve('webapps/ROOT/WEB-INF/lib/build-version.jar')
+        createJar(jarPath, version)
+    }
+
+    private static void createJar(Path jarPath, String version) {
         jarPath.toFile().parentFile.mkdirs()
 
         Properties props = new Properties()
