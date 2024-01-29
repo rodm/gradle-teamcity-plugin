@@ -134,6 +134,11 @@ project {
                 params {
                     param("java.home", "%java11.home%")
                 }
+
+                failureConditions {
+                    executionTimeoutMin = 12
+                }
+
                 requirements {
                     contains("teamcity.agent.jvm.os.name", "Windows")
                 }
