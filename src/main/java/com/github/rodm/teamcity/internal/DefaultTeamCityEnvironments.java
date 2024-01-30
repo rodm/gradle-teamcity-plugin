@@ -185,7 +185,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     public Provider<String> gradleProperty(final String name) {
-        return providers.gradleProperty(name).forUseAtConfigurationTime();
+        return providers.gradleProperty(name);
     }
 
     public final NamedDomainObjectContainer<TeamCityEnvironment> getEnvironments() {
