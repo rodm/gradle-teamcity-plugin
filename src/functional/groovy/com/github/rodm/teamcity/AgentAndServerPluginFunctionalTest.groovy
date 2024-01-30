@@ -80,6 +80,10 @@ class AgentAndServerPluginFunctionalTest extends FunctionalTestCase {
 
     @Test
     void multiProjectPlugin() {
+        createDirectory('common')
+        createDirectory('agent')
+        createDirectory('server')
+
         buildFile << """
             plugins {
                 id 'io.github.rodm.teamcity-agent'
