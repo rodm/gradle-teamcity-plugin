@@ -33,6 +33,7 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
+import org.gradle.util.GradleVersion;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -192,7 +193,11 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     }
 
     public Provider<String> gradleProperty(final String name) {
-        return providers.gradleProperty(name).forUseAtConfigurationTime();
+        if (GradleVersion.current().compareTo(GradleVersion.version("7.4")) <= 0) {
+            return providers.gradleProperty(name).forUseAtConfigurationTime();
+        } else {
+            return providers.gradleProperty(name);
+        }
     }
 
     public final NamedDomainObjectContainer<TeamCityEnvironment> getEnvironments() {
