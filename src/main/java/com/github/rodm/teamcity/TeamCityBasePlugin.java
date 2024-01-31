@@ -27,7 +27,7 @@ public class TeamCityBasePlugin implements Plugin<Project> {
 
     private static final String TEAMCITY_EXTENSION_NAME = "teamcity";
 
-    private static final String MINIMUM_SUPPORTED_VERSION = "7.0";
+    private static final String MINIMUM_SUPPORTED_VERSION = "8.0";
 
     public void apply(Project project) {
         project.getPluginManager().apply(BasePlugin.class);
