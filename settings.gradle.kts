@@ -4,7 +4,7 @@ rootProject.name = "gradle-teamcity-plugin"
 dependencyResolutionManagement {
     versionCatalogs {
         register("libs") {
-            library("download-task", "de.undercouch", "gradle-download-task").version("5.1.0")
+            library("download-task", "de.undercouch", "gradle-download-task").version("5.5.0")
 
             version("plugin-structure", "3.190")
             version("plugin-signer", "0.1.8")
