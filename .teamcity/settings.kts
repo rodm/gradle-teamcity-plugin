@@ -11,14 +11,15 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
-version = "2022.04"
+version = "2023.11"
 
 val versionsMap = mapOf(
     "14" to "6.3",
     "15" to "6.7.1",
     "16" to "7.0.2",
     "17" to "7.3",
-    "18" to "7.5-rc-1"
+    "18" to "7.5-rc-1",
+    "19" to "7.6.1"
 )
 
 fun supportedGradleVersion(javaVersion: String?): String? {
@@ -165,7 +166,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("17", "18")
+                    "Java"("17", "18", "19")
                 }
                 build {
                     val javaVersion = axes["Java"]
