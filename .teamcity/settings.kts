@@ -34,9 +34,9 @@ project {
         id(vcsId)
         name = "gradle-teamcity-plugin"
         url = "https://github.com/rodm/gradle-teamcity-plugin.git"
-        branch = "refs/heads/main"
+        branch = "refs/heads/v1.5.x"
         branchSpec = """
-            +:refs/heads/(main)
+            +:refs/heads/(*)
             +:refs/tags/(*)
         """.trimIndent()
         useTagsAsBranches = true
