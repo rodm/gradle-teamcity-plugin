@@ -76,6 +76,8 @@ class FunctionalTestCase {
         File homeDir = createDirectory(folder, "${baseDir}/TeamCity-${version}".toString())
         File binDir = createDirectory(homeDir.toPath(), 'bin')
 
+        createCommonApiJar(homeDir.toPath(), version)
+
         File teamcityServerShellFile = createFile(binDir.toPath(), 'teamcity-server.sh')
         teamcityServerShellFile << """
             #!/bin/bash
@@ -89,7 +91,19 @@ class FunctionalTestCase {
             echo "Fake TeamCity startup script"
         """
 
-        createCommonApiJar(homeDir.toPath(), version)
+        File agentBinDir = createDirectory(homeDir.toPath(), 'buildAgent/bin')
+        File agentShellFile = createFile(agentBinDir.toPath(), 'agent.sh')
+        agentShellFile << """
+            #!/bin/bash
+            echo "Fake TeamCity Agent startup script"
+        """
+        agentShellFile.executable = true
+
+        File agentBatchFile = createFile(agentBinDir.toPath(), 'agent.bat')
+        agentBatchFile << """
+            @echo off
+            echo "Fake TeamCity Agent startup script"
+        """
         return homeDir
     }
 
