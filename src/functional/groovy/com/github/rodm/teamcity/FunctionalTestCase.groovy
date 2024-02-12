@@ -57,6 +57,12 @@ class FunctionalTestCase {
         Files.createDirectories(folder.resolve(name)).toFile()
     }
 
+    static File createFile(Path folder, String name, String contents) {
+        File file = createFile(folder, name)
+        file << contents
+        return file
+    }
+
     BuildResult executeBuild(String... args = ['build']) {
         return executeBuild(testProjectDir.toFile(), args)
     }
@@ -72,44 +78,43 @@ class FunctionalTestCase {
         createFakeTeamCityInstall(testProjectDir, baseDir, version)
     }
 
+    private static final String SERVER_SHELL_FILE = """
+        #!/bin/bash
+        echo "Fake TeamCity startup script"
+    """
+    private static final String SERVER_BATCH_FILE = """
+        @echo off
+        echo "Fake TeamCity startup script"
+    """
+    private static final String AGENT_SHELL_FILE = """
+        #!/bin/bash
+        echo "Fake TeamCity Agent startup script"
+    """
+    private static final String AGENT_BATCH_FILE = """
+        @echo off
+        echo "Fake TeamCity Agent startup script"
+    """
+
     static File createFakeTeamCityInstall(Path folder, String baseDir, String version) {
         File homeDir = createDirectory(folder, "${baseDir}/TeamCity-${version}".toString())
-        File binDir = createDirectory(homeDir.toPath(), 'bin')
-
         createCommonApiJar(homeDir.toPath(), version)
 
-        File teamcityServerShellFile = createFile(binDir.toPath(), 'teamcity-server.sh')
-        teamcityServerShellFile << """
-            #!/bin/bash
-            echo "Fake TeamCity startup script"
-        """
-        teamcityServerShellFile.executable = true
+        Path binDir = createDirectory(homeDir.toPath(), 'bin').toPath()
+        File serverShellFile = createFile(binDir, 'teamcity-server.sh', SERVER_SHELL_FILE)
+        serverShellFile.executable = true
+        createFile(binDir, 'teamcity-server.bat', SERVER_BATCH_FILE)
 
-        File teamcityServerBatchFile = createFile(binDir.toPath(), 'teamcity-server.bat')
-        teamcityServerBatchFile << """
-            @echo off
-            echo "Fake TeamCity startup script"
-        """
-
-        File agentBinDir = createDirectory(homeDir.toPath(), 'buildAgent/bin')
-        File agentShellFile = createFile(agentBinDir.toPath(), 'agent.sh')
-        agentShellFile << """
-            #!/bin/bash
-            echo "Fake TeamCity Agent startup script"
-        """
+        Path agentBinDir = createDirectory(homeDir.toPath(), 'buildAgent/bin').toPath()
+        File agentShellFile = createFile(agentBinDir, 'agent.sh', AGENT_SHELL_FILE)
         agentShellFile.executable = true
 
-        File agentBatchFile = createFile(agentBinDir.toPath(), 'agent.bat')
-        agentBatchFile << """
-            @echo off
-            echo "Fake TeamCity Agent startup script"
-        """
+        createFile(agentBinDir, 'agent.bat', AGENT_BATCH_FILE)
         return homeDir
     }
 
     private static void createCommonApiJar(Path folder, String version) {
         Path jarPath = folder.resolve('webapps/ROOT/WEB-INF/lib/common-api.jar')
-        jarPath.toFile().parentFile.mkdirs()
+        Files.createDirectories(jarPath.parent)
 
         Properties props = new Properties()
         props.put('Display_Version', version)
