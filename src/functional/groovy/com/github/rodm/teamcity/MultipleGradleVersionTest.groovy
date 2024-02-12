@@ -21,6 +21,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
@@ -70,179 +71,224 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         return javaVersions
     }
 
-    @BeforeEach
-    void setup() throws IOException {
-        buildFile << """
-            plugins {
-                id 'java'
-                id 'io.github.rodm.teamcity-server'
-            }
+    private BuildResult executeBuild(String version, String task) {
+        BuildResult result = GradleRunner.create()
+            .withProjectDir(testProjectDir.toFile())
+            .withArguments('--warning-mode', 'fail', task)
+            .withPluginClasspath()
+            .withGradleVersion(version)
+            .forwardOutput()
+            .build()
+        return result
+    }
 
-            project(':common') {
-                apply plugin: 'java'
-                apply plugin: 'io.github.rodm.teamcity-common'
+    @Nested
+    @DisplayName("plugin project")
+    class PluginProject {
 
-                teamcity {
-                    version = '8.1.5'
-                }
-            }
-
-            project(':agent') {
-                apply plugin: 'java'
-                apply plugin: 'io.github.rodm.teamcity-agent'
-
-                dependencies {
-                    implementation project(':common')
+        @BeforeEach
+        void setup() throws IOException {
+            buildFile << """
+                plugins {
+                    id 'java'
+                    id 'io.github.rodm.teamcity-server'
                 }
 
-                teamcity {
-                    version = '8.1.5'
+                project(':common') {
+                    apply plugin: 'java'
+                    apply plugin: 'io.github.rodm.teamcity-common'
 
-                    agent {
-                        archiveName = 'test-plugin-agent'
-                        descriptor {
-                            pluginDeployment {
-                                useSeparateClassloader = false
+                    teamcity {
+                        version = '8.1.5'
+                    }
+                }
+
+                project(':agent') {
+                    apply plugin: 'java'
+                    apply plugin: 'io.github.rodm.teamcity-agent'
+
+                    dependencies {
+                        implementation project(':common')
+                    }
+
+                    teamcity {
+                        version = '8.1.5'
+
+                        agent {
+                            archiveName = 'test-plugin-agent'
+                            descriptor {
+                                pluginDeployment {
+                                    useSeparateClassloader = false
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            dependencies {
-                implementation project(':common')
-                agent project(path: ':agent', configuration: 'plugin')
-            }
+                dependencies {
+                    implementation project(':common')
+                    agent project(path: ':agent', configuration: 'plugin')
+                }
 
-            teamcity {
-                version = '8.1.5'
+                teamcity {
+                    version = '8.1.5'
 
-                server {
-                    archiveName = 'test-plugin'
-                    descriptor {
-                        name = 'test-plugin'
-                        displayName = 'Test plugin'
-                        description = 'Test plugin description'
-                        version = '1.0'
-                        vendorName = 'vendor name'
-                        vendorUrl = 'https://www.example.org'
+                    server {
+                        archiveName = 'test-plugin'
+                        descriptor {
+                            name = 'test-plugin'
+                            displayName = 'Test plugin'
+                            description = 'Test plugin description'
+                            version = '1.0'
+                            vendorName = 'vendor name'
+                            vendorUrl = 'https://www.example.org'
+                        }
                     }
                 }
-            }
-        """
+            """
 
-        settingsFile << """
-            rootProject.name = 'test-plugin'
+            settingsFile << """
+                rootProject.name = 'test-plugin'
 
-            include 'common'
-            include 'agent'
-        """
+                include 'common'
+                include 'agent'
+            """
 
-        File commonJavaDir = createDirectory('common/src/main/java/example/common')
-        File commonJavaFile = createFile(commonJavaDir.toPath(), 'ExampleBuildFeature.java')
-        commonJavaFile << """
-            package example.common;
+            File commonJavaDir = createDirectory('common/src/main/java/example/common')
+            File commonJavaFile = createFile(commonJavaDir.toPath(), 'ExampleBuildFeature.java')
+            commonJavaFile << """
+                package example.common;
 
-            import jetbrains.buildServer.util.StringUtil;
+                import jetbrains.buildServer.util.StringUtil;
 
-            public class ExampleBuildFeature {
-                public static final String BUILD_FEATURE_NAME = "example";
-            }
-        """
+                public class ExampleBuildFeature {
+                    public static final String BUILD_FEATURE_NAME = "example";
+                }
+            """
 
-        File agentJavaDir = createDirectory('agent/src/main/java/example/agent')
-        File agentJavaFile = createFile(agentJavaDir.toPath(), 'ExampleBuildFeature.java')
-        agentJavaFile << """
-            package example.agent;
+            File agentJavaDir = createDirectory('agent/src/main/java/example/agent')
+            File agentJavaFile = createFile(agentJavaDir.toPath(), 'ExampleBuildFeature.java')
+            agentJavaFile << """
+                package example.agent;
 
-            import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
+                import jetbrains.buildServer.agent.AgentLifeCycleAdapter;
 
-            public class ExampleBuildFeature extends AgentLifeCycleAdapter {
-                String FEATURE_NAME = example.common.ExampleBuildFeature.BUILD_FEATURE_NAME;
-            }
-        """
+                public class ExampleBuildFeature extends AgentLifeCycleAdapter {
+                    String FEATURE_NAME = example.common.ExampleBuildFeature.BUILD_FEATURE_NAME;
+                }
+            """
 
-        File agentMetaInfDir = createDirectory('agent/src/main/resources/META-INF')
-        File agentDefinitionFile = createFile(agentMetaInfDir.toPath(), 'build-agent-plugin-example.xml')
-        agentDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
-            <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns="http://www.springframework.org/schema/beans"
-                   xsi:schemaLocation="http://www.springframework.org/schema/beans
-                                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
-                   default-autowire="constructor">
-                <bean id="exampleFeature" class="example.agent.ExampleBuildFeature"></bean>
-            </beans>
-        """
+            File agentMetaInfDir = createDirectory('agent/src/main/resources/META-INF')
+            File agentDefinitionFile = createFile(agentMetaInfDir.toPath(), 'build-agent-plugin-example.xml')
+            agentDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
+                <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xmlns="http://www.springframework.org/schema/beans"
+                       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+                       default-autowire="constructor">
+                    <bean id="exampleFeature" class="example.agent.ExampleBuildFeature"></bean>
+                </beans>
+            """
 
-        File serverJavaDir = createDirectory('src/main/java/example/server')
-        File serverJavaFile = createFile(serverJavaDir.toPath(), 'ExampleServerPlugin.java')
-        serverJavaFile << """
-            package example.server;
+            File serverJavaDir = createDirectory('src/main/java/example/server')
+            File serverJavaFile = createFile(serverJavaDir.toPath(), 'ExampleServerPlugin.java')
+            serverJavaFile << """
+                package example.server;
 
-            import example.common.ExampleBuildFeature;
-            import jetbrains.buildServer.serverSide.BuildServerAdapter;
+                import example.common.ExampleBuildFeature;
+                import jetbrains.buildServer.serverSide.BuildServerAdapter;
 
-            public class ExampleServerPlugin extends BuildServerAdapter {
-                String FEATURE_NAME = ExampleBuildFeature.BUILD_FEATURE_NAME;
-            }
-        """
+                public class ExampleServerPlugin extends BuildServerAdapter {
+                    String FEATURE_NAME = ExampleBuildFeature.BUILD_FEATURE_NAME;
+                }
+            """
 
-        File serverMetaInfDir = createDirectory('src/main/resources/META-INF')
-        File serverDefinitionFile = createFile(serverMetaInfDir.toPath(), 'build-server-plugin-example.xml')
-        serverDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
-            <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns="http://www.springframework.org/schema/beans"
-                   xsi:schemaLocation="http://www.springframework.org/schema/beans
-                                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
-                   default-autowire="constructor">
-                <bean id="examplePlugin" class="example.server.ExampleServerPlugin"></bean>
-            </beans>
-        """
+            File serverMetaInfDir = createDirectory('src/main/resources/META-INF')
+            File serverDefinitionFile = createFile(serverMetaInfDir.toPath(), 'build-server-plugin-example.xml')
+            serverDefinitionFile << """<?xml version="1.0" encoding="UTF-8"?>
+                <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xmlns="http://www.springframework.org/schema/beans"
+                       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+                       default-autowire="constructor">
+                    <bean id="examplePlugin" class="example.server.ExampleServerPlugin"></bean>
+                </beans>
+            """
+        }
+
+        @DisplayName('build plugin')
+        @ParameterizedTest(name = 'with Gradle {0}')
+        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
+        void 'build plugin'(String gradleVersion) {
+            def releasedJavaVersions = releasedJavaVersions()
+            def javaVersion = JavaVersion.current().toString()
+            assertThat(releasedJavaVersions, hasItem(javaVersion))
+
+            def supportedJavaVersions = supportedByGradle(gradleVersion)
+            assumeTrue(supportedJavaVersions.contains(javaVersion))
+
+            BuildResult result = executeBuild(gradleVersion, 'build')
+            checkBuild(result)
+        }
+
+        private void checkBuild(BuildResult result) {
+            assertThat(result.task(":agent:agentPlugin").getOutcome(), is(SUCCESS))
+            assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+
+            assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
+            assertThat(result.getOutput(), not(containsString('but the implementation class')))
+            assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
+
+            List<String> agentEntries = archiveEntries('agent/build/distributions/test-plugin-agent.zip')
+            assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
+            assertThat(agentEntries, hasItem('lib/common.jar'))
+            assertThat(agentEntries, hasItem('lib/agent.jar'))
+
+            List<String> serverEntries = archiveEntries('build/distributions/test-plugin.zip')
+            assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
+            assertThat(serverEntries, hasItem('server/common.jar'))
+            assertThat(serverEntries, hasItem('server/test-plugin.jar'))
+            assertThat(serverEntries, hasItem('teamcity-plugin.xml'))
+        }
     }
 
-    @DisplayName('build plugin')
-    @ParameterizedTest(name = 'with Gradle {0}')
-    @MethodSource("gradleVersions")
-    void 'build plugin'(String gradleVersion) {
-        def releasedJavaVersions = releasedJavaVersions()
-        def javaVersion = JavaVersion.current().toString()
-        assertThat(releasedJavaVersions, hasItem(javaVersion) )
+    @Nested
+    @DisplayName("environment project")
+    class EnvironmentProject {
 
-        def supportedJavaVersions = supportedByGradle(gradleVersion)
-        assumeTrue(supportedJavaVersions.contains(javaVersion))
+        @BeforeEach
+        void setup() throws IOException {
+            createFakeTeamCityInstall('servers', '2023.11.3')
 
-        BuildResult result = executeBuild(gradleVersion)
-        checkBuild(result)
-    }
+            buildFile << """
+                plugins {
+                    id 'io.github.rodm.teamcity-environments'
+                }
 
-    private BuildResult executeBuild(String version) {
-        BuildResult result = GradleRunner.create()
-                .withProjectDir(testProjectDir.toFile())
-                .withArguments('--warning-mode', 'fail', 'build')
-                .withPluginClasspath()
-                .withGradleVersion(version)
-                .forwardOutput()
-                .build()
-        return result
-    }
+                teamcity {
+                    environments {
+                        register("teamcity") {
+                            version = "2023.11.3"
+                        }
+                    }
+                }
+            """
+        }
 
-    private void checkBuild(BuildResult result) {
-        assertThat(result.task(":agent:agentPlugin").getOutcome(), is(SUCCESS))
-        assertThat(result.task(":serverPlugin").getOutcome(), is(SUCCESS))
+        @DisplayName('stop environment')
+        @ParameterizedTest(name = 'with Gradle {0}')
+        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
+        void 'stop environment'(String gradleVersion) {
+            def releasedJavaVersions = releasedJavaVersions()
+            def javaVersion = JavaVersion.current().toString()
+            assertThat(releasedJavaVersions, hasItem(javaVersion))
 
-        assertThat(result.getOutput(), not(containsString(NO_DEFINITION_WARNING)))
-        assertThat(result.getOutput(), not(containsString('but the implementation class')))
-        assertThat(result.getOutput(), not(containsString('archiveName property has been deprecated.')))
+            def supportedJavaVersions = supportedByGradle(gradleVersion)
+            assumeTrue(supportedJavaVersions.contains(javaVersion))
 
-        List<String> agentEntries = archiveEntries('agent/build/distributions/test-plugin-agent.zip')
-        assertThat(agentEntries, hasItem('teamcity-plugin.xml'))
-        assertThat(agentEntries, hasItem('lib/common.jar'))
-        assertThat(agentEntries, hasItem('lib/agent.jar'))
+            BuildResult result = executeBuild(gradleVersion, 'stopTeamcity')
 
-        List<String> serverEntries = archiveEntries('build/distributions/test-plugin.zip')
-        assertThat(serverEntries, hasItem('agent/test-plugin-agent.zip'))
-        assertThat(serverEntries, hasItem('server/common.jar'))
-        assertThat(serverEntries, hasItem('server/test-plugin.jar'))
-        assertThat(serverEntries, hasItem('teamcity-plugin.xml'))
+            assertThat(result.task(":stopTeamcity").getOutcome(), is(SUCCESS))
+        }
     }
 }
