@@ -9,7 +9,7 @@
 :uri-jetbrains-teamcity-releases: https://www.jetbrains.com/teamcity/download/other.html
 :uri-github-project: https://github.com/rodm/gradle-teamcity-plugin
 :uri-github-actions: {uri-github-project}/actions
-:uri-github-status: {uri-github-project}/workflows/Build/badge.svg
+:uri-github-status: {uri-github-actions}/workflows/build.yml/badge.svg
 :uri-shields-gradle-portal: https://img.shields.io/gradle-plugin-portal/v
 :uri-gradle-plugin-portal: https://plugins.gradle.org
 :uri-gradle-plugin: {uri-gradle-plugin-portal}/plugin/{plugin-id}
@@ -24,7 +24,7 @@
 The plugin provides support for {uri-teamcity-sdk-docs}[developing TeamCity plugins], creating agent and server side archives, publishing them to {uri-jetbrains-plugin-portal}[plugins portal], downloading and
 installing a TeamCity server and tasks to deploy, start and stop the server and agent.
 
-image:{uri-github-status}?branch=master["Build Status", link="{uri-github-actions}"]
+image:{uri-github-status}?branch=main["Build Status", link="{uri-github-actions}"]
 image:{uri-gradle-plugin-version}?label=Gradle%20Plugin%20Portal[Gradle Plugin Portal, link="{uri-gradle-plugin}"]
 
 == Supported Gradle and Java versions
