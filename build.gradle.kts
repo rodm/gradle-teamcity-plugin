@@ -6,7 +6,7 @@ plugins {
     id ("org.gradle.maven-publish")
     id ("com.gradle.plugin-publish") version "1.1.0"
     id ("org.jetbrains.kotlin.jvm") version "1.7.10"
-    id ("org.sonarqube") version "3.4.0.2513"
+    id ("org.sonarqube") version "4.0.0.2929"
 }
 
 version = "2.0-SNAPSHOT"
