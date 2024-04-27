@@ -13,13 +13,9 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.N
 
 version = "2023.11"
 
-val javaVersionsSupportedByProjectGradle = (8..18).map { it.toString() }
+val javaVersionsSupportedByProjectGradle = (8..19).map { it.toString() }
 
 val javaVersionsSupportedByGradleVersionMap = mapOf(
-    "16" to "7.0.2",
-    "17" to "7.3",
-    "18" to "7.5.1",
-    "19" to "7.6.1",
     "20" to "8.3-rc-3",
     "21" to "8.5"
 )
