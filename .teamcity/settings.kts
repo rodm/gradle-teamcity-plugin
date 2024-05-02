@@ -13,6 +13,7 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.N
 
 version = "2023.11"
 
+// project Gradle version 8.0.2
 val javaVersionsSupportedByProjectGradle = (8..19).map { it.toString() }
 
 val javaVersionsSupportedByGradleVersionMap = mapOf(
@@ -23,7 +24,7 @@ val javaVersionsSupportedByGradleVersionMap = mapOf(
 
 fun supportedGradleVersion(javaVersion: String?): String? {
     if (javaVersion in javaVersionsSupportedByProjectGradle) return null
-    if (javaVersion !in javaVersionsSupportedByGradleVersionMap.keys) throw IllegalArgumentException("Unsupported Java version: ${javaVersion}")
+    if (javaVersion !in javaVersionsSupportedByGradleVersionMap.keys) throw IllegalArgumentException("Unsupported Java version: $javaVersion")
     return javaVersionsSupportedByGradleVersionMap[javaVersion]
 }
 
@@ -168,7 +169,7 @@ project {
                 build {
                     val javaVersion = axes["Java"]
                     id("BuildFunctionalTestJava${javaVersion}")
-                    name = "Build - Functional Test - Java ${javaVersion}"
+                    name = "Build - Functional Test - Java $javaVersion"
                     templates(buildTemplate)
 
                     params {
