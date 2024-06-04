@@ -22,12 +22,14 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.instanceOf
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.not
@@ -133,6 +135,11 @@ class TeamCityBasePluginTest {
         private Project rootProject
         private Project subproject
 
+        private final ResettableOutputEventListener outputEventListener = new ResettableOutputEventListener()
+
+        @RegisterExtension
+        public final ConfigureLogging logging = new ConfigureLogging(outputEventListener)
+
         @BeforeEach
         void setup() {
             rootProject = project
@@ -193,6 +200,30 @@ class TeamCityBasePluginTest {
             assertThat(extension.defaultRepositories, is(false))
             assertThat(extension.allowSnapshotVersions, is(true))
             assertThat(extension.validateBeanDefinition, is(FAIL))
+        }
+
+        @Test
+        void 'output deprecation messages for inherited properties'() {
+            rootProject.teamcity {
+                version = '2024.03.2'
+                defaultRepositories = false
+                allowSnapshotVersions = true
+                validateBeanDefinition = IGNORE
+            }
+
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
+
+            def extension = subproject.extensions.getByName('teamcity') as TeamCityPluginExtension
+            assertThat(extension.version, is('2024.03.2'))
+            assertThat(extension.defaultRepositories, is(false))
+            assertThat(extension.allowSnapshotVersions, is(true))
+            assertThat(extension.validateBeanDefinition, is(IGNORE))
+
+            def output = outputEventListener.toString()
+            assertThat(output, containsString("Using inherited property 'version' is deprecated"))
+            assertThat(output, containsString("Using inherited property 'defaultRepositories' is deprecated"))
+            assertThat(output, containsString("Using inherited property 'allowSnapshotVersions' is deprecated"))
+            assertThat(output, containsString("Using inherited property 'validateBeanDefinition' is deprecated"))
         }
     }
 }

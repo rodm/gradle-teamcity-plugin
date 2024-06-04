@@ -19,15 +19,21 @@ import com.github.rodm.teamcity.internal.DefaultTeamCityPluginExtension;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Transformer;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.util.GradleVersion;
+import org.jetbrains.annotations.NotNull;
 
 public class TeamCityBasePlugin implements Plugin<Project> {
 
     private static final String TEAMCITY_EXTENSION_NAME = "teamcity";
 
     private static final String MINIMUM_SUPPORTED_VERSION = "7.0";
+
+    private static final String INHERITED_PROPERTY_MESSAGE = "Using inherited property '{}' is deprecated. Consider using a convention plugin to configure properties in multiple projects.";
 
     public void apply(Project project) {
         project.getPluginManager().apply(BasePlugin.class);
@@ -50,12 +56,13 @@ public class TeamCityBasePlugin implements Plugin<Project> {
 
     private static void applyInheritedProperties(Project project, final DefaultTeamCityPluginExtension extension) {
         if (isNotRootProject(project)) {
-            DefaultTeamCityPluginExtension rootExtension = (DefaultTeamCityPluginExtension) getRootExtension(project);
+            final DefaultTeamCityPluginExtension rootExtension = (DefaultTeamCityPluginExtension) getRootExtension(project);
             if (rootExtension != null) {
-                extension.getVersionProperty().set(rootExtension.getVersionProperty());
-                extension.getAllowSnapshotVersionsProperty().set(rootExtension.getAllowSnapshotVersionsProperty());
-                extension.getValidateBeanDefinitionProperty().set(rootExtension.getValidateBeanDefinitionProperty());
-                extension.getDefaultRepositoriesProperty().set(rootExtension.getDefaultRepositoriesProperty());
+                final Logger logger = project.getLogger();
+                extension.getVersionProperty().set(withDeprecationTransformer(rootExtension.getVersionProperty(), logger, "version"));
+                extension.getAllowSnapshotVersionsProperty().set(withDeprecationTransformer(rootExtension.getAllowSnapshotVersionsProperty(), logger, "allowSnapshotVersions"));
+                extension.getValidateBeanDefinitionProperty().set(withDeprecationTransformer(rootExtension.getValidateBeanDefinitionProperty(), logger, "validateBeanDefinition"));
+                extension.getDefaultRepositoriesProperty().set(withDeprecationTransformer(rootExtension.getDefaultRepositoriesProperty(), logger, "defaultRepositories"));
             }
         }
     }
@@ -66,5 +73,31 @@ public class TeamCityBasePlugin implements Plugin<Project> {
 
     private static boolean isNotRootProject(Project project) {
         return !project.getRootProject().equals(project);
+    }
+
+    private static <T> Provider<T> withDeprecationTransformer(Property<T> property, Logger logger, String name) {
+        return property.map(new DeprecationTransformer<>(logger, name));
+    }
+
+    private static class DeprecationTransformer<T> implements Transformer<T, T> {
+
+        private final Logger logger;
+        private final String name;
+        private boolean shown = false;
+
+        DeprecationTransformer(Logger logger, String name) {
+            this.logger = logger;
+            this.name = name;
+        }
+
+        @NotNull
+        @Override
+        public T transform(@NotNull T in) {
+            if (!shown) {
+                logger.warn(INHERITED_PROPERTY_MESSAGE, name);
+                shown = true;
+            }
+            return in;
+        }
     }
 }
