@@ -42,6 +42,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     public static final String BASE_DOWNLOAD_URL_PROPERTY = "teamcity.environments.baseDownloadUrl";
     public static final String BASE_DATA_DIR_PROPERTY = "teamcity.environments.baseDataDir";
     public static final String BASE_HOME_DIR_PROPERTY = "teamcity.environments.baseHomeDir";
+    public static final String SHUTDOWN_TIMEOUT_PROPERTY = "teamcity.environments.shutdownTimeout";
 
     public static final String DEFAULT_DOWNLOADS_DIR = "downloads";
     public static final String DEFAULT_BASE_DOWNLOAD_URL = "https://download.jetbrains.com/teamcity";
@@ -134,6 +135,13 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
 
     public Provider<String> getBaseDataDirProperty() {
         return gradleProperty(BASE_DATA_DIR_PROPERTY).orElse(baseDataDir);
+    }
+
+    /*
+     * The time in seconds to wait for the TeamCity Server to shut down.
+     */
+    public Provider<String> getShutdownTimeoutProperty() {
+        return gradleProperty(SHUTDOWN_TIMEOUT_PROPERTY);
     }
 
     public TeamCityEnvironment getByName(String name) {
