@@ -19,8 +19,9 @@ import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultLocalTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import com.github.rodm.teamcity.internal.DisablePluginAction;
-import com.github.rodm.teamcity.docker.DockerTask;
 import com.github.rodm.teamcity.internal.EnablePluginAction;
+import com.github.rodm.teamcity.internal.ShutdownWaitAction;
+import com.github.rodm.teamcity.docker.DockerTask;
 import com.github.rodm.teamcity.tasks.Deploy;
 import com.github.rodm.teamcity.tasks.DownloadTeamCity;
 import com.github.rodm.teamcity.tasks.InstallTeamCity;
@@ -180,6 +181,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getHomeDir().set(environment.getHomeDirProperty());
                 task.getJavaHome().set(environment.getJavaHomeProperty());
                 task.finalizedBy(tasks.named(environment.undeployTaskName()));
+                task.doLast(new ShutdownWaitAction(environment.getShutdownTimeoutProperty()));
             });
 
             tasks.register(environment.startAgentTaskName(), StartAgent.class, task -> {

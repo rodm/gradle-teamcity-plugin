@@ -87,6 +87,10 @@ public class DefaultLocalTeamCityEnvironment extends BaseTeamCityEnvironment imp
         return gradleProperty(propertyName("javaHome")).orElse(javaHome);
     }
 
+    public Provider<String> getShutdownTimeoutProperty() {
+        return environments.getShutdownTimeoutProperty();
+    }
+
     private Provider<String> defaultDownloadUrl() {
         return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + getVersion() + ".tar.gz");
     }
