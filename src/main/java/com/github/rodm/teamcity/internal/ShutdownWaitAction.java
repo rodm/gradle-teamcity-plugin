@@ -44,26 +44,35 @@ public class ShutdownWaitAction implements Action<Task> {
         ServerAction serverActionTask = (ServerAction) task;
         final String host = serverActionTask.getServerHost().get();
         final int port = Integer.parseInt(serverActionTask.getServerPort().get());
+        sleep(250);
+        if (!isServerAvailable(host, port)) {
+            return;
+        }
+
+        final String path = task.getName();
         final Logger logger = task.getLogger();
         long timeout = getTimeout();
         long waitTime = TimeUnit.MILLISECONDS.convert(timeout, TimeUnit.SECONDS);
-        logger.info("TeamCity Server shutdown requested. Timeout is {} seconds.", timeout);
+        logger.info("{}: TeamCity Server shutdown requested. Timeout is {} seconds.", path, timeout);
         while (isServerAvailable(host, port) && waitTime > 0) {
-            logger.info("TeamCity Server is still running");
-            long start = System.currentTimeMillis();
-            try {
-                TimeUnit.MILLISECONDS.sleep(500);
-            }
-            catch (InterruptedException e) {
-                // ignore
-            }
-            long end = System.currentTimeMillis();
-            waitTime -= (end - start);
+            logger.info("{}: TeamCity Server is still running", path);
+            waitTime -= sleep(500);
         }
         if (isServerAvailable(host, port)) {
             throw new GradleException("Time out waiting for TeamCity Server to shutdown.");
         }
-        logger.info("TeamCity Server has stopped");
+        logger.info("{}: TeamCity Server has stopped", path);
+    }
+
+    private long sleep(int timeout) {
+        long start = System.currentTimeMillis();
+        try {
+            TimeUnit.MILLISECONDS.sleep(timeout);
+        }
+        catch (InterruptedException e) {
+            // ignore
+        }
+        return System.currentTimeMillis() - start;
     }
 
     private long getTimeout() {
