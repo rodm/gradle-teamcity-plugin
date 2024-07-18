@@ -17,7 +17,9 @@ package com.github.rodm.teamcity
 
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.plugins.BasePlugin
+import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -27,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir
 
 import static com.github.rodm.teamcity.ValidationMode.FAIL
 import static com.github.rodm.teamcity.ValidationMode.IGNORE
+import static com.github.rodm.teamcity.ValidationMode.WARN
 import static org.hamcrest.CoreMatchers.equalTo
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
@@ -47,6 +50,9 @@ class TeamCityBasePluginTest {
     void setup(@TempDir File projectDir) {
         project = ProjectBuilder.builder().withProjectDir(projectDir).build()
         project.apply plugin: 'io.github.rodm.teamcity-base'
+
+        // workaround for https://github.com/gradle/gradle/issues/13122
+        (project as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(projectDir)
     }
 
     @Test
@@ -115,7 +121,7 @@ class TeamCityBasePluginTest {
     @Test
     void 'default mode for bean definition validation'() {
         def extension = project.extensions.getByName('teamcity') as TeamCityPluginExtension
-        assertThat(extension.validateBeanDefinition, equalTo(ValidationMode.WARN))
+        assertThat(extension.validateBeanDefinition, equalTo(WARN))
     }
 
     @Test
@@ -224,6 +230,37 @@ class TeamCityBasePluginTest {
             assertThat(output, containsString("Using inherited property 'defaultRepositories' is deprecated"))
             assertThat(output, containsString("Using inherited property 'allowSnapshotVersions' is deprecated"))
             assertThat(output, containsString("Using inherited property 'validateBeanDefinition' is deprecated"))
+        }
+
+        @Test
+        void 'sub-project has default properties and no deprecation messages when inherited properties disabled'() {
+            rootProject.projectDir.toPath().resolve('gradle.properties').toFile() << """
+            teamcity.disableInheritedProperties = true
+            """
+            rootProject = ProjectBuilder.builder().withProjectDir(rootProject.projectDir).build()
+            rootProject.apply plugin: 'io.github.rodm.teamcity-base'
+            subproject = ProjectBuilder.builder().withParent(rootProject).build()
+            // workaround for https://github.com/gradle/gradle/issues/13122
+            (rootProject as ProjectInternal).services.get(GradlePropertiesController).loadGradlePropertiesFrom(rootProject.projectDir)
+
+            rootProject.teamcity {
+                version = '2024.03.2'
+                defaultRepositories = false
+                allowSnapshotVersions = true
+                validateBeanDefinition = IGNORE
+            }
+
+            subproject.apply plugin: 'io.github.rodm.teamcity-base'
+
+            def extension = subproject.extensions.getByName('teamcity') as TeamCityPluginExtension
+            // subproject has default values
+            assertThat(extension.version, is('9.0'))
+            assertThat(extension.defaultRepositories, is(true))
+            assertThat(extension.allowSnapshotVersions, is(false))
+            assertThat(extension.validateBeanDefinition, is(WARN))
+
+            def output = outputEventListener.toString()
+            assertThat(output, not(containsString("Using inherited property")))
         }
     }
 }

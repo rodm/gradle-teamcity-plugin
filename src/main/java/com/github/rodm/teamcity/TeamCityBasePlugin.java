@@ -34,6 +34,7 @@ public class TeamCityBasePlugin implements Plugin<Project> {
     private static final String MINIMUM_SUPPORTED_VERSION = "7.0";
 
     private static final String INHERITED_PROPERTY_MESSAGE = "Using inherited property '{}' is deprecated. Consider using a convention plugin to configure properties in multiple projects.";
+    private static final String DISABLE_INHERITED_PROPERTIES = "teamcity.disableInheritedProperties";
 
     public void apply(Project project) {
         project.getPluginManager().apply(BasePlugin.class);
@@ -55,7 +56,7 @@ public class TeamCityBasePlugin implements Plugin<Project> {
     }
 
     private static void applyInheritedProperties(Project project, final DefaultTeamCityPluginExtension extension) {
-        if (isNotRootProject(project)) {
+        if (isNotRootProject(project) && isInheritedPropertiesEnabled(project)) {
             final DefaultTeamCityPluginExtension rootExtension = (DefaultTeamCityPluginExtension) getRootExtension(project);
             if (rootExtension != null) {
                 final Logger logger = project.getLogger();
@@ -73,6 +74,20 @@ public class TeamCityBasePlugin implements Plugin<Project> {
 
     private static boolean isNotRootProject(Project project) {
         return !project.getRootProject().equals(project);
+    }
+
+    private static boolean isInheritedPropertiesEnabled(Project project) {
+        String value = getDisableInheritedProperties(project).getOrElse("false");
+        return !Boolean.parseBoolean(value.trim());
+    }
+
+    private static Provider<String> getDisableInheritedProperties(Project project) {
+        Provider<String> property = project.getProviders().gradleProperty(DISABLE_INHERITED_PROPERTIES);
+        if (GradleVersion.current().compareTo(GradleVersion.version("7.4")) <= 0) {
+            return property.forUseAtConfigurationTime();
+        } else {
+            return property;
+        }
     }
 
     private static <T> Provider<T> withDeprecationTransformer(Property<T> property, Logger logger, String name) {
