@@ -26,12 +26,28 @@ public interface DockerTeamCityEnvironment extends TeamCityEnvironment {
     void setServerImage(String serverImage);
 
     /**
+     * The tag of the TeamCity Server Docker image.
+     *
+     * @return the Docker image tag
+     */
+    String getServerTag();
+    void setServerTag(String serverTag);
+
+    /**
      * The name of the TeamCity Build Agent Docker image.
      *
      * @return the Docker image name
      */
     String getAgentImage();
     void setAgentImage(String agentImage);
+
+    /**
+     * The tag of the TeamCity Build Agent Docker image.
+     *
+     * @return the Docker image tag
+     */
+    String getAgentTag();
+    void setAgentTag(String agentTag);
 
     /**
      * The name of the TeamCity Server container.

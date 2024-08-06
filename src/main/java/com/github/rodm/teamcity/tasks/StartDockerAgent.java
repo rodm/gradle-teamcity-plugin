@@ -39,9 +39,6 @@ public abstract class StartDockerAgent extends DockerTask {
     }
 
     @Input
-    public abstract Property<String> getVersion();
-
-    @Input
     public abstract Property<String> getDataDir();
 
     @Input
@@ -54,6 +51,9 @@ public abstract class StartDockerAgent extends DockerTask {
     public abstract Property<String> getImageName();
 
     @Input
+    public abstract Property<String> getImageTag();
+
+    @Input
     public abstract Property<String> getServerContainerName();
 
     @TaskAction
@@ -64,11 +64,11 @@ public abstract class StartDockerAgent extends DockerTask {
             WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
             queue.submit(StartAgentContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
-                params.getVersion().set(getVersion());
                 params.getDataDir().set(getDataDir());
                 params.getConfigDir().set(getConfigDir());
                 params.getAgentOptions().set(getAgentOptions());
                 params.getImageName().set(getImageName());
+                params.getImageTag().set(getImageTag());
                 params.getServerContainerName().set(getServerContainerName());
             });
             queue.await();
