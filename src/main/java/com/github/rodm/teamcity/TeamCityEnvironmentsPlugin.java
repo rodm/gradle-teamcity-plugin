@@ -219,11 +219,11 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         final TaskContainer tasks = project.getTasks();
         tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
-            task.getVersion().set(environment.getVersionProperty());
             task.getDataDir().set(environment.getDataDirProperty());
             task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/logs"));
             task.getServerOptions().set(environment.getServerOptionsProvider());
             task.getImageName().set(environment.getServerImageProperty());
+            task.getImageTag().set(environment.getServerTagProperty().orElse(environment.getVersion()));
             task.getContainerName().set(environment.getServerNameProperty());
             task.getPort().set(environment.getPortProperty());
             task.doFirst(t -> project.mkdir(environment.getDataDir()));
@@ -238,11 +238,11 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
-            task.getVersion().set(environment.getVersionProperty());
             task.getDataDir().set(environment.getDataDirProperty());
             task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
             task.getAgentOptions().set(environment.getAgentOptionsProvider());
             task.getImageName().set(environment.getAgentImageProperty());
+            task.getImageTag().set(environment.getAgentTagProperty().orElse(environment.getVersion()));
             task.getContainerName().set(environment.getAgentNameProperty());
             task.getServerContainerName().set(environment.getServerNameProperty());
             task.mustRunAfter(tasks.named(environment.startServerTaskName()));

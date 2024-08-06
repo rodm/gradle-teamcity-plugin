@@ -46,9 +46,6 @@ public abstract class StartDockerServer extends DockerTask {
     }
 
     @Input
-    public abstract Property<String> getVersion();
-
-    @Input
     public abstract Property<String> getDataDir();
 
     @Input
@@ -61,11 +58,14 @@ public abstract class StartDockerServer extends DockerTask {
     public abstract Property<String> getImageName();
 
     @Input
+    public abstract Property<String> getImageTag();
+
+    @Input
     public abstract Property<String> getPort();
 
     @TaskAction
     void startServer() {
-        String image = getImageName().get() + ":" + getVersion().get();
+        String image = getImageName().get() + ":" + getImageTag().get();
         String serverOptions = getServerOptions().get();
         ContainerConfiguration configuration = ContainerConfiguration.builder()
             .image(image)

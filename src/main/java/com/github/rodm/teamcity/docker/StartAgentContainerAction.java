@@ -32,11 +32,11 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
 
     public interface StartAgentParameters extends WorkParameters {
         Property<String> getContainerName();
-        Property<String> getVersion();
         Property<String> getDataDir();
         Property<String> getConfigDir();
         Property<String> getAgentOptions();
         Property<String> getImageName();
+        Property<String> getImageTag();
         Property<String> getServerContainerName();
     }
 
@@ -45,7 +45,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
         final StartAgentParameters parameters = getParameters();
         final DockerOperations dockerOperations = new DockerOperations();
 
-        String image = parameters.getImageName().get() + ":" + parameters.getVersion().get();
+        String image = parameters.getImageName().get() + ":" + parameters.getImageTag().get();
         if (!dockerOperations.isImageAvailable(image)) {
             throw new GradleException(format(IMAGE_NOT_AVAILABLE, image));
         }

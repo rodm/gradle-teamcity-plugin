@@ -1255,7 +1255,6 @@ class EnvironmentsTest {
             project.evaluate()
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
-            assertThat(startServer.version.get(), equalTo('2021.2.3'))
             assertThat(normalize(startServer.dataDir.get()), endsWith('data/2021.2'))
             def expectedOptions = defaultOptions + ' -DadditionalOption=value'
             assertThat(startServer.serverOptions.get(), equalTo(expectedOptions))
@@ -1274,7 +1273,6 @@ class EnvironmentsTest {
             project.evaluate()
 
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
-            assertThat(startAgent.version.get(), equalTo('2021.2.3'))
             def expectedOptions = '-DadditionalOption=value'
             assertThat(startAgent.agentOptions.get(), equalTo(expectedOptions))
         }
@@ -1292,9 +1290,11 @@ class EnvironmentsTest {
 
             def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
             assertThat(startServer.imageName.get(), equalTo('jetbrains/teamcity-server'))
+            assertThat(startServer.imageTag.get(), equalTo('2021.2.3'))
             assertThat(startServer.containerName.get(), equalTo('teamcity-server'))
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.imageName.get(), equalTo('jetbrains/teamcity-agent'))
+            assertThat(startAgent.imageTag.get(), equalTo('2021.2.3'))
             assertThat(startAgent.containerName.get(), equalTo('teamcity-agent'))
         }
 
@@ -1315,6 +1315,25 @@ class EnvironmentsTest {
             assertThat(startServer.imageName.get(), equalTo('alt-teamcity-server'))
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.imageName.get(), equalTo('alt-teamcity-agent'))
+        }
+
+        @Test
+        void 'configures tasks with alternative Docker image tags'() {
+            project.teamcity {
+                environments {
+                    test(DockerTeamCityEnvironment) {
+                        version = '2021.2.3'
+                        serverTag = '2021.2.3-linux'
+                        agentTag = '2021.2.3-linux-sudo'
+                    }
+                }
+            }
+            project.evaluate()
+
+            def startServer = project.tasks.getByName('startTestServer') as StartDockerServer
+            assertThat(startServer.imageTag.get(), equalTo('2021.2.3-linux'))
+            def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
+            assertThat(startAgent.imageTag.get(), equalTo('2021.2.3-linux-sudo'))
         }
 
         @Test
