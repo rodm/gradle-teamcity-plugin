@@ -16,8 +16,10 @@
 package com.github.rodm.teamcity
 
 import org.gradle.api.JavaVersion
+import org.gradle.internal.os.OperatingSystem
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.tooling.internal.consumer.ConnectorServices
 import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -73,6 +75,10 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     }
 
     private BuildResult executeBuild(String version, String task) {
+        if (OperatingSystem.current() == OperatingSystem.LINUX) {
+            ConnectorServices.reset()
+        }
+
         BuildResult result = GradleRunner.create()
             .withProjectDir(testProjectDir.toFile())
             .withArguments('--warning-mode', 'fail', task)
