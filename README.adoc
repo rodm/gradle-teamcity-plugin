@@ -127,6 +127,14 @@ for resolving dependencies. Setting this flag to false allows a local repository
 Applying the base plugin allows the extension properties `version`, `allowSnapshotVersions`, `validateBeanDefinition`
 and `defaultRepositories` to be inherited by sub-projects applying the other plugins.
 
+The support for inheriting properties from the root project is now deprecated and will be removed in version 2.0.
+This functionality can be disabled by setting the Gradle property `teamcity.disableInheritedProperties` to `true`.
+The recommended way to share or set common configuration between projects is to use
+https://docs.gradle.org/current/userguide/custom_plugins.html#sec:convention_plugins[convention plugins].
+For examples see the `build-logic` directory in the following projects
+https://github.com/rodm/teamcity-gradle-init-scripts-plugin/[Gradle Init Scripts] plugin and
+https://github.com/rodm/teamcity-jvm-monitor-plugin/[JVM Monitor] plugin.
+
 ==== Example
 
 Plugin descriptor defined in the build script.
@@ -596,6 +604,10 @@ defined in the build script.
 * `teamcity.environments._<environment>_.serverOptions`
 * `teamcity.environments._<environment>_.agentOptions`
 
+The following Gradle property `teamcity.environments.shutdownTimeout` is used to set the seconds the Stop Server
+task will wait for the TeamCity Server to stop. This property is only used by the Stop Server task for local
+TeamCity environments. The default value is 10 seconds.
+
 ===== Tasks
 
 For each environment the following tasks are created based on the environment name:
@@ -774,8 +786,10 @@ To configure a Docker TeamCity environment the configuration block supports the 
 * `version` : The TeamCity version, the version of TeamCity to download and install locally. Defaults to '{default-api-version}'.
 * `dataDir` : The path to the TeamCity Data directory. Defaults to `${baseDataDir}/${version}`, version excludes the bug fix digit.
 * `serverImage` : The name of the Docker image to use for the TeamCity Server. Defaults to `{uri-docker-teamcity-server}[jetbrains/teamcity-server]:${version}`.
+* `serverTag` : The tag of the Docker image to use for the TeamCity Server. Defaults to the environment `version`.
 * `serverName` : The name of the running Docker container for the TeamCity Server. Defaults to `teamcity-server`.
 * `agentImage` : The name of the Docker image to use for the TeamCity Build Agent. Defaults to `{uri-docker-teamcity-agent}[jetbrains/teamcity-agent]:${version}`..
+* `agentTag` : The tag of the Docker image to use for the TeamCity Build Agent. Defaults to the environment `version`.
 * `agentName` : The name to the running Docker container for the TeamCity Build Agent. Defaults to `teamcity-agent`.
 * `serverOptions` : Options passed to the TeamCity server via the `TEAMCITY_SERVER_OPTS` environment variable.
 Default `-Dteamcity.development.mode=true`, `-Dteamcity.development.shadowCopyClasses=true`,
@@ -803,7 +817,6 @@ Note that this feature currently relies on the file name of the plugin not chang
 
 To start and stop a TeamCity Server and Build Agent using Docker requires {uri-docker-desktop}[Docker] to be
 installed and running before executing the environment tasks.
-The environment `version` property is used to select an image by tag.
 
 ===== Example
 
