@@ -79,6 +79,14 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
             ConnectorServices.reset()
         }
 
+        if (GradleVersion.version(version) >= GradleVersion.version('8.10')) {
+            def gradleDir = createDirectory('gradle').toPath()
+            File gradleDaemonJvmProperties = createFile(gradleDir, 'gradle-daemon-jvm.properties')
+            gradleDaemonJvmProperties << """
+            toolchainVersion=17
+            """
+        }
+
         BuildResult result = GradleRunner.create()
             .withProjectDir(testProjectDir.toFile())
             .withArguments('--warning-mode', 'fail', task)
