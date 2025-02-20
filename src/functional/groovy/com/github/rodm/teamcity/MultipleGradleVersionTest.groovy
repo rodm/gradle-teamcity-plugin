@@ -43,12 +43,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @SuppressWarnings('unused')
     static List<String> gradleVersions() {
         return [
-            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'
+            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9', '8.10.2', '8.11.1', '8.12.1'
         ]
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22']
+        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
     }
 
     private static Map<String, String> GRADLE_JAVA_VERSIONS = [
@@ -60,7 +60,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         '7.6-rc-1': '19',
         '8.3-rc-1': '20',
         '8.5': '21',
-        '8.8-rc-1': '22'
+        '8.8-rc-1': '22',
+        '8.10': '23'
     ].asUnmodifiable()
 
     static List<String> supportedByGradle(String version) {
