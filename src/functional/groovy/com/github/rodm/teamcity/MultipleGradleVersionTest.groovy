@@ -24,6 +24,7 @@ import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
@@ -82,7 +83,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         }
 
         if (GradleVersion.version(version) >= GradleVersion.version('8.10')) {
-            assumeFalse(OperatingSystem.current() == OperatingSystem.WINDOWS)
+//            assumeFalse(OperatingSystem.current() == OperatingSystem.WINDOWS)
             def gradleDir = createDirectory('gradle').toPath()
             File gradleDaemonJvmProperties = createFile(gradleDir, 'gradle-daemon-jvm.properties')
             gradleDaemonJvmProperties << """
@@ -98,6 +99,12 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
             .forwardOutput()
             .build()
         return result
+    }
+
+    @Test
+    void 'list Java toolchains'() {
+        BuildResult result = executeBuild('8.0.2', 'javaToolchains')
+        assertThat(result.task(":javaToolchains").getOutcome(), is(SUCCESS))
     }
 
     @Nested
