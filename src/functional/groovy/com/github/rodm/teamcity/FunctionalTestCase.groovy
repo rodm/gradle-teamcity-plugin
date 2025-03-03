@@ -15,8 +15,10 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
@@ -31,6 +33,13 @@ class FunctionalTestCase {
     static final String SETTINGS_SCRIPT_DEFAULT = """
     rootProject.name = 'test-plugin'
     """
+
+    private static Map<String, String> JAVA_TO_GRADLE_VERSIONS = [
+        '20': '8.3',
+        '21': '8.5',
+        '22': '8.8',
+        '23': '8.10'
+    ].asUnmodifiable()
 
     @TempDir
     public Path testProjectDir
@@ -66,11 +75,12 @@ class FunctionalTestCase {
         return file
     }
 
-    static BuildResult executeBuild(File projectDir, String... args = ['build']) {
+    static BuildResult executeBuild(File projectDir, String version, String... args = ['build']) {
         GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments('--warning-mode', 'fail', *args)
             .withPluginClasspath()
+            .withGradleVersion(version)
             .forwardOutput()
             .build()
     }
@@ -85,7 +95,12 @@ class FunctionalTestCase {
     }
 
     BuildResult executeBuild(String... args = ['build']) {
-        return executeBuild(testProjectDir.toFile(), args)
+        String gradleVersion = compatibleGradleVersion()
+        return executeBuild(testProjectDir.toFile(), gradleVersion, args)
+    }
+
+    private static String compatibleGradleVersion() {
+        return JAVA_TO_GRADLE_VERSIONS.getOrDefault(JavaVersion.current().majorVersion, GradleVersion.current().version)
     }
 
     List<String> archiveEntries(String path) {
