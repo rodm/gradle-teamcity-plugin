@@ -110,10 +110,15 @@ tasks {
         }
     }
 
+    val testJavaVersion = (findProperty("test.java.version") as String?) ?: "8"
+
     register<Test>("functionalTest") {
         description = "Runs the functional tests."
         group = "verification"
         useJUnitPlatform()
+        javaLauncher.set(project.javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(testJavaVersion))
+        })
         testClassesDirs = functional.output.classesDirs
         classpath = functional.runtimeClasspath
     }
