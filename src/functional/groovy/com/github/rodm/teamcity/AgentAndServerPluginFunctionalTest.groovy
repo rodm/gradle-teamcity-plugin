@@ -18,8 +18,6 @@ package com.github.rodm.teamcity
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.Test
 
-import static com.github.rodm.teamcity.TestSupport.executeBuildAndFail
-import static com.github.rodm.teamcity.TestSupport.SETTINGS_SCRIPT_DEFAULT
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.hasItem

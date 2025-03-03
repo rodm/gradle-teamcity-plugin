@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity
 
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
@@ -25,9 +26,11 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-import static com.github.rodm.teamcity.TestSupport.executeBuild
-
 class FunctionalTestCase {
+
+    static final String SETTINGS_SCRIPT_DEFAULT = """
+    rootProject.name = 'test-plugin'
+    """
 
     @TempDir
     public Path testProjectDir
@@ -61,6 +64,24 @@ class FunctionalTestCase {
         File file = createFile(folder, name)
         file << contents
         return file
+    }
+
+    static BuildResult executeBuild(File projectDir, String... args = ['build']) {
+        GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withArguments('--warning-mode', 'fail', *args)
+            .withPluginClasspath()
+            .forwardOutput()
+            .build()
+    }
+
+    static BuildResult executeBuildAndFail(File projectDir, String args) {
+        GradleRunner.create()
+            .withProjectDir(projectDir)
+            .withArguments(args)
+            .withPluginClasspath()
+            .forwardOutput()
+            .buildAndFail()
     }
 
     BuildResult executeBuild(String... args = ['build']) {
