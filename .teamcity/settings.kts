@@ -1,7 +1,6 @@
 
 import com.github.rodm.teamcity.pipeline
 import com.github.rodm.teamcity.project.githubIssueTracker
-import jetbrains.buildServer.configs.kotlin.BuildSteps
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.version
 import jetbrains.buildServer.configs.kotlin.project
@@ -12,31 +11,6 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
 version = "2024.12"
-
-// project Gradle version 8.0.2
-val javaVersionsSupportedByProjectGradle = (8..19).map { it.toString() }
-
-val javaVersionsSupportedByGradleVersionMap = mapOf(
-    "20" to "8.3-rc-3",
-    "21" to "8.5",
-    "22" to "8.8-rc-1",
-    "23" to "8.10"
-)
-
-fun supportedGradleVersion(javaVersion: String?): String? {
-    if (javaVersion in javaVersionsSupportedByProjectGradle) return null
-    if (javaVersion !in javaVersionsSupportedByGradleVersionMap.keys) throw IllegalArgumentException("Unsupported Java version: $javaVersion")
-    return javaVersionsSupportedByGradleVersionMap[javaVersion]
-}
-
-fun BuildSteps.switchGradleBuildStep(javaHome: String, gradleVersion: String) {
-    gradle {
-        id = "SWITCH_GRADLE"
-        name = "Switch Gradle"
-        tasks = "wrapper --gradle-version $gradleVersion"
-        jdkHome = javaHome
-    }
-}
 
 project {
 
@@ -174,16 +148,8 @@ project {
                     templates(buildTemplate)
 
                     params {
+                        param("gradle.opts", "-Ptest.java.version=${javaVersion}")
                         param("gradle.tasks", "clean functionalTest")
-                        param("java.home", "%java${javaVersion}.home%")
-                    }
-
-                    val gradleVersion = supportedGradleVersion(javaVersion)
-                    gradleVersion?.apply {
-                        steps {
-                            switchGradleBuildStep("%java8.home%", gradleVersion)
-                            stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
-                        }
                     }
                 }
             }
