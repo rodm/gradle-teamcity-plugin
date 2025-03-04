@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
-version = "2024.03"
+version = "2024.12"
 
 // project Gradle version 8.0.2
 val javaVersionsSupportedByProjectGradle = (8..19).map { it.toString() }
