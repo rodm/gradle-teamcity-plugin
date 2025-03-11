@@ -75,12 +75,14 @@ class FunctionalTestCase {
         return file
     }
 
-    static BuildResult executeBuild(File projectDir, String version, String... args = ['build']) {
+    static BuildResult executeBuild(File projectDir, String... args) {
+        String gradleVersion = compatibleGradleVersion()
+
         GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments('--warning-mode', 'fail', *args)
             .withPluginClasspath()
-            .withGradleVersion(version)
+            .withGradleVersion(gradleVersion)
             .forwardOutput()
             .build()
     }
@@ -98,8 +100,7 @@ class FunctionalTestCase {
     }
 
     BuildResult executeBuild(String... args = ['build']) {
-        String gradleVersion = compatibleGradleVersion()
-        return executeBuild(testProjectDir.toFile(), gradleVersion, args)
+        return executeBuild(testProjectDir.toFile() , args)
     }
 
     private static String compatibleGradleVersion() {
