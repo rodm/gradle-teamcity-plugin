@@ -86,10 +86,13 @@ class FunctionalTestCase {
     }
 
     static BuildResult executeBuildAndFail(File projectDir, String args) {
+        String gradleVersion = compatibleGradleVersion()
+
         GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments(args)
             .withPluginClasspath()
+            .withGradleVersion(gradleVersion)
             .forwardOutput()
             .buildAndFail()
     }
