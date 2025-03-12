@@ -34,7 +34,6 @@ import static org.hamcrest.CoreMatchers.hasItem
 import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.junit.jupiter.api.Assumptions.assumeFalse
 import static org.junit.jupiter.api.Assumptions.assumeTrue
 
 class MultipleGradleVersionTest extends FunctionalTestCase {
@@ -82,7 +81,6 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         }
 
         if (GradleVersion.version(version) >= GradleVersion.version('8.10')) {
-            assumeFalse(OperatingSystem.current() == OperatingSystem.WINDOWS)
             if (JavaVersion.current() < JavaVersion.VERSION_17) {
                 File gradleProperties = createFile('gradle.properties')
                 gradleProperties << """
