@@ -43,7 +43,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     @SuppressWarnings('unused')
     static List<String> gradleVersions() {
         return [
-            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9', '8.10.2', '8.11.1', '8.12.1'
+            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
+            '8.10.2', '8.11.1', '8.12.1', '8.13'
         ]
     }
 
