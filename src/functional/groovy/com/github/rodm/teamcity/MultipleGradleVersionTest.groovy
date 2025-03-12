@@ -83,11 +83,17 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
         if (GradleVersion.version(version) >= GradleVersion.version('8.10')) {
             assumeFalse(OperatingSystem.current() == OperatingSystem.WINDOWS)
-            def gradleDir = createDirectory('gradle').toPath()
-            File gradleDaemonJvmProperties = createFile(gradleDir, 'gradle-daemon-jvm.properties')
-            gradleDaemonJvmProperties << """
-            toolchainVersion=17
-            """
+            if (JavaVersion.current() < JavaVersion.VERSION_17) {
+                File gradleProperties = createFile('gradle.properties')
+                gradleProperties << """
+                org.gradle.java.installations.fromEnv=JDK_17_0,JAVA_HOME_17_X64,JAVA_HOME_17_ARM64
+                """
+                def gradleDir = createDirectory('gradle').toPath()
+                File gradleDaemonJvmProperties = createFile(gradleDir, 'gradle-daemon-jvm.properties')
+                gradleDaemonJvmProperties << """
+                toolchainVersion=17
+                """
+            }
         }
 
         BuildResult result = GradleRunner.create()
