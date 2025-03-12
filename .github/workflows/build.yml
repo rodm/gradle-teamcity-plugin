@@ -22,7 +22,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'corretto'
           java-version: ${{ matrix.java }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -41,7 +41,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'corretto'
           java-version: |
             17
             8
