@@ -48,34 +48,13 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
-    }
-
-    private static Map<String, String> GRADLE_JAVA_VERSIONS = [
-        '6.3': '14',
-        '6.7-rc-1': '15',
-        '7.0-rc-1': '16',
-        '7.3': '17',
-        '7.5-rc-1': '18',
-        '7.6-rc-1': '19',
-        '8.3-rc-1': '20',
-        '8.5': '21',
-        '8.8-rc-1': '22',
-        '8.10': '23'
-    ].asUnmodifiable()
-
-    static List<String> supportedByGradle(String version) {
-        def gradleVersion = GradleVersion.version(version)
-        def javaVersions = releasedJavaVersions()
-        GRADLE_JAVA_VERSIONS.each { entry ->
-            if (gradleVersion < GradleVersion.version(entry.key)) {
-                javaVersions.remove(entry.value)
-            }
-        }
-        return javaVersions
+        return ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
     }
 
     private BuildResult executeBuild(String version, String task) {
+        assertThat(releasedJavaVersions(), hasItem(JavaVersion.current().majorVersion))
+        assumeTrue(GradleVersion.version(version) >= GradleVersion.version(compatibleGradleVersion()))
+
         if (OperatingSystem.current() == OperatingSystem.LINUX) {
             ConnectorServices.reset()
         }
@@ -242,13 +221,6 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         @ParameterizedTest(name = 'with Gradle {0}')
         @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
         void 'build plugin'(String gradleVersion) {
-            def releasedJavaVersions = releasedJavaVersions()
-            def javaVersion = JavaVersion.current().toString()
-            assertThat(releasedJavaVersions, hasItem(javaVersion))
-
-            def supportedJavaVersions = supportedByGradle(gradleVersion)
-            assumeTrue(supportedJavaVersions.contains(javaVersion))
-
             BuildResult result = executeBuild(gradleVersion, 'build')
             checkBuild(result)
         }
@@ -301,13 +273,6 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
         @ParameterizedTest(name = 'with Gradle {0}')
         @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
         void 'stop environment'(String gradleVersion) {
-            def releasedJavaVersions = releasedJavaVersions()
-            def javaVersion = JavaVersion.current().toString()
-            assertThat(releasedJavaVersions, hasItem(javaVersion))
-
-            def supportedJavaVersions = supportedByGradle(gradleVersion)
-            assumeTrue(supportedJavaVersions.contains(javaVersion))
-
             BuildResult result = executeBuild(gradleVersion, 'stopTeamcity')
 
             assertThat(result.task(":stopTeamcity").getOutcome(), is(SUCCESS))

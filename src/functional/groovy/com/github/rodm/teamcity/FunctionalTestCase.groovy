@@ -34,7 +34,7 @@ class FunctionalTestCase {
     rootProject.name = 'test-plugin'
     """
 
-    private static Map<String, String> JAVA_TO_GRADLE_VERSIONS = [
+    static Map<String, String> JAVA_TO_GRADLE_VERSIONS = [
         '20': '8.3',
         '21': '8.5',
         '22': '8.8',
@@ -75,6 +75,10 @@ class FunctionalTestCase {
         return file
     }
 
+    static String compatibleGradleVersion() {
+        return JAVA_TO_GRADLE_VERSIONS.getOrDefault(JavaVersion.current().majorVersion, GradleVersion.current().version)
+    }
+
     static BuildResult executeBuild(File projectDir, String... args) {
         String gradleVersion = compatibleGradleVersion()
 
@@ -101,10 +105,6 @@ class FunctionalTestCase {
 
     BuildResult executeBuild(String... args = ['build']) {
         return executeBuild(testProjectDir.toFile() , args)
-    }
-
-    private static String compatibleGradleVersion() {
-        return JAVA_TO_GRADLE_VERSIONS.getOrDefault(JavaVersion.current().majorVersion, GradleVersion.current().version)
     }
 
     List<String> archiveEntries(String path) {
