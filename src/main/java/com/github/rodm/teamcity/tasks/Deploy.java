@@ -15,7 +15,7 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ServerAction;
+import com.github.rodm.teamcity.internal.ServerConfiguration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.tasks.Copy;
@@ -26,7 +26,7 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.work.DisableCachingByDefault;
 
 @DisableCachingByDefault(because = "Not worth caching")
-public abstract class Deploy extends Copy implements ServerAction {
+public abstract class Deploy extends Copy implements ServerConfiguration {
 
     public Deploy() {
         setDescription("Deploys plugins to the TeamCity Server");

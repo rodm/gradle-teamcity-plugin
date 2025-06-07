@@ -15,7 +15,7 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ServerAction;
+import com.github.rodm.teamcity.internal.ServerConfiguration;
 import com.github.rodm.teamcity.internal.TeamCityTask;
 import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.process.ExecOperations;
@@ -24,7 +24,7 @@ import org.gradle.process.ExecSpec;
 import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the TeamCity task")
-public abstract class StopServer extends TeamCityTask implements ServerAction {
+public abstract class StopServer extends TeamCityTask implements ServerConfiguration {
 
     @Inject
     public StopServer(ExecOperations execOperations) {

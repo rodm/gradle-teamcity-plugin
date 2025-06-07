@@ -63,13 +63,13 @@ public abstract class PluginAction implements Action<Task> {
 
     @Override
     public void execute(final Task task) {
-        if (!(task instanceof ServerAction)) {
+        if (!(task instanceof ServerConfiguration)) {
             throw new GradleException("PluginAction attached to an invalid task");
         }
         path = task.getPath();
-        ServerAction serverActionTask = (ServerAction) task;
-        String host = serverActionTask.getServerHost().get();
-        int port = Integer.parseInt(serverActionTask.getServerPort().get());
+        ServerConfiguration serverConfigurationTask = (ServerConfiguration) task;
+        String host = serverConfigurationTask.getServerHost().get();
+        int port = Integer.parseInt(serverConfigurationTask.getServerPort().get());
         plugins.forEach(file -> {
             if (canExecuteAction(task, file.getName())) {
                 executeAction(file.getName(), host, port);

@@ -18,7 +18,7 @@ package com.github.rodm.teamcity.internal;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 
-public interface ServerAction {
+public interface ServerConfiguration {
 
     @Input
     Property<String> getServerHost();

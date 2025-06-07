@@ -38,12 +38,12 @@ public class ShutdownWaitAction implements Action<Task> {
 
     @Override
     public void execute(@NotNull Task task) {
-        if (!(task instanceof ServerAction)) {
+        if (!(task instanceof ServerConfiguration)) {
             throw new GradleException(getClass().getSimpleName() + " attached to an invalid task");
         }
-        ServerAction serverActionTask = (ServerAction) task;
-        final String host = serverActionTask.getServerHost().get();
-        final int port = Integer.parseInt(serverActionTask.getServerPort().get());
+        ServerConfiguration serverConfigurationTask = (ServerConfiguration) task;
+        final String host = serverConfigurationTask.getServerHost().get();
+        final int port = Integer.parseInt(serverConfigurationTask.getServerPort().get());
         sleep(250);
         if (!isServerAvailable(host, port)) {
             return;

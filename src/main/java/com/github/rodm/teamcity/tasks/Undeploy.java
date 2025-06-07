@@ -15,7 +15,7 @@
  */
 package com.github.rodm.teamcity.tasks;
 
-import com.github.rodm.teamcity.internal.ServerAction;
+import com.github.rodm.teamcity.internal.ServerConfiguration;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @DisableCachingByDefault(because = "Not worth caching")
-public abstract class Undeploy extends Delete implements ServerAction {
+public abstract class Undeploy extends Delete implements ServerConfiguration {
 
     @Inject
     public Undeploy(ObjectFactory objects, ProviderFactory providers) {
