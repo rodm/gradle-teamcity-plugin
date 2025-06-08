@@ -32,7 +32,6 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
 
     public interface StartAgentParameters extends WorkParameters {
         Property<String> getContainerName();
-        Property<String> getDataDir();
         Property<String> getConfigDir();
         Property<String> getAgentOptions();
         Property<String> getImageName();

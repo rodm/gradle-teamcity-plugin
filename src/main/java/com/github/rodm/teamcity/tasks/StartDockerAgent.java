@@ -66,7 +66,6 @@ public abstract class StartDockerAgent extends DockerTask {
             WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
             queue.submit(StartAgentContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
-                params.getDataDir().set(getDataDir());
                 params.getConfigDir().set(getConfigDir());
                 params.getAgentOptions().set(getAgentOptions());
                 params.getImageName().set(getImageName());
