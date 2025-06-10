@@ -18,6 +18,7 @@ package com.github.rodm.teamcity.docker;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ContainerConfiguration implements Serializable {
 
@@ -67,6 +68,13 @@ public class ContainerConfiguration implements Serializable {
 
     public List<String> getBinds() {
         return binds;
+    }
+
+    public ContainerConfiguration environment(Map<String, String> variables) {
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            environment(entry.getKey(), entry.getValue());
+        }
+        return this;
     }
 
     public ContainerConfiguration environment(String name, String value) {

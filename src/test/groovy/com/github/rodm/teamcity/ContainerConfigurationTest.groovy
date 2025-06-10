@@ -78,6 +78,15 @@ class ContainerConfigurationTest {
     }
 
     @Test
+    void 'add environment variables using a map'() {
+        config.environment(["ENV_VAR_1": "VALUE_1", "ENV_VAR_2": "VALUE_2"])
+
+        assertThat(config.getEnvironment(), hasSize(2))
+        assertThat(config.getEnvironment().get(0), equalTo("ENV_VAR_1=VALUE_1"))
+        assertThat(config.getEnvironment().get(1), equalTo("ENV_VAR_2=VALUE_2"))
+    }
+
+    @Test
     void 'add a port binding'() {
         config.bindPort("7111", "8111")
 
