@@ -1354,6 +1354,11 @@ class EnvironmentsTest {
             def startAgent = project.tasks.getByName('startTestAgent') as StartDockerAgent
             assertThat(startAgent.containerName.get(), equalTo('tc-agent'))
             assertThat(startAgent.serverContainerName.get(), equalTo('tc-server'))
+
+            def stopServer = project.tasks.getByName('stopTestServer') as StopDockerServer
+            assertThat(stopServer.containerName.get(), equalTo('tc-server'))
+            def stopAgent = project.tasks.getByName('stopTestAgent') as StopDockerAgent
+            assertThat(stopAgent.containerName.get(), equalTo('tc-agent'))
         }
 
         @Test

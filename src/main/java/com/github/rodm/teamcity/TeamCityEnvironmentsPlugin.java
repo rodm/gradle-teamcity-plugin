@@ -232,7 +232,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         tasks.register(environment.stopServerTaskName(), StopDockerServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
-            task.getContainerName().set(environment.getServerName());
+            task.getContainerName().set(environment.getServerNameProperty());
             task.finalizedBy(tasks.named(environment.undeployTaskName()));
         });
 
@@ -250,7 +250,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
 
         tasks.register(environment.stopAgentTaskName(), StopDockerAgent.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
-            task.getContainerName().set(environment.getAgentName());
+            task.getContainerName().set(environment.getAgentNameProperty());
         });
 
         tasks.named(environment.deployTaskName(), Deploy.class).configure(task ->
