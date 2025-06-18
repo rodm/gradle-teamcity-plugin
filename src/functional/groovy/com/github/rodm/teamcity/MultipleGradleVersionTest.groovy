@@ -44,12 +44,13 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static List<String> gradleVersions() {
         return [
             '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
-            '8.10.2', '8.11.1', '8.12.1', '8.13'
+            '8.10.2', '8.11.1', '8.12.1', '8.13', '8.14.2',
+            '9.0.0-rc-1'
         ]
     }
 
     static List<String> releasedJavaVersions() {
-        return ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23']
+        return ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
     }
 
     private BuildResult executeBuild(String version, String task) {

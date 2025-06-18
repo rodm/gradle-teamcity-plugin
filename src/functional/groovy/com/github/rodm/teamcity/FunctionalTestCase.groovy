@@ -38,7 +38,8 @@ class FunctionalTestCase {
         '20': '8.3',
         '21': '8.5',
         '22': '8.8',
-        '23': '8.10'
+        '23': '8.10',
+        '24': '8.14'
     ].asUnmodifiable()
 
     @TempDir
