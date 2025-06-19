@@ -86,14 +86,17 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
 
     private int compareVersionParts(String[] versionParts, String[] otherVersionParts) {
         for (int part = 0; part < versionParts.length && part < otherVersionParts.length; ++part){
-            if (versionParts[part].equals(SNAPSHOT) || otherVersionParts[part].equals(SNAPSHOT)) continue;
-            if (versionParts[part].equals(LOCAL_PART) || otherVersionParts[part].equals(LOCAL_PART)) continue;
+            if (isIgnoredPart(versionParts[part]) || isIgnoredPart(otherVersionParts[part])) continue;
             int partValue = Integer.parseInt(versionParts[part]);
             int otherPartValue = Integer.parseInt(otherVersionParts[part]);
             if (partValue > otherPartValue) return 1;
             if (otherPartValue > partValue) return -1;
         }
         return (versionParts.length > otherVersionParts.length) ? 1 : -1;
+    }
+
+    private boolean isIgnoredPart(String part) {
+        return part.equals(SNAPSHOT) || part.equals(LOCAL_PART);
     }
 
     @Override
