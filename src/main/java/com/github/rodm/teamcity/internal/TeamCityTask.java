@@ -41,7 +41,8 @@ import java.util.zip.ZipEntry;
 @UntrackedTask(because = "Should always run the TeamCity task")
 public abstract class TeamCityTask extends DefaultTask {
 
-    private static final String VERSION_MISMATCH_WARNING = "%s: Version %s does not match the TeamCity version %s installed at %s.";
+    private static final String VERSION_MISMATCH_WARNING = "{}: Version {} does not match the TeamCity version {} installed at {}.";
+
     private static final String VERSION_INCOMPATIBLE = "Version %s is not compatible with the TeamCity version %s installed at %s.";
     private static final String INVALID_HOME_DIR = "Invalid TeamCity installation at %s.";
     private static final String MISSING_VERSION = "Unable to read version of TeamCity installation at %s";
@@ -71,7 +72,7 @@ public abstract class TeamCityTask extends DefaultTask {
             execSpec.setErrorOutput(out);
             execSpec.setIgnoreExitValue(true);
         });
-        getLogger().info(out.toString());
+        getLogger().info("{}", out);
     }
 
     public abstract void configure(ExecSpec execSpec);
@@ -88,7 +89,7 @@ public abstract class TeamCityTask extends DefaultTask {
             return;
         }
         if (dataVersion(extractVersion(installationVersion)).equals(dataVersion(version))) {
-            getLogger().warn(String.format(VERSION_MISMATCH_WARNING, getPath(), version, installationVersion, homeDir));
+            getLogger().warn(VERSION_MISMATCH_WARNING, getPath(), version, installationVersion, homeDir);
             return;
         }
         throw new InvalidUserDataException(String.format(VERSION_INCOMPATIBLE, version, installationVersion, homeDir));

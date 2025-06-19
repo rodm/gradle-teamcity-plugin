@@ -50,6 +50,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.function.Executable
 import org.junit.jupiter.api.io.TempDir
+import org.slf4j.helpers.MessageFormatter
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -825,7 +826,7 @@ class EnvironmentsTest {
             StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
             startServer.validate()
 
-            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3')
+            String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3').message
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
@@ -845,7 +846,7 @@ class EnvironmentsTest {
             StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
             startServer.validate()
 
-            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1')
+            String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1').message
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
@@ -865,7 +866,7 @@ class EnvironmentsTest {
             StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
             startServer.validate()
 
-            String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC')
+            String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC').message
             assertThat(outputEventListener.toString(), containsString(expectedMessage))
         }
 
