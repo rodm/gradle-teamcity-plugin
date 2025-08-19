@@ -133,7 +133,7 @@ project {
         stage("Functional Tests") {
             defaults {
                 failureConditions {
-                    executionTimeoutMin = 20
+                    executionTimeoutMin = 30
                 }
             }
 
