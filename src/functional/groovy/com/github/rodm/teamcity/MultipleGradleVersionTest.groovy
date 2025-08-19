@@ -41,41 +41,39 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static final String NO_DEFINITION_WARNING = NO_DEFINITION_WARNING_MESSAGE.substring(4)
 
     @SuppressWarnings('unused')
-    static List<String> data() {
+    static List<String> gradleVersions() {
         return [
-            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6.4',
-            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9'
+            '7.0.2', '7.1.1', '7.2', '7.3.3', '7.4.2', '7.5.1', '7.6.6',
+            '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
+            '8.10.2', '8.11.1', '8.12.1', '8.13', '8.14.3',
+            '9.0.0'
         ]
     }
 
     static List<String> releasedJavaVersions() {
-        return ['1.8', '1.9', '1.10', '11', '12', '13', '14', '15', '16', '17', '18']
-    }
-
-    static List<String> supportedByGradle(String version) {
-        def gradleVersion = GradleVersion.version(version)
-        def javaVersions = releasedJavaVersions()
-        if (gradleVersion < GradleVersion.version('6.3')) {
-            javaVersions.remove('14')
-        }
-        if (gradleVersion < GradleVersion.version('6.7-rc-1')) {
-            javaVersions.remove('15')
-        }
-        if (gradleVersion < GradleVersion.version('7.0-rc-1')) {
-            javaVersions.remove('16')
-        }
-        if (gradleVersion < GradleVersion.version('7.3')) {
-            javaVersions.remove('17')
-        }
-        if (gradleVersion < GradleVersion.version('7.5-rc-1')) {
-            javaVersions.remove('18')
-        }
-        return javaVersions
+        return ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
     }
 
     private BuildResult executeBuild(String version, String task) {
+        assertThat(releasedJavaVersions(), hasItem(JavaVersion.current().majorVersion))
+        assumeTrue(GradleVersion.version(version) >= GradleVersion.version(compatibleGradleVersion()))
+
         if (OperatingSystem.current() == OperatingSystem.LINUX) {
             ConnectorServices.reset()
+        }
+
+        if (GradleVersion.version(version) >= GradleVersion.version('8.10')) {
+            if (JavaVersion.current() < JavaVersion.VERSION_17) {
+                File gradleProperties = createFile('gradle.properties')
+                gradleProperties << """
+                org.gradle.java.installations.fromEnv=JDK_17_0,JAVA_HOME_17_X64,JAVA_HOME_17_ARM64
+                """
+                def gradleDir = createDirectory('gradle').toPath()
+                File gradleDaemonJvmProperties = createFile(gradleDir, 'gradle-daemon-jvm.properties')
+                gradleDaemonJvmProperties << """
+                toolchainVersion=17
+                """
+            }
         }
 
         BuildResult result = GradleRunner.create()
@@ -224,15 +222,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
         @DisplayName('build plugin')
         @ParameterizedTest(name = 'with Gradle {0}')
-        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#data")
+        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
         void 'build plugin'(String gradleVersion) {
-            def releasedJavaVersions = releasedJavaVersions()
-            def javaVersion = JavaVersion.current().toString()
-            assertThat(releasedJavaVersions, hasItem(javaVersion))
-
-            def supportedJavaVersions = supportedByGradle(gradleVersion)
-            assumeTrue(supportedJavaVersions.contains(javaVersion))
-
             BuildResult result = executeBuild(gradleVersion, 'build')
             checkBuild(result)
         }
@@ -283,15 +274,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
         @DisplayName('stop environment')
         @ParameterizedTest(name = 'with Gradle {0}')
-        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#data")
+        @MethodSource("com.github.rodm.teamcity.MultipleGradleVersionTest#gradleVersions")
         void 'stop environment'(String gradleVersion) {
-            def releasedJavaVersions = releasedJavaVersions()
-            def javaVersion = JavaVersion.current().toString()
-            assertThat(releasedJavaVersions, hasItem(javaVersion))
-
-            def supportedJavaVersions = supportedByGradle(gradleVersion)
-            assumeTrue(supportedJavaVersions.contains(javaVersion))
-
             BuildResult result = executeBuild(gradleVersion, 'stopTeamcity')
 
             assertThat(result.task(":stopTeamcity").getOutcome(), is(SUCCESS))

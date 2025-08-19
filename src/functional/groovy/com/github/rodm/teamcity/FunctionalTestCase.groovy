@@ -15,7 +15,9 @@
  */
 package com.github.rodm.teamcity
 
+import org.gradle.api.JavaVersion
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
 
@@ -28,6 +30,14 @@ import java.util.zip.ZipOutputStream
 import static com.github.rodm.teamcity.TestSupport.executeBuild
 
 class FunctionalTestCase {
+
+    static Map<String, String> JAVA_TO_GRADLE_VERSIONS = [
+        '20': '8.3',
+        '21': '8.5',
+        '22': '8.8',
+        '23': '8.10',
+        '24': '8.14'
+    ].asUnmodifiable()
 
     @TempDir
     public Path testProjectDir
@@ -61,6 +71,10 @@ class FunctionalTestCase {
         File file = createFile(folder, name)
         file << contents
         return file
+    }
+
+    static String compatibleGradleVersion() {
+        return JAVA_TO_GRADLE_VERSIONS.getOrDefault(JavaVersion.current().majorVersion, GradleVersion.current().version)
     }
 
     BuildResult executeBuild(String... args = ['build']) {
