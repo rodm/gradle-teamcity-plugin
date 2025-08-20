@@ -210,6 +210,35 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
     }
 
     @Test
+    void 'start agent task copies configuration directory'() {
+        File homeDir = createFakeTeamCityInstall('teamcity', '2025.07.1')
+        File configDir = testProjectDir.resolve('data/2025.07/agent/conf').toFile()
+        File propertyFile = configDir.toPath().resolve("buildAgent.properties").toFile()
+
+        buildFile << """
+            plugins {
+                id 'io.github.rodm.teamcity-environments'
+            }
+            teamcity {
+                environments {
+                    teamcity {
+                        version = '2025.07.1'
+                        homeDir = file('${homeDir.toURI()}')
+                    }
+                }
+            }
+        """
+
+        assertFalse(configDir.exists(), 'Agent configuration directory should not exist')
+
+        BuildResult result = executeBuild('--info', 'startTeamcityAgent')
+
+        assertThat(result.task(":startTeamcityAgent").getOutcome(), is(SUCCESS))
+        assertTrue(configDir.exists(), 'Agent configuration directory was not created by startAgent task')
+        assertTrue(propertyFile.exists(), 'Agent properties file should exist')
+    }
+
+    @Test
     void 'deploy and undeploy multiple plugins to and from an environment'() {
         buildFile << """
             plugins {

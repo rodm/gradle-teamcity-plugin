@@ -150,6 +150,9 @@ class FunctionalTestCase {
         agentShellFile.executable = true
 
         createFile(agentBinDir, 'agent.bat', AGENT_BATCH_FILE)
+
+        Path agentConfigDir = createDirectory(homeDir.toPath(), 'buildAgent/conf').toPath()
+        createFile(agentConfigDir, 'buildAgent.properties', "name=Default Agent")
         return homeDir
     }
 
