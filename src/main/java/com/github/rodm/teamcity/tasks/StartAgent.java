@@ -16,8 +16,10 @@
 package com.github.rodm.teamcity.tasks;
 
 import com.github.rodm.teamcity.internal.TeamCityTask;
+import org.gradle.api.file.FileSystemOperations;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
 
@@ -25,20 +27,32 @@ import javax.inject.Inject;
 
 public abstract class StartAgent extends TeamCityTask {
 
+    private final FileSystemOperations fileOperations;
+
     @Inject
-    public StartAgent(ExecOperations execOperations) {
+    public StartAgent(ExecOperations execOperations, FileSystemOperations fileOperations) {
         super(execOperations);
+        this.fileOperations = fileOperations;
         setDescription("Starts the TeamCity Agent");
     }
 
     @Input
     public abstract Property<String> getAgentOptions();
 
+    @Input
+    public abstract Property<String> getConfigDir();
+
+    @Internal
+    public FileSystemOperations getFileOperations() {
+        return fileOperations;
+    }
+
     @Override
     public void configure(ExecSpec execSpec) {
         final String name = TeamCityTask.isWindows() ? "agent.bat" : "agent.sh";
         execSpec.executable(getHomeDir().get() + "/buildAgent/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
+        execSpec.environment("CONFIG_FILE", getConfigDir().get() + "/buildAgent.properties");
         execSpec.environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());
         execSpec.args("start");
     }

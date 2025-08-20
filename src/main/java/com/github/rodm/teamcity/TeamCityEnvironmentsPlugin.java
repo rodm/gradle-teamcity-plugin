@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity;
 
+import com.github.rodm.teamcity.internal.AgentConfigurationAction;
 import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultLocalTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
@@ -189,7 +190,9 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
                 task.getJavaHome().set(environment.getJavaHomeProperty());
+                task.getConfigDir().set(environment.getDataDirProperty().map(dir -> dir + "/agent/conf"));
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
+                task.doFirst(new AgentConfigurationAction());
             });
 
             tasks.register(environment.stopAgentTaskName(), StopAgent.class, task -> {
