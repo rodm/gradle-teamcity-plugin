@@ -18,6 +18,8 @@ package com.github.rodm.teamcity.tasks;
 import com.github.rodm.teamcity.internal.ServerConfiguration;
 import com.github.rodm.teamcity.internal.TeamCityTask;
 import org.gradle.api.tasks.UntrackedTask;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
 
@@ -25,6 +27,9 @@ import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the TeamCity task")
 public abstract class StopLocalServer extends TeamCityTask implements ServerConfiguration {
+
+    @Input
+    public abstract Property<String> getLogsDir();
 
     @Inject
     public StopLocalServer(ExecOperations execOperations) {
@@ -39,6 +44,7 @@ public abstract class StopLocalServer extends TeamCityTask implements ServerConf
         String name = TeamCityTask.isWindows() ? "teamcity-server.bat" : "teamcity-server.sh";
         execSpec.executable(getHomeDir().get() + "/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
+        execSpec.environment("TEAMCITY_LOGS_PATH", getLogsDir().get());
         execSpec.args("stop");
     }
 }
