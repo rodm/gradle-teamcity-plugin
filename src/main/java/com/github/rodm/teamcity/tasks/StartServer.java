@@ -35,6 +35,9 @@ public abstract class StartServer extends TeamCityTask {
     public abstract Property<String> getDataDir();
 
     @Input
+    public abstract Property<String> getLogsDir();
+
+    @Input
     public abstract Property<String> getServerOptions();
 
     @Override
@@ -43,6 +46,7 @@ public abstract class StartServer extends TeamCityTask {
         execSpec.executable(getHomeDir().get() + "/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
         execSpec.environment("TEAMCITY_DATA_PATH", getDataDir().get());
+        execSpec.environment("TEAMCITY_LOGS_PATH", getLogsDir().get());
         execSpec.environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
         execSpec.args("start");
     }

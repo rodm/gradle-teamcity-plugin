@@ -17,12 +17,17 @@ package com.github.rodm.teamcity.tasks;
 
 import com.github.rodm.teamcity.internal.ServerAction;
 import com.github.rodm.teamcity.internal.TeamCityTask;
+import org.gradle.api.provider.Property;
+import org.gradle.api.tasks.Input;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
 
 import javax.inject.Inject;
 
 public abstract class StopServer extends TeamCityTask implements ServerAction {
+
+    @Input
+    public abstract Property<String> getLogsDir();
 
     @Inject
     public StopServer(ExecOperations execOperations) {
@@ -37,6 +42,7 @@ public abstract class StopServer extends TeamCityTask implements ServerAction {
         String name = TeamCityTask.isWindows() ? "teamcity-server.bat" : "teamcity-server.sh";
         execSpec.executable(getHomeDir().get() + "/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
+        execSpec.environment("TEAMCITY_LOGS_PATH", getLogsDir().get());
         execSpec.args("stop");
     }
 }

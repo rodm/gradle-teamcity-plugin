@@ -170,6 +170,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
                 task.getDataDir().set(environment.getDataDirProperty());
+                task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/logs"));
                 task.getJavaHome().set(environment.getJavaHomeProperty());
                 task.getServerOptions().set(environment.getServerOptionsProvider());
                 task.doFirst(t -> project.mkdir(environment.getDataDir()));
@@ -180,6 +181,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getVersion().set(environment.getVersion());
                 task.getHomeDir().set(environment.getHomeDirProperty());
+                task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/logs"));
                 task.getJavaHome().set(environment.getJavaHomeProperty());
                 task.finalizedBy(tasks.named(environment.undeployTaskName()));
                 task.doLast(new ShutdownWaitAction(environment.getShutdownTimeoutProperty()));
