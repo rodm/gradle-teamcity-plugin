@@ -16,8 +16,6 @@
 package com.github.rodm.teamcity.tasks;
 
 import com.github.rodm.teamcity.internal.TeamCityTask;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.process.ExecOperations;
 import org.gradle.process.ExecSpec;
@@ -25,27 +23,19 @@ import org.gradle.process.ExecSpec;
 import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the TeamCity task")
-public abstract class StartServer extends TeamCityTask {
+public abstract class StopLocalAgent extends TeamCityTask {
 
     @Inject
-    public StartServer(ExecOperations execOperations) {
+    public StopLocalAgent(ExecOperations execOperations) {
         super(execOperations);
-        setDescription("Starts the TeamCity Server");
+        setDescription("Stops the TeamCity Agent");
     }
-
-    @Input
-    public abstract Property<String> getDataDir();
-
-    @Input
-    public abstract Property<String> getServerOptions();
 
     @Override
     public void configure(ExecSpec execSpec) {
-        String name = TeamCityTask.isWindows() ? "teamcity-server.bat" : "teamcity-server.sh";
-        execSpec.executable(getHomeDir().get() + "/bin/" + name);
+        final String name = TeamCityTask.isWindows() ? "agent.bat" : "agent.sh";
+        execSpec.executable(getHomeDir().get() + "/buildAgent/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
-        execSpec.environment("TEAMCITY_DATA_PATH", getDataDir().get());
-        execSpec.environment("TEAMCITY_SERVER_OPTS", getServerOptions().get());
-        execSpec.args("start");
+        execSpec.args("stop");
     }
 }

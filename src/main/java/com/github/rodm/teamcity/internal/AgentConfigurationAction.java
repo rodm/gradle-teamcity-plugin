@@ -15,7 +15,7 @@
  */
 package com.github.rodm.teamcity.internal;
 
-import com.github.rodm.teamcity.tasks.StartAgent;
+import com.github.rodm.teamcity.tasks.StartLocalAgent;
 import org.gradle.api.Action;
 import org.gradle.api.Task;
 import org.gradle.api.file.FileSystemOperations;
@@ -28,7 +28,7 @@ public class AgentConfigurationAction implements Action<Task> {
 
     @Override
     public void execute(Task task) {
-        StartAgent startAgent = (StartAgent) task;
+        StartLocalAgent startAgent = (StartLocalAgent) task;
         FileSystemOperations fileOperations = startAgent.getFileOperations();
         try {
             String propertyFile = startAgent.getConfigDir().get() + "/buildAgent.properties";

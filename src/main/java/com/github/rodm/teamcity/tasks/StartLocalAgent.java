@@ -27,12 +27,12 @@ import org.gradle.process.ExecSpec;
 import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the TeamCity task")
-public abstract class StartAgent extends TeamCityTask {
+public abstract class StartLocalAgent extends TeamCityTask {
 
     private final FileSystemOperations fileOperations;
 
     @Inject
-    public StartAgent(ExecOperations execOperations, FileSystemOperations fileOperations) {
+    public StartLocalAgent(ExecOperations execOperations, FileSystemOperations fileOperations) {
         super(execOperations);
         this.fileOperations = fileOperations;
         setDescription("Starts the TeamCity Agent");

@@ -27,14 +27,14 @@ import com.github.rodm.teamcity.tasks.Deploy;
 import com.github.rodm.teamcity.tasks.DownloadTeamCity;
 import com.github.rodm.teamcity.tasks.InstallTeamCity;
 import com.github.rodm.teamcity.tasks.ServerPlugin;
-import com.github.rodm.teamcity.tasks.StartAgent;
+import com.github.rodm.teamcity.tasks.StartLocalAgent;
 import com.github.rodm.teamcity.tasks.StartDockerAgent;
 import com.github.rodm.teamcity.tasks.StartDockerServer;
-import com.github.rodm.teamcity.tasks.StartServer;
-import com.github.rodm.teamcity.tasks.StopAgent;
+import com.github.rodm.teamcity.tasks.StartLocalServer;
+import com.github.rodm.teamcity.tasks.StopLocalAgent;
 import com.github.rodm.teamcity.tasks.StopDockerAgent;
 import com.github.rodm.teamcity.tasks.StopDockerServer;
-import com.github.rodm.teamcity.tasks.StopServer;
+import com.github.rodm.teamcity.tasks.StopLocalServer;
 import com.github.rodm.teamcity.tasks.Undeploy;
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
@@ -180,7 +180,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.dependsOn(tasks.named(downloadTaskName));
         });
 
-        tasks.register(environment.startServerTaskName(), StartServer.class, task -> {
+        tasks.register(environment.startServerTaskName(), StartLocalServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
@@ -191,7 +191,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.dependsOn(tasks.named(environment.deployTaskName()));
         });
 
-        tasks.register(environment.stopServerTaskName(), StopServer.class, task -> {
+        tasks.register(environment.stopServerTaskName(), StopLocalServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
@@ -200,7 +200,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.doLast(new ShutdownWaitAction(environment.getShutdownTimeoutProperty()));
         });
 
-        tasks.register(environment.startAgentTaskName(), StartAgent.class, task -> {
+        tasks.register(environment.startAgentTaskName(), StartLocalAgent.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
@@ -210,7 +210,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.doFirst(new AgentConfigurationAction());
         });
 
-        tasks.register(environment.stopAgentTaskName(), StopAgent.class, task -> {
+        tasks.register(environment.stopAgentTaskName(), StopLocalAgent.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());

@@ -22,14 +22,14 @@ import com.github.rodm.teamcity.internal.PluginAction
 import com.github.rodm.teamcity.tasks.Deploy
 import com.github.rodm.teamcity.tasks.DownloadTeamCity
 import com.github.rodm.teamcity.tasks.InstallTeamCity
-import com.github.rodm.teamcity.tasks.StartAgent
+import com.github.rodm.teamcity.tasks.StartLocalAgent
 import com.github.rodm.teamcity.tasks.StartDockerAgent
 import com.github.rodm.teamcity.tasks.StartDockerServer
-import com.github.rodm.teamcity.tasks.StartServer
-import com.github.rodm.teamcity.tasks.StopAgent
+import com.github.rodm.teamcity.tasks.StartLocalServer
+import com.github.rodm.teamcity.tasks.StopLocalAgent
 import com.github.rodm.teamcity.tasks.StopDockerAgent
 import com.github.rodm.teamcity.tasks.StopDockerServer
-import com.github.rodm.teamcity.tasks.StopServer
+import com.github.rodm.teamcity.tasks.StopLocalServer
 import com.github.rodm.teamcity.internal.TeamCityTask
 import com.github.rodm.teamcity.tasks.Undeploy
 import org.gradle.api.InvalidUserDataException
@@ -193,9 +193,9 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.serverOptions.get(), equalTo(defaultOptions))
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo(''))
         }
 
@@ -224,7 +224,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.serverOptions.get(), equalTo('-DnewOption=test'))
         }
 
@@ -239,7 +239,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.serverOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
         }
 
@@ -255,7 +255,7 @@ class EnvironmentsTest {
             project.evaluate()
 
             def expectedOptions = defaultOptions + ' -DadditionalOption=test'
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
         }
 
@@ -271,7 +271,7 @@ class EnvironmentsTest {
             project.evaluate()
 
             def expectedOptions = defaultOptions + ' -DadditionalOption1=value1 -DadditionalOption2=value2'
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.serverOptions.get(), equalTo(expectedOptions))
         }
 
@@ -287,7 +287,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo('-DnewOption2=value2'))
         }
 
@@ -302,7 +302,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo('-Doption1=value1 -Doption2=value2'))
         }
 
@@ -319,7 +319,7 @@ class EnvironmentsTest {
             project.evaluate()
 
             String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
         }
 
@@ -335,7 +335,7 @@ class EnvironmentsTest {
             project.evaluate()
 
             String expectedOptions = '-DadditionalOption1=value1 -DadditionalOption2=value2'
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo(expectedOptions))
         }
 
@@ -383,14 +383,14 @@ class EnvironmentsTest {
 
             def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
             assertThat(downloadTest1.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-9.1.7.tar.gz'))
-            def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+            def startTest1Server = project.tasks.getByName('startTest1Server') as StartLocalServer
             assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/servers/TeamCity-9.1.7'))
             assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/data/9.1'))
             assertThat(startTest1Server.javaHome.get(), equalTo(System.getProperty('java.home')))
 
             def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
             assertThat(downloadTest2.src.toString(), equalTo('https://download.jetbrains.com/teamcity/TeamCity-10.0.4.tar.gz'))
-            def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+            def startTest2Server = project.tasks.getByName('startTest2Server') as StartLocalServer
             assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/servers/TeamCity-10.0.4'))
             assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/data/10.0'))
             assertThat(startTest2Server.javaHome.get(), equalTo(System.getProperty('java.home')))
@@ -416,14 +416,14 @@ class EnvironmentsTest {
             def downloadTest1 = project.tasks.getByName('downloadTest1') as DownloadTeamCity
             assertThat(downloadTest1.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
-            def startTest1Server = project.tasks.getByName('startTest1Server') as StartServer
+            def startTest1Server = project.tasks.getByName('startTest1Server') as StartLocalServer
             assertThat(normalize(startTest1Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
             assertThat(normalize(startTest1Server.dataDir.get()), endsWith('/tmp/data/9.1'))
 
             def downloadTest2 = project.tasks.getByName('downloadTest2') as DownloadTeamCity
             assertThat(downloadTest2.src.toString(), equalTo('http://local-repository/TeamCity-10.0.4.tar.gz'))
 
-            def startTest2Server = project.tasks.getByName('startTest2Server') as StartServer
+            def startTest2Server = project.tasks.getByName('startTest2Server') as StartLocalServer
             assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/TeamCity-10.0.4'))
             assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/10.0'))
         }
@@ -443,7 +443,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            def startTest2Server = project.tasks.getByName('startTest1Server') as StartServer
+            def startTest2Server = project.tasks.getByName('startTest1Server') as StartLocalServer
             assertThat(normalize(startTest2Server.homeDir.get()), endsWith('/tmp/servers/Test1'))
             assertThat(normalize(startTest2Server.dataDir.get()), endsWith('/tmp/data/Test1'))
         }
@@ -466,7 +466,7 @@ class EnvironmentsTest {
             def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
             assertThat(downloadTest.src.toString(), equalTo('http://local-repository/TeamCity-9.1.7.tar.gz'))
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(normalize(startTestServer.homeDir.get()), endsWith('/tmp/servers/TeamCity-9.1.7'))
             assertThat(normalize(startTestServer.dataDir.get()), endsWith('/tmp/data/teamcity9.1'))
             assertThat(normalize(startTestServer.javaHome.get()), endsWith('/tmp/java'))
@@ -698,7 +698,7 @@ class EnvironmentsTest {
 
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity10Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity10Server') as StartLocalServer
             assertThat(normalize(startServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
             assertThat(normalize(startServer.dataDir.get()), endsWith('data/10.0'))
             assertThat(normalize(startServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
@@ -711,7 +711,7 @@ class EnvironmentsTest {
 
             project.evaluate()
 
-            StopServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopServer
+            StopLocalServer stopServer = project.tasks.getByName('stopTeamcity10Server') as StopLocalServer
             assertThat(normalize(stopServer.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
             assertThat(normalize(stopServer.javaHome.get()), endsWith('/opt/jdk1.8.0'))
         }
@@ -722,7 +722,7 @@ class EnvironmentsTest {
 
             project.evaluate()
 
-            StartAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartAgent
+            StartLocalAgent startAgent = project.tasks.getByName('startTeamcity10Agent') as StartLocalAgent
             assertThat(normalize(startAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
             assertThat(normalize(startAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
             assertThat(startAgent.agentOptions.get(), endsWith('-DagentOption=agentValue'))
@@ -734,7 +734,7 @@ class EnvironmentsTest {
 
             project.evaluate()
 
-            StopAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopAgent
+            StopLocalAgent stopAgent = project.tasks.getByName('stopTeamcity10Agent') as StopLocalAgent
             assertThat(normalize(stopAgent.homeDir.get()), endsWith('servers/TeamCity-10.0.4'))
             assertThat(normalize(stopAgent.javaHome.get()), endsWith('/opt/jdk1.8.0'))
         }
@@ -750,7 +750,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartLocalServer
             def e = assertThrows(InvalidUserDataException) { startServer.validate() }
             assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
             assertThat(e.message, containsString("specified for property 'homeDir' does not exist."))
@@ -769,7 +769,7 @@ class EnvironmentsTest {
             def serverDir = createDirectory(projectDir.resolve('servers'))
             createFile(serverDir.toPath().resolve('TeamCity-2020.1'))
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartLocalServer
             def e = assertThrows(InvalidUserDataException) { startServer.validate() }
             assertThat(normalize(e.message), containsString('/servers/TeamCity-2020.1'))
             assertThat(e.message, containsString("specified for property 'homeDir' is not a directory."))
@@ -787,7 +787,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2023.11Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2023.11Server') as StartLocalServer
             assertDoesNotThrow((Executable) { startServer.validate() })
         }
 
@@ -803,7 +803,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartLocalServer
             startServer.validate()
 
             String expectedMessage = String.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.3', '2020.2.3')
@@ -823,7 +823,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartLocalServer
             startServer.validate()
 
             String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2020.2.5', '2020.2.3').message
@@ -843,7 +843,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartLocalServer
             startServer.validate()
 
             String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 EAP1').message
@@ -863,7 +863,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2021.2Server') as StartLocalServer
             startServer.validate()
 
             String expectedMessage = MessageFormatter.format(TeamCityTask.VERSION_MISMATCH_WARNING[4..-4], '2021.2', '2021.2 RC').message
@@ -883,7 +883,7 @@ class EnvironmentsTest {
             }
             project.evaluate()
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.2Server') as StartLocalServer
             def e = assertThrows(InvalidUserDataException) { startServer.validate() }
 
             String expectedMessage = String.format(TeamCityTask.VERSION_INCOMPATIBLE[0..-4], '2020.1.2', '2020.2.3')
@@ -904,7 +904,7 @@ class EnvironmentsTest {
             project.evaluate()
             createFakeTeamCityInstall(projectDir, 'servers', '2020.1')
 
-            StartServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartServer
+            StartLocalServer startServer = project.tasks.getByName('startTeamcity2020.1Server') as StartLocalServer
             def e = assertThrows(InvalidUserDataException) { startServer.validate() }
             assertThat(normalize(e.message), containsString('/tmp/opt/jdk1.8.0'))
             assertThat(e.message, containsString("specified for property 'javaHome' does not exist."))
@@ -953,10 +953,10 @@ class EnvironmentsTest {
 
             assertThat(task('downloadTest'), isA(DownloadTeamCity))
             assertThat(task('installTest'), isA(InstallTeamCity))
-            assertThat(task('startTestServer'), isA(StartServer))
-            assertThat(task('stopTestServer'), isA(StopServer))
-            assertThat(task('startTestAgent'), isA(StartAgent))
-            assertThat(task('stopTestAgent'), isA(StopAgent))
+            assertThat(task('startTestServer'), isA(StartLocalServer))
+            assertThat(task('stopTestServer'), isA(StopLocalServer))
+            assertThat(task('startTestAgent'), isA(StartLocalAgent))
+            assertThat(task('stopTestAgent'), isA(StopLocalAgent))
         }
 
         @Test
@@ -1062,7 +1062,7 @@ class EnvironmentsTest {
             assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
             assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-2021.2.3'))
             assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
         }
@@ -1099,7 +1099,7 @@ class EnvironmentsTest {
             assertThat(downloadTest.src.toString(), startsWith('http://alt-repository/'))
             assertThat(normalizePath(downloadTest.getDest()), endsWith('/alt/downloads/TeamCity-2021.2.3.tar.gz'))
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(normalize(startTestServer.homeDir.get()), endsWith('/alt/servers/TeamCity-2021.2.3'))
             assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/2021.2'))
         }
@@ -1136,13 +1136,13 @@ class EnvironmentsTest {
             def downloadTest = project.tasks.getByName('downloadTest') as DownloadTeamCity
             assertThat(downloadTest.src.toString(), equalTo('https://alt-repository/TeamCity-9.1.7.tar.gz'))
 
-            def startTestServer = project.tasks.getByName('startTestServer') as StartServer
+            def startTestServer = project.tasks.getByName('startTestServer') as StartLocalServer
             assertThat(startTestServer.homeDir.get(), endsWith('/alt/servers/TeamCity-9.1.7'))
             assertThat(startTestServer.dataDir.get(), endsWith('/alt/data/9.1'))
             assertThat(startTestServer.javaHome.get(), equalTo('/alt/java'))
             assertThat(startTestServer.serverOptions.get(), equalTo('-DserverOption1=value1 -DserverOption2=value2'))
 
-            def startTestAgent = project.tasks.getByName('startTestAgent') as StartAgent
+            def startTestAgent = project.tasks.getByName('startTestAgent') as StartLocalAgent
             assertThat(startTestAgent.agentOptions.get(), equalTo('-DagentOption1=value1 -DagentOption2=value2'))
         }
     }

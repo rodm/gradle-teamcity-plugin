@@ -24,10 +24,10 @@ import org.gradle.process.ExecSpec;
 import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the TeamCity task")
-public abstract class StopServer extends TeamCityTask implements ServerConfiguration {
+public abstract class StopLocalServer extends TeamCityTask implements ServerConfiguration {
 
     @Inject
-    public StopServer(ExecOperations execOperations) {
+    public StopLocalServer(ExecOperations execOperations) {
         super(execOperations);
         setDescription("Stops the TeamCity Server");
         getServerHost().convention("localhost");
