@@ -193,6 +193,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.getHomeDir().set(environment.getHomeDirProperty());
                 task.getJavaHome().set(environment.getJavaHomeProperty());
                 task.getConfigDir().set(environment.getDataDirProperty().map(dir -> dir + "/agent/conf"));
+                task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/agent/logs"));
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
                 task.doFirst(new AgentConfigurationAction());
             });
@@ -230,6 +231,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
                 task.setGroup(TEAMCITY_GROUP);
                 task.getDataDir().set(environment.getDataDirProperty());
                 task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
+                task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/agent/logs"));
                 task.getAgentOptions().set(environment.getAgentOptionsProvider());
                 task.getImageName().set(environment.getAgentImageProperty());
                 task.getImageTag().set(environment.getAgentTagProperty().orElse(environment.getVersion()));
