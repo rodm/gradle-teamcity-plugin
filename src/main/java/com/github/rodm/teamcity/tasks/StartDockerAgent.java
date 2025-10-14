@@ -47,6 +47,9 @@ public abstract class StartDockerAgent extends DockerTask {
     public abstract Property<String> getConfigDir();
 
     @Input
+    public abstract Property<String> getLogsDir();
+
+    @Input
     public abstract Property<String> getAgentOptions();
 
     @Input
@@ -67,6 +70,7 @@ public abstract class StartDockerAgent extends DockerTask {
             queue.submit(StartAgentContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
                 params.getConfigDir().set(getConfigDir());
+                params.getLogsDir().set(getLogsDir());
                 params.getAgentOptions().set(getAgentOptions());
                 params.getImageName().set(getImageName());
                 params.getImageTag().set(getImageTag());

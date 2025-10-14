@@ -33,6 +33,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
     public interface StartAgentParameters extends WorkParameters {
         Property<String> getContainerName();
         Property<String> getConfigDir();
+        Property<String> getLogsDir();
         Property<String> getAgentOptions();
         Property<String> getImageName();
         Property<String> getImageTag();
@@ -68,6 +69,7 @@ public abstract class StartAgentContainerAction implements WorkAction<StartAgent
             .name(containerId)
             .autoRemove()
             .bind(parameters.getConfigDir().get(), "/data/teamcity_agent/conf")
+            .bind(parameters.getLogsDir().get(), "/opt/buildagent/logs")
             .environment("SERVER_URL", serverUrl)
             .environment("AGENT_NAME", "Default Agent")
             .environment("TEAMCITY_AGENT_OPTS", agentOptions);

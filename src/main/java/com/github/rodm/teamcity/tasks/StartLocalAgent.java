@@ -44,6 +44,9 @@ public abstract class StartLocalAgent extends TeamCityTask {
     @Input
     public abstract Property<String> getConfigDir();
 
+    @Input
+    public abstract Property<String> getLogsDir();
+
     @Internal
     public FileSystemOperations getFileOperations() {
         return fileOperations;
@@ -55,6 +58,7 @@ public abstract class StartLocalAgent extends TeamCityTask {
         execSpec.executable(getHomeDir().get() + "/buildAgent/bin/" + name);
         execSpec.environment("JAVA_HOME", getJavaHome().get());
         execSpec.environment("CONFIG_FILE", getConfigDir().get() + "/buildAgent.properties");
+        execSpec.environment("LOG_DIR", getLogsDir().get());
         execSpec.environment("TEAMCITY_AGENT_OPTS", getAgentOptions().get());
         execSpec.args("start");
     }
