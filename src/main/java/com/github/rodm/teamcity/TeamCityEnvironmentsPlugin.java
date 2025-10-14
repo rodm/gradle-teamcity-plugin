@@ -185,7 +185,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
             task.getDataDir().set(environment.getDataDirProperty());
-            task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/logs"));
+            task.getLogsDir().set(environment.getServerLogsDirProperty());
             task.getJavaHome().set(environment.getJavaHomeProperty());
             task.getServerOptions().set(environment.getServerOptionsProvider());
             task.doFirst(t -> project.mkdir(environment.getDataDir()));
@@ -196,7 +196,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.setGroup(TEAMCITY_GROUP);
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
-            task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/logs"));
+            task.getLogsDir().set(environment.getServerLogsDirProperty());
             task.getJavaHome().set(environment.getJavaHomeProperty());
             task.finalizedBy(tasks.named(environment.undeployTaskName()));
             task.doLast(new ShutdownWaitAction(environment.getShutdownTimeoutProperty()));
@@ -207,8 +207,8 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
             task.getVersion().set(environment.getVersionProperty());
             task.getHomeDir().set(environment.getHomeDirProperty());
             task.getJavaHome().set(environment.getJavaHomeProperty());
-            task.getConfigDir().set(environment.getDataDirProperty().map(dir -> dir + "/agent/conf"));
-            task.getLogsDir().set(environment.getDataDirProperty().map(dir -> dir + "/agent/logs"));
+            task.getConfigDir().set(environment.getAgentConfigurationDirProperty());
+            task.getLogsDir().set(environment.getAgentLogsDirProperty());
             task.getAgentOptions().set(environment.getAgentOptionsProvider());
             task.doFirst(new AgentConfigurationAction());
         });
@@ -226,7 +226,7 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getDataDir().set(environment.getDataDirProperty());
-            task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/logs"));
+            task.getLogsDir().set(environment.getServerLogsDirProperty());
             task.getServerOptions().set(environment.getServerOptionsProvider());
             task.getImageName().set(environment.getServerImageProperty());
             task.getImageTag().set(environment.getServerTagProperty());
@@ -245,8 +245,8 @@ public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
         tasks.register(environment.startAgentTaskName(), StartDockerAgent.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getDataDir().set(environment.getDataDirProperty());
-            task.getConfigDir().set(environment.getDataDirProperty().map(path -> path + "/agent/conf"));
-            task.getLogsDir().set(environment.getDataDirProperty().map(path -> path + "/agent/logs"));
+            task.getConfigDir().set(environment.getAgentConfigurationDirProperty());
+            task.getLogsDir().set(environment.getAgentLogsDirProperty());
             task.getAgentOptions().set(environment.getAgentOptionsProvider());
             task.getImageName().set(environment.getAgentImageProperty());
             task.getImageTag().set(environment.getAgentTagProperty());

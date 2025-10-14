@@ -145,6 +145,10 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
         return gradleProperty(propertyName("serverOptions")).orElse(asStringProvider(serverOptions));
     }
 
+    public Provider<String> getServerLogsDirProperty() {
+        return getDataDirProperty().map(path -> path + "/logs");
+    }
+
     /**
      * The Java command line options to be used when starting the TeamCity Agent.
      */
@@ -167,6 +171,14 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     public Provider<String> getAgentOptionsProvider() {
         return gradleProperty(propertyName("agentOptions")).orElse(asStringProvider(agentOptions));
+    }
+
+    public Provider<String> getAgentConfigurationDirProperty() {
+        return getDataDirProperty().map(path -> path + "/agent/conf");
+    }
+
+    public Provider<String> getAgentLogsDirProperty() {
+        return getDataDirProperty().map(path -> path + "/agent/logs");
     }
 
     public String getBaseHomeDir() {
