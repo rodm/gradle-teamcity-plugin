@@ -64,19 +64,17 @@ public class TeamCityLocalEnvironmentsPlugin implements Plugin<Project> {
 
     private static void configureLocalEnvironmentTasks(Project project, DefaultLocalTeamCityEnvironment environment) {
         final TaskContainer tasks = project.getTasks();
-        final String name = capitalize(environment.getName());
-        final String downloadTaskName = "download" + name;
-        tasks.register(downloadTaskName, DownloadTeamCity.class, task -> {
+        tasks.register(environment.downloadTaskName(), DownloadTeamCity.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.src(environment.getDownloadUrl());
             task.dest(project.file(environment.getInstallerFile()));
         });
 
-        tasks.register("install" + name, InstallTeamCity.class, task -> {
+        tasks.register(environment.installTaskName(), InstallTeamCity.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getSource().set(project.file(environment.getInstallerFile()));
             task.getTarget().set(project.file(environment.getHomeDirProperty()));
-            task.dependsOn(tasks.named(downloadTaskName));
+            task.dependsOn(tasks.named(environment.downloadTaskName()));
         });
 
         tasks.register(environment.startServerTaskName(), StartLocalServer.class, task -> {
@@ -119,13 +117,9 @@ public class TeamCityLocalEnvironmentsPlugin implements Plugin<Project> {
             task.getJavaHome().set(environment.getJavaHomeProperty());
         });
 
-        tasks.named("start" + name, task ->
+        tasks.named(environment.startTaskName(), task ->
             task.dependsOn(tasks.named(environment.startServerTaskName()), tasks.named(environment.startAgentTaskName())));
-        tasks.named("stop" + name, task ->
+        tasks.named(environment.stopTaskName(), task ->
             task.dependsOn(tasks.named(environment.stopServerTaskName()), tasks.named(environment.stopAgentTaskName())));
-    }
-
-    private static String capitalize(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

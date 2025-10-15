@@ -91,6 +91,14 @@ public class DefaultLocalTeamCityEnvironment extends BaseTeamCityEnvironment imp
         return environments.getShutdownTimeoutProperty();
     }
 
+    public String downloadTaskName() {
+        return "download" + getCapitalizedName();
+    }
+
+    public String installTaskName() {
+        return "install" + getCapitalizedName();
+    }
+
     private Provider<String> defaultDownloadUrl() {
         return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + getVersion() + ".tar.gz");
     }

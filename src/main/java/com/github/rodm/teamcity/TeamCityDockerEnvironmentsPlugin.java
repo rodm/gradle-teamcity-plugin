@@ -132,14 +132,9 @@ public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
         tasks.withType(DockerTask.class, task ->
             task.setClasspath(project.getConfigurations().getByName(DOCKER_CONFIGURATION_NAME)));
 
-        final String name = capitalize(environment.getName());
-        tasks.named("start" + name, task ->
+        tasks.named(environment.startTaskName(), task ->
             task.dependsOn(tasks.named(environment.startServerTaskName()), tasks.named(environment.startAgentTaskName())));
-        tasks.named("stop" + name, task ->
+        tasks.named(environment.stopTaskName(), task ->
             task.dependsOn(tasks.named(environment.stopServerTaskName()), tasks.named(environment.stopAgentTaskName())));
-    }
-
-    private static String capitalize(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

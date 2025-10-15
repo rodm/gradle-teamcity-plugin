@@ -66,6 +66,10 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
         return name;
     }
 
+    public final String getCapitalizedName() {
+        return capitalize(name);
+    }
+
     /**
      * The version of TeamCity this environment uses. Defaults to version '9.0'
      */
@@ -195,6 +199,14 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
 
     public String undeployTaskName() {
         return "undeployFrom" + capitalize(name);
+    }
+
+    public String startTaskName() {
+        return "start" + capitalize(name);
+    }
+
+    public String stopTaskName() {
+        return "stop" + capitalize(name);
     }
 
     public String startServerTaskName() {

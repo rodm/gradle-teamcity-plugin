@@ -94,19 +94,14 @@ public class TeamCityBaseEnvironmentsPlugin implements Plugin<Project> {
 
     private static void configureLifecycleTasks(Project project, BaseTeamCityEnvironment environment) {
         final TaskContainer tasks = project.getTasks();
-        final String name = capitalize(environment.getName());
-        tasks.register("start" + name, task -> {
+        tasks.register(environment.startTaskName(), task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.setDescription("Starts the TeamCity Server and Build Agent");
         });
 
-        tasks.register("stop" + name, task -> {
+        tasks.register(environment.stopTaskName(), task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.setDescription("Stops the TeamCity Server and Build Agent");
         });
-    }
-
-    private static String capitalize(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }
