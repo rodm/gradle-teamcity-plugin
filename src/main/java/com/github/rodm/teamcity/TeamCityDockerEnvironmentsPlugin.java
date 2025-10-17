@@ -29,6 +29,7 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
 
@@ -87,6 +88,7 @@ public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
 
     private static void configureDockerEnvironmentTasks(Project project, DefaultDockerTeamCityEnvironment environment) {
         final TaskContainer tasks = project.getTasks();
+        final ProjectLayout layout = project.getLayout();
         tasks.register(environment.startServerTaskName(), StartDockerServer.class, task -> {
             task.setGroup(TEAMCITY_GROUP);
             task.getDataDir().set(environment.getDataDirProperty());
@@ -116,6 +118,7 @@ public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
             task.getImageTag().set(environment.getAgentTagProperty());
             task.getContainerName().set(environment.getAgentNameProperty());
             task.getServerContainerName().set(environment.getServerNameProperty());
+            task.getOutputDir().set(layout.getBuildDirectory().dir("containers"));
             task.mustRunAfter(tasks.named(environment.startServerTaskName()));
         });
 
