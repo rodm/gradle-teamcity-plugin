@@ -20,7 +20,7 @@ repositories {
 val maven by configurations.creating
 
 dependencies {
-    maven (group = "org.apache.maven", name = "apache-maven", version = "3.5.0", classifier = "bin", ext = "zip")
+    maven ("org.apache.maven:apache-maven:3.5.0:bin@zip")
 }
 
 tasks {
