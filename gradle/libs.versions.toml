@@ -1,0 +1,27 @@
+
+[versions]
+docker = "3.2.13"
+plugin-structure = "3.190"
+plugin-client = "2.0.20"
+plugin-signer = "0.1.8"
+
+[libraries]
+download-task = { module = "de.undercouch:gradle-download-task", version = "5.5.0" }
+
+docker-core = { module = "com.github.docker-java:docker-java-core", version.ref = "docker" }
+docker-httpclient5 = { module = "com.github.docker-java:docker-java-transport-httpclient5", version.ref = "docker" }
+
+plugin-base = { module = "org.jetbrains.intellij.plugins:structure-base", version.ref = "plugin-structure" }
+plugin-teamcity = { module = "org.jetbrains.intellij.plugins:structure-teamcity", version.ref = "plugin-structure" }
+plugin-client = { module = "org.jetbrains.intellij:plugin-repository-rest-client", version.ref = "plugin-client" }
+plugin-signer = { module = "org.jetbrains:marketplace-zip-signer", version.ref = "plugin-signer" }
+
+junit = { module = "org.junit.jupiter:junit-jupiter", version = "5.9.0" }
+xmlunit = { module = "org.xmlunit:xmlunit-matchers", version = "2.9.0" }
+hamcrest = { module = "org.hamcrest:hamcrest-library", version = "2.2" }
+mockito = { module = "org.mockito:mockito-core", version = "4.7.0" }
+
+[bundles]
+docker = ["docker-core", "docker-httpclient5"]
+publishing = ["plugin-base", "plugin-teamcity", "plugin-client", "plugin-signer"]
+testing = ["junit", "xmlunit", "hamcrest", "mockito"]
