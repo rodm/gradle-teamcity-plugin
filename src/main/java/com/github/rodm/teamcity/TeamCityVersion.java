@@ -37,6 +37,7 @@ public class TeamCityVersion implements Comparable<TeamCityVersion>, Serializabl
     public static final TeamCityVersion VERSION_9_0 = version("9.0");
     public static final TeamCityVersion VERSION_2018_2 = version("2018.2");
     public static final TeamCityVersion VERSION_2020_1 = version("2020.1");
+    public static final TeamCityVersion VERSION_2024_03 = version("2024.03");
 
     public static TeamCityVersion version(String version) throws IllegalArgumentException {
         return TeamCityVersion.version(version, false);

@@ -46,6 +46,7 @@ import static com.github.rodm.teamcity.TeamCityPlugin.SERVER_PLUGIN_ID;
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP;
 import static com.github.rodm.teamcity.TeamCityPlugin.configureJarTask;
 import static com.github.rodm.teamcity.TeamCityPlugin.configurePluginArchiveTask;
+import static com.github.rodm.teamcity.TeamCityVersion.VERSION_2024_03;
 import static org.gradle.api.plugins.JavaPlugin.JAR_TASK_NAME;
 import static org.gradle.api.plugins.JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME;
 import static org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME;
@@ -120,7 +121,8 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
         });
 
         tasks.withType(AgentPlugin.class).configureEach(task -> {
-            task.doLast(new PluginDescriptorValidationAction("teamcity-agent-plugin-descriptor.xsd"));
+            String schemaPath = getSchemaPath(extension.getVersion(), extension.getAllowSnapshotVersions());
+            task.doLast(new PluginDescriptorValidationAction(schemaPath));
             Set<FileCopyDetails> files = new LinkedHashSet<>();
             task.filesMatching("**/*", new FileCollectorAction(files));
             task.doLast(new PluginExecutableFilesValidationAction(files));
@@ -136,5 +138,14 @@ public class TeamCityAgentPlugin implements Plugin<Project> {
 
         tasks.named(AGENT_PLUGIN_TASK_NAME, Zip.class, task ->
             configurePluginArchiveTask(task, agent.getArchiveName()));
+    }
+
+    private static String getSchemaPath(String version, boolean allowSnapshots) {
+        TeamCityVersion teamcityVersion = TeamCityVersion.version(version, allowSnapshots);
+        if (teamcityVersion.equalOrGreaterThan(VERSION_2024_03)) {
+            return "2024.03/teamcity-agent-plugin-descriptor.xsd";
+        } else {
+            return "teamcity-agent-plugin-descriptor.xsd";
+        }
     }
 }
