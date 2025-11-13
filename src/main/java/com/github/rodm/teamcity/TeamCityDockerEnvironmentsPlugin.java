@@ -15,7 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import com.github.rodm.teamcity.docker.DockerTask;
 import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import com.github.rodm.teamcity.tasks.Deploy;
@@ -28,7 +27,6 @@ import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskContainer;
@@ -38,35 +36,13 @@ import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP;
 @SuppressWarnings("unused")
 public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
 
-    public static final String DOCKER_CONFIGURATION_NAME = "docker";
-
     @Override
     public void apply(Project project) {
         project.getPluginManager().apply(TeamCityBaseEnvironmentsPlugin.class);
+        project.getPluginManager().apply(TeamCityBaseDockerPlugin.class);
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
-        configureRepository(project, extension);
-        configureConfiguration(project);
         configureDockerEnvironments(project, extension);
-    }
-
-    private static void configureRepository(Project project, TeamCityPluginExtension extension) {
-        project.afterEvaluate(p -> {
-            if (extension.getDefaultRepositories()) {
-                project.getRepositories().mavenCentral();
-            }
-        });
-    }
-
-    private static void configureConfiguration(final Project project) {
-        ConfigurationContainer configurations = project.getConfigurations();
-        configurations.maybeCreate(DOCKER_CONFIGURATION_NAME)
-            .setVisible(false)
-            .setDescription("Configuration for Docker task dependencies.")
-            .defaultDependencies(dependencies -> {
-                dependencies.add(project.getDependencies().create("com.github.docker-java:docker-java-core:3.2.13"));
-                dependencies.add(project.getDependencies().create("com.github.docker-java:docker-java-transport-httpclient5:3.2.13"));
-            });
     }
 
     private static void configureDockerEnvironments(final Project project, final TeamCityPluginExtension extension) {
@@ -131,9 +107,6 @@ public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
             task.getServerPort().set(environment.getPortProperty()));
         tasks.named(environment.undeployTaskName(), Undeploy.class).configure(task ->
             task.getServerPort().set(environment.getPortProperty()));
-
-        tasks.withType(DockerTask.class, task ->
-            task.setClasspath(project.getConfigurations().getByName(DOCKER_CONFIGURATION_NAME)));
 
         tasks.named(environment.startTaskName(), task ->
             task.dependsOn(tasks.named(environment.startServerTaskName()), tasks.named(environment.startAgentTaskName())));
