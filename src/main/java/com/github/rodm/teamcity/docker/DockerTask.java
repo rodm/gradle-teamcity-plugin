@@ -21,9 +21,15 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.UntrackedTask;
+import org.gradle.workers.WorkerExecutor;
+
+import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the Docker task")
 public abstract class DockerTask extends DefaultTask {
+
+    @Inject
+    public abstract WorkerExecutor getExecutor();
 
     @Classpath
     public abstract FileCollection getClasspath();

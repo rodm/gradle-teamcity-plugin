@@ -20,24 +20,17 @@ import com.github.rodm.teamcity.docker.StopContainerAction;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.workers.WorkQueue;
-import org.gradle.workers.WorkerExecutor;
-
-import javax.inject.Inject;
 
 @UntrackedTask(because = "Should always run the Docker task")
 public abstract class StopDockerServer extends DockerTask {
 
-    private final WorkerExecutor executor;
-
-    @Inject
-    public StopDockerServer(WorkerExecutor executor) {
+    public StopDockerServer() {
         setDescription("Stops the TeamCity Server using Docker");
-        this.executor = executor;
     }
 
     @TaskAction
     void stopServer() {
-        WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+        WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
         queue.submit(StopContainerAction.class, params -> {
             params.getContainerName().set(getContainerName());
             params.getDescription().set("TeamCity Server");

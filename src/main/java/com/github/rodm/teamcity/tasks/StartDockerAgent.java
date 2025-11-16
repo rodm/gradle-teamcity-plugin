@@ -27,9 +27,7 @@ import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.workers.WorkQueue;
-import org.gradle.workers.WorkerExecutor;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -42,12 +40,8 @@ import static com.github.rodm.teamcity.docker.DockerSupport.getDebugPort;
 @UntrackedTask(because = "Should always run the Docker task")
 public abstract class StartDockerAgent extends DockerTask {
 
-    private final WorkerExecutor executor;
-
-    @Inject
-    public StartDockerAgent(WorkerExecutor executor) {
+    public StartDockerAgent() {
         setDescription("Starts the TeamCity Agent using Docker");
-        this.executor = executor;
     }
 
     @Input
@@ -81,7 +75,7 @@ public abstract class StartDockerAgent extends DockerTask {
         Path path = getOutputDir().file(getServerContainerName().get() + ".properties").get().getAsFile().toPath();
 
         try {
-            WorkQueue queue = executor.classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
+            WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
             queue.submit(QueryContainerAction.class, params -> {
                 params.getContainerName().set(getServerContainerName());
                 params.getDescription().set("TeamCity Build Agent");
