@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Rod MacKenzie
+ * Copyright 2025 Rod MacKenzie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,20 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.gradle.api.Action;
+import org.gradle.api.Named;
 
-@SuppressWarnings("unused")
-public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
-    @Override
-    public void apply(Project project) {
-        project.getPluginManager().apply(TeamCityDockerContainersPlugin.class);
-        project.getPluginManager().apply(TeamCityLocalEnvironmentsPlugin.class);
-        project.getPluginManager().apply(TeamCityDockerEnvironmentsPlugin.class);
-    }
+public interface DockerContainer extends Named, Ports, Variables, Volumes {
+
+    /**
+     * The name of the Docker image.
+     *
+     * @return the Docker image name
+     */
+    String getImage();
+    void setImage(String image);
+
+    void ports(Action<? super Ports> action);
+    void variables(Action<? super Variables> action);
+    void volumes(Action<? super Volumes> action);
 }

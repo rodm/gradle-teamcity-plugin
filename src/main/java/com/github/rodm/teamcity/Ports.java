@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Rod MacKenzie
+ * Copyright 2025 Rod MacKenzie
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,6 @@
  */
 package com.github.rodm.teamcity;
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-
-@SuppressWarnings("unused")
-public class TeamCityEnvironmentsPlugin implements Plugin<Project> {
-    @Override
-    public void apply(Project project) {
-        project.getPluginManager().apply(TeamCityDockerContainersPlugin.class);
-        project.getPluginManager().apply(TeamCityLocalEnvironmentsPlugin.class);
-        project.getPluginManager().apply(TeamCityDockerEnvironmentsPlugin.class);
-    }
+public interface Ports {
+    void port(String host, String container);
 }

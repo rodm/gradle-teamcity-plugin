@@ -29,6 +29,7 @@ import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
@@ -180,6 +181,14 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     @SuppressWarnings("rawtypes")
     public TeamCityEnvironment methodMissing(String name, Object arg) {
         Object[] args = (Object[]) arg;
+        Object extension = ((ExtensionAware) this).getExtensions().findByName(name);
+        if (extension instanceof NamedDomainObjectContainer && args.length == 1 && args[0] instanceof Closure) {
+            NamedDomainObjectContainer container = (NamedDomainObjectContainer) extension;
+            Closure configuration = (Closure) args[0];
+            ClosureBackedAction.of(configuration).execute(container);
+            return null;
+        }
+
         if (args.length == 1 && args[0] instanceof Closure) {
             Closure configuration = (Closure) args[0];
             return environments.create(name, LocalTeamCityEnvironment.class, ClosureBackedAction.of(configuration));
