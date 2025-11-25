@@ -50,20 +50,15 @@ public abstract class StartDockerContainer extends DockerTask {
 
     @TaskAction
     void startContainer() {
-        String image = getImage().get();
         String name = getContainerName().get();
         ContainerConfiguration configuration = ContainerConfiguration.builder()
-            .image(image)
+            .image(getImage().get())
             .name(name)
             .autoRemove()
-            .environment(getEnvironmentVariables().get());
-
-        getPorts().get().forEach((hostPort, containerPort) -> configuration
-            .bindPort(hostPort, containerPort)
-            .exposePort(hostPort));
-
-        getVolumes().get().forEach((hostPath, containerPath) -> configuration
-            .bind(getDataDir().get() + "/" + hostPath, containerPath));
+            .environment(getEnvironmentVariables().get())
+            .bind(getVolumes().get())
+            .bindPorts(getPorts().get())
+            .exposePorts(getPorts().get().keySet());
 
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
         queue.submit(CreateContainerAction.class, params -> {
@@ -73,7 +68,7 @@ public abstract class StartDockerContainer extends DockerTask {
         queue.await();
 
         queue.submit(StartContainerAction.class, params -> {
-            params.getContainerName().set(getContainerName());
+            params.getContainerName().set(name);
             params.getDescription().set("Start container" + name);
         });
         queue.await();

@@ -17,6 +17,7 @@ package com.github.rodm.teamcity.docker;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,11 @@ public class ContainerConfiguration implements Serializable {
         return autoRemove;
     }
 
+    public ContainerConfiguration bind(Map<String, String> paths) {
+        paths.forEach(this::bind);
+        return this;
+    }
+
     public ContainerConfiguration bind(String hostPath, String containerPath) {
         binds.add(hostPath + ":" + containerPath);
         return this;
@@ -71,9 +77,7 @@ public class ContainerConfiguration implements Serializable {
     }
 
     public ContainerConfiguration environment(Map<String, String> variables) {
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
-            environment(entry.getKey(), entry.getValue());
-        }
+        variables.forEach(this::environment);
         return this;
     }
 
@@ -86,6 +90,11 @@ public class ContainerConfiguration implements Serializable {
         return environment;
     }
 
+    public ContainerConfiguration bindPorts(Map<String, String> ports) {
+        ports.forEach(this::bindPort);
+        return this;
+    }
+
     public ContainerConfiguration bindPort(String hostPort, String containerPort) {
         portBindings.add(hostPort + ":" + containerPort);
         return this;
@@ -93,6 +102,11 @@ public class ContainerConfiguration implements Serializable {
 
     public List<String> getPortBindings() {
         return portBindings;
+    }
+
+    public ContainerConfiguration exposePorts(Collection<String> ports) {
+        exposedPorts.addAll(ports);
+        return this;
     }
 
     public ContainerConfiguration exposePort(String port) {

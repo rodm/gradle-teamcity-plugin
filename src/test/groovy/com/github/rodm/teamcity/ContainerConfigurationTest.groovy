@@ -70,6 +70,16 @@ class ContainerConfigurationTest {
     }
 
     @Test
+    void 'add multiple volumes'() {
+        config.bind(['/host/path': '/container/path', '/host/data': '/container/data'])
+
+        def binds = config.getBinds()
+        assertThat(binds, hasSize(2))
+        assertThat(binds.get(0), equalTo('/host/path:/container/path'))
+        assertThat(binds.get(1), equalTo('/host/data:/container/data'))
+    }
+
+    @Test
     void 'add an environment variable'() {
         config.environment("ENV_VAR", "VALUE")
 
@@ -95,10 +105,30 @@ class ContainerConfigurationTest {
     }
 
     @Test
+    void 'add multiple port bindings'() {
+        config.bindPorts(["7111": '8111', '1234': '2345'])
+
+        def ports = config.getPortBindings()
+        assertThat(ports, hasSize(2))
+        assertThat(ports.get(0), equalTo("7111:8111"))
+        assertThat(ports.get(1), equalTo("1234:2345"))
+    }
+
+    @Test
     void 'add an exposed port'() {
         config.exposePort("7111")
 
         assertThat(config.getExposedPorts(), hasSize(1))
         assertThat(config.getExposedPorts().get(0), equalTo("7111"))
+    }
+
+    @Test
+    void 'add multiple exposed ports'() {
+        config.exposePorts(["7111", "1234"])
+
+        def ports = config.getExposedPorts()
+        assertThat(ports, hasSize(2))
+        assertThat(ports.get(0), equalTo("7111"))
+        assertThat(ports.get(1), equalTo("1234"))
     }
 }
