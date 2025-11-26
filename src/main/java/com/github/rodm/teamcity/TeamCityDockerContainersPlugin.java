@@ -24,7 +24,6 @@ import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 
 import static com.github.rodm.teamcity.TeamCityPlugin.TEAMCITY_GROUP;
@@ -46,7 +45,7 @@ public class TeamCityDockerContainersPlugin implements Plugin<Project> {
 
         TeamCityPluginExtension extension = project.getExtensions().getByType(TeamCityPluginExtension.class);
         TeamCityEnvironments environments = getEnvironments(extension);
-        ((ExtensionAware) environments).getExtensions().add(EXTENSION_NAME, containers);
+        environments.getExtensions().add(EXTENSION_NAME, containers);
 
         configureDockerContainers(project, containers);
     }

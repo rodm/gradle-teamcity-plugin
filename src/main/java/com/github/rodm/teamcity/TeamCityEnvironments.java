@@ -20,10 +20,11 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.NamedDomainObjectFactory;
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.UnknownDomainObjectException;
+import org.gradle.api.plugins.ExtensionAware;
 
 import java.io.File;
 
-public interface TeamCityEnvironments {
+public interface TeamCityEnvironments extends ExtensionAware {
 
     /**
      * The downloads directory that TeamCity distributions are saved to by the download task. Defaults to "downloads".

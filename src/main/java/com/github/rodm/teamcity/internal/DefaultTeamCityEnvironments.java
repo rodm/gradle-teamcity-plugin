@@ -29,7 +29,6 @@ import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.model.ObjectFactory;
-import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
@@ -37,7 +36,7 @@ import org.gradle.api.provider.ProviderFactory;
 import javax.inject.Inject;
 import java.io.File;
 
-public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
+public abstract class DefaultTeamCityEnvironments implements TeamCityEnvironments {
 
     public static final String DOWNLOADS_DIR_PROPERTY = "teamcity.environments.downloadsDir";
     public static final String BASE_DOWNLOAD_URL_PROPERTY = "teamcity.environments.baseDownloadUrl";
@@ -181,7 +180,7 @@ public class DefaultTeamCityEnvironments implements TeamCityEnvironments {
     @SuppressWarnings("rawtypes")
     public TeamCityEnvironment methodMissing(String name, Object arg) {
         Object[] args = (Object[]) arg;
-        Object extension = ((ExtensionAware) this).getExtensions().findByName(name);
+        Object extension = getExtensions().findByName(name);
         if (extension instanceof NamedDomainObjectContainer && args.length == 1 && args[0] instanceof Closure) {
             NamedDomainObjectContainer container = (NamedDomainObjectContainer) extension;
             Closure configuration = (Closure) args[0];
