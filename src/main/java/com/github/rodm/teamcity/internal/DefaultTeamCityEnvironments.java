@@ -177,7 +177,7 @@ public abstract class DefaultTeamCityEnvironments implements TeamCityEnvironment
         environments.registerFactory(type, factory);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"unused", "rawtypes", "unchecked"})
     public TeamCityEnvironment methodMissing(String name, Object arg) {
         Object[] args = (Object[]) arg;
         Object extension = getExtensions().findByName(name);
