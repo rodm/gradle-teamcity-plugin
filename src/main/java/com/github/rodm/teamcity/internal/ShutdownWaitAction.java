@@ -70,7 +70,7 @@ public class ShutdownWaitAction implements Action<Task> {
             TimeUnit.MILLISECONDS.sleep(timeout);
         }
         catch (InterruptedException e) {
-            // ignore
+            Thread.currentThread().interrupt();
         }
         return System.currentTimeMillis() - start;
     }

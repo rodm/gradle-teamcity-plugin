@@ -17,6 +17,7 @@ package com.github.rodm.teamcity.internal;
 
 import com.github.rodm.teamcity.tasks.StartLocalAgent;
 import org.gradle.api.Action;
+import org.gradle.api.GradleException;
 import org.gradle.api.Task;
 import org.gradle.api.file.FileSystemOperations;
 
@@ -42,7 +43,7 @@ public class AgentConfigurationAction implements Action<Task> {
         }
         catch (IOException e) {
             task.getLogger().warn(e.getMessage());
-            throw new RuntimeException(e);
+            throw new GradleException("Failed to create agent configuration directory.", e);
         }
     }
 }

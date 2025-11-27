@@ -37,6 +37,11 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
             "-Dteamcity.kotlinConfigsDsl.generateDslDocs=false"
         ));
 
+    private static final String START_TASK_PREFIX = "start";
+    private static final String STOP_TASK_PREFIX = "stop";
+    private static final String DEPLOY_TASK_PREFIX = "deployTo";
+    private static final String UNDEPLOY_TASK_PREFIX = "undeployFrom";
+
     /**
      * The name of the environment
      */
@@ -194,35 +199,35 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     public String deployTaskName() {
-        return "deployTo" + capitalize(name);
+        return DEPLOY_TASK_PREFIX + capitalize(name);
     }
 
     public String undeployTaskName() {
-        return "undeployFrom" + capitalize(name);
+        return UNDEPLOY_TASK_PREFIX + capitalize(name);
     }
 
     public String startTaskName() {
-        return "start" + capitalize(name);
+        return START_TASK_PREFIX + capitalize(name);
     }
 
     public String stopTaskName() {
-        return "stop" + capitalize(name);
+        return STOP_TASK_PREFIX + capitalize(name);
     }
 
     public String startServerTaskName() {
-        return "start" + capitalize(name) + "Server";
+        return START_TASK_PREFIX + capitalize(name) + "Server";
     }
 
     public String stopServerTaskName() {
-        return "stop" + capitalize(name) + "Server";
+        return STOP_TASK_PREFIX + capitalize(name) + "Server";
     }
 
     public String startAgentTaskName() {
-        return "start" + capitalize(name) + "Agent";
+        return START_TASK_PREFIX + capitalize(name) + "Agent";
     }
 
     public String stopAgentTaskName() {
-        return "stop" + capitalize(name) + "Agent";
+        return STOP_TASK_PREFIX + capitalize(name) + "Agent";
     }
 
     protected final Provider<String> gradleProperty(final String name) {
