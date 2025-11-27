@@ -17,10 +17,12 @@ package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
 import org.gradle.api.InvalidUserDataException;
-import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.Optional;
+
+import javax.inject.Inject;
 
 /**
  * Agent-side plugin descriptor
@@ -38,8 +40,12 @@ public class AgentPluginDescriptor {
     @Nested
     private final Dependencies dependencies;
 
-    public AgentPluginDescriptor() {
-        dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
+    private final ObjectFactory objects;
+
+    @Inject
+    public AgentPluginDescriptor(ObjectFactory objects) {
+        this.objects = objects;
+        this.dependencies = objects.newInstance(Dependencies.class);
     }
 
     /**
@@ -53,7 +59,7 @@ public class AgentPluginDescriptor {
         if (toolDeployment != null)
             throw new InvalidUserDataException("Agent plugin cannot be configured for plugin deployment and tool deployment");
         if (pluginDeployment == null) {
-            pluginDeployment = ((ExtensionAware) this).getExtensions().create("deployment", PluginDeployment.class);
+            pluginDeployment = objects.newInstance(PluginDeployment.class);
         }
         configuration.execute(pluginDeployment);
     }
@@ -73,7 +79,7 @@ public class AgentPluginDescriptor {
         if (pluginDeployment != null)
             throw new InvalidUserDataException("Agent plugin cannot be configured for plugin deployment and tool deployment");
         if (toolDeployment == null) {
-            toolDeployment = ((ExtensionAware) this).getExtensions().create("deployment", ToolDeployment.class);
+            toolDeployment = objects.newInstance(ToolDeployment.class);
         }
         configuration.execute(toolDeployment);
     }

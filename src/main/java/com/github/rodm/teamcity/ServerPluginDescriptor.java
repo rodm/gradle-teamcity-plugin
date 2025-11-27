@@ -16,10 +16,12 @@
 package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
-import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.Optional;
+
+import javax.inject.Inject;
 
 /**
  * Server-side plugin descriptor
@@ -112,9 +114,10 @@ public class ServerPluginDescriptor {
     @Nested
     private final Dependencies dependencies;
 
-    public ServerPluginDescriptor() {
-        parameters = ((ExtensionAware) this).getExtensions().create("parameters", Parameters.class);
-        dependencies = ((ExtensionAware) this).getExtensions().create("dependencies", Dependencies.class);
+    @Inject
+    public ServerPluginDescriptor(ObjectFactory objects) {
+        parameters = objects.newInstance(Parameters.class);
+        dependencies = objects.newInstance(Dependencies.class);
     }
 
     /**

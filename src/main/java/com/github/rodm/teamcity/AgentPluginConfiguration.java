@@ -17,15 +17,18 @@ package com.github.rodm.teamcity;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.model.ObjectFactory;
 
 /**
  * Agent-side plugin configuration
  */
 public class AgentPluginConfiguration extends PluginConfiguration {
 
+    private final ObjectFactory objects;
+
     public AgentPluginConfiguration(Project project) {
         super(project);
+        this.objects = project.getObjects();
     }
 
     /**
@@ -37,7 +40,7 @@ public class AgentPluginConfiguration extends PluginConfiguration {
      */
     public void descriptor(Action<AgentPluginDescriptor> configuration) {
         if (getDescriptor() == null) {
-            AgentPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", AgentPluginDescriptor.class);
+            AgentPluginDescriptor descriptor = objects.newInstance(AgentPluginDescriptor.class);
             setDescriptor(descriptor);
         }
         configuration.execute((AgentPluginDescriptor) getDescriptor());

@@ -16,13 +16,21 @@
 package com.github.rodm.teamcity;
 
 import com.github.rodm.teamcity.internal.AbstractDeployment;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
+
+import javax.inject.Inject;
 
 /**
  * Agent-side plugin deployment configuration
  */
 public class PluginDeployment extends AbstractDeployment {
+
+    @Inject
+    public PluginDeployment(ObjectFactory objects) {
+        super(objects);
+    }
 
     /**
      * Use a separate classloader to load the agent-side plugin's classes.

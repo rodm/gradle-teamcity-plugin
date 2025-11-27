@@ -16,9 +16,17 @@
 package com.github.rodm.teamcity;
 
 import com.github.rodm.teamcity.internal.AbstractDeployment;
+import org.gradle.api.model.ObjectFactory;
+
+import javax.inject.Inject;
 
 /**
  * Agent-side plugin tool deployment configuration
  */
 public class ToolDeployment extends AbstractDeployment {
+
+    @Inject
+    public ToolDeployment(ObjectFactory objects) {
+        super(objects);
+    }
 }

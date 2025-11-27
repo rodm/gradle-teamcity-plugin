@@ -20,7 +20,7 @@ import com.github.rodm.teamcity.internal.DefaultSignConfiguration;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.model.ObjectFactory;
 
 /**
  * Server-side plugin configuration
@@ -31,9 +31,12 @@ public class ServerPluginConfiguration extends PluginConfiguration {
     private PublishConfiguration publish;
     private SignConfiguration sign;
 
+    private final ObjectFactory objects;
+
     public ServerPluginConfiguration(Project project) {
         super(project);
-        this.web = project.getObjects().fileCollection();
+        this.objects = project.getObjects();
+        this.web = objects.fileCollection();
     }
 
     /**
@@ -45,7 +48,7 @@ public class ServerPluginConfiguration extends PluginConfiguration {
      */
     public void descriptor(Action<ServerPluginDescriptor> configuration) {
         if (getDescriptor() == null) {
-            ServerPluginDescriptor descriptor = ((ExtensionAware) this).getExtensions().create("descriptor", ServerPluginDescriptor.class);
+            ServerPluginDescriptor descriptor = objects.newInstance(ServerPluginDescriptor.class);
             setDescriptor(descriptor);
         }
         configuration.execute((ServerPluginDescriptor) getDescriptor());
@@ -72,7 +75,7 @@ public class ServerPluginConfiguration extends PluginConfiguration {
      */
     public void publish(Action<PublishConfiguration> configuration) {
         if (publish == null) {
-            publish = ((ExtensionAware) this).getExtensions().create(PublishConfiguration.class, "publish", DefaultPublishConfiguration.class);
+            publish = objects.newInstance(DefaultPublishConfiguration.class);
         }
         configuration.execute(publish);
     }
@@ -83,7 +86,7 @@ public class ServerPluginConfiguration extends PluginConfiguration {
 
     public void sign(Action<SignConfiguration> configuration) {
         if (sign == null) {
-            sign = ((ExtensionAware) this).getExtensions().create(SignConfiguration.class, "sign", DefaultSignConfiguration.class);
+            sign = objects.newInstance(DefaultSignConfiguration.class);
         }
         configuration.execute(sign);
     }
