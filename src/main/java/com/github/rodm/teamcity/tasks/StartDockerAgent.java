@@ -78,7 +78,6 @@ public abstract class StartDockerAgent extends DockerTask {
             WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
             queue.submit(QueryContainerAction.class, params -> {
                 params.getContainerName().set(getServerContainerName());
-                params.getDescription().set("TeamCity Build Agent");
                 params.getOutputPath().set(path.toFile());
             });
             queue.await();
@@ -105,14 +104,12 @@ public abstract class StartDockerAgent extends DockerTask {
 
             queue.submit(CreateContainerAction.class, params -> {
                 params.getConfiguration().set(configuration);
-                params.getDescription().set("TeamCity Build Agent");
             });
             queue.await();
 
             Files.createDirectories(Paths.get(getConfigDir().get()));
             queue.submit(StartContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
-                params.getDescription().set("TeamCity Build Agent");
             });
             queue.await();
         }

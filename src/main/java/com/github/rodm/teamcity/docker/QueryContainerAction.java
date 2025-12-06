@@ -34,7 +34,6 @@ public abstract class QueryContainerAction implements WorkAction<QueryContainerA
 
     public interface ServerAddressParameters extends WorkParameters {
         Property<String> getContainerName();
-        Property<String> getDescription();
         RegularFileProperty getOutputPath();
     }
 
@@ -43,10 +42,9 @@ public abstract class QueryContainerAction implements WorkAction<QueryContainerA
         final ServerAddressParameters parameters = getParameters();
         final DockerOperations dockerOperations = new DockerOperations();
 
-        String description = parameters.getDescription().get();
         String containerId = parameters.getContainerName().get();
         if (!dockerOperations.isContainerRunning(containerId)) {
-            LOGGER.info("{} container {} is not running", description, containerId);
+            LOGGER.info("Container {} is not running", containerId);
             return;
         }
 

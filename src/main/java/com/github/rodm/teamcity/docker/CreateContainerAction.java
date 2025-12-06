@@ -31,7 +31,6 @@ public abstract class CreateContainerAction implements WorkAction<CreateContaine
 
     public interface CreateContainerParameters extends WorkParameters {
         Property<ContainerConfiguration> getConfiguration();
-        Property<String> getDescription();
     }
 
     @Override
@@ -45,14 +44,13 @@ public abstract class CreateContainerAction implements WorkAction<CreateContaine
             throw new GradleException(format(IMAGE_NOT_AVAILABLE, image));
         }
 
-        String description = parameters.getDescription().get();
         String containerId = configuration.getName();
         if (dockerOperations.isContainerAvailable(containerId)) {
-            LOGGER.info("{} container '{}' already exists", description, containerId);
+            LOGGER.info("Container '{}' already exists", containerId);
             return;
         }
 
         String id = dockerOperations.createContainer(configuration);
-        LOGGER.info("Created {} container with id: {}", description, id);
+        LOGGER.info("Created container {} with id: {}", containerId, id);
     }
 }

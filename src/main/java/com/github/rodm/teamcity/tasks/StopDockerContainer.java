@@ -33,7 +33,6 @@ public abstract class StopDockerContainer extends DockerTask {
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
         queue.submit(StopContainerAction.class, params -> {
             params.getContainerName().set(getContainerName());
-            params.getDescription().set("Stop container " + getContainerName().get());
         });
         queue.await();
     }

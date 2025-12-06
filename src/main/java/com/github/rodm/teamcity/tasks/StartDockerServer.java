@@ -75,7 +75,6 @@ public abstract class StartDockerServer extends DockerTask {
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
         queue.submit(CreateContainerAction.class, params -> {
             params.getConfiguration().set(configuration);
-            params.getDescription().set("TeamCity Server");
         });
         queue.await();
 
@@ -84,7 +83,6 @@ public abstract class StartDockerServer extends DockerTask {
 
             queue.submit(StartContainerAction.class, params -> {
                 params.getContainerName().set(getContainerName());
-                params.getDescription().set("TeamCity Server");
             });
             queue.await();
         }

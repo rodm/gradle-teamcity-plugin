@@ -27,7 +27,6 @@ public abstract class StartContainerAction implements WorkAction<StartContainerA
 
     public interface StartContainerParameters extends WorkParameters {
         Property<String> getContainerName();
-        Property<String> getDescription();
     }
 
     @Override
@@ -35,14 +34,13 @@ public abstract class StartContainerAction implements WorkAction<StartContainerA
         final StartContainerParameters parameters = getParameters();
         final DockerOperations dockerOperations = new DockerOperations();
 
-        String description = parameters.getDescription().get();
         String containerId = parameters.getContainerName().get();
         if (dockerOperations.isContainerRunning(containerId)) {
-            LOGGER.info("{} container '{}' is already running", description, containerId);
+            LOGGER.info("Container '{}' is already running", containerId);
             return;
         }
 
         dockerOperations.startContainer(containerId);
-        LOGGER.info("{} container started", description);
+        LOGGER.info("Container started {}", containerId);
     }
 }

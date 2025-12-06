@@ -27,7 +27,6 @@ public abstract class StopContainerAction implements WorkAction<StopContainerAct
 
     public interface StopContainerParameters extends WorkParameters {
         Property<String> getContainerName();
-        Property<String> getDescription();
     }
 
     @Override
@@ -35,14 +34,13 @@ public abstract class StopContainerAction implements WorkAction<StopContainerAct
         final StopContainerParameters parameters = getParameters();
         final DockerOperations dockerOperations = new DockerOperations();
 
-        String description = parameters.getDescription().get();
         String containerId = parameters.getContainerName().get();
         if (!dockerOperations.isContainerRunning(containerId)) {
-            LOGGER.info("{} container {} is already stopped", description, containerId);
+            LOGGER.info("Container {} is already stopped", containerId);
             return;
         }
 
         dockerOperations.stopContainer(containerId);
-        LOGGER.info("{} container stopped", description);
+        LOGGER.info("Container stopped {}", containerId);
     }
 }
