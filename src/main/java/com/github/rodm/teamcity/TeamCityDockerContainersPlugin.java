@@ -76,6 +76,11 @@ public class TeamCityDockerContainersPlugin implements Plugin<Project> {
             task.setGroup(TEAMCITY_GROUP);
             task.getContainerName().set(container.getName());
         });
+
+        tasks.named(environment.startServerTaskName()).configure(task ->
+            task.dependsOn(tasks.named(startTaskName)));
+        tasks.named(environment.stopServerTaskName()).configure(task ->
+            task.finalizedBy(tasks.named(stopTaskName)));
     }
 
     private static NamedDomainObjectContainer<TeamCityEnvironment> getEnvironmentsContainer(Project project) {

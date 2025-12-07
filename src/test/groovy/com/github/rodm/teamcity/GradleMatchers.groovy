@@ -81,6 +81,44 @@ class GradleMatchers {
         }
     }
 
+    static Matcher<Task> dependsOn(String name) {
+        return new TypeSafeDiagnosingMatcher<Task>() {
+            @Override
+            protected boolean matchesSafely(Task task, Description mismatchDescription) {
+                def names = task.getTaskDependencies().getDependencies(task)
+                    .collect { it.name }
+                mismatchDescription
+                    .appendText('task dependencies are ')
+                    .appendValueList('[', ', ', ']', names)
+                return names.contains(name)
+            }
+
+            @Override
+            void describeTo(Description description) {
+                description.appendText('a Task that depends on ').appendValue(name)
+            }
+        }
+    }
+
+    static Matcher<Task> finalizedBy(String name) {
+        return new TypeSafeDiagnosingMatcher<Task>() {
+            @Override
+            protected boolean matchesSafely(Task task, Description mismatchDescription) {
+                def names = task.getFinalizedBy().getDependencies(task)
+                    .collect { it.name }
+                mismatchDescription
+                    .appendText('task was finalized by ')
+                    .appendValueList('[', ', ', ']', names)
+                return names.contains(name)
+            }
+
+            @Override
+            void describeTo(Description description) {
+                description.appendText('a Task that is finalized by ').appendValue(name)
+            }
+        }
+    }
+
     static class HasDependency extends TypeSafeDiagnosingMatcher<Configuration> {
 
         private String group

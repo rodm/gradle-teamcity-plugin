@@ -29,6 +29,8 @@ import org.junit.jupiter.params.provider.ValueSource
 
 import java.nio.file.Path
 
+import static com.github.rodm.teamcity.GradleMatchers.dependsOn
+import static com.github.rodm.teamcity.GradleMatchers.finalizedBy
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasEntry
@@ -219,5 +221,20 @@ class ContainersTest {
 
         def startTestExample = task('startTestExample') as StartDockerContainer
         assertThat(startTestExample.environmentVariables.get(), hasEntry('USER', 'tester'))
+    }
+
+    @Test
+    void 'container start and stop tasks are configured to start and stop with the environment server'() {
+        project.teamcity {
+            environments {
+                containers {
+                    example {}
+                }
+                test {}
+            }
+        }
+
+        assertThat(task('startTestServer'), dependsOn('startTestExample'))
+        assertThat(task('stopTestServer'), finalizedBy('stopTestExample'))
     }
 }
