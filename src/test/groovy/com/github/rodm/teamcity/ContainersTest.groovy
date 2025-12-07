@@ -17,12 +17,15 @@ package com.github.rodm.teamcity
 
 import com.github.rodm.teamcity.tasks.StartDockerContainer
 import com.github.rodm.teamcity.tasks.StopDockerContainer
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 import java.nio.file.Path
 
@@ -31,6 +34,7 @@ import static org.hamcrest.Matchers.equalTo
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.instanceOf
 import static org.hamcrest.Matchers.nullValue
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 @SuppressWarnings('ConfigurationAvoidance')
 class ContainersTest {
@@ -175,6 +179,26 @@ class ContainersTest {
 
         def startTestExample = task('startTestExample') as StartDockerContainer
         assertThat(startTestExample.volumes.get(), hasEntry('data', '/var/lib/data'))
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ['', '/', '/data', 'path/data', 'data/', 'path\\data'])
+    void 'container host path volume mapping should not contain a path separator'(String path) {
+        def e= assertThrows(InvalidUserDataException, {
+            project.teamcity {
+                environments {
+                    containers {
+                        example {
+                            volumes {
+                                volume(path, '/var/lib/data')
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        assertThat(e.message, equalTo('Invalid host path: ' + path))
     }
 
     @Test

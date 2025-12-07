@@ -20,6 +20,7 @@ import com.github.rodm.teamcity.Ports;
 import com.github.rodm.teamcity.Variables;
 import com.github.rodm.teamcity.Volumes;
 import org.gradle.api.Action;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
@@ -103,6 +104,7 @@ public class DefaultDockerContainer implements DockerContainer {
 
     @Override
     public void volume(String path, String containerPath) {
+        validatePath(path);
         volumes.put(path, containerPath);
     }
 
@@ -112,5 +114,11 @@ public class DefaultDockerContainer implements DockerContainer {
 
     private String capitalize(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    private void validatePath(String path) {
+        if (path.isEmpty() || path.contains("/") || path.contains("\\")) {
+            throw new InvalidUserDataException("Invalid host path: " + path) ;
+        }
     }
 }
