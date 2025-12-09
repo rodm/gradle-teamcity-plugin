@@ -26,11 +26,14 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.UntrackedTask;
 import org.gradle.workers.WorkQueue;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 @UntrackedTask(because = "Should always run the Docker task")
 public abstract class StartDockerContainer extends DockerTask {
+
+    private static final String CONTAINERS_PATH = "containers";
 
     public StartDockerContainer() {
         setDescription("Starts the Docker container");
@@ -57,7 +60,7 @@ public abstract class StartDockerContainer extends DockerTask {
         String dataDir = getDataDir().get();
         Map<String, String> volumes = new HashMap<>();
         getVolumes().get().forEach((hostPath, containerPath) ->
-            volumes.put(dataDir + "/" + hostPath, containerPath));
+            volumes.put(Paths.get(dataDir, CONTAINERS_PATH, name, hostPath).toString(), containerPath));
 
         ContainerConfiguration configuration = ContainerConfiguration.builder()
             .image(getImage().get())
