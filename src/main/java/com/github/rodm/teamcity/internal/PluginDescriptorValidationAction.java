@@ -27,9 +27,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PluginDescriptorValidationAction implements Action<Task> {
 
@@ -42,7 +44,8 @@ public class PluginDescriptorValidationAction implements Action<Task> {
     @Override
     public void execute(Task task) {
         AbstractPluginTask pluginTask = (AbstractPluginTask) task;
-        try {
+        Path descriptorPath = pluginTask.getDescriptor().getAsFile().get().toPath();
+        try (Reader reader = Files.newBufferedReader(descriptorPath)) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             setProperty(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
             setProperty(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
@@ -51,7 +54,7 @@ public class PluginDescriptorValidationAction implements Action<Task> {
             Validator validator = schema.newValidator();
             PluginDescriptorErrorHandler errorHandler = new PluginDescriptorErrorHandler(task);
             validator.setErrorHandler(errorHandler);
-            validator.validate(new StreamSource(new FileReader(pluginTask.getDescriptor().get().getAsFile())));
+            validator.validate(new StreamSource(reader));
         }
         catch (IOException | SAXException e) {
             throw new GradleException("Failure validating descriptor", e);
