@@ -100,20 +100,20 @@ public class DefaultLocalTeamCityEnvironment extends BaseTeamCityEnvironment imp
     }
 
     private Provider<String> defaultDownloadUrl() {
-        return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + getVersion() + ".tar.gz");
+        Provider<String> version = getVersionProperty();
+        return environments.getBaseDownloadUrlProperty().map(baseUrl -> baseUrl + "/TeamCity-" + version.get() + ".tar.gz");
     }
 
     private Provider<String> defaultInstallerFile() {
-        return environments.getDownloadsDirProperty().map(dir -> dir + "/" + filename());
-    }
-
-    private String filename() {
-        String url = downloadUrl.get();
-        int index = url.lastIndexOf("/") + 1;
-        return url.substring(index);
+        Provider<String> filename = downloadUrl.map(url -> {
+            int index = url.lastIndexOf("/") + 1;
+            return url.substring(index);
+        });
+        return environments.getDownloadsDirProperty().map(dir -> dir + "/" + filename.get());
     }
 
     private Provider<String> defaultHomeDir() {
-        return environments.getBaseHomeDirProperty().map(dir -> dir + "/TeamCity-" + getVersion());
+        Provider<String> version = getVersionProperty();
+        return environments.getBaseHomeDirProperty().map(dir -> dir + "/TeamCity-" + version.get());
     }
 }

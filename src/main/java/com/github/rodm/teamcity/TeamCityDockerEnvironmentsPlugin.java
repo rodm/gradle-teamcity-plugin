@@ -15,6 +15,7 @@
  */
 package com.github.rodm.teamcity;
 
+import com.github.rodm.teamcity.internal.CreateDataDirAction;
 import com.github.rodm.teamcity.internal.DefaultDockerTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import com.github.rodm.teamcity.tasks.Deploy;
@@ -74,7 +75,7 @@ public class TeamCityDockerEnvironmentsPlugin implements Plugin<Project> {
             task.getImageTag().set(environment.getServerTagProperty());
             task.getContainerName().set(environment.getServerNameProperty());
             task.getPort().set(environment.getPortProperty());
-            task.doFirst(t -> project.mkdir(environment.getDataDir()));
+            task.doFirst(new CreateDataDirAction(environment.getDataDirProperty()));
             task.dependsOn(tasks.named(environment.deployTaskName()));
         });
 

@@ -24,6 +24,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -358,31 +360,15 @@ class EnvironmentsPluginFunctionalTest extends FunctionalTestCase {
             """
         }
 
-        @Test
-        void 'check download task can be loaded from the configuration cache'() {
-            executeBuild('--configuration-cache', 'downloadTeamcity')
-            BuildResult result = executeBuild('--configuration-cache', 'downloadTeamcity')
-            assertThat(result.output, containsString('Reusing configuration cache.'))
-        }
-
-        @Test
-        void 'check install task can be loaded from the configuration cache'() {
-            executeBuild('--configuration-cache', 'installTeamcity')
-            BuildResult result = executeBuild('--configuration-cache', 'installTeamcity')
-            assertThat(result.output, containsString('Reusing configuration cache.'))
-        }
-
-        @Test
-        void 'check deployTo task can be loaded from the configuration cache'() {
-            executeBuild('--configuration-cache', 'deployToTeamcity')
-            BuildResult result = executeBuild('--configuration-cache', 'deployToTeamcity')
-            assertThat(result.output, containsString('Reusing configuration cache.'))
-        }
-
-        @Test
-        void 'check undeployFrom task can be loaded from the configuration cache'() {
-            executeBuild('--configuration-cache', 'undeployFromTeamcity')
-            BuildResult result = executeBuild('--configuration-cache', 'undeployFromTeamcity')
+        @ParameterizedTest
+        @ValueSource(strings = [
+            'downloadTeamCity', 'installTeamCity', 'deployToTeamCity', 'undeployFromTeamCity',
+            'startTeamCityServer', 'startTeamCityAgent', 'stopTeamCityServer', 'stopTeamCityAgent'
+        ])
+        void 'check task is compatible with the configuration cache'(String task) {
+            createFakeTeamCityInstall(testProjectDir, 'servers','2021.2.3')
+            executeBuild('--configuration-cache', task)
+            BuildResult result = executeBuild('--configuration-cache', task)
             assertThat(result.output, containsString('Reusing configuration cache.'))
         }
     }

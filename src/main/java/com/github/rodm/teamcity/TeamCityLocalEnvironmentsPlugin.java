@@ -16,6 +16,7 @@
 package com.github.rodm.teamcity;
 
 import com.github.rodm.teamcity.internal.AgentConfigurationAction;
+import com.github.rodm.teamcity.internal.CreateDataDirAction;
 import com.github.rodm.teamcity.internal.DefaultLocalTeamCityEnvironment;
 import com.github.rodm.teamcity.internal.DefaultTeamCityEnvironments;
 import com.github.rodm.teamcity.internal.ShutdownWaitAction;
@@ -85,7 +86,7 @@ public class TeamCityLocalEnvironmentsPlugin implements Plugin<Project> {
             task.getLogsDir().set(environment.getServerLogsDirProperty());
             task.getJavaHome().set(environment.getJavaHomeProperty());
             task.getServerOptions().set(environment.getServerOptionsProvider());
-            task.doFirst(t -> project.mkdir(environment.getDataDir()));
+            task.doFirst(new CreateDataDirAction(environment.getDataDirProperty()));
             task.dependsOn(tasks.named(environment.deployTaskName()));
         });
 

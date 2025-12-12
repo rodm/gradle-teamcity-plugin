@@ -239,8 +239,9 @@ public abstract class BaseTeamCityEnvironment implements TeamCityEnvironment {
     }
 
     private Provider<String> defaultDataDir() {
+        Provider<String> v = getVersionProperty();
         return environments.getBaseDataDirProperty()
-            .map(dir -> dir + "/" + TeamCityVersion.version(getVersion()).getDataVersion());
+            .map(dir -> dir + "/" + TeamCityVersion.version(v.get()).getDataVersion());
     }
 
     private Provider<String> asStringProvider(ListProperty<String> options) {
