@@ -114,6 +114,10 @@ pluginBundle {
 }
 
 tasks {
+    withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+    }
+
     test {
         useJUnitPlatform()
         finalizedBy (jacocoTestReport)
