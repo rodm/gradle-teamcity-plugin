@@ -73,17 +73,15 @@ public abstract class StartDockerServer extends DockerTask {
             .exposePort(debugPort));
 
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
-        queue.submit(CreateContainerAction.class, params -> {
-            params.getConfiguration().set(configuration);
-        });
+        queue.submit(CreateContainerAction.class, params ->
+            params.getConfiguration().set(configuration));
         queue.await();
 
         try {
             Files.createDirectories(Paths.get(getLogsDir().get()));
 
-            queue.submit(StartContainerAction.class, params -> {
-                params.getContainerName().set(getContainerName());
-            });
+            queue.submit(StartContainerAction.class, params ->
+                params.getContainerName().set(getContainerName()));
             queue.await();
         }
         catch (IOException e) {

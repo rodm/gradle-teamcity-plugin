@@ -31,9 +31,8 @@ public abstract class StopDockerAgent extends DockerTask {
     @TaskAction
     void stopAgent() {
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
-        queue.submit(StopContainerAction.class, params -> {
-            params.getContainerName().set(getContainerName());
-        });
+        queue.submit(StopContainerAction.class, params ->
+            params.getContainerName().set(getContainerName()));
         queue.await();
     }
 }

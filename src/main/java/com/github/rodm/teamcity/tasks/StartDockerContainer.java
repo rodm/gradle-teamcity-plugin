@@ -72,14 +72,12 @@ public abstract class StartDockerContainer extends DockerTask {
             .exposePorts(getPorts().get().keySet());
 
         WorkQueue queue = getExecutor().classLoaderIsolation(spec -> spec.getClasspath().from(getClasspath()));
-        queue.submit(CreateContainerAction.class, params -> {
-            params.getConfiguration().set(configuration);
-        });
+        queue.submit(CreateContainerAction.class, params ->
+            params.getConfiguration().set(configuration));
         queue.await();
 
-        queue.submit(StartContainerAction.class, params -> {
-            params.getContainerName().set(name);
-        });
+        queue.submit(StartContainerAction.class, params ->
+            params.getContainerName().set(name));
         queue.await();
     }
 }

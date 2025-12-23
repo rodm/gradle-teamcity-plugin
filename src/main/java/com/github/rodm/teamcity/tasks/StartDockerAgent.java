@@ -102,15 +102,13 @@ public abstract class StartDockerAgent extends DockerTask {
                 .bindPort(debugPort, debugPort)
                 .exposePort(debugPort));
 
-            queue.submit(CreateContainerAction.class, params -> {
-                params.getConfiguration().set(configuration);
-            });
+            queue.submit(CreateContainerAction.class, params ->
+                params.getConfiguration().set(configuration));
             queue.await();
 
             Files.createDirectories(Paths.get(getConfigDir().get()));
-            queue.submit(StartContainerAction.class, params -> {
-                params.getContainerName().set(getContainerName());
-            });
+            queue.submit(StartContainerAction.class, params ->
+                params.getContainerName().set(getContainerName()));
             queue.await();
         }
         catch (IOException e) {
