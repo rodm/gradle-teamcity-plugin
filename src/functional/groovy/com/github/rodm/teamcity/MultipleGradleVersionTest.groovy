@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
+import java.util.stream.Collectors
+
 import static com.github.rodm.teamcity.internal.PluginDefinitionValidationAction.NO_DEFINITION_WARNING_MESSAGE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import static org.hamcrest.CoreMatchers.containsString
@@ -50,7 +52,9 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     }
 
     static List<String> releasedJavaVersions() {
-        return ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25']
+        return (8..26).stream()
+            .map { it.toString() }
+            .collect(Collectors.toList())
     }
 
     private BuildResult executeBuild(String version, String task) {
