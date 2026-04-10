@@ -44,8 +44,8 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     static List<String> gradleVersions() {
         return [
             '8.0.2', '8.1.1', '8.2.1', '8.3', '8.4', '8.5', '8.6', '8.7', '8.8', '8.9',
-            '8.10.2', '8.11.1', '8.12.1', '8.13', '8.14.3',
-            '9.0.0', '9.1.0' //, '9.2.1'
+            '8.10.2', '8.11.1', '8.12.1', '8.13', '8.14.4',
+            '9.0.0', '9.1.0', '9.2.1', '9.3.1', '9.4.1'
         ]
     }
 
@@ -55,7 +55,11 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
 
     private BuildResult executeBuild(String version, String task) {
         assertThat(releasedJavaVersions(), hasItem(JavaVersion.current().majorVersion))
+
         assumeTrue(GradleVersion.version(version) >= GradleVersion.version(compatibleGradleVersion()))
+
+        // Gradle version 9.2.0 and later require a minimum of Java 17
+        assumeTrue(GradleVersion.version(version) < GradleVersion.version('9.2.0') || JavaVersion.current() >= JavaVersion.VERSION_17)
 
         if (OperatingSystem.current() == OperatingSystem.LINUX) {
             ConnectorServices.reset()
