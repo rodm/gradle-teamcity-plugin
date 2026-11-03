@@ -139,7 +139,7 @@ project {
 
             matrix {
                 axes {
-                    "Java"("8", "11", "17", "21", "25", "26")
+                    "Java"("8", "11", "17", "21", "25", "26", "27")
                 }
                 build {
                     val javaVersion = axes["Java"]

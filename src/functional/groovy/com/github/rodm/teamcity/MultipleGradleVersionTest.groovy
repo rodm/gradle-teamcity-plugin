@@ -52,7 +52,7 @@ class MultipleGradleVersionTest extends FunctionalTestCase {
     }
 
     static List<String> releasedJavaVersions() {
-        return (8..26).stream()
+        return (8..27).stream()
             .map { it.toString() }
             .collect(Collectors.toList())
     }
