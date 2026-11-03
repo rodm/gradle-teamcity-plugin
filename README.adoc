@@ -7,13 +7,20 @@
 :uri-jetbrains-plugin-portal: https://plugins.jetbrains.com/teamcity
 :uri-jetbrains-hub-token: https://www.jetbrains.com/help/hub/Manage-Permanent-Tokens.html
 :uri-jetbrains-teamcity-releases: https://www.jetbrains.com/teamcity/download/other.html
-:uri-github-project: https://github.com/rodm/gradle-teamcity-plugin
+:uri-github-user: https://github.com/rodm
+:uri-github-project: {uri-github-user}/gradle-teamcity-plugin
 :uri-github-actions: {uri-github-project}/actions
 :uri-github-status: {uri-github-actions}/workflows/build.yml/badge.svg
+:uri-github-gradle-init-script-plugin: {uri-github-user}/teamcity-gradle-init-scripts-plugin
 :uri-shields-gradle-portal: https://img.shields.io/gradle-plugin-portal/v
 :uri-gradle-plugin-portal: https://plugins.gradle.org
 :uri-gradle-plugin: {uri-gradle-plugin-portal}/plugin/{plugin-id}
 :uri-gradle-plugin-version: {uri-shields-gradle-portal}/{plugin-id}
+
+:uri-gradle-docs: https://docs.gradle.org
+:uri-gradle-docs-convention-plugins: {uri-gradle-docs}/9.2.0/userguide/implementing_gradle_plugins_convention.html
+:uri-gradle-docs-precompiled-plugins: {uri-gradle-docs}/8.14.5/userguide/implementing_gradle_plugins_precompiled.html
+
 :uri-docker-hub: https://hub.docker.com
 :uri-docker-teamcity-server: {uri-docker-hub}/r/jetbrains/teamcity-server
 :uri-docker-teamcity-agent: {uri-docker-hub}/r/jetbrains/teamcity-agent
@@ -92,6 +99,20 @@ Refer to the Gradle Plugin Portal for instructions on how to apply the
 {uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-common[common],
 {uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-base[base] and
 {uri-gradle-plugin-portal}/plugin/io.github.rodm.teamcity-environments[environments] plugins.
+
+=== Applying the plugin using convention plugins
+
+A convention plugin is a plugin that can be used to configure common configuration such as the Java version
+`java.toolchain.languageVersion = JavaLanguageVersion.of(8)` or the TeamCity API version
+`teamcity.version = "2025.11"` and common dependencies.
+Convention plugins are preferred over using the `allprojects {}` and
+`subprojects {}` blocks, see the Gradle documentation for
+{uri-gradle-docs-convention-plugins}[Convention Plugins] for Gradle 9.2.0 and later or
+{uri-gradle-docs-precompiled-plugins}[Implementing Pre-compiled Script Plugins] for Gradle 8.7 and later.
+
+An example TeamCity plugin built using convention plugins is the
+{uri-github-gradle-init-script-plugin}[Gradle Init Script] plugin, see the `build-logic` directory for the convention
+plugins and the build scripts in the subprojects.
 
 === Configurations
 
