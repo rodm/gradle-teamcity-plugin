@@ -1,5 +1,5 @@
 
-import com.github.rodm.teamcity.pipeline
+import com.github.rodm.teamcity.pipeline as pipeline2
 import com.github.rodm.teamcity.project.githubIssueTracker
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.version
@@ -81,7 +81,7 @@ project {
         }
     }
 
-    pipeline {
+    pipeline2 {
         stage ("Build") {
             build {
                 id("BuildJava8")
