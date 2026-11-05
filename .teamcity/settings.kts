@@ -1,6 +1,7 @@
 
 import com.github.rodm.teamcity.pipeline as pipeline2
 import com.github.rodm.teamcity.project.githubIssueTracker
+import jetbrains.buildServer.configs.kotlin.BuildSteps
 import jetbrains.buildServer.configs.kotlin.buildFeatures.perfmon
 import jetbrains.buildServer.configs.kotlin.version
 import jetbrains.buildServer.configs.kotlin.project
@@ -11,6 +12,15 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot.AgentCheckoutPolicy.NO_MIRRORS
 
 version = "2026.2"
+
+fun BuildSteps.switchGradleBuildStep(javaHome: String, gradleVersion: String) {
+    gradle {
+        id = "SWITCH_GRADLE"
+        name = "Switch Gradle"
+        tasks = "wrapper --gradle-version $gradleVersion"
+        jdkHome = javaHome
+    }
+}
 
 project {
 
@@ -150,6 +160,13 @@ project {
                     params {
                         param("gradle.opts", "-Ptest.java.version=${javaVersion}")
                         param("gradle.tasks", "clean functionalTest")
+                    }
+
+                    if (javaVersion in listOf("26", "27")) {
+                        steps {
+                            switchGradleBuildStep("%java8.home%", "8.7")
+                            stepsOrder = arrayListOf("SWITCH_GRADLE", "GRADLE_BUILD")
+                        }
                     }
                 }
             }
