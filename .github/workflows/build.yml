@@ -23,7 +23,9 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
-          java-version: ${{ matrix.java }}
+          java-version: |
+            ${{ matrix.java }}
+            8
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Build and run unit tests
