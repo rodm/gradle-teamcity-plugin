@@ -49,7 +49,6 @@ public class TeamCityBaseDockerPlugin implements Plugin<Project> {
     private static void configureConfiguration(final Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
         configurations.maybeCreate(DOCKER_CONFIGURATION_NAME)
-            .setVisible(false)
             .setDescription("Configuration for Docker task dependencies.")
             .defaultDependencies(dependencies -> {
                 DependencyHandler handler = project.getDependencies();

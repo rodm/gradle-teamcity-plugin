@@ -85,21 +85,17 @@ public class TeamCityPlugin implements Plugin<Project> {
     public static void configureConfigurations(final Project project) {
         final ConfigurationContainer configurations = project.getConfigurations();
         configurations.maybeCreate(AGENT_CONFIGURATION_NAME)
-            .setVisible(false)
             .setDescription("Configuration for agent plugin.")
             .setCanBeConsumed(false);
         configurations.maybeCreate(SERVER_CONFIGURATION_NAME)
-            .setVisible(false)
             .setDescription("Configuration for server plugin.")
             .setCanBeConsumed(false);
         configurations.maybeCreate(PLUGIN_CONFIGURATION_NAME)
-            .setVisible(false)
             .setTransitive(false)
             .setDescription("Configuration for plugin artifact.")
             .setCanBeResolved(false);
         project.getPluginManager().withPlugin(JAVA_PLUGIN_ID, plugin -> {
             Configuration providedConfiguration = configurations.maybeCreate(PROVIDED_CONFIGURATION_NAME)
-                .setVisible(false)
                 .setDescription("Additional compile classpath for TeamCity libraries that will not be part of the plugin archive.");
             providedConfiguration.setCanBeConsumed(false);
             configurations.getByName(JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME).extendsFrom(providedConfiguration);

@@ -98,7 +98,6 @@ public class TeamCityServerPlugin implements Plugin<Project> {
     public static void configureConfigurations(final Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
         configurations.maybeCreate(MARKETPLACE_CONFIGURATION_NAME)
-            .setVisible(false)
             .setDescription("Configuration for signing and publishing task dependencies.")
             .defaultDependencies(dependencies -> {
                 dependencies.add(project.getDependencies().create("org.jetbrains:marketplace-zip-signer:0.1.8"));
