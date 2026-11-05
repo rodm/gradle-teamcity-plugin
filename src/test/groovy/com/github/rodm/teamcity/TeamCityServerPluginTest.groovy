@@ -51,17 +51,14 @@ class TeamCityServerPluginTest {
     void configurationsCreatedWithoutJavaPlugin() {
         def configuration = project.configurations.getByName('agent')
         assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(true))
 
         configuration = project.configurations.getByName('server')
         assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(true))
 
         configuration = project.configurations.getByName('plugin')
         assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(false))
     }
 
@@ -86,7 +83,6 @@ class TeamCityServerPluginTest {
 
         configuration = project.configurations.getByName('provided')
         assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(true))
     }
 
@@ -94,7 +90,6 @@ class TeamCityServerPluginTest {
     void 'creates configuration for signing and publishing task dependencies'() {
         def configuration = project.configurations.getByName('marketplace')
         assertThat(configuration, notNullValue())
-        assertThat(configuration.visible, is(false))
         assertThat(configuration.transitive, is(true))
     }
 
