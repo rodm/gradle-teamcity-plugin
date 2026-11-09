@@ -218,12 +218,8 @@ class ServerPluginFunctionalTest extends FunctionalTestCase {
         BuildResult result = executeBuildAndFail(testProjectDir.toFile(), 'serverPlugin')
 
         assertThat(result.task(":processServerDescriptor").getOutcome(), is(FAILED))
-        if (GradleVersion.current() < GradleVersion.version('7.0')) {
-            assertThat(result.getOutput(), containsString("specified for property 'descriptor' does not exist."))
-        } else {
-            assertThat(result.getOutput(), containsString("property 'descriptor' specifies file"))
-            assertThat(result.getOutput(), containsString("which doesn't exist."))
-        }
+        assertThat(result.getOutput(), containsString("property 'descriptor' specifies file"))
+        assertThat(result.getOutput(), containsString("which doesn't exist"))
     }
 
     @Test
